@@ -1,0 +1,176 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    Layout = null; // Layout kullanılmıyor
+}
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İlan Detayı</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/ilansayfasi.css" />
+    <link rel="stylesheet" href="~/css/kullanici-paneli.css" />
+    <link rel="stylesheet" href="~/css/şevvalhat.css" />
+    <!-- FontAwesome kütüphanesi -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+
+
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <a href="/">
+                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+                <span>Şevval Emlak</span>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <ul class="nav-linkss" id="nav-links">
+                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                <li>
+                    <a href="@Url.Action("TumIlanlar", "Ilan")">İlanlar</a>
+                </li>
+
+                <li><a href="@Url.Action("KardesFirmalar", "Home")">Kardeş Firmalar</a></li>
+                <li class="dropdown">
+                    <a href="#">Hakkımızda</a>
+                    <ul class="dropdown-content">
+                        <li><a href="@Url.Action("About", "Home")">Biz Kimiz</a></li>
+                        <li><a href="@Url.Action("Channels", "Home")">Diğer Kanallarımız</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">Videolar</a>
+                    <ul class="dropdown-content">
+                        <li><a href="@Url.Action("Videos", "Home")">Tüm Videolar</a></li>
+                    </ul>
+                </li>
+
+                
+
+            </ul>
+            <div class="auth-buttons">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var currentUser = await UserManager.GetUserAsync(User);
+
+                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                    if (currentUser != null)
+                    {
+                        <div class="dropdown">
+                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a> <!-- İsim ve Soyisim -->
+                            <ul class="dropdown-content">
+                                <li><a href="@Url.Action("Panel", "Ilan")">Kullanıcı Paneli</a></li>
+                                <li>
+                                    <form asp-action="Logout" asp-controller="Account" method="post">
+                                        <button type="submit" style="background: none; border: none; color: inherit; cursor: pointer;">Çıkış Yap</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                    }
+                }
+                else
+                {
+                    <a href="#" class="login" id="login-button">Giriş Yap</a>
+                }
+
+
+                <!-- İlan Ver butonu için yönlendirme -->
+                <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account") : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- Pop-up Penceresi -->
+    <div id="login-popup" class="popup">
+        <div class="popup-content">
+            <button class="close-button" id="close-popup">&times;</button> <!-- Kapat Butonu -->
+            <div class="left-section">
+                <h2>Bireysel Kullanıcı</h2>
+                <a href="@Url.Action("Login", "Account")" class="button">Giriş Yap</a>
+                <a href="@Url.Action("Register", "Account")" class="button">Üye Ol</a>
+            </div>
+            <div class="right-section">
+                <h2>Emlakçı Girişi</h2>
+                <a href="#" class="button">Giriş Yap</a>
+                <a href="#" class="button">Üye Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('login-button').addEventListener('click', function (event) {
+            event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+            document.getElementById('login-popup').style.display = 'flex'; // Pop-up'ı aç
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('login-popup').addEventListener('click', function (event) {
+            if (event.target === this) { // Eğer dış alana tıklandıysa
+                this.style.display = 'none'; // Pop-up'ı kapat
+            }
+        });
+    </script>
+
+    <!-- Alt Bar -->
+    <div class="alt-bar">
+        <ul class="alt-bar-list">
+            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
+            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+            
+            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
+            <li class="office-menu">
+                <a href="#">Ofis/Hesap</a>
+                <ul class="office-menu-content">
+                    <a href="#">Paketim</a>
+                    <a href="#">Ödemelerim</a>
+                    <a href="#">Doping Satın Al</a>
+                    <a href="#">Sipariş Ver</a>
+                    <a href="#">Kart Bilgilerim</a>
+                    <a href="#">Dopinglerim</a>
+                    <a href="#">Favorilerim</a>
+                    <a href="#">Beğendiklerim</a>
+                </ul>
+            </li>
+            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
+            
+            <li><a href="@Url.Action("ŞevvalHat", "Ilan")">ŞevvalHat</a></li>
+            <li><a href="@Url.Action("Hizmetler", "Ilan")">Hizmetler</a></li>
+            <li><a href="#">Ayarlar</a></li>
+        </ul>
+    </div>
+
+
+
+    <div class="container">
+        <h2 class="animated-text">Şu anda Size Aktarılan Bir Hizmet Bulunmamakta</h2>
+    </div>
+
+
+</body>
+</html>

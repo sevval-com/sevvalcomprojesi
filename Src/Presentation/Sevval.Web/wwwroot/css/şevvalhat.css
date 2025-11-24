@@ -1,0 +1,41 @@
+﻿/* Ana container için stil */
+.container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Başlık (Text) için animasyon ve efektler */
+.animated-text {
+    font-size: 36px;
+    font-weight: bold;
+    color: #fff;
+    display: inline-block;
+    position: relative;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    animation: textGlow 1.5s ease-in-out infinite;
+}
+
+/* Mavi ışık etrafında dönecek animasyon */
+@keyframes textGlow {
+    0% {
+        text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 15px #00f, 0 0 20px #00f, 0 0 25px #00f, 0 0 30px #00f, 0 0 35px #00f;
+    }
+
+    50% {
+        text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f, 0 0 40px #00f, 0 0 50px #00f, 0 0 60px #00f, 0 0 70px #00f;
+    }
+
+    100% {
+        text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 15px #00f, 0 0 20px #00f, 0 0 25px #00f, 0 0 30px #00f, 0 0 35px #00f;
+    }
+}
+
+/* Responsive Design için */
+@media (max-width: 768px) {
+    .animated-text {
+        font-size: 24px;
+    }
+}

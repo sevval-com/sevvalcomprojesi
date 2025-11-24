@@ -1,0 +1,103 @@
+﻿/* Genel Sayfa Stil */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6fc; /* Açık gri-mavi arka plan */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    text-align: center;
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #007BFF; /* Mavi renk başlık için */
+}
+
+p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+/* PDF kutucukları için konteyner */
+.pdf-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 sütunlu grid */
+    gap: 20px;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 1000px;
+}
+
+/* Her bir PDF kutusu */
+.pdf-box {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid #007BFF; /* Mavi sınır */
+}
+
+    .pdf-box:hover {
+        transform: scale(1.05); /* Hover ile kutu büyür */
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2); /* Hoverda daha belirgin gölge */
+    }
+
+.pdf-iframe {
+    width: 100%;
+    height: 200px;
+    border: none;
+    border-radius: 10px;
+    background-color: #e9f1fd; /* Gri-mavi arka plan */
+    margin-bottom: 15px;
+}
+
+.pdf-box p {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007BFF; /* Mavi renk başlık için */
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+
+.pdf-box a {
+    display: inline-block;
+    background-color: #007BFF; /* Mavi buton */
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 1em;
+    margin-top: 15px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    .pdf-box a:hover {
+        background-color: #0056b3; /* Buton hover rengi */
+        transform: scale(1.05); /* Hover ile buton büyür */
+    }
+
+/* Mobil uyumlu tasarım */
+@media (max-width: 768px) {
+    .pdf-container {
+        grid-template-columns: 1fr; /* Mobilde 1 sütun */
+    }
+
+    .pdf-box {
+        padding: 20px;
+    }
+
+    .pdf-iframe {
+        height: 250px;
+    }
+}

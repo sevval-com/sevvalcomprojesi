@@ -1,0 +1,357 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<Sevval.Domain.Entities.ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Dopingler";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Şevval Emlak</title>
+
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Navbar için özel CSS -->
+    <link rel="stylesheet" href="~/css/Anasayfa.css" />
+    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .pencere {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1100
+        }
+
+        .pencere-icerik {
+            background: linear-gradient(90deg,#1e88e5,#2196f3);
+            width: 460px;
+            height: 490px;
+            display: flex;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.3);
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            margin: auto
+        }
+
+        .sol-bolum, .sag-bolum {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center
+        }
+
+        .sag-bolum {
+            border-left: 2px solid #fff
+        }
+
+        .pencere-icerik h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #fff;
+            font-weight: 700
+        }
+
+        .baglanti {
+            margin: 15px 0;
+            padding: 15px 25px;
+            background: #fff;
+            color: #1e88e5;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background .3s,transform .2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+            font-size: 18px;
+            width: 80%
+        }
+
+            .baglanti:hover {
+                background: #f1f1f1;
+                transform: translateY(-2px)
+            }
+
+        .kapat-buton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 30px;
+            color: #fff;
+            background: 0 0;
+            border: 2px solid #fff;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+            .kapat-buton:hover {
+                color: #d32f2f;
+                border-color: #d32f2f
+            }
+
+        .doping-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+            .doping-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+
+            .doping-card .card-header {
+                padding: 2rem 1.5rem;
+                text-align: center;
+                color: white;
+            }
+
+            .doping-card .icon {
+                font-size: 3.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .doping-card .card-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+            }
+
+            .doping-card .card-body {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .doping-card .card-text {
+                color: #6c757d;
+                min-height: 60px;
+            }
+
+            .doping-card .price {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin: 1.5rem 0;
+            }
+
+            .doping-card .btn {
+                font-weight: bold;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+            }
+
+        /* Renkler */
+        .gunun-ilani .card-header {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+
+        .acil-acil .card-header {
+            background: linear-gradient(135deg, #DC3545, #F06292);
+        }
+
+        .fiyati-dusenler .card-header {
+            background: linear-gradient(135deg, #28A745, #20C997);
+        }
+
+    </style>
+</head>
+<body>
+    @Html.AntiForgeryToken()
+    <!-- Navbar -->
+    <nav class="navbaar">
+        <div class="navbaar-container">
+            <div class="logo">
+                <a href="/">
+                    <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+                <span>Şevval Emlak</span>
+            </div>
+            <div class="hamburger" id="hamburger-menu">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <ul class="naav-linkss" id="nav-links">
+                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
+                <li><a href="@Url.Action("About", "Home")">Hakkımızda</a></li>
+                <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li><a href="@Url.Action("Panel", "Ilan")">Mağazam</a></li>
+                }
+            </ul>
+            <div class="auth-buttoons">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var currentUser = await UserManager.GetUserAsync(User);
+                    if (currentUser != null)
+                    {
+                        <div class="dropdown">
+                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                            <ul class="dropdown-content">
+                                <li><a href="@Url.Action("Panel", "Ilan")">Panele Git</a></li>
+                                <li>
+                                    <form asp-action="Logout" asp-controller="Account" method="post">
+                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
+                }
+                <div class="post-ad-container">
+                    <span class="free-tag">Ücretsiz</span>
+                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">+ İlan Ver</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Giriş Yap Pop-up -->
+    <div id="popup-giris" class="pencere" style="display:none;">
+        <div class="pencere-icerik">
+            <button class="kapat-buton" id="pencere-kapat">&times;</button>
+            <div class="sol-bolum">
+                <h2>Bireysel</h2>
+                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+            <div class="sag-bolum">
+                <h2>Kurumsal</h2>
+                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container-fluid my-4">
+        <div class="row g-lg-4 g-3">
+            <aside class="col-lg-2">
+                <div class="d-lg-none mb-3 px-3">
+                    <button class="btn btn-primary w-100 p-3" type="button" data-bs-toggle="collapse" data-bs-target="#controlPanel" aria-expanded="false" aria-controls="controlPanel">
+                        <i class="fas fa-bars me-2"></i> Menü
+                    </button>
+                </div>
+                <div class="collapse d-lg-block" id="controlPanel">
+                    <div class="sticky-top" style="top: 20px;">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-gem me-2"></i>Satın Al</h5>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Index", "Satinal")"><i class="fas fa-box me-2"></i>Paketler</a>
+                                <a class="list-group-item list-group-item-action active" aria-current="page" href="@Url.Action("Dopingler", "Satinal")"><i class="fas fa-rocket me-2"></i>Dopingler</a>
+                                
+                                
+                                
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Panel", "Ilan")"><i class="fas fa-arrow-left me-2"></i>Panele Dön</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <section class="col-lg-10">
+                <h1 class="text-center mb-5 display-4 fw-bold text-primary">İlan Dopingleri</h1>
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <a href="@Url.Action("GununIlaniTalep", "Satinal")" class="doping-card gunun-ilani">
+                            <div class="card-header">
+                                <div class="icon"><i class="bi bi-star-fill"></i></div>
+                                <h3 class="card-title">Günün İlanı</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">İlanınız bir gün boyunca ana sayfanın en üstünde yer alsın, tüm dikkatleri üzerinize çekin.</p>
+                                <div class="price text-warning">50 <small>TL</small></div>
+                                <div class="btn btn-warning">Hemen Başvur</div>
+                            </div>
+                        </a>
+                    </div>
+                    @* <div class="col-lg-4 col-md-6">
+                        <div class="doping-card acil-acil">
+                            <div class="card-header">
+                                <div class="icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                                <h3 class="card-title">Acil Acil</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">"Acil" etiketi ile ilanınıza daha fazla ilgi çekin ve satış sürecini hızlandırın.</p>
+                                <div class="price text-danger">40 <small>TL</small></div>
+                                <div class="btn btn-danger disabled">Yakında</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="doping-card fiyati-dusenler">
+                            <div class="card-header">
+                                <div class="icon"><i class="bi bi-graph-down-arrow"></i></div>
+                                <h3 class="card-title">Fiyatı Düşenler</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">İlanınız "Fiyatı Düşenler" kategorisinde öne çıksın, fırsat arayan alıcıları yakalayın.</p>
+                                <div class="price text-success">30 <small>TL</small></div>
+                                <div class="btn btn-success disabled">Yakında</div>
+                            </div>
+                        </div>
+                    </div> *@
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar ve popup scriptleri
+        document.addEventListener("DOMContentLoaded", function () {
+            var hamburgerMenu = document.getElementById("hamburger-menu");
+            var navLinks = document.getElementById("nav-links");
+            if (hamburgerMenu) {
+                hamburgerMenu.addEventListener("click", (e) => { navLinks.classList.toggle("active"); e.stopPropagation(); });
+            }
+            document.addEventListener("click", (e) => {
+                if (navLinks && !navLinks.contains(e.target) && !hamburgerMenu.contains(e.target)) navLinks.classList.remove("active");
+            });
+            const girisButon = document.getElementById('giris-buton'), popupGiris = document.getElementById('popup-giris'), pencereKapat = document.getElementById('pencere-kapat');
+            if (girisButon) girisButon.addEventListener('click', (e) => { e.preventDefault(); popupGiris.style.display = 'flex'; });
+            if (popupGiris) popupGiris.addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+            if (pencereKapat) pencereKapat.addEventListener('click', () => { popupGiris.style.display = 'none'; });
+        });
+    </script>
+</body>
+</html>
+

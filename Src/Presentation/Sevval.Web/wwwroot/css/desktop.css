@@ -1,0 +1,19 @@
+﻿@media screen and (min-width: 1024px) {
+    body .daily-offer-container {
+        width: 90vw;
+        top: 25%;
+    }
+
+    .offer-left {
+        position: relative;
+        top: 0.5vw;
+    }
+
+        .offer-left div {
+            font-size: 24px;
+        }
+
+    .slideshow-container {
+        top: -5vw;
+    }
+}

@@ -1,0 +1,150 @@
+.eye-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+    user-select: none;
+}
+
+.text-danger {
+    color: red;
+}
+
+
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .form-card {
+        width: 100%;
+        margin: 0;
+        padding: 15px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .password-fields {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+
+    .back-to-home {
+        width: 100%;
+        margin: 20px 0;
+    }
+
+        .back-to-home a {
+            min-width: auto;
+            width: 100%;
+        }
+
+    h2 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-content {
+        padding: 15px 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+
+    .extra-links {
+        text-align: center;
+    }
+}
+.terms-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.terms-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.terms-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 16px; /* Yazı boyutu */
+    font-family: 'Arial', sans-serif;
+    color: #333; /* Yazı rengi */
+    flex-wrap: wrap;
+}
+
+    .terms-label input[type="checkbox"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #007bff; /* Çerçeve rengi */
+        border-radius: 4px; /* Hafif yuvarlak köşeler */
+        margin-right: 10px; /* Kutucuk ile yazı arasındaki boşluk */
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+        .terms-label input[type="checkbox"]:checked {
+            background-color: #007bff; /* Seçildiğinde mavi arka plan */
+            border-color: #0056b3; /* Daha koyu çerçeve */
+        }
+
+            .terms-label input[type="checkbox"]:checked::before {
+                content: '✔'; /* İşaret simgesi */
+                color: white;
+                font-weight: bold;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+.checkmark {
+    margin-right: 10px;
+}
+
+#terms-error {
+    font-size: 14px; /* Uyarı yazısı boyutu */
+    margin-top: 5px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .terms-label {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .terms-label {
+        font-size: 13px;
+    }
+}

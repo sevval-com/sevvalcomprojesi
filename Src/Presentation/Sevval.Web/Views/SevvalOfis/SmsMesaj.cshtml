@@ -1,0 +1,291 @@
+﻿@model SmsDTO
+@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "SMS Mesaj";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 2rem rgba(0,0,0,0.05);
+        }
+
+            .sidebar .nav-link {
+                color: #343a40;
+                font-size: 0.95rem;
+                padding: 0.85rem 1.5rem;
+                transition: all 0.2s ease;
+                border-left: 4px solid transparent;
+                border-radius: 0;
+                margin-bottom: 2px;
+            }
+
+                .sidebar .nav-link:hover {
+                    color: #0d6efd;
+                    background-color: #e7f1ff;
+                }
+
+                .sidebar .nav-link.active {
+                    color: #0d6efd;
+                    background-color: #e7f1ff;
+                    border-left-color: #0d6efd;
+                    font-weight: 500;
+                }
+
+                .sidebar .nav-link i {
+                    width: 25px;
+                    text-align: center;
+                    color: #0d6efd;
+                }
+
+            .sidebar .site-home-link {
+                background-color: #0d6efd;
+                color: white;
+                font-weight: bold;
+                border-radius: .25rem;
+            }
+
+                .sidebar .site-home-link:hover {
+                    background-color: #0b5ed7;
+                }
+
+        .content {
+            flex-grow: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .char-count-warning {
+            color: #dc3545;
+        }
+
+        .sidebar-wrapper {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .offcanvas .nav-link {
+            color: #343a40;
+        }
+
+            .offcanvas .nav-link.active {
+                font-weight: bold;
+                color: #0d6efd;
+            }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar-wrapper d-none d-lg-block" id="sidebar">
+            <nav class="sidebar p-3 h-100 d-flex flex-column">
+                <div class="text-center py-3">
+                    <img src="~/images/favlogo.png" alt="Şevval Ofis Logo" class="img-fluid mb-3" style="max-width: 100px;">
+                    <h4 class="fw-bold text-primary">Şevval Ofis</h4>
+                </div>
+                <hr>
+                <ul class="nav flex-column mb-auto">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SehirlereGoreEmlakcilar", "SevvalOfis")"><i class="bi bi-building me-2"></i> Şehirlere Göre Emlakçılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("BireyselKullanicilar", "SevvalOfis")"><i class="bi bi-person-fill me-2"></i> Bireysel Kullanıcılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanYonetim")"><i class="bi bi-clipboard2-data-fill me-2"></i> İlan Yönetimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanTakip")"><i class="bi bi-search me-2"></i> Bireysel İlan Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
+                </ul>
+                <div class="mt-auto">
+                    <a class="nav-link site-home-link text-center" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content p-4">
+            <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="bi bi-list"></i></button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold mb-0">Toplu SMS Gönder</h1>
+                <a href="#" class="btn btn-outline-primary">
+                    <i class="bi bi-file-bar-graph me-2"></i> SMS Raporları
+                </a>
+            </div>
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert @(ViewBag.Success == true ? "alert-success" : "alert-danger")">@ViewBag.Message</div>
+                    }
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Şehre Göre Filtrele:</label>
+                            <select id="citySelect" class="form-select" onchange="selectUsersByCity()">
+                                <option value="">-- Tüm Şehirler --</option>
+                                @foreach (var city in Model.AvailableCities)
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kayıtlı Alıcılar:</label>
+                            <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="modal" data-bs-target="#userSelectModal">
+                                <i class="bi bi-people-fill me-2"></i> Alıcıları Seç
+                            </button>
+                            <input type="hidden" id="selectedUsersInput" name="aliciPhones">
+                            <div id="selectedUsersText" class="mt-2 text-muted small"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="externalPhones" class="form-label fw-bold">Harici Numaralar:</label>
+                            <textarea class="form-control" id="externalPhones" name="externalPhones" rows="3" placeholder="Numaraları alt alta girin (örn: 5551112233)"></textarea>
+                            <div class="form-text">Her satıra bir telefon numarası yazın. Başında 0 olmadan yazabilirsiniz.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mesaj" class="form-label fw-bold">Mesaj:</label>
+                            <textarea class="form-control" id="mesaj" name="mesaj" rows="4" required></textarea>
+                            <div class="mt-2 text-end">
+                                <small id="charCount">0/917 karakter</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 btn-lg"><i class="bi bi-send-fill me-2"></i> Gönder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal and Offcanvas -->
+    <div class="modal fade" id="userSelectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Alıcıları Seç</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelection()">
+                            <label for="selectAll" class="form-check-label"><strong>Tümünü Seç</strong></label>
+                        </div>
+                        <input type="text" id="searchInput" class="form-control w-50" placeholder="İsim veya telefon ile ara...">
+                    </div>
+                    <hr>
+                    <div id="userList">
+                        @foreach (var user in Model.Users)
+                        {
+                            <div class="form-check user-item">
+                                <input class="form-check-input user-checkbox" type="checkbox" value="@user.Phone" id="user_@user.Id" data-city="@user.City" @(user.Phone?.Replace(" ", "") == Model.SelectedPhone?.Replace(" ", "") ? "checked" : "")>
+                                <label class="form-check-label" for="user_@user.Id">@user.Name (@user.Phone) - @user.City</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="applySelection()" data-bs-dismiss="modal">Seçimi Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-primary fw-bold">Şevval Ofis</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="h-100 d-flex flex-column">
+                <ul class="nav flex-column mb-auto">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SehirlereGoreEmlakcilar", "SevvalOfis")"><i class="bi bi-building me-2"></i> Şehirlere Göre Emlakçılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("BireyselKullanicilar", "SevvalOfis")"><i class="bi bi-person-fill me-2"></i> Bireysel Kullanıcılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanYonetim")"><i class="bi bi-clipboard2-data-fill me-2"></i> İlan Yönetimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanTakip")"><i class="bi bi-search me-2"></i> Bireysel İlan Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("TumIlanlar", "SevvalOfis")"><i class="bi bi-list-ul me-2"></i> Tüm İlanlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-diagram-3-fill me-2"></i> Kardeş Firma Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
+                </ul>
+                <div class="p-3 mt-auto">
+                    <a class="nav-link site-home-link text-center" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('mesaj').addEventListener('input', function() {
+                const charCount = this.value.length;
+                const charCountEl = document.getElementById('charCount');
+                charCountEl.textContent = `${charCount}/917 karakter`;
+                charCountEl.classList.toggle('char-count-warning', charCount > 917);
+            });
+
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                document.querySelectorAll('.user-item').forEach(item => {
+                    item.style.display = item.textContent.toLowerCase().includes(filter) ? '' : 'none';
+                });
+            });
+        });
+
+        function toggleSelection() {
+            const isChecked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.user-item').forEach(item => {
+                if(item.style.display !== 'none') {
+                    item.querySelector('.user-checkbox').checked = isChecked;
+                }
+            });
+        }
+
+        function applySelection() {
+            const selected = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(c => c.value);
+            document.getElementById('selectedUsersInput').value = selected.join(',');
+            document.getElementById('selectedUsersText').textContent = selected.length ? `${selected.length} kayıtlı alıcı seçildi.` : "Hiçbir kayıtlı alıcı seçilmedi.";
+        }
+
+        function selectUsersByCity() {
+            const city = document.getElementById('citySelect').value;
+            document.querySelectorAll('.user-item').forEach(item => {
+                const checkbox = item.querySelector('.user-checkbox');
+                if (city === "" || checkbox.dataset.city === city) {
+                    item.style.display = '';
+                    checkbox.checked = city !== "";
+                } else {
+                    item.style.display = 'none';
+                    checkbox.checked = false;
+                }
+            });
+            document.getElementById('searchInput').value = '';
+            applySelection();
+        }
+    </script>
+</body>
+</html>
+

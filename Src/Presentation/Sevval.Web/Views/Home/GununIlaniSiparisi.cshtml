@@ -1,0 +1,213 @@
+﻿@{
+    Layout = null; // Bu sayfanın kendi stili olacağı için ana layout'u kullanmıyoruz.
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Günün İlanı Siparişi Nasıl Verilir? - sevval.com</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #0056b3;
+            --background-color: #f0f8ff;
+            --text-color: #333;
+            --white-color: #ffffff;
+            --shadow-color: rgba(0, 123, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--white-color);
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-color);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: #555;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .step-card {
+            background-color: #f8f9fa;
+            border: 2px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+            .step-card:nth-child(1) {
+                animation-delay: 0.2s;
+            }
+
+            .step-card:nth-child(2) {
+                animation-delay: 0.4s;
+            }
+
+            .step-card:nth-child(3) {
+                animation-delay: 0.6s;
+            }
+
+            .step-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px var(--shadow-color);
+            }
+
+        .step-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .step-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .step-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        code {
+            background-color: #e9ecef;
+            color: #c7254e;
+            padding: 3px 6px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .order-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--white-color);
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 91, 179, 0.4);
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out 0.8s forwards;
+        }
+
+            .order-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 8px 25px rgba(0, 91, 179, 0.5);
+            }
+
+            .order-button i {
+                margin-right: 10px;
+            }
+
+        @@keyframes fadeInUp {
+            to
+
+        {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        /* Responsive Tasarım */
+        @@media (max-width: 768px) {
+            .steps-container
+
+        {
+            flex-direction: column;
+        }
+
+        .container {
+            padding: 30px 25px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-rocket"></i> İlanınızı Öne Çıkarın!</h1>
+            <p>Sadece 3 basit adımla ilanınızı "Günün İlanı" yaparak binlerce potansiyel alıcıya ulaşın.</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-link"></i></div>
+                <h3>1. İlan Linkinizi Kopyalayın</h3>
+                <p>İlk olarak, <strong>sevval.com</strong> sitemizde yayında olan ve öne çıkarmak istediğiniz ilanın linkini kopyalayın.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-keyboard"></i></div>
+                <h3>2. Açıklamayı Doğru Girin</h3>
+                <p>Ödeme sayfasındaki <b>"Adres"</b> kısmına <code>Günün İlanı: </code> yazdıktan sonra kopyaladığınız ilan linkini yapıştırın.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>3. Siparişi Tamamlayın</h3>
+                <p>Gerekli bilgileri eksiksiz doldurarak ödemeyi tamamlayın. İlanınız en kısa sürede "Günün İlanı" olarak yayınlanacaktır.</p>
+            </div>
+        </div>
+
+        <a href="https://www.paytr.com/link/ltIDq7i" target="_blank" class="order-button">
+            <i class="fas fa-credit-card"></i> Sipariş Ver
+        </a>
+    </div>
+
+</body>
+</html>

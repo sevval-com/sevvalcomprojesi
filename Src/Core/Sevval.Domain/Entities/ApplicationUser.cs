@@ -1,0 +1,80 @@
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+
+namespace Sevval.Domain.Entities;
+
+public class ApplicationUser : IdentityUser
+{
+    public int UserOrder { get; set; }
+
+    [Required]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    public string CompanyName { get; set; } = string.Empty;
+
+    [Required]
+    public string UserTypes { get; set; } = string.Empty;
+
+  
+    public string? ProfilePicturePath { get; set; }
+    public string? BannerPicturePath { get; set; }
+    public string? Level5CertificatePath { get; set; }
+    public string? TaxPlatePath { get; set; }
+
+
+    [Required]
+    public string City { get; set; } = string.Empty;
+
+    [Required]
+    public string District { get; set; } = string.Empty;
+
+    [Required]
+    public string IPAddress { get; set; } = string.Empty;
+
+    public bool IsConsultant { get; set; }
+
+    public string? ConsultantCompanyId { get; set; }
+
+    [ForeignKey("ConsultantCompanyId")]
+    public ApplicationUser? ConsultantCompany { get; set; }
+
+    public virtual ICollection<ApplicationUser>? Consultants { get; set; }
+
+    private DateTime? _registrationDate;
+
+    public DateTime RegistrationDate
+    {
+        get => _registrationDate ?? DateTime.Now; // Varsayılan olarak mevcut tarih atanır
+        set => _registrationDate = value;
+    }
+    public int IlanSayisi { get; set; }
+
+    public string Ucretlilik { get; set; } = string.Empty;
+
+    // Abonelik Durumu
+    public string IsSubscribed { get; set; } // Abonelik durumu (aktif/pasif)
+
+    // Abonelik Başlangıç Tarihi
+    public DateTime? SubscriptionStartDate => RegistrationDate;
+
+    // Abonelik Bitiş Tarihi (1 ay sonrası)
+    public DateTime? SubscriptionEndDate { get; private set; }
+    // Kullanıcının aktif mi pasif mi olduğunu belirten durum
+    public string IsActive { get; set; } // Varsayılan olarak "Active"
+    public string? VergiNo { get;  set; }
+    public string? AcikAdres { get; set; }  // Nullable açık adres alanı
+
+    public string? Referans { get; set; }
+    //public DateTime? CreatedDate { get; set; }
+    //public string? CreatedBy { get; set; }
+    //public DateTime? LastModifiedDate { get; set; }
+    //public string? LastModifiedBy { get; set; }
+    //public bool IsDeleted { get; set; }
+
+}

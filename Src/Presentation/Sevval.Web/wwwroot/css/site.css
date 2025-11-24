@@ -1,0 +1,434 @@
+﻿/* Genel Ayar */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Başlık */
+h1, h2, h3 {
+    color: #333;
+}
+
+/* Form ve Filtreleme Alanları */
+.form-label {
+    font-weight: bold;
+}
+
+.form-select, .form-control {
+    border-radius: 5px;
+    box-shadow: none;
+    margin-bottom: 15px;
+}
+
+    .form-select:focus, .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+/* Tablo */
+.table {
+    width: 100%;
+    max-width: 1177px;
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    table-layout: auto;
+    border: 1px solid #ddd;
+    left: 168px;
+    position: relative;
+}
+
+    .table th, .table td {
+        padding: 12px 15px; /* Hücre içi boşluklar arttırıldı */
+        text-align: left; /* Tüm hücrelerin sola hizalanması */
+        border: 1px solid #ddd;
+        word-wrap: break-word; /* Uzun kelimelerin taşmaması için */
+        vertical-align: middle; /* Verilerin dikeyde ortalanmasını sağlarız */
+    }
+
+    .table th {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        text-align: center; /* Başlık hücrelerini ortalamak */
+        font-size: 14px; /* Başlık yazı boyutu */
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f9f9f9; /* Her iki satırda bir farklı arka plan */
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1; /* Hover efekti */
+    }
+
+    .table td a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: normal;
+    }
+
+        .table td a:hover {
+            text-decoration: underline;
+        }
+
+    /* Başlık ve sütun genişliklerinin daha uyumlu olması için */
+    .table th:nth-child(1), .table td:nth-child(1) {
+        width: 8%;
+    }
+
+    .table th:nth-child(2), .table td:nth-child(2) {
+        width: 20%;
+    }
+
+    .table th:nth-child(3), .table td:nth-child(3) {
+        width: 15%;
+    }
+
+    .table th:nth-child(4), .table td:nth-child(4) {
+        width: 10%;
+    }
+
+    .table th:nth-child(5), .table td:nth-child(5) {
+        width: 15%;
+    }
+
+    .table th:nth-child(6), .table td:nth-child(6) {
+        width: 10%;
+    }
+
+    .table th:nth-child(7), .table td:nth-child(7) {
+        width: 15%;
+    }
+
+    .table th:nth-child(8), .table td:nth-child(8) {
+        width: 12%;
+    }
+
+    /* Hücre içeriğinin daha düzgün hizalanması */
+    .table td {
+        font-size: 13px;
+    }
+
+        .table td:nth-child(4), .table td:nth-child(5), .table td:nth-child(6) {
+            text-align: center; /* Fiyat, Durum gibi hücreler ortalanacak */
+        }
+
+@media (max-width: 1200px) {
+    .table {
+        font-size: 13px; /* Ekran küçükse yazı boyutunu küçültür */
+    }
+
+        .table td, .table th {
+            padding: 10px 12px; /* Küçük ekranlar için hücre içi boşlukları kısalt */
+        }
+}
+
+@media (max-width: 768px) {
+    .table th, .table td {
+        padding: 8px 10px; /* Çok küçük ekranlar için daha küçük boşluklar */
+        font-size: 12px; /* Küçük ekranlarda font boyutunu küçültür */
+    }
+
+        /* Sütun başlıklarını daha anlaşılır hale getirmek için metin hizalamaları */
+        .table th:nth-child(1), .table td:nth-child(1),
+        .table th:nth-child(2), .table td:nth-child(2),
+        .table th:nth-child(3), .table td:nth-child(3),
+        .table th:nth-child(4), .table td:nth-child(4),
+        .table th:nth-child(5), .table td:nth-child(5),
+        .table th:nth-child(6), .table td:nth-child(6) {
+            text-align: center;
+        }
+}
+
+/* Duyarlı sütunlar */
+@media (max-width: 576px) {
+    .table th, .table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 0;
+    }
+
+    .table th {
+        text-align: left;
+    }
+
+    .table td {
+        text-align: left;
+        border-top: 1px solid #ddd;
+    }
+
+        .table td:before {
+            content: attr(data-label);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+}
+
+/* Filtreleme Butonu */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 5px;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+/* Arama Çubuğu */
+#search {
+    margin-top: -7px;
+    margin-bottom: 20px;
+    width: 96%;
+    height: 50%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+    #search:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+/* Form Container */
+form {
+    width: 95%;
+    margin: 15px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+    /* Row and Columns */
+    form .row {
+        display: flex;
+        /* justify-content: space-between; */
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    form .col-md-3 {
+        flex: 1;
+        min-width: 200px; /* Daha küçük minimum genişlik */
+    }
+
+    /* Form Labels */
+    form label {
+        font-weight: bold;
+        color: #4a4a4a;
+        margin-bottom: 5px; /* Daha az boşluk */
+        font-size: 13px;
+        display: block;
+    }
+
+    /* Form Select and Input */
+    form .form-select,
+    form .form-control {
+        width: 273px;
+        padding: 10px; /* Daha dar padding */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: #f9f9f9;
+        color: #555;
+        transition: all 0.3s ease;
+    }
+
+        /* Hover and Focus Effects */
+        form .form-select:hover,
+        form .form-control:hover {
+            border-color: #007bff;
+            background-color: #ffffff;
+        }
+
+        form .form-select:focus,
+        form .form-control:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 3px rgba(0, 91, 187, 0.5); /* Daha ince shadow */
+            outline: none;
+        }
+
+.col-lg-3 col-md-6 d-flex align-items-end justify-content-between gap-2 {
+    margin-top: 1px;
+}
+/* Submit Button */
+form button {
+    width: 35%;
+    padding: 10px 18px; /* Daha dar padding */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px; /* Daha yuvarlak köşeler */
+    cursor: pointer;
+    font-size: 14px; /* Daha küçük font */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    top: -13px;
+    position: relative;
+}
+
+        /* Button Hover Effect */
+        form button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px); /* Daha küçük hareket */
+        }
+
+/* Return Button */
+.site-return-btn {
+    background-color: transparent;
+    color: #0056b3; /* Yeni mavi tonu */
+    border: 2px solid #0056b3;
+    padding: 10px 18px; /* Daha dar padding */
+    border-radius: 6px;
+    font-size: 14px; /* Daha küçük font */
+    font-weight: bold;
+    transition: all 0.3s ease;
+    top: -13px;
+    position: relative;
+    animation: blink 1.5s infinite alternate; /* Yanıp sönme animasyonu ekledik */
+}
+
+    /* Return Button Hover Effect */
+    .site-return-btn:hover {
+        background-color: #0056b3;
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-1px); /* Daha küçük hareket */
+    }
+
+/* Yanıp Sönme Animasyonu */
+@keyframes blink {
+    0% {
+        opacity: 1; /* Tam görünür */
+    }
+
+    50% {
+        opacity: 0.5; /* Yarı görünür */
+    }
+
+    100% {
+        opacity: 1; /* Tam görünür */
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    form .row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    form button,
+    .site-return-btn {
+        width: 100%;
+    }
+}
+
+/* Arama Çubuğu Container */
+.form-group {
+    width: 28%;
+    height: 56px;
+    margin: 20px auto;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+    /* Arama Çubuğu Label */
+    .form-group label {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 12px;
+        font-size: 16px;
+        display: block;
+    }
+
+    /* Arama Çubuğu Input */
+    .form-group .form-control {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #333;
+        transition: border-color 0.3s ease;
+    }
+
+        /* Arama Çubuğu Input - Focus Durumu */
+        .form-group .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Arama Çubuğu Input - Hover Durumu */
+        .form-group .form-control:hover {
+            border-color: #0056b3;
+        }
+
+/* Button Container Adjustment */
+.button-container {
+    margin-top: 20px; /* Yukarıdan boşluk eklenir */
+}
+
+    /* Optional: Buttons Specific Padding */
+    .button-container button,
+    .button-container a {
+        margin-top: 10px; /* İki butonun üst boşluğu artırılır */
+    }
+
+
+/* Responsive Tasarım için */
+@media (max-width: 768px) {
+    .form-group {
+        width: 90%;
+        padding: 15px;
+    }
+
+        .form-group .form-control {
+            font-size: 14px;
+        }
+}
+
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    form {
+        width: 90%;
+    }
+
+        form .row {
+            flex-direction: column;
+        }
+
+        form .col-md-4 {
+            margin-bottom: 20px;
+        }
+
+        form button {
+            width: 100%;
+        }
+}
+
+
+/* Mobil uyumlu stil */
+@media (max-width: 768px) {
+    .col-md-4 {
+        margin-bottom: 15px;
+    }
+
+    .table th, .table td {
+        font-size: 14px;
+    }
+}

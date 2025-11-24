@@ -1,0 +1,217 @@
+﻿/* Genel Stil Ayarları */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Açık gri Bootstrap arka planı */
+    color: #212529; /* Koyu metin rengi */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Bölümü */
+.header-bg {
+    background-color: #007bff; /* Bootstrap mavisi */
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section (Giriş Bölümü) */
+.hero-section {
+    background: linear-gradient(to right, #007bff, #0056b3); /* Mavi gradient */
+    color: white;
+    padding: 60px 0; /* Alan küçültüldü */
+    text-align: center;
+    animation: fadeIn 1s ease-out; /* Animasyon */
+}
+
+/* Blog Kartları */
+.blog-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Animasyon */
+}
+
+    .blog-card:hover {
+        transform: translateY(-10px); /* Hover efekti */
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .blog-card img {
+        height: 250px; /* Görsel yüksekliği */
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+.blog-card-body {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.blog-card-title {
+    color: #007bff; /* Mavi başlık */
+    font-weight: 600;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+
+.blog-card:hover .blog-card-title {
+    color: #0056b3; /* Koyu mavi hover */
+}
+
+.blog-meta {
+    font-size: 0.85rem;
+    color: #6c757d; /* Gri metin */
+    margin-bottom: 15px;
+}
+
+/* Butonlar */
+.read-more-btn {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .read-more-btn:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        transform: scale(1.05); /* Buton büyütme efekti */
+    }
+
+.admin-btn {
+    background-color: #28a745; /* Yeşil Admin butonu */
+    border-color: #28a745;
+    transition: background-color 0.3s ease;
+}
+
+    .admin-btn:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+.admin-action-btn {
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+    .admin-action-btn.edit {
+        color: #ffc107; /* Sarımsı renk */
+    }
+
+        .admin-action-btn.edit:hover {
+            color: #e0a800;
+        }
+
+    .admin-action-btn.delete {
+        color: #dc3545; /* Kırmızı renk */
+    }
+
+        .admin-action-btn.delete:hover {
+            color: #c82333;
+        }
+
+/* Footer Bölümü */
+.footer-bg {
+    background-color: #343a40; /* Koyu gri footer */
+    color: white;
+    padding: 20px 0;
+    margin-top: auto; /* Footer'ı alta sabitle */
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Başlık için animasyon */
+.animated-heading {
+    animation: scaleIn 0.6s ease-out;
+    display: inline-block; /* Animasyon için gerekli */
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Boş yazı mesajı animasyon */
+.no-posts-message {
+    animation: fadeIn 1s ease-out;
+}
+
+/* Kategori Butonları */
+/* Mobil görünümde taşmayı engellemek için ayarlamalar */
+.category-btn-container { /* Butonları saran bir div eklenmesi gerekebilir */
+    display: flex;
+    flex-wrap: wrap; /* Butonların alt satıra geçmesini sağlar */
+    gap: 10px; /* Butonlar arasında boşluk bırakır */
+    justify-content: center; /* Butonları ortalar */
+}
+
+.category-btn {
+    min-width: 120px; /* Minimum genişlik verilebilir */
+    font-weight: 500;
+    transition: all 0.3s ease;
+    flex-grow: 1; /* Esnekliği artırır, eşit genişlikte yayılmaya çalışır */
+    text-align: center; /* Metni ortalar */
+    padding: 10px 15px; /* İç boşluğu artırarak metnin taşmasını azaltabiliriz */
+}
+
+    .category-btn:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .category-btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+/* Yatay Kaydırma Çubuğu Gizleme */
+.scrollbar-hidden {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera*/
+    }
+
+/* Daha Fazlasını Göster Butonu */
+.show-more-btn {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+    .show-more-btn:hover {
+        background-color: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }

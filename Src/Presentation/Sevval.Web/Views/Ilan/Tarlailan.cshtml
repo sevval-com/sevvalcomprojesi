@@ -1,0 +1,1925 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@model Sevval.Domain.Entities.IlanModel
+@inject UserManager<ApplicationUser> UserManager
+
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    Layout = null;
+}
+
+<!-- Stil Dosyası Bağlantısı -->
+<link rel="stylesheet" href="~/css/ilandet.css" />
+<link rel="stylesheet" href="~/css/hizmetler.css">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="icon" type="image/png" href="~/images/favlogo.png">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
+
+<!-- Navbar -->
+<nav class="navbaar">
+    <div class="navbaar-container">
+        <div class="logo">
+            <a href="/">
+                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+            <span>Sevval.com</span>
+        </div>
+        <div class="haamburger" id="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <ul class="naav-linkss" id="nav-links">
+            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                </li>
+                
+            }
+
+            <li><a href="@Url.Action("KardesFirmalar", "Home")">Kardeş Firmalar</a></li>
+            <li class="dropdoawn">
+                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
+            </li>
+
+
+
+        </ul>
+        <div class="auth-buttoons">
+            @if (User.Identity.IsAuthenticated)
+            {
+                var currentUser = await UserManager.GetUserAsync(User);
+
+                // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                if (currentUser != null)
+                {
+                    <div class="dropdown">
+                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                        <ul class="dropdown-content">
+                            <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
+                            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
+                            
+                            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
+                            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
+                            
+                            <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
+                            <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
+                            @if (User.Identity.IsAuthenticated &&
+                           (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+
+                            {
+                                <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
+                            }
+                            <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                }
+            }
+            else
+            {
+                <a href="#" class="login" id="login-button">Giriş Yap</a>
+            }
+
+
+            <!-- İlan Ver butonu için yönlendirme -->
+            <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account") : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+        </div>
+
+        
+
+        <!-- Butonun Aktifliği için JavaScript -->
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                const floatingButton = document.getElementById('floating_button');
+                const translateElement = document.getElementById('google_translate_element');
+                let clickCount = 0; // Tıklama sayacı
+
+                // Çeviri elementini başlangıçta gizli yap
+                translateElement.style.display = "none";
+
+                floatingButton.addEventListener('click', function () {
+                    clickCount++;
+
+                    if (clickCount === 1) {
+                        // İlk tıklamada çeviri elementini göster
+                        translateElement.style.display = "block";
+                    } else if (clickCount === 3) {
+                        // Üçüncü tıklamada her şeyi gizle ve sayacı sıfırla
+                        translateElement.style.display = "none";
+                        clickCount = 0;
+                    }
+                });
+
+                // Çeviri elementindeki dil seçme işlemi (içerikteki bir tıklama simülasyonu)
+                translateElement.addEventListener('click', function () {
+                    console.log("Dil seçimi yapıldı!"); // İsteğe bağlı olarak işlev ekleyin
+                });
+            });
+        </script>
+
+    </div>
+</nav>
+
+
+
+<form asp-action="Kaydet" method="post" enctype="multipart/form-data" id="myForm">
+    <!-- Yuvarlak Aşama Çizgileri -->
+    <div class="step-container">
+        <div class="step">
+            <div class="step-circle active">1</div>
+            <div class="step-description">Kategori Seçimi</div>
+        </div>
+        <div class="step">
+            <div class="step-circle active">2</div>
+            <div class="step-description">İlan Detayları</div>
+        </div>
+        <div class="step">
+            <div class="step-circle inactive">3</div>
+            <div class="step-description">Önizleme</div>
+        </div>
+        <div class="step">
+            <div class="step-circle inactive">4</div>
+            <div class="step-description">Tebrikler</div>
+        </div>
+    </div>
+    <div class="category-info">
+        <label for="Categoryy">Kategori:</label>
+        <input type="text" id="Categoryy" name="Categoryy" class="form-control" value="@Model.Category / @Model.KonutDurumu / @Model.MulkTipi " readonly>
+    </div>
+
+    <style>
+        /* Genel düzen */
+        .category-info {
+            position: absolute;
+            left: 50%; /* Sayfanın ortasına yatayda yerleştirir */
+            transform: translate(-50%, -50%); /* Gerçekten ortada yerleşmesini sağlar */
+            display: flex;
+            justify-content: center; /* Etiketi ve input kutusunu yatayda ortalar */
+            align-items: center; /* Dikeyde de ortalar */
+            margin: 20px 0; /* Üst ve alt margin ile biraz boşluk ekler */
+            padding: 20px;
+            border-radius: 20px; /* Köşeleri yuvarlattık */
+            background-color: #ffffff; /* Beyaz arka plan */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Hafif bir gölge efekti */
+        }
+
+            /* Etiket düzeni */
+            .category-info label {
+                margin-right: 20px; /* Etiket ile kutu arasında boşluk */
+                font-weight: 700; /* Etiketi daha belirgin yapalım */
+                font-size: 26px; /* Etiketin boyutunu büyütüyoruz */
+                color: #1E90FF; /* Canlı mavi */
+                font-family: 'Montserrat', sans-serif; /* Modern bir font */
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+            }
+
+            /* Input kutusu düzeni */
+            .category-info input {
+                padding: 12px 18px;
+                font-size: 20px; /* Font boyutunu büyütüyoruz */
+                border: 2px solid #1E90FF; /* Daha belirgin mavi bir kenarlık */
+                background-color: #f9f9f9; /* Hafif gri bir arka plan */
+                width: 380px; /* Genişliği biraz daha arttırdık */
+                text-align: center;
+                color: #333; /* Yazı rengi */
+                font-family: 'Roboto', sans-serif; /* Aynı fontu inputa da ekledik */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+                transition: all 0.3s ease; /* Yumuşak geçiş efekti */
+                cursor: default; /* İmleci yazma ikonundan normal ikona değiştirir */
+            }
+
+                /* Okunabilir input kutusunun rengi */
+                .category-info input:readonly {
+                    background-color: #f9f9f9; /* Hafif gri arka plan */
+                    cursor: default; /* İmleci yazma ikonundan normal ikona değiştirir */
+                }
+
+                /* Input kutusuna odaklanıldığında etkisi */
+                .category-info input:focus {
+                    outline: none; /* Fokuslandığında kenarlık gösterme */
+                    box-shadow: 0 0 10px rgba(30, 144, 255, 0.5); /* Odaklanınca mavi renk ve gölge */
+                    border: 2px solid #1E90FF; /* Mavi renkli kenarlık */
+                }
+
+                /* Hover efekti: input kutusunun üzerine gelindiğinde */
+                .category-info input:hover {
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Hoverda daha belirgin gölge */
+                }
+
+            /* Hoverda etiketin rengi değişir */
+            .category-info label:hover {
+                color: #007bff; /* Etiketin rengini maviye çevirir */
+                /* cursor: pointer; -- Bu satır kaldırıldı */
+            }
+    </style>
+
+    <!-- İlan Formu Çerçevesi -->
+    <div class="container ilan-container">
+    <style>
+        .category-info {
+            border: 1px solid #ccc; /* Kenar çizgisi */
+            padding: 10px; /* İçerik alanı */
+            border-radius: 5px; /* Kenar yuvarlama */
+            background-color: #f9f9f9; /* Arka plan rengi */
+            width: fit-content; /* İçerik boyutuna göre genişlik */
+            margin: 10px 0; /* Üst ve alt boşluk */
+        }
+
+            .category-info p {
+                margin: 0; /* Paragraf üst ve alt boşluklarını sıfırla */
+                font-size: 16px; /* Yazı boyutu */
+                font-weight: bold; /* Kalın yazı stili */
+            }
+
+        .text-danger {
+            color: red; /* Hata mesajı rengi */
+        }
+    </style>
+
+        <!-- Fotoğraf ve Video -->
+        <div class="form-group d-flex align-items-center">
+            <label for="Photos" class="mr-3">Fotoğraf Yükleyin:</label>
+            <div class="upload-container">
+                <div id="photoUploadArea" class="photo-upload-area" onclick="triggerFileInput()">
+                    <i class="fas fa-camera camera-icon"></i>
+                </div>
+                <div class="video-upload-info">
+                    <br />
+                    <br />
+                    <p class="warning-textt" id="durationWarning">En Fazla 60 Adet fotoğraf yükleyebilirsiniz</p>
+                </div>
+                <div id="photoPreview" class="photo-preview mt-2">
+                    <button id="deleteAllButton" class="delete-all-btn d-none" onclick="removeAllPhotos()">Tümünü Sil</button>
+                </div>
+            </div>
+            <input type="file" id="UploadedFiles" name="UploadedFiles" class="form-control d-none" accept="image/*" multiple onchange="previewPhotos(this)">
+        </div>
+
+        <style>
+            .upload-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .photo-upload-area {
+                width: 150px;
+                height: 150px;
+                border: 2px dashed #007BFF;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                background-color: rgba(0, 123, 255, 0.1);
+                cursor: pointer;
+                margin-bottom: 10px;
+                /* Yükleme alanının sabit boyutlarda kalması için ek özellikler */
+                flex-shrink: 0; /* Alanın küçülmesini engeller */
+                flex-grow: 0; /* Alanın genişlemeye çalışmasını engeller */
+                flex-basis: auto; /* Esnek konteyner içindeyken boyutunun değişmesini engeller */
+                min-width: 150px; /* Minimum genişlik */
+                min-height: 150px; /* Minimum yükseklik */
+                max-width: 150px; /* Maksimum genişlik */
+                max-height: 150px; /* Maksimum yükseklik */
+            }
+
+
+                .photo-upload-area:hover {
+                    background-color: rgba(0, 123, 255, 0.2);
+                }
+
+            .camera-icon {
+                font-size: 50px;
+                color: #007BFF;
+                opacity: 0.7;
+            }
+
+            .photo-preview {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: space-between;
+                position: relative;
+                min-width: 250px;
+            }
+
+            .image-preview-container {
+                position: relative;
+                width: 120px;
+                height: 120px;
+                overflow: hidden;
+                margin: 5px;
+                border: 2px solid #ddd;
+                border-radius: 10px;
+            }
+
+                .image-preview-container img {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 100%;
+                    height: 100%;
+                    transform: translate(-50%, -50%);
+                    object-fit: contain;
+                }
+
+            .delete-icon {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                cursor: pointer;
+                color: red;
+                font-weight: bold;
+                background-color: white;
+                border-radius: 50%;
+                padding: 2px;
+                width: 24px;
+            }
+
+            .vitrin-label {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                background-color: green;
+                color: white;
+                padding: 2px 5px;
+                border-radius: 5px;
+                font-size: 12px;
+                z-index: 10;
+            }
+
+            .warning-textt {
+                font-size: 14px;
+                color: red;
+            }
+
+            .delete-all-btn {
+                position: absolute;
+                top: -30px;
+                left: 134px;
+                background-color: red;
+                color: white;
+                border: 1px solid red;
+                padding: 5px 10px;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 5px;
+                z-index: 10;
+            }
+
+                .delete-all-btn:hover {
+                    background-color: darkred;
+                    border-color: darkred;
+                }
+
+            .d-none {
+                display: none !important;
+            }
+
+            .loading-animation {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+            }
+
+            .spinner {
+                width: 30px;
+                height: 30px;
+                border: 4px solid rgba(0, 123, 255, 0.3);
+                border-top-color: #007BFF;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            .loading-animation p {
+                margin-top: 10px;
+                font-size: 14px;
+                color: #007BFF;
+            }
+        </style>
+
+        <script>
+            function triggerFileInput() {
+                document.getElementById('UploadedFiles').click();
+            }
+
+            function previewPhotos(input) {
+                const photoPreview = document.getElementById('photoPreview');
+                const warningText = document.getElementById('durationWarning');
+                const currentPhotos = photoPreview.getElementsByClassName('image-preview-container');
+                const files = Array.from(input.files);
+
+                const totalPhotos = currentPhotos.length + files.length;
+
+                if (totalPhotos > 60) {
+                    alert("Maksimum 60 fotoğraf yükleyebilirsiniz!");
+                    return;
+                }
+
+                warningText.style.display = "none"; // Uyarı metnini gizle
+
+                files.forEach((file) => {
+                    const loadingTime = Math.floor(Math.random() * 6000) + 1000;
+                    const div = document.createElement('div');
+                    div.classList.add('image-preview-container');
+
+                    div.innerHTML = `
+                                        <div class="loading-animation">
+                                            <div class="spinner"></div>
+                                            <p>Yükleniyor...</p>
+                                        </div>
+                                    `;
+                    photoPreview.appendChild(div);
+
+                    setTimeout(() => {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            div.innerHTML = `
+                                                <span class="vitrin-label" style="display: ${currentPhotos.length === 0 ? 'block' : 'none'};">Vitrin</span>
+                                                <img src="${e.target.result}" alt="Photo" />
+                                                <span class="delete-icon" onclick="removePhoto(this)">✖</span>
+                                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    }, loadingTime);
+                });
+
+                if (photoPreview.children.length > 0) {
+                    document.getElementById('deleteAllButton').classList.remove('d-none');
+                }
+
+                enableDragAndDrop();
+            }
+
+            function removePhoto(element) {
+                const photoPreview = document.getElementById('photoPreview');
+                const parentDiv = element.parentElement;
+                photoPreview.removeChild(parentDiv);
+
+                updateVitrinLabel();
+
+                if (photoPreview.children.length === 0) {
+                    document.getElementById('deleteAllButton').classList.add('d-none');
+                    document.getElementById('durationWarning').style.display = "block"; // Uyarı metnini tekrar göster
+                }
+            }
+
+            function removeAllPhotos() {
+                const photoPreview = document.getElementById('photoPreview');
+                photoPreview.innerHTML = '';
+                document.getElementById('deleteAllButton').classList.add('d-none');
+                document.getElementById('durationWarning').style.display = "block"; // Uyarı metnini tekrar göster
+            }
+
+            function updateVitrinLabel() {
+                const photoPreview = document.getElementById('photoPreview');
+                const previewContainers = photoPreview.getElementsByClassName('image-preview-container');
+
+                Array.from(previewContainers).forEach(container => {
+                    const vitrinLabel = container.querySelector('.vitrin-label');
+                    if (vitrinLabel) vitrinLabel.style.display = 'none';
+                });
+
+                if (previewContainers.length > 0) {
+                    const firstVitrinLabel = previewContainers[0].querySelector('.vitrin-label');
+                    if (firstVitrinLabel) firstVitrinLabel.style.display = 'block';
+                }
+            }
+
+            function enableDragAndDrop() {
+                const photoPreview = document.getElementById('photoPreview');
+                let draggedElement = null;
+
+                photoPreview.addEventListener('dragstart', (e) => {
+                    draggedElement = e.target.closest('.image-preview-container');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                photoPreview.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+
+                photoPreview.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const target = e.target.closest('.image-preview-container');
+                    if (target && draggedElement !== target) {
+                        const allItems = Array.from(photoPreview.children);
+                        const draggedIndex = allItems.indexOf(draggedElement);
+                        const targetIndex = allItems.indexOf(target);
+
+                        if (draggedIndex < targetIndex) {
+                            photoPreview.insertBefore(draggedElement, target.nextSibling);
+                        } else {
+                            photoPreview.insertBefore(draggedElement, target);
+                        }
+                    }
+                });
+            }
+        </script>
+
+
+
+
+        <!-- Video Yükleyin -->
+        <div class="form-group">
+            <label for="VideoUpload">Video Yükleyin:</label>
+            <div class="upload-container">
+                <div id="videoUploadArea" class="video-upload-area" onclick="triggerVideoInput()">
+                    <i class="fas fa-video video-icon"></i>
+                    <div class="tooltip-text d-none">Bulut sistemi ile yapılan yüklemeler daha uzun sürebilir. Lütfen bilgisayarınızdan doğrudan yükleme yapmayı tercih edin.</div>
+                </div>
+                <div class="video-upload-info">
+                    <br />
+                    <p class="warning-text" id="sizeWarning">
+                        Video süresi en fazla 2 dakika olmasına dikkat edin.<br />
+                        Videolar en fazla 200MB olmasına dikkat edin.
+
+                    </p>
+                </div>
+                <div id="videoPreview" class="video-preview"></div>
+            </div>
+            <input type="file" id="UploadedVideos" name="UploadedVideos" class="form-control d-none" accept="video/*" onchange="previewVideos(this)">
+        </div>
+
+        <style>
+            .upload-container {
+                display: flex;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .video-upload-area {
+                width: 150px;
+                height: 150px;
+                border: 2px dashed #007BFF;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                background-color: rgba(0, 123, 255, 0.1);
+                cursor: pointer;
+                position: relative;
+            }
+
+                .video-upload-area:hover {
+                    background-color: rgba(0, 123, 255, 0.2);
+                }
+
+            .video-icon {
+                font-size: 50px;
+                color: #007BFF;
+                opacity: 0.7;
+            }
+
+            .tooltip-text {
+                position: absolute;
+                bottom: -30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #fff;
+                color: #333;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px 10px;
+                font-size: 12px;
+                white-space: nowrap;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+            }
+
+                .tooltip-text.d-none {
+                    display: none;
+                }
+
+            .video-preview {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+                .video-preview video {
+                    width: 300px;
+                    height: 150px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    margin-top: -10px;
+                }
+
+            .warning-text {
+                font-size: 14px;
+                color: red;
+            }
+
+            .uploading-text {
+                position: absolute;
+                font-size: 30px;
+                font-weight: bold;
+                color: #007BFF;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 999;
+            }
+
+            #uploadProgressDisplay {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: rgba(0, 123, 255, 0.7);
+                color: white;
+                padding: 5px 8px;
+                border-radius: 3px;
+                font-size: 16px;
+                display: none;
+                font-weight: bold;
+                transition: opacity 0.3s ease-in-out;
+            }
+        </style>
+
+
+
+
+
+        <script>
+            let videoUploaded = false;  // İlk başta video yüklenmiş değil.
+
+            function triggerVideoInput() {
+                if (videoUploaded) {
+                    alert("Sadece bir video yüklenebilir.");
+                    return;
+                }
+                document.getElementById('UploadedVideos').click();
+            }
+
+            document.getElementById('videoUploadArea').addEventListener('mouseover', function () {
+                const tooltip = this.querySelector('.tooltip-text');
+                tooltip.classList.remove('d-none');
+            });
+
+            document.getElementById('videoUploadArea').addEventListener('mouseout', function () {
+                const tooltip = this.querySelector('.tooltip-text');
+                tooltip.classList.add('d-none');
+            });
+
+            function previewVideos(input) {
+                const video = input.files[0];
+
+                // Video boyutu kontrolü (200MB)
+                if (video.size > 200 * 1024 * 1024) {
+                    document.getElementById('sizeWarning').style.display = 'block';
+                    input.value = ''; // Yüklenmişse input'u sıfırlayın.
+                    return;
+                } else {
+                    document.getElementById('sizeWarning').style.display = 'none';
+                }
+
+                // Video süresi kontrolü (2 dakika)
+                const videoElement = document.createElement('video');
+                videoElement.preload = 'metadata';
+                videoElement.onloadedmetadata = function () {
+                    const duration = videoElement.duration;
+                    if (duration > 120) {  // 120 saniye = 2 dakika
+                        document.getElementById('durationWarning').style.display = 'block';
+                        input.value = ''; // Yüklenmişse input'u sıfırlayın.
+                        return;
+                    } else {
+                        document.getElementById('durationWarning').style.display = 'none';
+                    }
+
+                    if (videoUploaded) {
+                        alert("Sadece bir video yüklenebilir.");
+                        input.value = ''; // Yüklenmişse input'u sıfırlayın.
+                        return;
+                    }
+
+                    const videoPreview = document.getElementById('videoPreview');
+                    videoPreview.innerHTML = '';  // Eski video önizlemesi temizleniyor
+
+                    const files = Array.from(input.files);
+
+                    files.forEach((file) => {
+                        const videoUploadArea = document.getElementById('videoUploadArea');
+                        videoUploadArea.innerHTML = '<div class="uploading-text">0%</div>'; // Yüzde gösterimi başladı
+                        let progress = 0;
+                        videoUploaded = true;
+
+                        // Yükleme süresi rastgele belirleniyor (35 ile 60 saniye arasında)
+                        const totalTime = Math.floor(Math.random() * (60 - 35 + 1)) + 35; // 35-60 saniye arasında
+                        let intervalTime = (totalTime * 1000) / 100; // Başlangıçta %1 artış için 100 dilim
+
+                        // Sağ alt köşede ilerleme göstergeyi başlat
+                        const uploadProgressDisplay = document.getElementById('uploadProgressDisplay');
+                        uploadProgressDisplay.style.display = 'block';
+                        uploadProgressDisplay.innerText = `Video Yükleniyor: 0%`;
+
+                        const interval = setInterval(() => {
+                            // Rastgele hız değişimlerine karar verelim
+                            let speedFactor = 1; // Normal hız başlangıç
+                            let randomEffect = Math.random();
+
+                            if (randomEffect < 0.3) { // %30 ihtimalle duraklama efekti
+                                speedFactor = 0; // Yükleme duruyor
+                                setTimeout(() => {
+                                    progress++; // Duraklama bitince ilerlemeyi başlat
+                                }, Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000); // 1-2 saniye arası duraklama
+                            } else if (randomEffect < 0.6) { // %30 ihtimalle hızlanma efekti
+                                speedFactor = 1.5; // Hızlandır
+                            } else if (randomEffect < 0.9) { // %30 ihtimalle yavaşlama efekti
+                                speedFactor = 0.5; // Yavaşlat
+                            }
+
+                            // Yükleme işlemi zamanla devam eder
+                            if (progress <= 100) {
+                                progress += speedFactor; // İlerlemenin hızını yavaşlatma veya hızlandırma
+                            }
+
+                            // Yükleme tamamlandığında işlemi durdur
+                            if (progress >= 100) {
+                                progress = 100;
+                                clearInterval(interval);
+
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    const div = document.createElement('div');
+                                    div.classList.add('preview-container');
+                                    div.innerHTML = `
+                                            <video controls>
+                                                <source src="${e.target.result}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <span class="delete-icon" onclick="removeVideo(this)">✖</span>
+                                        `;
+                                    videoPreview.appendChild(div);
+                                };
+                                reader.readAsDataURL(file);
+
+                                videoUploadArea.innerHTML = '<i class="fas fa-video video-icon"></i>'; // Orijinal ikon geri yüklendi
+
+                                // %100 tamamlandığında 3 saniye sonra sağ alt göstergeyi gizle
+                                setTimeout(() => {
+                                    uploadProgressDisplay.style.display = 'none';
+                                }, 3000); // 3000 ms = 3 saniye
+                            }
+
+                            // Tam sayı olarak yuvarlama
+                            const roundedProgress = Math.floor(progress); // Yüzdeyi tam sayıya yuvarla
+
+                            const uploadingText = videoUploadArea.querySelector('.uploading-text');
+                            if (uploadingText) {
+                                uploadingText.innerText = `${roundedProgress}%`; // Yuvarlanmış değeri göster
+                            }
+                            uploadProgressDisplay.innerText = `Video Yükleniyor: ${roundedProgress}%`;
+
+                        }, intervalTime);
+                    });
+
+                };
+                videoElement.src = URL.createObjectURL(video);
+            }
+
+            function removeVideo(icon) {
+                const container = icon.closest('.preview-container');
+                container.remove();
+                videoUploaded = false; // Video silindiğinde sıfırlama yapıldı
+
+                // Video önizleme alanını temizleme
+                const videoPreview = document.getElementById('videoPreview');
+                videoPreview.innerHTML = ''; // Video önizlemelerini sıfırlayın
+
+                // Yükleme alanını tekrar etkinleştir
+                document.getElementById('videoUploadArea').innerHTML = '<i class="fas fa-video video-icon"></i>';
+                alert("Video silindi, yeni video yükleyebilirsiniz.");
+            }
+
+            // Sayfa kaydırıldığında yükleme göstergesini görünür yapma
+            window.addEventListener('scroll', function () {
+                const uploadProgressDisplay = document.getElementById('uploadProgressDisplay');
+                if (window.scrollY > 650) {
+                    uploadProgressDisplay.style.opacity = '1';  // Görünür yap
+                } else {
+                    uploadProgressDisplay.style.opacity = '0';  // Gizle
+                }
+            });
+
+        </script>
+
+        <!-- Sağ alt köşe yükleme durumu -->
+        <div id="uploadProgressDisplay">Video Yükleniyor: 0%</div>
+
+
+
+
+
+
+
+
+        <div class="form-group">
+            <label for="VideoLink">Firmanızın Reklam Filmi Ya Da Bu İlanın YouTube Video Linkini Yapıştırın:</label>
+            <input type="text" id="VideoLink" name="VideoLink" class="form-control" oninput="previewVideoLink(this)">
+            <div id="videoLinkPreview" class="mt-2"></div>
+        </div>
+
+         <div class="form-group">
+            <label for="TKGMParselLink">TKGM Parsel Sorgu Linki:</label>
+            <input type="text" id="TKGMParselLink" name="TKGMParselLink" class="form-control" placeholder="TKGM parsel sorgu linkinizi girin">
+        </div>
+
+        <script>
+            function previewVideoLink(input) {
+                const videoLinkPreview = document.getElementById("videoLinkPreview");
+                const url = input.value.trim();
+
+                // Regular expression to match YouTube URL formats
+                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                const match = url.match(regex);
+
+                if (match && match[1]) {
+                    const videoId = match[1]; // Extract the video ID
+
+                    // Generate iframe HTML for embedding the video
+                    videoLinkPreview.innerHTML = `
+                            <iframe width="560" height="315"
+                                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                            </iframe>`;
+                } else {
+                    videoLinkPreview.innerHTML = ''; // Clear preview if no valid video link
+                }
+            }
+        </script>
+
+
+
+
+        <!-- CSS -->
+        <style>
+            .preview-container {
+                position: relative;
+                display: inline-block;
+                margin: 5px;
+            }
+
+                .preview-container img {
+                    width: 80px; /* Yeni boyut: 80px */
+                    height: 80px; /* Yeni boyut: 80px */
+                    object-fit: cover;
+                    border: 1px solid #ccc; /* İsteğe bağlı: Çerçeve eklemek için */
+                    border-radius: 4px; /* İsteğe bağlı: Kenarları yuvarlatmak için */
+                }
+
+            .delete-icon {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                cursor: pointer;
+                color: red;
+                font-weight: bold;
+                background-color: white;
+                border-radius: 50%;
+                padding: 2px;
+                width: 24px;
+            }
+
+            #videoPreview {
+                position: relative;
+                width: 100%;
+                max-width: 300px; /* İstediğiniz maksimum genişlik */
+                margin-top: 10px;
+            }
+
+            .video-container {
+                position: relative;
+                display: inline-block;
+            }
+
+                .video-container video {
+                    width: 100%; /* Pencereye sığacak şekilde ayarlayın */
+                    height: auto; /* Orantılı yüksekliği korusun */
+                }
+
+            .close-button {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background-color: red;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                padding: 5px;
+            }
+
+        </style>
+
+    <!-- İlan Detayları İçin Ana Kapsayıcı -->
+    <div class="ilan-detay">
+        <!-- Diğer İlan Detayları -->
+            <div class="form-group">
+                <label for="Title">İlan Başlığı</label>
+                <input type="text" id="Title" name="Title" class="form-control" maxlength="80" required />
+            </div>
+    </div>
+
+        <div class="form-group">
+            <label for="Description">Açıklama</label>
+            <textarea id="Description" name="Description" class="form-control" rows="5" required oninput="checkForForbiddenWords(this)"></textarea>
+        </div>
+
+        <style>
+            #Description {
+                resize: none;
+                height: 400px; /* Yüksekliği istediğiniz gibi ayarlayın */
+                font-family: Arial, sans-serif; /* Yazı tipini Arial yapar */
+            }
+        </style>
+
+    <script>
+        const forbiddenWords = ["salak", "aptal", "mal", "bok", "göt"];
+
+        function checkForForbiddenWords(textarea) {
+            const text = textarea.value;
+
+            // Split text into words
+            const words = text.split(/\s+/);
+
+            // Yeni metin için dizi oluştur
+            const newWords = [];
+
+            let containsForbidden = false; // Yasaklı kelime kontrolü için flag
+
+            // Her kelimeyi kontrol et
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i].toLowerCase(); // Küçük harfe çevir
+
+                if (forbiddenWords.includes(word)) {
+                    // Eğer yasaklı kelime bulunursa
+                    containsForbidden = true; // Flag'i true yap
+                    continue; // Kelimeyi atla
+                }
+                newWords.push(words[i]); // Yasaklı kelime değilse yeni metne ekle
+            }
+
+            // Eğer yasaklı kelime bulunursa
+            if (containsForbidden) {
+                textarea.value = newWords.join(' '); // Güncellenmiş metni textarea'ya yerleştir
+                // Kelimenin renk değiştirmesi için gerekli işlemleri burada yap
+                textarea.classList.add('forbidden'); // Yasaklı kelime sınıfını ekle
+            } else {
+                textarea.classList.remove('forbidden'); // Eğer yasaklı kelime yoksa sınıfı kaldır
+            }
+        }
+    </script>
+
+
+        <div class="form-group">
+            <label for="displayPrice">Fiyat (₺):</label>
+            <input type="text" id="displayPrice" name="displayPrice" class="form-control"
+                   required onblur="validatePrice(this)" oninput="sanitizeInput(this)" />
+            <input type="hidden" id="Price" name="Price" />
+            <div id="fiyatHataMin" class="text-danger" style="display: none;">
+                En az 1.000₺ olmalıdır.
+            </div>
+            <div id="fiyatHataMax" class="text-danger" style="display: none;">
+                En fazla 500.000.000₺ olmalıdır.
+            </div>
+        </div>
+
+        <script>
+            // Girilen değerdeki nokta ve virgülleri temizler
+            function sanitizeInput(input) {
+                input.value = input.value.replace(/[.,]/g, '');
+            }
+
+            // Rakamı 3'lü gruplar halinde nokta ile formatlar (örneğin: 1000 -> 1.000)
+            function formatNumberWithDots(number) {
+                // Eğer ondalıklı sayı ihtiyacınız varsa toFixed() gibi yöntemler de kullanılabilir.
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            // Fiyat girişi için validasyon işlemleri
+            function validatePrice(input) {
+                const minPrice = 1000;
+                const maxPrice = 500000000;
+                const fiyatHataMin = document.getElementById('fiyatHataMin');
+                const fiyatHataMax = document.getElementById('fiyatHataMax');
+                const hiddenPriceInput = document.getElementById('Price');
+
+                // Kullanıcının girdiği değerin nokta ve virgül temizlenmiş hali
+                const rawValue = input.value.replace(/[.,]/g, '');
+                const price = parseInt(rawValue, 10) || 0;
+
+                // Hata mesajlarını ve renk ayarlarını sıfırlıyoruz
+                fiyatHataMin.style.display = 'none';
+                fiyatHataMax.style.display = 'none';
+                input.style.color = '';
+
+                // Geçersiz karakter kontrolü
+                if (isNaN(price)) {
+                    input.value = '';
+                    hiddenPriceInput.value = '';
+                    calculatePricePerSquareMeter();
+                    return;
+                }
+
+                // Fiyat sınır kontrolleri
+                if (price < minPrice) {
+                    fiyatHataMin.style.display = 'block';
+                    input.style.color = 'red';
+                    input.value = '';
+                    hiddenPriceInput.value = '';
+                } else if (price > maxPrice) {
+                    fiyatHataMax.style.display = 'block';
+                    input.style.color = 'red';
+                    input.value = '';
+                    hiddenPriceInput.value = '';
+                } else {
+                    // Giriş doğruysa, formatlanmış değeri göster fakat saklanan (hidden) değeri ham haliyle tut
+                    input.value = formatNumberWithDots(price);
+                    hiddenPriceInput.value = price;
+                }
+                // Fiyat validasyonu sonrası metrekare fiyatını güncelle
+                calculatePricePerSquareMeter();
+            }
+
+            // Fiyatı metrekareye bölerek m² fiyatını hesaplar
+            function calculatePricePerSquareMeter() {
+                const price = parseInt(document.getElementById('Price').value, 10) || 0;
+                // Area girdisindeki noktaları ve virgülleri temizleyip sayısal değere çeviriyoruz.
+                const areaValue = document.getElementById('Area').value.replace(/[.,]/g, '');
+                const area = parseFloat(areaValue) || 0;
+                const pricePerSquareMeterInput = document.getElementById('PricePerSquareMeter');
+
+                // Fiyat ve alan doğru şekilde girildiyse; bölme işlemi yapılıyor
+                if (price > 0 && area > 0) {
+                    const pricePerSquareMeter = price / area;
+                    // Sonucu yuvarlayıp formatlı hale getiriyoruz.
+                    pricePerSquareMeterInput.value = formatNumberWithDots(Math.round(pricePerSquareMeter));
+                } else {
+                    // Eğer değerlerden biri geçerli değilse, alan temizleniyor
+                    pricePerSquareMeterInput.value = '';
+                }
+            }
+        </script>
+
+        <div class="form-group">
+            <label for="Area">Arazi Metrekaresi:</label>
+            <input type="text" id="Area" name="Area" class="form-control" oninput="calculatePricePerSquareMeter()" />
+        </div>
+
+        <div class="form-group">
+            <label for="PricePerSquareMeter">m² Fiyatı:</label>
+            <input type="text" id="PricePerSquareMeter" class="form-control" readonly style="color: green;" />
+        </div>
+
+
+   
+
+    <div class="form-group">
+        <label for="AdaNo">Ada No:</label>
+        <input type="text" id="AdaNo" name="AdaNo" class="form-control"  />
+    </div>
+
+    <div class="form-group">
+        <label for="ParselNo">Parsel No:</label>
+        <input type="text" id="ParselNo" name="ParselNo" class="form-control"  />
+    </div>
+
+    <div class="form-group">
+        <label for="PaftaNo">Pafta No:</label>
+        <input type="text" id="PaftaNo" name="PaftaNo" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="SerhDurumu">Şerh Durumu:</label>
+        <select id="SerhDurumu" name="SerhDurumu" class="form-control" >
+            <option value="">Seçiniz</option>
+            <option value="Elektrik Şerhi">Şerh Yok</option>
+            <option value="Elektrik Şerhi">Elektrik Şerhi</option>
+            <option value="DSİ Şerhi">DSİ Şerhi</option>
+            <option value="İhtiyati haciz">İhtiyati haciz</option>
+            <option value="Aile konutu şerhi">Aile konutu şerhi</option>
+            <option value="Davalıdır şerhi">Davalıdır şerhi</option>
+            <option value="Satışa şerh">Satışa şerh</option>
+            <option value="İhtiyati tedbir">İhtiyati tedbir</option>
+            <option value="Oturma hakkı">Oturma hakkı</option>
+            <option value="Haciz şerhi">Haciz şerhi</option>
+            <option value="İpotek şerhi">İpotek şerhi</option>
+            <option value="Vefa hakkı">Vefa hakkı</option>
+            <option value="Geçit hakkı">Geçit hakkı</option>
+            <option value="Şufa hakkı">Şufa hakkı</option>
+            <option value="İştira hakkı">İştira hakkı</option>
+            <option value="Ayırma şerhi">Ayırma şerhi</option>
+            <option value="İntifa hakkı">İntifa hakkı</option>
+            <option value="Birleştirme şerhi">Birleştirme şerhi</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Kaks">Kaks (Emsal):</label>
+        <select id="Kaks" name="Kaks" class="form-control">
+            <option value="">Seçiniz</option>
+            <option value="0.05">0.05</option>
+            <option value="0.10">0.10</option>
+            <option value="0.15">0.15</option>
+            <option value="0.20">0.20</option>
+            <option value="0.24">0.24</option>
+            <option value="0.25">0.25</option>
+            <option value="0.30">0.30</option>
+            <option value="0.35">0.35</option>
+            <option value="0.40">0.40</option>
+            <option value="0.45">0.45</option>
+            <option value="0.50">0.50</option>
+            <option value="0.60">0.60</option>
+            <option value="0.70">0.70</option>
+            <option value="0.75">0.75</option>
+            <option value="0.80">0.80</option>
+            <option value="0.90">0.90</option>
+            <option value="0.95">0.95</option>
+            <option value="1.0">1.0</option>
+            <option value="1.50">1.50</option>
+            <option value="1.55">1.55</option>
+            <option value="1.60">1.60</option>
+            <option value="1.75">1.75</option>
+            <option value="1.80">1.80</option>
+            <option value="1.90">1.90</option>
+            <option value="2.0">2.0</option>
+            <option value="2.07">2.07</option>
+            <option value="2.10">2.10</option>
+            <option value="2.15">2.15</option>
+            <option value="2.30">2.30</option>
+            <option value="2.40">2.40</option>
+            <option value="2.50">2.50</option>
+            <option value="2.80">2.80</option>
+            <option value="3.0">3.0</option>
+            <option value="3.20">3.20</option>
+            <option value="3.30">3.30</option>
+            <option value="5.0">5.0</option>
+            <option value="10.20">10.20</option>
+            <option value="15.30">15.30</option>
+            <option value="Belirtilmemiş">Belirtilmemiş</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Gabari">Gabari:</label>
+        <select id="Gabari" name="Gabari" class="form-control">
+            <option value="">Seçiniz</option>
+            <option value="3.50">3.50</option>
+            <option value="6.50">6.50</option>
+            <option value="7.50">7.50</option>
+            <option value="8.50">8.50</option>
+            <option value="9.50">9.50</option>
+            <option value="11.50">11.50</option>
+            <option value="12.50">12.50</option>
+            <option value="14.50">14.50</option>
+            <option value="15.50">15.50</option>
+            <option value="18.50">18.50</option>
+            <option value="21.50">21.50</option>
+            <option value="24.50">24.50</option>
+            <option value="27.50">27.50</option>
+            <option value="30.50">30.50</option>
+            <option value="36.00">36.00</option>
+            <option value="Serbest">Serbest</option>
+            <option value="Belirtilmemiş">Belirtilmemiş</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="KrediUygunluk">Krediye Uygunluk:</label>
+        <select id="KrediyeUygunluk" name="KrediyeUygunluk" class="form-control">
+            <option value="">Seçiniz</option>
+            <option value="Evet">Evet</option>
+            <option value="Hayır">Hayır</option>
+            <option value="Bilinmiyor">Bilinmiyor</option>
+        </select>
+    </div>
+
+        <div class="form-group">
+            <label for="TakasaUygunluk">Takasa Uygunluk:</label>
+            <select id="TakasaUygunluk" name="TakasaUygunluk" class="form-control">
+                <option value="">Seçiniz</option>
+                <option value="Uygun Değil">Uygun Değil</option>
+                <option value="Araba İle Takas">Araba İle Takas</option>
+                <option value="Ev İle Takas">Ev İle Takas</option>
+                <option value="Arazi ile Takas">Arazi ile Takas</option>
+                <option value="Araba + Arazi İle Takas">Araba + Arazi İle Takas</option>
+                <option value="Yarısı Nakit Yarısı Araç/Arazi">Yarısı Nakit Yarısı Araç/Arazi</option>
+            </select>
+        </div>
+
+
+
+    <!-- Tapu Durumu -->
+    <div class="form-group">
+        <label for="TapuDurumu">Tapu Durumu</label>
+        <select id="TapuDurumu" name="TapuDurumu" class="form-control" >
+            <option value="">Seçiniz</option>
+            <option value="KatMulkiyeti">Kat Mülkiyeti</option>
+            <option value="KatIrtifaki">Kat İrtifakı</option>
+            <option value="HisseliTapu">Hisseli Tapu</option>
+            <option value="MüstakilTapu">Müstakil Tapu</option>
+            <option value="ArsaTapusu">Arsa Tapusu</option>
+            <option value="KooperatifHisseliTapu">Kooperatif Hisseli Tapu</option>
+            <option value="YurtDisiTapusu">Yurt Dışı Tapusu</option>
+            <option value="TapuKaydiYok">Tapu Kaydı Yok</option>
+        </select>
+    </div>
+
+    <!-- Kimden -->
+    <div class="form-group">
+        <label for="Kimden">Kimden</label>
+        <select id="Kimden" name="Kimden" class="form-control" >
+            <option value="">Seçiniz</option>
+            <option value="EmlakOfisinden">Emlak Ofisinden</option>
+            <option value="Sahibinden">Sahibinden</option>
+        </select>
+    </div>
+
+
+    <div class="form-group">
+        <label for="GayrimenkulSahibi">Gayrimenkul Sahibi</label>
+        <select id="GayrimenkulSahibi" name="GayrimenkulSahibi" class="form-control" >
+            <option value="">Seçiniz</option>
+            <option value="TC Vatandaşı">T.C Vatandaşı</option>
+            <option value="TC Vatandaşı Değil">T.C Vatandaşı Değil</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="TasınmazNumarasi">Taşınmaz Numarası</label>
+        <input type="text" id="TasınmazNumarasi" name="TasınmazNumarasi" class="form-control"  onkeypress="return isNumberKey(event)" maxlength="11" />
+    </div>
+
+       <div class="category-box">
+    <div class="form-group">
+        <label for="location-input">Konum Seçiniz:</label>
+        <!-- Şehir, Semt ve Mahalle/Köy Seçenek Kutuları -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <select id="sehir" name="sehir" class="form-control" required>
+                <option value="">Şehir Seçiniz</option>
+                <!-- Şehir seçenekleri buraya eklenebilir -->
+            </select>
+
+            <select id="semt" name="semt" class="form-control" required>
+                <option value="">Semt Seçiniz</option>
+                <!-- Semt seçenekleri buraya eklenebilir -->
+            </select>
+
+            <select id="mahalleKoy" name="mahalleKoy" class="form-control" required>
+                <option value="">Mahalle/Köy Seçiniz</option>
+                <!-- Mahalle/Köy seçenekleri buraya eklenebilir -->
+            </select>
+        </div>
+
+        <!-- Konum inputu, artık harita ile bağlantılı değil -->
+        <input type="text" id="location-input" name="konum" class="form-control" placeholder="İl, İlçe, Mahalle Seçin" required readonly>
+        <span class="error-message" id="locationInputError" style="color: red; display: none;">Lütfen bu alanı doldurunuz.</span>
+    </div>
+</div>
+
+<!-- jQuery kütüphanesi -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    // Belge yüklendiğinde çalışacak fonksiyon
+    $(document).ready(function () {
+        // JSON dosyasından şehir, ilçe, mahalle/köy verilerini yükle
+        $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+            // Şehirleri sadece baş harfe göre alfabetik sıralayın
+            data.sort((a, b) => a.Il[0].localeCompare(b.Il[0]));
+
+            // Şehirleri doldur
+            data.forEach(function (city) {
+                $('#sehir').append(new Option(city.Il, city.Il));
+            });
+
+            // Şehir seçimi değiştiğinde ilçe ve mahalle seçeneklerini güncelle
+            $('#sehir').change(function () {
+                var selectedCity = $(this).val();
+                var selectedCityData = data.find(c => c.Il === selectedCity);
+
+                // İlçe menüsünü temizle
+                $('#semt').empty().append('<option value="">İlçe Seçiniz</option>');
+                // Mahalle menüsünü temizle
+                $('#mahalleKoy').empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+
+                if (selectedCityData) {
+                    // İlçeleri sadece baş harfe göre alfabetik sıralayın
+                    selectedCityData.Ilce.sort((a, b) => a.Ilce[0].localeCompare(b.Ilce[0]));
+
+                    selectedCityData.Ilce.forEach(function (district) {
+                        $('#semt').append(new Option(district.Ilce, district.Ilce));
+                    });
+                }
+            });
+
+            // Semt değiştiğinde mahalle seçeneklerini güncelle
+            $('#semt').change(function () {
+                var selectedCity = $('#sehir').val();
+                var selectedDistrict = $(this).val();
+                var selectedCityData = data.find(c => c.Il === selectedCity);
+                var selectedDistrictData = selectedCityData.Ilce.find(d => d.Ilce === selectedDistrict);
+
+                // Mahalle menüsünü temizle
+                $('#mahalleKoy').empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+
+                if (selectedDistrictData) {
+                    selectedDistrictData.Semt.forEach(function (neighborhood) {
+                        // Mahalleleri sadece baş harfe göre alfabetik sıralayın
+                        neighborhood.Mahalle.sort((a, b) => a.Mahalle[0].localeCompare(b.Mahalle[0]));
+
+                        neighborhood.Mahalle.forEach(function (mah) {
+                            // Mahalle ismini seçenekler olarak ekleyin
+                            $('#mahalleKoy').append(new Option(mah.Mahalle, mah.Mahalle));
+                        });
+                    });
+                }
+            });
+
+            // Şehir, semt veya mahalle/köy seçimi değiştiğinde konum inputunu güncelle
+            $('#sehir, #semt, #mahalleKoy').on('change', function () {
+                var sehir = $('#sehir').val();
+                var semt = $('#semt').val();
+                var mahalle = $('#mahalleKoy').val();
+
+                // Konum bilgilerini birleştir
+                var konum = [];
+                if (sehir) {
+                    konum.push(sehir);
+                }
+                if (semt) {
+                    konum.push(semt);
+                }
+                if (mahalle) {
+                    konum.push(mahalle);
+                }
+
+                // Eğer konum bilgisi varsa, virgülle ayırarak input alanına yaz
+                if (konum.length > 0) {
+                    $('#location-input').val(konum.join(', ')); // Virgülle ayırarak
+                } else {
+                    $('#location-input').val(''); // Konum yoksa inputu temizle
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+    <div class="form-group">
+        <label for="PatronunNotu">Patronun Notu:</label>
+        <textarea id="PatronunNotu" name="PatronunNotu" class="form-control" rows="4" placeholder="Patronun Notunu Danışmanların Hepsi Görür. Müşteriler Göremez."></textarea>
+    </div>
+
+    <div class="form-group" hidden>
+        <label for="FirstName">Ad:</label>
+        <input type="text" class="form-control" id="FirstName" name="FirstName" value="@user.FirstName" readonly />
+    </div>
+
+    <div class="form-group" hidden>
+        <label for="LastName">Soyad:</label>
+        <input type="text" class="form-control" id="LastName" name="LastName" value="@user.LastName" readonly />
+    </div>
+
+    <div class="form-group" hidden>
+        <label for="PhoneNumber">Telefon Numarası:</label>
+        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@user.PhoneNumber" readonly />
+    </div>
+
+    <div class="form-group" hidden>
+        <label for="Email">E-posta:</label>
+        <input type="email" class="form-control" id="Email" name="Email" value="@user.Email" readonly />
+    </div>
+
+        <div class="form-group" style="display: none;">
+            <label for="Category">Kategori</label>
+            <input type="text" id="Category" name="Category" class="form-control" value="@Model.Category" />
+        </div>
+
+        <div class="form-group" style="display: none;">
+            <label for="KonutDurumu">Konut Durumu</label>
+            <input type="text" id="KonutDurumu" name="KonutDurumu" class="form-control" value="@Model.KonutDurumu" />
+        </div>
+
+        <div class="form-group" style="display: none;">
+            <label for="MulkTipi">Mülk Tipi</label>
+            <input type="text" id="MulkTipi" name="MulkTipi" class="form-control" value="@Model.MulkTipi" />
+        </div>
+
+        <!-- Kullanıcının Profil Fotoğrafını Gösterme -->
+        <div class="form-group" style="display: none;">
+            <label for="ProfilePicturePath">Profil Fotoğrafı:</label>
+            <div>
+                <img src="@user.ProfilePicturePath" alt="Profil Fotoğrafı" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+            </div>
+        </div>
+
+        <!-- Kaydet ve Devam Et Butonu -->
+        <button type="button" class="btn btn-primary" id="submitButton">Kaydet ve Devam Et</button>
+</form>
+
+<!-- Yarı karanlık arka plan -->
+<div id="backdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background-color: rgba(0, 0, 0, 0.5); z-index: 900;"></div>
+
+<!-- Mesaj için tasarlanmış pencere -->
+<div id="loadingMessage" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+width: 400px; padding: 40px; background-color: #ffffff; border: 2px solid #007bff; border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1000;">
+    <p style="margin: 0; font-size: 20px; color: #007bff; text-align: center; font-weight: bold;">
+        İlanınız yayınlanıyor, lütfen bekleyin...
+    </p>
+</div>
+</div>
+
+<script>
+    document.getElementById("submitButton").addEventListener("click", function () {
+        // Formu seç
+        const form = document.getElementById("myForm");
+
+        // Required alanları kontrol et
+        const requiredFields = form.querySelectorAll("[required]");
+        let allFilled = true;
+
+        requiredFields.forEach(function (field) {
+            if (!field.value.trim()) {
+                allFilled = false;
+                field.style.borderColor = "red"; // Boş alanları kırmızı yap
+                field.scrollIntoView({ behavior: "smooth", block: "center" }); // Boş alanları ekrana getir
+            } else {
+                field.style.borderColor = ""; // Doldurulmuş alanları normal hale getir
+            }
+        });
+
+        // Eğer tüm required alanlar doluysa, mesajı göster ve formu gönder
+        if (allFilled) {
+            const loadingMessage = document.getElementById("loadingMessage");
+            const backdrop = document.getElementById("backdrop");
+            backdrop.style.display = "block"; // Yarı saydam arka planı göster
+            loadingMessage.style.display = "block"; // Yükleniyor mesajını göster
+
+            // 2 saniye sonra formu gönder
+            setTimeout(function () {
+                form.submit(); // Formu gönder
+            }, 2000);
+        }
+    });
+</script>
+
+<div id="loadingMessage" class="loading-message">
+    <p>İlanınız Yayınlanıyor Lütfen Bekleyin...</p>
+</div>
+
+<!-- Arka planı karartacak overlay -->
+<div id="overlay" class="overlay"></div>
+
+<style>
+    /* Sayfanın ortasında mesaj kutusunu stilize et */
+    .loading-message {
+        display: none; /* Başlangıçta görünmesin */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background-color: white;
+        border: 2px solid blue;
+        color: blue;
+        font-size: 18px;
+        text-align: center;
+        z-index: 10000; /* Yükleniyor mesajının üstte görünmesini sağlar */
+    }
+
+    /* Arka planı karartacak ve bulanıklaştıracak overlay */
+    .overlay {
+        display: none; /* Başlangıçta görünmesin */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Yarı saydam siyah arka plan */
+        backdrop-filter: blur(5px); /* Bulanıklaştırma efekti */
+        z-index: 9999; /* Yükleniyor mesajından önceki katman */
+    }
+</style>
+
+<script>
+    document.getElementById("submitButton").addEventListener("click", function (event) {
+        // Formdaki zorunlu alanları kontrol et
+        let isim = document.getElementById("isim").value;
+        let email = document.getElementById("email").value;
+
+        // Zorunlu alanlar boşsa, mesaj göster ve işlem durdur
+        if (!isim || !email) {  // Zorunlu alanlar boşsa
+            alert("Lütfen tüm zorunlu alanları doldurun!");
+            return;  // Fonksiyonu durdurur, yönlendirmeyi engeller
+        }
+
+        // Butonun formu hemen göndermesini engelle
+        event.preventDefault();
+
+        // Yükleniyor mesajını ve overlay'i göster
+        document.getElementById("loadingMessage").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+
+        // Belirli bir süre sonra sayfayı yönlendirebilirsiniz
+        setTimeout(function () {
+            // Formu göndererek yeni sayfaya yönlendir
+            document.getElementById("myForm").submit();
+        }, 3000);  // 3 saniye sonra form gönderilecek
+    });
+</script>
+
+
+<script>
+
+
+    function previewVideo(input) {
+        const videoPreview = document.getElementById('videoPreview');
+        videoPreview.innerHTML = ''; // Önceki önizlemeyi temizle
+
+        if (input.files && input.files[0]) {
+            const videoURL = URL.createObjectURL(input.files[0]);
+            const videoContainer = document.createElement('div');
+            videoContainer.classList.add('video-container');
+
+            const videoElement = document.createElement('video');
+            videoElement.src = videoURL;
+            videoElement.controls = true; // Kontrol butonlarını ekler
+
+            const closeButton = document.createElement('button');
+            closeButton.classList.add('close-button');
+            closeButton.innerHTML = '×'; // Çarpı işareti
+            closeButton.onclick = function () {
+                videoPreview.innerHTML = ''; // Video silindiğinde önizlemeyi temizle
+                input.value = ''; // Dosya yükleme inputunu sıfırla
+            };
+
+            videoContainer.appendChild(videoElement);
+            videoContainer.appendChild(closeButton);
+            videoPreview.appendChild(videoContainer);
+        }
+    }
+
+    function removeVideo(element) {
+        const videoPreview = document.getElementById('videoPreview');
+        videoPreview.innerHTML = ''; // Videoyu temizle
+        document.getElementById('Videos').value = ''; // Dosya girdi değerini sıfırla
+    }
+
+    function previewVideoLink(input) {
+        const videoLinkPreview = document.getElementById('videoLinkPreview');
+        videoLinkPreview.innerHTML = ''; // Önizleme alanını temizle
+
+        const link = input.value;
+        if (link) {
+            const embedUrl = link.replace('watch?v=', 'embed/'); // YouTube embed URL formatına dönüştürme
+            videoLinkPreview.innerHTML = `
+                <iframe width="200" height="113" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+            `;
+        }
+    }
+
+
+    function toggleTakasOptions() {
+        var takasCheckBox = document.getElementById("TakasaUygun");
+        var takasOptions = document.getElementById("takasOptions");
+
+        // Eğer "Takasa Uygun" kutucuğu işaretlendiyse seçenek kutucuğunu göster
+        if (takasCheckBox.checked) {
+            takasOptions.style.display = "block";
+        } else {
+            takasOptions.style.display = "none";
+        }
+    }
+
+    let map;
+    let marker;
+
+    function initMap() {
+        const defaultLocation = { lat: 41.0082, lng: 28.9784 }; // İstanbul, Türkiye
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 6,
+            center: defaultLocation,
+        });
+
+        marker = new google.maps.Marker({
+            position: defaultLocation,
+            map: map,
+            title: "Seçim Yapınız",
+            draggable: true,
+        });
+
+        const input = document.getElementById("location-input");
+        const autocomplete = new google.maps.places.Autocomplete(input, {
+            componentRestrictions: { country: ['TR'] }, // Sadece Türkiye'deki lokasyonları göster
+        });
+        autocomplete.bindTo("bounds", map);
+
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                return;
+            }
+
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(15);
+            }
+
+            marker.setPosition(place.geometry.location);
+            input.value = place.formatted_address; // Seçilen adresi inputa yaz
+        });
+
+        // Haritaya tıklama olayı ekleyin
+        map.addListener("click", (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            const latLng = { lat, lng };
+
+            marker.setPosition(latLng);
+            map.setCenter(latLng);
+
+            // Latitude ve Longitude'u inputa yaz
+            input.value = lat + ", " + lng;
+        });
+
+        google.maps.event.addListener(marker, "dragend", (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            input.value = lat + ", " + lng;
+        });
+    }
+
+
+
+    function checkMetrekare() {
+        const brutMetrekare = parseFloat(document.getElementById('BrutMetrekare').value);
+        const netMetrekare = parseFloat(document.getElementById('NetMetrekare').value);
+        const metrekareHata = document.getElementById('metrekareHata');
+
+        if (netMetrekare > brutMetrekare) {
+            metrekareHata.style.display = 'block';
+        } else {
+            metrekareHata.style.display = 'none';
+        }
+    }
+
+    function formatPrice(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (value.length > 3) {
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        input.value = value;
+    }
+
+    function validateForm() {
+        const priceInput = document.getElementById('Price');
+        const priceValue = parseInt(priceInput.value.replace(/\./g, ""), 10);
+        const fiyatHata = document.getElementById('fiyatHata');
+
+        if (priceValue < 1000) {
+            fiyatHata.style.display = 'block';
+            return false; // Formu gönderme
+        } else {
+            fiyatHata.style.display = 'none';
+        }
+
+        return true; // Formu gönder
+    }
+</script>
+
+<!-- Map'ı başlat -->
+<script>
+    google.maps.event.addDomListener(window, 'load', initMap);
+</script>
+
+
+
+<script>
+    // Kullanıcı cihazını tespit et
+    const isMobile8 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const whatsappNumber8 = "905393756389";
+    const message8 = "Merhaba,%20Şevval%20Emlak%20Sitenizden%20Size%20Ulaşıyorum";
+
+    // Doğru linki oluştur
+    const whatsappLink8 = isMobile8
+        ? `https://wa.me/${whatsappNumber8}?text=${message8}` // Mobilde uygulama
+        : `https://web.whatsapp.com/send?phone=${whatsappNumber8}&text=${message8}`; // Tarayıcıda WhatsApp Web
+
+    // Bağlantıyı ayarla
+    document.getElementById("whatsapp-link-8").href = whatsappLink8;
+</script>
+
+<style>
+    .whatsapp-float {
+        position: fixed;
+        bottom: 20px; /* Ekranın altından 20px yukarıda */
+        right: 20px; /* Ekranın sağından 20px içeride */
+        z-index: 1001; /* Üstte görünmesini sağlamak için yüksek bir z-index */
+    }
+
+    .whatsapp-image {
+        width: 90px; /* Resmin genişliği */
+        height: auto; /* Yüksekliği orantılı olarak ayarla
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
+        transition: transform 0.3s; /* Hover efekti için geçiş süresi */
+    }
+
+        .whatsapp-image:hover {
+            transform: scale(1.1); /* Üzerine gelindiğinde büyütme efekti */
+        }
+</style>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-content footer-contact">
+            <h2 class="footer-title">İletişim Bilgileri</h2>
+            <p class="footer-info">Adres: Güney Mh, Saatçi Sk, No:9/A Kocaeli/Körfez</p>
+            <p class="footer-info">
+                Telefon: <a href="tel:+902129555541" class="footer-link">0212 955 55 41</a>
+            </p>
+            <p class="footer-info">
+                Talep ve Öneri:
+                <a id="contact-email" href="#" class="footer-link">sevvaltalep@gmail.com</a>
+            </p>
+
+            <script>
+                document.getElementById("contact-email").addEventListener("click", function (event) {
+                    event.preventDefault(); // Bağlantıyı varsayılan olarak çalıştırmayı durdurur.
+
+                    const email = "sevvaltalep@gmail.com";
+                    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+                    if (mobileRegex.test(navigator.userAgent)) {
+                        // Mobil cihazlarda Gmail uygulamasını açmaya çalış
+                        window.location.href = `mailto:${email}`;
+                    } else {
+                        // Masaüstü cihazlarda Gmail web sitesine yönlendir
+                        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`, "_blank");
+                    }
+                });
+            </script>
+
+        </div>
+        <div id="ETBIS"><div id="7788668188421678"><a href="https://etbis.eticaret.gov.tr/sitedogrulama/7788668188421678" target="_blank"><img style='width:100px; height:120px' src="data:image/jpeg;base64, iVBORw0KGgoAAAANSUhEUgAAAIIAAACWCAYAAAASRFBwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAEWRSURBVHhe7Z0HuF1F9fYhICEQEoqAdBCkCSgkEDAUEQREEKSI9K4oiJRI7yBFUVA6CAihKb1jRCBA2s2tyU0hCem99w7zrd8+5913nX3nlJsCfz59n+cl3Gl7n73XzKy1Zs3sVQxhRfBvf/tbADNnzgwbbLBBs/xu3bol+R433XRTs3L7779/PjeEc889t1m+5zvvvJOU+/TTT8Nqq62WpF155ZVJGth1112b1RHXWWedMGnSpKTcc889l6a/+eabSZrH7bffXlAXfu9738vnNmHu3LnhG9/4RpJ//PHH51ObMHLkyPC1r30tyf/d736XTy2NefPmhU033TSpc9xxx+VTQ/jJT36S3sty8kVjglhmi1lOEHr37p3ke8QEoWPHjvncEH7zm980y/fs3r17Um7KlClp2hVXXJGkgW222aagfJaLFi1Kyr300ktp2n/+858kzeOOO+4oqAe//e1v53MLoZd28skn51OaMGvWrFQQrrvuunxqeWy++eZJnS9EELbddttw6qmntog//OEP0wbLCcJll10WnnzyyQLecMMNzdq88MIL0/zvf//7zdrh5arsXXfdlZR76KGHwmmnnZak8YBV/1e/+lWSduihh6b1O3XqlKSdeeaZyT1T7g9/+EPa5p///Oe0vojAKl8kTejTp09S7pFHHgnt27dPrrPXXns1a4e2NXIdfvjhzfJj5B7XW2+9pE5MENZee+1E6LL3V4onnXRSWGuttZL6xkJB+MUvfpG/ROWorq5WY2UFIcZrr702qePRt2/faFmRFygccMABSdrXv/71fEoIt912W1p2+PDhSVpDQ0Oa9tRTTyVpoHXr1knaT3/603xKCD/4wQ/SsmK5YfyMM85oVmdlMCYIW2+9dT6lZdhiiy3UbqEgnH766fkileO9995TY8skCLfccktSx4PhPlZWPOaYY/IlQ9rTv/nNb4alS5cmabfeemtatl+/fknaRx99lKb9/e9/T9LAxhtvnKSdcsop+ZT4kHvRRRflc+Ng5MnWWRmMCcKWW26ZTnGVYsGCBWGzzTZTu8UF4fLLL08ecjGOHj06KVdOEA466KBE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" /></a></div></div>
+
+        <div class="footer-section">
+            <h2 class="footer-title">Bizi Takip Edin</h2>
+            <div class="social-icons">
+                <a href="https://www.youtube.com/channel/UChZqkipFfybTJPO2iHWGe3Q?sub_confirmation=1" class="social-icon" target="_blank">
+                    <img src="~/images/youtubelogo.png" alt="Youtube">
+                </a>
+                <a href="https://www.instagram.com/sevvalsitesi/" class="social-icon" target="_blank">
+                    <img src="~/images/instagramlogo.png" alt="Instagram">
+                </a>
+                <a href="https://www.facebook.com/groups/2013013515882317" class="social-icon" target="_blank">
+                    <img src="~/images/facebooklogo.png" alt="Facebook">
+                </a>
+                <a href="https://l24.im/PfLhyG" class="social-icon" target="_blank">
+                    <img src="~/images/tiktoklogo.png" alt="TikTok">
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
+    </div>
+</footer>
+<style>
+    /* Genel Footer Stil */
+    .footer {
+        background: linear-gradient(90deg, #009cfb, #0056b3);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .footer-content, .footer-section {
+        flex: 1;
+        margin: 20px;
+        min-width: 250px;
+        font-size: 1rem;
+    }
+
+    .footer-contact {
+        text-align: left;
+    }
+
+    .footer-title {
+        font-size: 1.5rem;
+        margin-bottom: 17px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .footer-info {
+        position: relative;
+        margin: 8px;
+        font-size: 0.8rem;
+        left: -7px;
+        text-align: left;
+    }
+
+    .nav-links {
+        list-style: none;
+        padding: 0;
+    }
+
+        .nav-links li {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+    .footer-link {
+        text-decoration: none;
+        color: white;
+        white-space: nowrap;
+    }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+    .footer-social {
+        text-align: center;
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .social-icon {
+        margin: 0 10px;
+        display: inline-block;
+        transition: transform 0.3s;
+    }
+
+        .social-icon img {
+            width: 36px;
+            height: 36px;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+
+    .footer-bottom {
+        margin-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        padding-top: 10px;
+    }
+
+        .footer-bottom p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+</style>

@@ -1,0 +1,237 @@
+﻿.panel-forms-container {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.panel-forms-filter {
+    background: #ffffff;
+    border: 1px solid #eee;
+    transition: box-shadow 0.2s;
+}
+
+    .panel-forms-filter:hover {
+        box-shadow: 0 0 15px rgba(0,0,0,0.08);
+    }
+
+.panel-forms-table {
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+    .panel-forms-table thead {
+        background-color: #D4AF37 !important;
+        color: #fff;
+    }
+
+    .panel-forms-table tbody tr:hover {
+        background-color: #faf5e6 !important;
+        transition: 0.2s;
+    }
+
+@media (max-width: 992px) {
+    .panel-forms-filter .row > div {
+        width: 100%;
+    }
+
+    .panel-forms-table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .panel-forms-container h3 {
+        font-size: 1.2rem;
+    }
+
+    .panel-forms-filter {
+        padding: 1rem;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ==========================================================
+   PANEL FORMS & DASHBOARD STYLES
+   ========================================================== */
+
+.rep-dashboard-container {
+    background: #f8f9fa;
+    padding: 40px 20px;
+    min-height: 80vh;
+}
+
+.rep-dashboard-card {
+    max-width: 600px;
+    width: 100%;
+    border-radius: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rep-dashboard-card {
+        padding: 2rem 1rem !important;
+    }
+
+        .rep-dashboard-card h3 {
+            font-size: 1.3rem;
+        }
+}
+
+@media (max-width: 576px) {
+    .rep-dashboard-container {
+        min-height: 70vh;
+    }
+
+    .rep-dashboard-card .btn {
+        width: 100%;
+    }
+}
+
+.panel-forms-container table {
+    font-size: 0.9rem;
+}
+
+.panel-forms-container .table th {
+    background-color: #e8f0fe;
+    color: #0d6efd;
+}
+
+.panel-forms-container .table-hover tbody tr:hover {
+    background-color: #f6f9ff;
+}
+
+.panel-forms-filter {
+    background-color: #ffffff;
+    border: 1px solid #e2e6ea;
+}
+
+    .panel-forms-filter input,
+    .panel-forms-filter select {
+        border-radius: 10px;
+    }
+
+.btn-outline-success,
+.btn-outline-primary,
+.btn-outline-secondary {
+    border-radius: 10px;
+}
+
+
+/* ==============================
+   Kullanıcı Yönetimi Sayfası
+   ============================== */
+.panel-users-container {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.user-section {
+    border: 1px solid #e3e6ef;
+    border-radius: 15px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .user-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+.panel-users-table th {
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.panel-users-table td {
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.panel-users-table .btn {
+    padding: 4px 8px;
+}
+
+.alert {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==============================
+   Create/Edit/Delete Form UI
+   ============================== */
+.card {
+    transition: all 0.25s ease-in-out;
+}
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    }
+
+.form-label {
+    font-weight: 500;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.alert {
+    border-radius: 10px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* ============================================================
+    Icon 
+   ============================================================ */
+
+/*.bi {
+    display: inline-block;
+    font-size: 1.25rem; 
+    line-height: 1;
+    vertical-align: middle;
+    color: inherit; 
+}
+
+h3 .bi, h4 .bi, h5 .bi {
+    margin-right: 0.4rem;
+    font-size: 1.4rem;
+    color: var(--bs-primary, #0d6efd); 
+}
+
+.bi::before {
+    display: inline-block;
+    font-family: "Bootstrap-icons";
+    font-style: normal;
+    font-weight: normal !important;
+    speak: none;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}*/
+

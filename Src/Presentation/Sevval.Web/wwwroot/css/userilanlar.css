@@ -1,0 +1,154 @@
+﻿.profile-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.profile-info {
+    flex-grow: 1;
+    color: #007bff;
+}
+
+    .profile-info h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+
+    .profile-info p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+.back-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+    .back-btn:hover {
+        background-color: #0056b3;
+    }
+
+.header-bar {
+    background-image: url('https://i.hizliresim.com/nvfmug0.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 50px 0;
+    margin-bottom: 30px;
+}
+
+.no-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+}
+
+    .no-image i {
+        color: #7EC8E3;
+    }
+
+.card-img-top {
+    object-fit: cover;
+    height: 200px;
+}
+
+.result-description {
+    font-size: 1rem;
+}
+
+.giristarihi {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+
+@media screen and (max-width: 768px) {
+    /* Profil container */
+    .profile-container {
+        flex-direction: column; /* Dikey hizalama */
+        align-items: center;
+        width: 100%; /* Tam genişlik */
+        padding: 15px; /* Daha küçük padding */
+    }
+
+    .profile-img {
+        width: 80px; /* Daha küçük profil resmi */
+        height: 80px;
+        margin: 0 0 10px 0; /* Altına boşluk ekle */
+    }
+
+    .profile-info h3 {
+        font-size: 1.4rem; /* Başlık boyutunu küçült */
+        text-align: center; /* Ortala */
+    }
+
+    .profile-info p {
+        font-size: 0.9rem; /* Yazı boyutunu küçült */
+        text-align: center; /* Ortala */
+    }
+
+    .back-btn {
+        font-size: 0.9rem; /* Buton yazısını küçült */
+        padding: 8px 16px; /* Daha küçük buton boyutu */
+        margin-top: 10px; /* Üstten boşluk ekle */
+    }
+
+    /* Header bar */
+    .header-bar {
+        padding: 30px 0; /* Daha az padding */
+        margin-bottom: 20px; /* Daha az alt boşluk */
+    }
+
+    /* Kart container */
+    .card {
+        flex-direction: column; /* Dikey hizalama */
+        margin: 10px 0; /* Kartlar arasında boşluk */
+    }
+
+    .card-img-top {
+        height: 150px; /* Resim yüksekliğini küçült */
+    }
+
+    /* No-image */
+    .no-image {
+        height: 150px; /* Resim alanı yüksekliğini küçült */
+    }
+
+    /* Result description */
+    .result-description {
+        font-size: 0.9rem; /* Yazı boyutunu küçült */
+    }
+
+    /* Giriş tarihleri */
+    .giristarihi {
+        font-size: 0.8rem; /* Tarih boyutunu küçült */
+        text-align: center; /* Ortala */
+    }
+
+    /* Grid yapısını optimize et */
+    .row-cols-1 {
+        row-gap: 15px; /* Kartlar arasında dikey boşluk */
+    }
+}

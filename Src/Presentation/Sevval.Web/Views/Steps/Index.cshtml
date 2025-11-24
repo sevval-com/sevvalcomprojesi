@@ -1,0 +1,28 @@
+﻿@{
+    Layout = null; // Layout kullanmadığını belirt
+}
+
+@model IEnumerable<string>
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <title>Adımlar</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Adımlar</h1>
+        <div class="step-container">
+            @foreach (var step in Model)
+            {
+                <div class="step">
+                    <div class="step-circle">@Html.Raw(step.Substring(0, 1))</div>
+                    <div class="step-description">@step</div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

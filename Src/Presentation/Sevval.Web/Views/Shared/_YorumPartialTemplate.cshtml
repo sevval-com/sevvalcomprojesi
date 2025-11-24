@@ -1,0 +1,14 @@
+﻿<div class="comment-container flex items-start gap-4" data-comment-id="${data.yorumId}">
+    <img src="${data.profilResmi}" class="w-10 h-10 rounded-full flex-shrink-0" alt="${escapeHTML(data.kullaniciAdi)} profili" />
+    <div class="flex-1">
+        <div class="flex items-center gap-2 mb-0.5">
+            <p class="font-semibold text-slate-800 text-sm">${escapeHTML(data.kullaniciAdi)}</p>
+            ${data.isVideoOwner ? `<i class="fas fa-check-circle text-blue-500 text-xs" title="Video Sahibi"></i>` : ''}
+            <span class="text-slate-400 text-xs">${data.yorumTarihi}</span>
+        </div>
+        <p class="text-slate-700 text-sm">${escapeHTML(data.yorumMetni)}</p>
+        <div class="mt-2">
+            <button class="reply-button text-xs font-bold text-slate-500 hover:underline">YANITLA</button>
+        </div>
+    </div>
+</div>

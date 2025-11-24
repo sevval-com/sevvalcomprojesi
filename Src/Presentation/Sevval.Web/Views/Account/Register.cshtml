@@ -1,0 +1,564 @@
+@model sevvalemlak.Models.RegisterViewModel
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üye Ol</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <!-- Göz İkonu için Font Awesome Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/modern-register.css" />
+    <link href="~/css/register/register.css" rel="stylesheet" />
+    <link href="~/css/social-login.css" rel="stylesheet" />
+    <style>
+        .back-to-home {
+            background-color: #007bff; /* Canlı kırmızı */
+            padding: 5px 20px; /* Butonun iç boşluğunu büyütme */
+            text-align: center;
+            border-radius: 60px; /* Daha yuvarlak köşeler */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Daha belirgin gölge */
+            transition: all 0.3s ease-in-out; /* Geçiş efekti */
+            font-family: 'Arial', sans-serif; /* Modern font */
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+            .back-to-home a {
+                color: white;
+                text-decoration: none;
+                font-size: 18px; /* Font boyutunu artırdık */
+                font-weight: 600;
+                letter-spacing: 1px; /* Harf aralığını açtık */
+                display: inline-block;
+                transition: all 0.3s ease-in-out;
+            }
+
+            .back-to-home:hover {
+                background-color: #007bff; /* Hoverda rengin açılması */
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Hoverda gölgenin güçlenmesi */
+                transform: translateY(-8px); /* Yüksekliğe animasyon */
+            }
+
+            .back-to-home a:hover {
+                color: #fffff; /* Hoverda metin rengini altın yap */
+                transform: scale(1.1); /* Hoverda metni büyütme */
+            }
+
+            .back-to-home a:active {
+                transform: scale(1); /* Butona tıklandığında boyutunu eski haline getirme */
+            }
+                /* Footer responsiveness */
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+            .footer p {
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .footer a {
+                color: #007bff;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .footer a:hover {
+                    color: #0056b3;
+                    text-decoration: underline;
+                }
+        /* Zorunlu alan yıldızlarını etiketle aynı satıra yerleştir */
+        .form-card .form-group label { display: inline-flex; align-items: center; gap: 4px; }
+        .required-star { color: #dc3545; display: inline; }
+        .terms-label { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    </style>
+  
+
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+
+            <div class="form-content">
+                <h2 class="text-center">Sevval.com</h2>
+                <h2 class="text-center">Üye Ol</h2>
+                <p class="text-muted text-center" style="font-size: 0.95rem;">
+                    <span class="text-danger">*</span> ile işaretli alanların doldurulması zorunludur.
+                </p>
+
+                <form asp-action="Register" method="post" enctype="multipart/form-data" autocomplete="off">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <!-- Ad ve Soyad -->
+                    <div class="form-row row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="FirstName">Adı <span class="required-star">*</span></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="LastName">Soyadı <span class="required-star">*</span></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Email">E-posta Adresi <span class="required-star">*</span></label>
+                            <input asp-for="Email" id="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <span id="email-format-error" class="text-danger" style="display:none;">Lütfen geçerli bir e-posta adresi giriniz.</span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="PhoneNumber">Telefon Numarası <span class="required-star">*</span></label>
+                            <input asp-for="PhoneNumber" id="phoneNumber" type="tel" inputmode="numeric" pattern="\\d*" maxlength="16" class="form-control phone-input"
+                                   onkeypress="return event.charCode >= 48 && event.charCode <= 57" onblur="formatPhoneNumber()" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <div class="password-fields row">
+                            <div class="password-field col-md-6" style="position: relative;">
+                                <label for="password">Şifre <span class="required-star">*</span></label>
+                                <div class="password-container">
+                                    <input type="password" id="password" asp-for="Password" class="form-control" placeholder="Şifrenizi girin" required>
+                                    <span class="eye-toggle" id="togglePassword" data-target="password">
+                                        <i class="fa fa-eye" id="eyeIcon"></i>
+                                    </span>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="password-field col-md-6" style="position: relative;">
+                                <label for="confirmPassword">Şifre Yinele <span class="required-star">*</span></label>
+                                <div class="password-container">
+                                    <input type="password" id="confirmPassword" asp-for="ConfirmPassword" class="form-control" placeholder="Şifrenizi tekrar girin" required>
+                                    <span class="eye-toggle" id="toggleConfirmPassword" data-target="confirmPassword">
+                                        <i class="fa fa-eye" id="confirmEyeIcon"></i>
+                                    </span>
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                <span id="confirm-error" class="text-danger" style="display:none;">Şifreler eşleşmiyor.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profil fotoğrafı alanı -->
+                    <div class="form-row row">
+                        <div class="form-group col-12">
+                            <label asp-for="ProfilePicture">Profil Fotoğrafı</label>
+                            <input asp-for="ProfilePicture" type="file" class="form-control" style="padding:4px!important" />
+                            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                            <!-- Zorunlu Değil yazısı alt kısımda -->
+                            <div style="color: red; font-size: 0.9em;">*Zorunlu Değil</div>
+                        </div>
+                    </div>
+
+                    <!-- Sözleşme Onayı -->
+                    <div class="form-row terms-row">
+                        <div class="form-group terms-group">
+                            <label for="terms-checkbox" class="terms-label">
+                                <input type="checkbox" id="terms-checkbox" name="terms-checkbox" />
+                                <span class="checkmark"></span>
+                                <a href="#" id="show-terms" style="color: blue; text-decoration: underline;">
+                                    Bireysel Hesap Sözleşmesini
+                                </a>
+                                okudum ve onaylıyorum <span class="required-star">*</span>
+                            </label>
+                            <span id="terms-error" class="text-danger" style="display:none;">Bu alanın işaretlenmesi zorunludur.</span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-row row">
+                        <div class="form-group col-12">
+                            <button id="submitBtn" type="submit" style="width: 100%;" class="btn btn-primary mt-3" disabled>Üye Ol</button>
+                        </div>
+                    </div>
+
+                   @*  <!-- Sosyal Medya Giriş -->
+                    <div class="social-buttons text-center mt-1">
+                        <div class="separator-with-text">
+                            <span>veya sosyal medya ile kayıt olun</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="@Url.Action("LoginWithGoogle", "Account",new { Type = "Bireysel" })" class="btn-google w-100 d-flex align-items-center justify-content-center">
+                                    <i class="fab fa-google mr-2"></i> Google ile Kayıt
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <a href="@Url.Action("LoginWithApple", "Account",new { Type = "Bireysel" })" class="btn-apple w-100 d-flex align-items-center justify-content-center">
+                                    <i class="fab fa-apple mr-2"></i> Apple ile Kayıt
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+ *@
+
+
+                    <div class="footer">
+                    <p>Hesabınız yok mu? <a href="/Account/Register">Kayıt Olun</a></p>
+                    <p><a asp-controller="Account" asp-action="SendNewCode" style="padding: 20px 0;">Şifremi Unuttum?</a></p>
+                    <button class="btn btn-primary w-100"><a href="/" style="color: white; text-decoration: none;">Ana Sayfa</a></button>
+                </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Sözleşme Modalı -->
+    <div id="terms-modal" class="modal">
+        <div class="modal-content" style="max-width: 90%; max-height: 90vh; overflow-y: auto;">
+            <span class="close-button" id="close-modal">&times;</span>
+            <h1>Bireysel Hesap Sözleşmesi</h1>
+            <p>Şevval Emlak platformuna kayıt olan kullanıcılar aşağıdaki tüm şartları kabul etmiş sayılır. Bu şartlar, kullanıcıların platformu doğru, güvenli ve etik bir şekilde kullanmasını sağlamak amacıyla hazırlanmıştır.</p>
+            <ol>
+                <li>
+                    <strong>Hizmet Tanımı:</strong>
+                    <ul>
+                        <li>Şevval Emlak, kullanıcılarına emlak ilanlarını listeleme, görüntüleme, arama ve karşılaştırma hizmetleri sunar.</li>
+                        <li>Platform üzerinden yayınlanan ilanların içeriği, doğruluğu ve güncelliği tamamen ilan sahibinin sorumluluğundadır.</li>
+                        <li>Kullanıcılar, platformdan faydalanırken, kendi ilanlarını yükleyebilir veya mevcut ilanları inceleyebilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Kayıt ve Üyelik:</strong>
+                    <ul>
+                        <li>Kayıt işlemi sırasında kullanıcıların sağladığı tüm bilgilerin doğru ve eksiksiz olması zorunludur.</li>
+                        <li>Hatalı veya yanıltıcı bilgi veren kullanıcıların hesapları, Şevval Emlak tarafından önceden bildirilmeden askıya alınabilir veya iptal edilebilir.</li>
+                        <li>Bir kullanıcı, yalnızca bir bireysel hesap açma hakkına sahiptir. Çoğul hesaplar tespit edildiğinde, bu hesaplar kapatılabilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Platformun Kullanımı:</strong>
+                    <ul>
+                        <li>Platformun kötüye kullanımı, yasadışı içerik paylaşımı veya diğer kullanıcıları rahatsız edici davranışlar yasaktır.</li>
+                        <li>Her kullanıcı, yalnızca kendi adına işlem yapmakla yükümlüdür ve başka bir kullanıcı adına işlem yapamaz.</li>
+                        <li>Platformdaki her işlem kayıt altına alınır ve gerektiğinde yasal mercilere sunulabilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Kullanıcı Verileri:</strong>
+                    <ul>
+                        <li>Kişisel verileriniz KVKK kapsamında korunmaktadır ve üçüncü şahıslarla paylaşılmaz.</li>
+                        <li>Platform üzerinden paylaşılan verileriniz, yalnızca belirtilen amaçlar doğrultusunda işlenir ve güvenli şekilde saklanır.</li>
+                        <li>Kullanıcıların açık rızası olmadan kişisel veriler, başka bir amaçla kullanılmaz.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>İçerik Sorumluluğu:</strong>
+                    <ul>
+                        <li>Kullanıcılar tarafından platforma yüklenen içeriklerin (ilan, resim, açıklama, vb.) tüm yasal sorumluluğu yükleyen kullanıcıya aittir.</li>
+                        <li>Şevval Emlak, yüklenen içeriklerin doğruluğunu veya güncelliğini garanti etmez.</li>
+                        <li>Platformda, yanıltıcı veya yasalara aykırı içeriklerin tespit edilmesi durumunda, bu içerikler kaldırılır ve ilgili kullanıcı hesabı askıya alınabilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Ücretli Hizmetler:</strong>
+                    <ul>
+                        <li>Platformda ilanları ön plana çıkarma, reklam verme gibi ücretli hizmetler sunulabilir.</li>
+                        <li>Ücretli hizmetlerden faydalanmak isteyen kullanıcılar, ödeme işlemi sırasında belirtilen şartları kabul etmiş sayılır.</li>
+                        <li>Ödemeler iade edilmez ve ücretli hizmetlerin kötüye kullanımı durumunda hesap kapatılabilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Reklam Politikası:</strong>
+                    <ul>
+                        <li>Platformda reklam veren firmalar ve bireyler, sundukları içeriklerin yasalara uygun olmasını sağlamakla yükümlüdür.</li>
+                        <li>Yanıltıcı, hakaret içerikli veya yasa dışı reklamların tespiti durumunda bu reklamlar derhal kaldırılır.</li>
+                        <li>Reklam veren kullanıcılar, içeriklerinin doğruluğundan tamamen sorumludur.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Üyelik İptali:</strong>
+                    <ul>
+                        <li>Kullanıcılar, hesaplarını diledikleri zaman iptal etme hakkına sahiptir.</li>
+                        <li>Hesap iptali sonrası, kullanıcı bilgileri kanunlara uygun şekilde silinir veya anonim hale getirilir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Fikri Mülkiyet Hakları:</strong>
+                    <ul>
+                        <li>Platformda yer alan tüm yazılımlar, tasarımlar, içerikler ve görseller Şevval Emlak’a aittir ve izinsiz kopyalanamaz.</li>
+                        <li>Kullanıcılar, platformda yer alan herhangi bir içeriği izinsiz şekilde çoğaltamaz veya ticari amaçlarla kullanamaz.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Gizlilik ve Güvenlik:</strong>
+                    <ul>
+                        <li>Kullanıcıların hesap güvenliğini sağlamaları kendi sorumluluklarındadır. Şifre paylaşımı kesinlikle yasaktır.</li>
+                        <li>Şevval Emlak, kullanıcıların hesaplarına izinsiz erişim durumunda oluşabilecek zararlardan sorumlu değildir.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Değişiklik Hakkı:</strong>
+                    <ul>
+                        <li>Şevval Emlak, bu sözleşmede değişiklik yapma hakkını saklı tutar.</li>
+                        <li>Değişiklikler, kullanıcıların kayıtlı e-posta adresine gönderilir ve platformda duyurulur.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>İletişim:</strong>
+                    <ul>
+                        <li>Platformla ilgili her türlü soru, öneri veya şikayetleriniz için bizimle iletişime geçebilirsiniz:</li>
+                        <li><strong>E-posta:</strong> <a href="mailto:sevvaldestek@gmail.com">sevvaldestek@gmail.com</a></li>
+                        <li><strong>Web Sitesi:</strong> <a href="https://www.sevval.com" target="_blank">sevval.com</a></li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Şevval Emlak platformunu tercih ettiğiniz için teşekkür ederiz. Bizimle çalışmayı seçtiğiniz için mutluyuz!</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            // Dinamik e-posta format kontrolü (regex kullanmadan basit kontrol)
+            function isValidEmail(value) {
+                var at = value.indexOf(String.fromCharCode(64));
+                var dot = value.lastIndexOf('.');
+                return at > 0 && dot > at + 1 && dot < value.length - 1;
+            }
+            $('#email').on('input blur', function () {
+                var emailVal = $(this).val().trim();
+                if (emailVal.length === 0 || isValidEmail(emailVal)) {
+                    $('#email-format-error').hide();
+                    $('#email').removeClass('is-invalid');
+                } else {
+                    $('#email-format-error').show();
+                    $('#email').addClass('is-invalid');
+                }
+                validateForm();
+            });
+
+            // Şifre eşleşme kontrolü
+            function checkPasswordsMatch() {
+                var p1 = $('#password').val();
+                var p2 = $('#confirmPassword').val();
+                if (p1 && p2 && p1 !== p2) {
+                    $('#confirm-error').show();
+                    $('#confirmPassword').addClass('is-invalid');
+                    return false;
+                }
+                $('#confirm-error').hide();
+                $('#confirmPassword').removeClass('is-invalid');
+                return true;
+            }
+
+            $('#password, #confirmPassword').on('input blur', function () {
+                checkPasswordsMatch();
+                validateForm();
+            });
+
+            // Ad ve Soyad değişince formu kontrol et
+            $('input[name="FirstName"], input[name="LastName"]').on('input blur', function () {
+                validateForm();
+            });
+
+            // Telefon girişi (sadece rakam ve format)
+            $('.phone-input').on('input', function () {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 0 && value[0] !== '0') {
+                    value = '0' + value;
+                }
+                var formattedValue = value.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+                $(this).val(formattedValue);
+                validateForm();
+            });
+
+            // Zorunlu alanlar dolmadan submit butonunu kapat
+            function validateForm() {
+                var firstName = $('input[name="FirstName"]').val()?.trim();
+                var lastName = $('input[name="LastName"]').val()?.trim();
+                var emailOk = $('#email').val().trim().length > 0 && !$('#email-format-error').is(':visible') && $('.email-error').length === 0;
+                var phoneDigits = $('#phoneNumber').val().replace(/\D/g, '');
+                var phoneOk = phoneDigits.length === 11 && $('.phone-error').length === 0; // 0xxx xxx xx xx -> 11 hane
+                var passFilled = $('#password').val().length > 0;
+                var pass2Filled = $('#confirmPassword').val().length > 0;
+                var passMatch = checkPasswordsMatch();
+                var termsChecked = $('#terms-checkbox').is(':checked');
+
+                var allOk = firstName && lastName && emailOk && phoneOk && passFilled && pass2Filled && passMatch && termsChecked;
+                $('#submitBtn').prop('disabled', !allOk);
+            }
+
+            // Form submitini engelle (ek güvenlik)
+            $('form[asp-action="Register"]').on('submit', function (e) {
+                if (!checkPasswordsMatch()) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (!$('#terms-checkbox').is(':checked')) {
+                    e.preventDefault();
+                    $('#terms-error').show();
+                    return false;
+                }
+                validateForm();
+                if ($('#submitBtn').prop('disabled')) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+
+            // Terms checkbox kontrolü
+            $('#terms-checkbox').on('change', function () {
+                if (!$(this).is(':checked')) {
+                    $('#terms-error').show();
+                } else {
+                    $('#terms-error').hide();
+                }
+                validateForm();
+            });
+
+            // İlk yüklemede de kontrol et
+            validateForm();
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            function checkUserExists(field) {
+                var email = $("#email").val().trim();
+                var phone = $("#phoneNumber").val().trim();
+
+                $.ajax({
+                    url: '@Url.Action("CheckUserExists", "Account")', // Doğru controller adını yaz
+                    type: "POST",
+                    data: { email: email, phone: phone },
+                    success: function (response) {
+                        // Önce eski hata mesajlarını temizle
+                        $(".email-error").remove();
+                        $(".phone-error").remove();
+
+                        if (field === "email" && response.emailExists) {
+                            $("#email").val(""); // Email inputunu temizle
+                            $("#email").after('<span class="text-danger email-error">Bu e-posta zaten kayıtlı.</span>');
+                        }
+
+                        if (field === "phone" && response.phoneExists) {
+                            $("#phoneNumber").val(""); // Telefon inputunu temizle
+                            $("#phoneNumber").after('<span class="text-danger phone-error">Bu telefon numarası zaten kayıtlı.</span>');
+                        }
+                    }
+                });
+            }
+
+            $("#email").blur(function () {
+                checkUserExists("email");
+            });
+
+            $("#phoneNumber").blur(function () {
+                checkUserExists("phone");
+            });
+        });
+
+        function formatPhoneNumber() {
+            let input = document.getElementById("phoneNumber");
+            let value = input.value.replace(/\D/g, ""); // Sadece rakamları al
+
+            if (value.length === 10) {
+                value = "0" + value; // Eğer başında 0 yoksa ekle
+            }
+
+            if (value.length === 11) {
+                value = value.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4");
+            }
+
+            input.value = value;
+        }
+    </script>
+    <script>
+        function validateTerms() {
+            var termsCheckbox = document.getElementById('terms-checkbox');
+            var termsError = document.getElementById('terms-error');
+            if (!termsCheckbox.checked) {
+                termsError.style.display = 'block';
+                return false;
+            }
+            termsError.style.display = 'none';
+            return true;
+        }
+    </script>
+
+
+    <script>
+        // Modal Aç/Kapa İşlemleri
+        const showTerms = document.getElementById("show-terms");
+        const modal = document.getElementById("terms-modal");
+        const closeModal = document.getElementById("close-modal");
+
+        showTerms.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.style.display = "block";
+        });
+
+        closeModal.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        // Modal Kapanışı (Ekranın herhangi bir yerine tıklayınca)
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    </script>
+
+    <script>
+        // Şifreyi göster/gizle işlevi
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            var passwordField = document.getElementById('password');
+            var eyeIcon = document.getElementById('eyeIcon');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Şifreyi yenileyi göster/gizle işlevi
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+            var confirmPasswordField = document.getElementById('confirmPassword');
+            var confirmEyeIcon = document.getElementById('confirmEyeIcon');
+            if (confirmPasswordField.type === 'password') {
+                confirmPasswordField.type = 'text';
+                confirmEyeIcon.classList.remove('fa-eye');
+                confirmEyeIcon.classList.add('fa-eye-slash');
+            } else {
+                confirmPasswordField.type = 'password';
+                confirmEyeIcon.classList.remove('fa-eye-slash');
+                confirmEyeIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+</body>
+</html>

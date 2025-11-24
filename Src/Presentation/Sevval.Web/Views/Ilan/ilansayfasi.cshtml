@@ -1,0 +1,2326 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@using DocumentFormat.OpenXml.Office2010.PowerPoint
+@using Microsoft.AspNetCore.Identity
+@using sevvalemlak.Models
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var youtubeVideoId = string.Empty;
+    var isNotActive = Model._Ilanlar?.Any(i => i.Status != "active") ?? false;
+    var currentIlan = Model._Ilanlar?.FirstOrDefault(); 
+   
+    var imageUrls = new List<string>();
+    if (Model._Fotograflar != null && Model._Fotograflar.Any())
+    {
+        imageUrls.AddRange(Model._Fotograflar.Select(f => f.Url));
+    }
+    
+    var mainImageUrl = imageUrls.FirstOrDefault() ?? "https://placehold.co/1200x630/E0E0E0/333333?text=Gorsel+Bulunamadi";
+    
+    // canonicalUrl tanımını güncelliyoruz: ilan başlığını URL'ye dahil ediyoruz
+    // Türkçe karakterleri ve özel karakterleri URL uyumlu hale getiriyoruz
+    var seoFriendlyTitle = currentIlan?.Title?.ToLower()
+        .Replace(" ", "-")
+        .Replace("ğ", "g")
+        .Replace("ü", "u")
+        .Replace("ş", "s")
+        .Replace("ı", "i")
+        .Replace("ö", "o")
+        .Replace("ç", "c")
+        .Replace("(", "")
+        .Replace(")", "")
+        .Replace("[", "")
+        .Replace("]", "")
+        .Replace("{", "")
+        .Replace("}", "")
+        .Replace(".", "")
+        .Replace(",", "")
+        .Replace("'", "")
+        .Replace("\"", "")
+        .Replace("/", "-")
+        .Replace("\\", "-")
+        .Replace("&", "ve")
+        .Replace("?", "")
+        .Replace("!", "")
+        .Replace("=", "");
+
+    // Birden fazla tireyi tek tireye dönüştürme ve URL'nin başında veya sonunda tire olmamasını sağlama
+    seoFriendlyTitle = System.Text.RegularExpressions.Regex.Replace(seoFriendlyTitle ?? "", @"-+", "-").Trim('-');
+
+    var canonicalUrl = $"https://sevval.com/ilan/{seoFriendlyTitle}-{currentIlan?.Id}"; 
+    
+    var ilanDescriptionForMeta = currentIlan?.Description != null && currentIlan.Description.Length > 150 ? currentIlan.Description.Substring(0, 150) + "..." : currentIlan?.Description; 
+    
+    if (currentIlan != null && !string.IsNullOrEmpty(currentIlan.VideoLink)) 
+    {
+        youtubeVideoId = currentIlan.VideoLink.Split('?').LastOrDefault()?.Split('&').FirstOrDefault()?.Split('=').LastOrDefault();
+    }
+    var user = await UserManager.GetUserAsync(User);
+    Layout = null;
+    // Schema.org additionalProperty'leri için liste oluştur
+    var additionalProperties = new List<string>();
+    if (!string.IsNullOrEmpty(currentIlan?.MulkTipi)) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"Mülk Tipi\", \"value\": \"{currentIlan.MulkTipi}\" }}");
+    }
+    if (currentIlan?.Area != null) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"Metrekare\", \"value\": \"{currentIlan.Area}\" }}");
+    }
+    if (!string.IsNullOrEmpty(currentIlan?.ImarDurumu)) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"İmar Durumu\", \"value\": \"{currentIlan.ImarDurumu}\" }}");
+    }
+    if (!string.IsNullOrEmpty(currentIlan?.AdaNo)) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"Ada No\", \"value\": \"{currentIlan.AdaNo}\" }}");
+    }
+    if (!string.IsNullOrEmpty(currentIlan?.ParselNo)) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"Parsel No\", \"value\": \"{currentIlan.ParselNo}\" }}");
+    }
+    if (!string.IsNullOrEmpty(currentIlan?.TapuDurumu)) { 
+        additionalProperties.Add($"{{ \"@@type\": \"PropertyValue\", \"name\": \"Tapu Durumu\", \"value\": \"{currentIlan.TapuDurumu}\" }}");
+    }
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(currentIlan?.Title) | Sevval Emlak</title>
+    <meta name="description" content="@(ilanDescriptionForMeta)">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="@(canonicalUrl)">
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WSQR6TXV');</script>
+<!-- End Google Tag Manager -->
+    <!-- Open Graph (Facebook, LinkedIn) Meta Tags -->
+    <meta property="og:title" content="@(currentIlan?.Title)"> 
+    <meta property="og:description" content="@(ilanDescriptionForMeta)">
+    <meta property="og:image" content="@(mainImageUrl)">
+    <meta property="og:url" content="@(canonicalUrl)">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Sevval Emlak">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@(currentIlan?.Title)"> 
+    <meta name="twitter:description" content="@(ilanDescriptionForMeta)">
+    <meta name="twitter:image" content="@(mainImageUrl)">
+    <!-- Bootstrap and FontAwesome CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/ilansayfasi.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+    @if (isNotActive)
+    {
+        <style>
+            body {
+                filter: grayscale(100%);
+            }
+        </style>
+    }
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "RealEstateListing",
+        "name": "@(currentIlan?.Title)", 
+        "description": "@(currentIlan?.Description)", 
+        "url": "@(canonicalUrl)",
+        "image": [
+            @Html.Raw(string.Join(", ", imageUrls.Select(url => $"\"{url}\"")))
+        ],
+        "datePosted": "@(currentIlan?.GirisTarihi.ToString("yyyy-MM-ddTHH:mm:sszzz"))", 
+        "offers": {
+            "@@type": "Offer",
+            "price": "@(currentIlan?.Price)", 
+            "priceCurrency": "TRY",
+            "availability": "https://schema.org/InStock"
+        },
+        "address": {
+            "@@type": "PostalAddress",
+            "addressLocality": "@(currentIlan?.semt)", 
+            "addressRegion": "@(currentIlan?.sehir)", 
+            "addressCountry": "TR"
+        },
+        "geo": {
+            "@@type": "GeoCoordinates",
+            "latitude": "@(currentIlan?.Latitude)", 
+            "longitude": "@(currentIlan?.Longitude)" 
+        },
+        "additionalProperty": [
+            @Html.Raw(string.Join(", ", additionalProperties))
+        ]
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSQR6TXV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navbar -->
+    <nav class="navbaar">
+        <div class="navbaar-container">
+            <div class="logo">
+               <a href="/">
+                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+                <span>Sevval.com</span>
+            </div>
+            <!-- Hamburger Menu Icon -->
+            <div class="hamburger" id="hamburger-menu">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var hamburgerMenu = document.getElementById("hamburger-menu");
+                    var navLinks = document.getElementById("nav-links");
+
+                    // Hamburger menüye tıklanınca menüyü aç/kapat
+                    hamburgerMenu.addEventListener("click", function (event) {
+                        navLinks.classList.toggle("active");
+                        event.stopPropagation(); // Hamburger menüye tıklanınca kapanmayı engelle
+                    });
+
+                    // Sayfanın herhangi bir yerine tıklanınca menüyü kapat
+                    document.addEventListener("click", function (event) {
+                        if (!navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
+                            navLinks.classList.remove("active");
+                        }
+                    });
+                });
+            </script>
+            <ul class="naav-linkss" id="nav-links">
+                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
+                <li class="dropdoawn">
+                    <a href="@Url.Action("About", "Home")">Hakkımızda</a>
+                </li>
+
+                <li>
+                    <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
+                </li>
+
+               
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <li>
+                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                    </li>
+                   
+                }
+
+
+            </ul>
+            <div class="auth-buttoons">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var currentUser = await UserManager.GetUserAsync(User);
+
+                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                    if (currentUser != null)
+                    {
+                        <div class="dropdown">
+                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                            <ul class="dropdown-content">
+                                <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
+                                <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
+                                
+                                <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                                <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
+                                <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
+                                
+                                <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
+                                <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
+                                @if (User.Identity.IsAuthenticated &&
+                               (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+
+                                {
+                                    <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
+                                }
+                                <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
+                                <li>
+                                    <form asp-action="Logout" asp-controller="Account" method="post">
+                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                    }
+                }
+                else
+                {
+                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
+                }
+
+
+                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
+                <div class="post-ad-container">
+                    <span class="free-tag">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <style>
+        .post-ad-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .free-tag {
+            position: absolute;
+            top: -10px;
+            left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: rotate(-10deg); /* Hafif eğik bir görünüm */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+
+        .post-ad {
+            display: inline-block;
+            background-color: #ffffff; /* Beyaz arka plan */
+            color: #007bff; /* Mavi yazı rengi */
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 1px solid #007bff; /* Mavi çerçeve */
+            transition: 0.3s ease;
+        }
+
+            .post-ad:hover {
+                background-color: #007bff; /* Hoverda mavi arka plan */
+                color: white; /* Hoverda beyaz metin */
+            }
+
+        .coming-soon-tag {
+            position: absolute;
+            top: 20px;
+            left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+    </style>
+    <!-- Pop-up Penceresi -->
+    <div id="popup-giris" class="pencere">
+        <div class="pencere-icerik">
+            <button class="kapat-buton" id="pencere-kapat">&times;</button> <!-- Kapat Butonu -->
+            <div class="sol-bolum">
+                <h2>Bireysel</h2>
+                <a href="@Url.Action("Login", "Account",new {Type="BIREYSEL"})" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+            <div class="sag-bolum">
+                <h2>Kurumsal</h2>
+                <a href="@Url.Action("Login","Account",new{Type="KURUMSAL"} )" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("EmlakçıÜyelik", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Pop-up penceresi stili */
+        .pencere {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+
+        /* Pop-up içeriği stili */
+        .pencere-icerik {
+            background: linear-gradient(90deg, #1e88e5, #2196f3); /* Mavi tonları */
+            width: 460px;
+            height: 490px;
+            display: flex;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: gorunmeEfekti 0.3s ease;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            margin: auto;
+        }
+
+        /* Sol ve sağ bölümler */
+        .sol-bolum, .sag-bolum {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Sağ bölümdeki ayırıcı */
+        .sag-bolum {
+            border-left: 2px solid #fff;
+        }
+
+        /* Başlık stilleri */
+        h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Bağlantı buton stilleri */
+        .baglanti {
+            margin: 15px 0;
+            padding: 15px 25px;
+            background: #fff;
+            color: #1e88e5;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            width: 80%;
+        }
+
+            .baglanti:hover {
+                background: #f1f1f1;
+                transform: translateY(-2px);
+            }
+
+            .baglanti:focus {
+                outline: none;
+            }
+
+        /* Kapat butonu */
+        .kapat-buton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 30px;
+            color: #fff;
+            background: none;
+            border: 2px solid #fff;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .kapat-buton:hover {
+                color: #d32f2f;
+                border-color: #d32f2f;
+            }
+    </style>
+
+    <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('giris-buton').addEventListener('click', function (event) {
+            event.preventDefault();
+            document.getElementById('popup-giris').style.display = 'flex';
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('popup-giris').addEventListener('click', function (event) {
+            if (event.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Kapatma butonuna tıklandığında pop-up penceresini kapat
+        document.getElementById('pencere-kapat').addEventListener('click', function () {
+            document.getElementById('popup-giris').style.display = 'none';
+        });
+               function toggleHamburgerMenu() {
+            // Menü öğesinin görünür olup olmadığını kontrol et
+            if (document.querySelector('.naav-linkss')) {
+                document.querySelector('.naav-linkss').classList.toggle('active');
+            }
+        }
+
+
+
+
+    </script>
+
+
+
+    <!-- Pop-up Penceresi -->
+    <div id="login-popup" class="popup">
+        <div class="popup-content">
+            <!-- Emirhan Acar'ın Fotoğraf Popup'ı -->
+            <div id="emirhanPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanEmirhanPopup()">×</span>
+                    <img src="~/ImageFiles/emir.jpg" alt="Emirhan Acar Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+
+            <script>
+                // Popup açma fonksiyonu
+                function showEmirhanPopup() {
+                document.getElementById("emirhanPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanEmirhanPopup() {
+                document.getElementById("emirhanPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('emirhanPopup').addEventListener('click', function (event) {
+                if (event.target === this) { // Eğer dış alana tıklandıysa
+                this.style.display = 'none'; // Pop-up'ı kapat
+                }
+                });
+            </script>
+
+
+            <!-- İlkay Koyun'un Fotoğraf Popup'ı -->
+            <div id="ilkayPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanIlkayPopup()">×</span>
+                    <img src="~/ImageFiles/ilkay.jpg" alt="İlkay Koyun Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+            <script>
+                // Popup açma fonksiyonu
+                function showIlkayPopup() {
+                    document.getElementById("ilkayPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanIlkayPopup() {
+                    document.getElementById("ilkayPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('ilkayPopup').addEventListener('click', function (event) {
+                    if (event.target === this) { // Eğer dış alana tıklandıysa
+                        this.style.display = 'none'; // Pop-up'ı kapat
+                    }
+                });
+
+            </script>
+
+            <!-- Burak TÜMEN'in Fotoğraf Popup'ı -->
+            <div id="burakPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanBurakPopup()">×</span>
+                    <img src="~/ImageFiles/burak.jpg" alt="Burak TÜMEN Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+            <script>
+                // Popup açma fonksiyonu
+                function showBurakPopup() {
+                    document.getElementById("burakPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanBurakPopup() {
+                    document.getElementById("burakPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('burakPopup').addEventListener('click', function (event) {
+                    if (event.target === this) { // Eğer dış alana tıklandıysa
+                        this.style.display = 'none'; // Pop-up'ı kapat
+                    }
+                });
+
+            </script>
+
+
+            <!-- Fahri TÜMEN'in Fotoğraf Popup'ı -->
+            <div id="fahriPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanFahriPopup()">×</span>
+                    <img src="~/ImageFiles/fahri.jpg" alt="Fahri TÜMEN Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+            <script>
+                // Popup açma fonksiyonu
+                function showFahriPopup() {
+                    document.getElementById("fahriPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanFahriPopup() {
+                    document.getElementById("fahriPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('fahriPopup').addEventListener('click', function (event) {
+                    if (event.target === this) { // Eğer dış alana tıklandıysa
+                        this.style.display = 'none'; // Pop-up'ı kapat
+                    }
+                });
+
+
+            </script>
+
+            <!-- Serkan SÖZ'ün Fotoğraf Popup'ı -->
+            <div id="korayPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanKorayPopup()">×</span>
+                    <img src="~/ImageFiles/serkan.jpg" alt="Serkan SÖZ Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+            <script>
+                // Popup açma fonksiyonu
+                function showKorayPopup() {
+                    document.getElementById("korayPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanKorayPopup() {
+                    document.getElementById("korayPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('korayPopup').addEventListener('click', function (event) {
+                    if (event.target === this) { // Eğer dış alana tıklandıysa
+                        this.style.display = 'none'; // Pop-up'ı kapat
+                    }
+                });
+
+            </script>
+
+            <!-- Eren ACAR'ın Fotoğraf Popup'ı -->
+            <div id="erenPopup" class="danisman-popup" style="display: none;">
+                <div class="danisman-popup-content">
+                    <span class="danisman-popup-close" onclick="closeDanismanErenPopup()">×</span>
+                    <img src="~/ImageFiles/eren.jpg" alt="Eren ACAR Fotoğraf" class="danisman-popup-image">
+                </div>
+            </div>
+
+            <script>
+                // Popup açma fonksiyonu
+                function showErenPopup() {
+                    document.getElementById("erenPopup").style.display = "flex"; // Popup'ı görünür yapar
+                }
+
+                // Popup kapama fonksiyonu
+                function closeDanismanErenPopup() {
+                    document.getElementById("erenPopup").style.display = "none"; // Popup'ı gizler
+                }
+
+                // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                document.getElementById('erenPopup').addEventListener('click', function (event) {
+                    if (event.target === this) { // Eğer dış alana tıklandıysa
+                        this.style.display = 'none'; // Pop-up'ı kapat
+                    }
+                });
+
+            </script>
+            <div class="left-section">
+                <h2>Bireysel</h2>
+                <a href="@Url.Action("Login", "Account")" class="button">Giriş Yap</a>
+                <a href="@Url.Action("Register", "Account")" class="button">Üye Ol</a>
+            </div>
+            <div class="right-section">
+                <h2>Kurumsal</h2>
+                <a href="@Url.Action("Login", "Account")" class="button">Giriş Yap</a>
+                <a href="@Url.Action("EmlakçıÜyelik", "Account")" class="button">Üye Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('login-button').addEventListener('click', function (event) {
+            event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+            document.getElementById('login-popup').style.display = 'flex'; // Pop-up'ı aç
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('login-popup').addEventListener('click', function (event) {
+            if (event.target === this) { // Eğer dış alana tıklandıysa
+                this.style.display = 'none'; // Pop-up'ı kapat
+            }
+        });
+    </script>
+
+
+
+
+
+    <div class="container">
+        <div class="row">
+            @foreach (var ilan in Model._Ilanlar ?? Enumerable.Empty<IlanModel>())
+            {
+                <div class="col-md-4">
+                    <div class="ilan-card">
+                        <div class="ilan-baslik-container">
+
+                            <!-- Fiyat Kısmı -->
+                            <div class="ilan-fiyat-container">
+                                <span class="ilan-fiyat">
+                                    @(ilan?.Price.ToString("N0") ?? "Fiyat Belirtilmemiş") TL
+                                </span>
+                            </div>
+                            <div class="ilan-konum-container">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span class="ilan-konum">
+                                    @(ilan?.sehir ?? "Bilinmiyor") > @(ilan?.semt ?? "Bilinmiyor") > @(ilan?.mahalleKoy ?? "Bilinmiyor")
+                                </span>
+
+                            </div>
+
+                            <div class="ilan-kategori-container">
+                                <i class="fas fa-home"></i>
+                                <span class="ilan-kategori">
+                                    @(ilan?.Category ?? "Kategori Yok") > @(ilan?.KonutDurumu ?? "Durum Yok") > @(ilan?.MulkTipi ?? "Tip Yok")
+                                </span>
+                            </div>
+
+                            <h3 class="ilan-baslik">
+                                @(ilan?.Title?.Substring(0, Math.Min(ilan.Title?.Length ?? 0, 60)) ?? "Başlık Yok")
+                            </h3>
+                        </div>
+                        <hr style="border-top: 2px solid #007bff;">
+
+                        <!-- Buton Seçenekleri -->
+                        <div class="button-container">
+                            <div class="option-button active" onclick="showGallery('photo', event)">
+                                <i class="fas fa-image"></i>
+                                <span>Fotoğraflar</span>
+                            </div>
+                            <div class="option-button @(!Model._Videolar.Any() ? "inactive" : "")" id="video-button" onclick="showGallery('video', event)"
+                            @(!Model._Videolar.Any() ? "disabled" : "")>
+                                <i class="fas fa-video"></i>
+                                <span>Video</span>
+                            </div>
+                            <div class="option-button @(string.IsNullOrEmpty(Model._Ilanlar.FirstOrDefault()?.VideoLink) ? "inactive" : "")"
+                                 id="youtube-button" onclick="showGallery('youtube', event)"
+                            @(string.IsNullOrEmpty(Model._Ilanlar.FirstOrDefault()?.VideoLink) ? "disabled" : "")>
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube Videosu</span>
+                            </div>
+                        </div>
+
+                        <hr style="border-top: 2px solid #007bff;">
+
+                        <!-- İndirme Mesajı -->
+                        <div id="downloadMessage" class="download-message" style="display: none;">
+                            Fotoğraflar indiriliyor...
+                        </div>
+
+                        <div class="gallery-section" id="photo-gallery" style="display: block;">
+                            <div class="photo-gallery-container">
+                                <div class="photo-window" id="photoWindow">
+                                    <img src="@("https://www.sevval.com/" + (Model?._Fotograflar?.FirstOrDefault()?.Url ?? "default.jpg"))"
+                                         alt="Fotoğraf"
+                                         class="gallery-image" />
+                                </div>
+                                <button class="nav-button left" onclick="changePhoto(-1)">&#9664;</button>
+                                <button class="nav-button right" onclick="changePhoto(1)">&#9654;</button>
+                                <button class="btn-enlarge-photo" onclick="openCustomPhotoPopup()">Fotoğrafı Büyüt</button>
+                                <div class="download-section">
+                                    <button class="btn-download" onclick="downloadAllPhotos()">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </div>
+                                @* <div class="slideshow-section">
+                                    <button class="btn-slide" id="slideshowButton" onclick="toggleSlideshow()">
+                                        <i class="fa fa-play"></i>
+                                    </button>
+                                </div> *@
+                            </div>
+
+                            <div class="photo-preview-container">
+                                <div class="photo-preview-item blue" id="photoPreviewCount">
+                                    <span id="photoCountDisplay">1/0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="customPhotoPopup" class="custom-photo-popup" style="display: none;">
+                            <div class="custom-popup-content">
+                                <span class="custom-close-popup" onclick="closeCustomPhotoPopup()">&times;</span>
+                                <div class="custom-popup-photo-window">
+                                    <img id="customPopupImage" src="" alt="Büyük Fotoğraf" />
+                                </div>
+                                <div class="custom-photo-counter">
+                                    <span id="customPhotoCountDisplay">1/0</span>
+                                </div>
+                                <button class="custom-popup-nav-button custom-left"
+                                        onclick="changeCustomPhoto(-1)">
+                                    &#9664;
+                                </button>
+                                <button class="custom-popup-nav-button custom-right"
+                                        onclick="changeCustomPhoto(1)">
+                                    &#9654;
+                                </button>
+                            </div>
+                        </div>
+                        <style>
+                            .custom-photo-counter {
+                                position: absolute;
+                                bottom: 10px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                background-color: rgba(0, 0, 0, 0.6);
+                                color: white;
+                                padding: 5px 10px;
+                                border-radius: 5px;
+                                font-size: 14px;
+                                font-family: Arial, sans-serif;
+                                z-index: 10;
+                            }
+
+                        </style>
+
+
+                        <script>
+                            let currentCustomPhotoIndex = 0;
+                            const customPhotos = @Html.Raw(
+                            Json.Serialize(Model._Fotograflar.Select(f => "https://www.sevval.com/" + f.Url))
+                        );
+
+                            // Pop-up açma fonksiyonu
+                            function openCustomPhotoPopup() {
+                                const popup = document.getElementById("customPhotoPopup");
+                                const popupImage = document.getElementById("customPopupImage");
+                                popup.style.display = "flex";
+                                popupImage.src = customPhotos[currentCustomPhotoIndex];
+                            }
+
+                            // Pop-up kapama fonksiyonu
+                            function closeCustomPhotoPopup() {
+                                const popup = document.getElementById("customPhotoPopup");
+                                popup.style.display = "none";
+                            }
+
+                            // Fotoğraf değiştirme fonksiyonu
+                            function changeCustomPhoto(direction) {
+                                currentCustomPhotoIndex =
+                                    (currentCustomPhotoIndex + direction + customPhotos.length) %
+                                    customPhotos.length;
+                                const popupImage = document.getElementById("customPopupImage");
+                                if (popupImage) popupImage.src = customPhotos[currentCustomPhotoIndex];
+                            }
+
+                            function updateCustomPhotoCountDisplay() {
+                                const photoCountDisplay = document.getElementById("customPhotoCountDisplay");
+                                if (photoCountDisplay) {
+                                    const displayedIndex = (currentCustomPhotoIndex % customPhotos.length) + 1;
+                                    photoCountDisplay.innerText = `${displayedIndex}/${customPhotos.length}`;
+                                }
+                            }
+
+                            function changeCustomPhoto(direction) {
+                                currentCustomPhotoIndex =
+                                    (currentCustomPhotoIndex + direction + customPhotos.length) %
+                                    customPhotos.length;
+                                const popupImage = document.getElementById("customPopupImage");
+                                if (popupImage) {
+                                    popupImage.src = customPhotos[currentCustomPhotoIndex];
+                                }
+                                updateCustomPhotoCountDisplay();
+                            }
+
+                            // İlk açılışta sayaç güncelleniyor
+                            document.addEventListener("DOMContentLoaded", () => {
+                                updateCustomPhotoCountDisplay();
+                            });
+                        </script>
+
+                        <script>
+                            async function downloadAllPhotos() {
+                                // Fotoğraflar indiriliyor mesajını göster
+                                const messageDiv = document.getElementById("downloadMessage");
+                                messageDiv.style.display = "flex";
+
+                                const photoUrls = @Html.Raw(
+                                Json.Serialize(Model._Fotograflar.Select(f => "https://www.sevval.com/" + f.Url))
+                            );
+
+                                try {
+                                    // Eğer zip dosyası oluşturma sunucu tarafında yapılacaksa
+                                    const zipUrl = "/api/download/photos"; // Sunucuda bu endpoint'i oluşturmanız gerek
+                                    const response = await fetch(zipUrl, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(photoUrls),
+                                    });
+
+                                    if (response.ok) {
+                                        const blob = await response.blob();
+                                        const link = document.createElement("a");
+                                        link.href = URL.createObjectURL(blob);
+                                        link.download = "ilan-fotograflari.zip";
+                                        link.click();
+                                    } else {
+                                        alert("Fotoğraflar indirilemedi. Lütfen tekrar deneyin.");
+                                    }
+                                } catch (error) {
+                                    console.error("Fotoğraf indirme hatası:", error);
+                                    alert("Fotoğraflar indirilemedi. Lütfen tekrar deneyin.");
+                                } finally {
+                                    // 5 saniye sonra mesajı gizle
+                                    setTimeout(() => {
+                                        messageDiv.style.display = "none";
+                                    }, 2000);
+                                }
+                            }
+                        </script>
+
+
+                        <!-- Video Galerisi -->
+                        <div class="gallery-section" id="video-gallery" style="display: none;">
+                            @if (Model?._Videolar != null && Model._Videolar.Any())
+                            {
+                                @foreach (var video in Model._Videolar)
+                                {
+                                    var videoUrl = video?.Url ?? "";
+                                    if (videoUrl.Contains("autoplay=1"))
+                                    {
+                                        videoUrl = videoUrl.Replace("autoplay=1", "autoplay=0");
+                                    }
+
+                                    <div class="custom-video-container">
+                                        <video id="video-@video?.Id" class="custom-video-iframe" controls>
+                                            <source src="@videoUrl" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>Video bulunamadı.</p>
+                            }
+                        </div>
+
+                        <!-- YouTube Galerisi -->
+                        <div class="gallery-section" id="youtube-gallery" style="display: none;">
+                            @if (Model._Ilanlar != null && Model._Ilanlar.Any())
+                            {
+                                var videoLink = Model._Ilanlar.First().VideoLink;
+
+                                // YouTube video ID'sini linkten ayıklama (sadece "v" parametresini kullanacağız)
+                                var videoId = string.Empty;
+
+                                if (!string.IsNullOrEmpty(videoLink))
+                                {
+                                    videoId = videoLink.Split('?')
+                                    .Where(part => part.Contains("v="))
+                                    .Select(part => part.Split('=')[1])
+                                    .FirstOrDefault();
+                                }
+
+                                // YouTube video ID'si varsa video göster, yoksa boş bir oynatıcı göster
+                                <iframe class="video-iframe" width="898" height="377"
+                                        src="https://www.youtube.com/embed/@videoId?autoplay=0"
+                                        title="YouTube video player" frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                                </iframe>
+
+                                @if (string.IsNullOrEmpty(videoId))
+                                {
+                                }
+                            }
+                            else
+                            {
+                                <!-- Eğer ilanlar boşsa yine boş bir oynatıcı gösterilir -->
+                                <iframe class="video-iframe" width="560" height="315"
+                                        src="https://www.youtube.com/embed/?autoplay=0"
+                                        title="YouTube video player" frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                                </iframe>
+                                <p>Video bulunamadı.</p>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(currentIlan?.TKGMParselLink))
+                        {
+                            <div class="tkgm-link-container">
+                                <a href="@currentIlan.TKGMParselLink" target="_blank" class="tkgm-link-button">TKGM Linki</a>
+                            </div>
+                        }
+
+<style>
+    .tkgm-link-container {
+        text-align: center;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+    .tkgm-link-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #FFA500;
+        background-color: transparent;
+        border: 2px solid #FFA500;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .tkgm-link-button:hover {
+        color: #fff;
+        background-color: #007BFF;
+        border-color: #007BFF;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+    .tkgm-link-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+    media (min-width: 768px) {
+        .tkgm-link-button {
+            padding: 15px 40px;
+            font-size: 18px;
+        }
+    }
+    media (max-width: 480px) {
+        .tkgm-link-button {
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+        .tkgm-link-container {
+            padding: 0 15px;
+        }
+    }
+</style>
+
+                        <hr style="border-top: 2px solid #007bff;">
+                        @foreach (var item in Model._Ilanlar)
+                        {
+                            <!-- Aksiyonlar Bölümü -->
+                            <div class="actions-container">
+                                <span class="action-item" onclick="shareOnWhatsApp('https://sevval.com/Ilan/ilansayfasi/@item.Id')">
+                                    <i class="bi bi-share"></i> Paylaş
+                                </span>
+                                <span class="action-item" id="heart-icon-@item.Id" onclick="toggleFavorite(@item.Id)">
+                                    <i class="fas fa-heart @(ViewBag.FavoritedIds != null && ViewBag.FavoritedIds.Contains(@item.Id) ? "favorited" : "")"></i> Beğen (@ilan.FavoriSayisi)
+                                </span>
+                                <a class="action-item" href="mailto:sevvaldestek@gmail.com?subject=Şikayet&body=İyi günler, Bu ilan hakkında bir şikayetim var: https://localhost:7026/Ilan/ilansayfasi/@item.Id">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Şikayet Et
+                                </a>
+                                <!-- Yazdır Butonu -->
+                                <span class="action-item" onclick="window.print()">
+                                    <i class="bi bi-printer"></i> Yazdır
+                                </span>
+                            </div>
+
+                            <div class="ilan-detay">
+                                <!-- İlan Bilgileri -->
+                                <div class="ilan-bilgileri">
+                                    <button class="info-button">
+                                        <b>İlan Numarası:</b> @item.Id
+                                    </button>
+                                    <button class="info-button">
+                                        <b>Giriş Tarihi:</b> @item.GirisTarihi.ToString("dd.MM.yyyy") - @item.GirisTarihi.ToString("HH:mm")
+                                    </button>
+                                    <button class="info-button">
+                                        <b>Yayından Kalkacağı Tarihi:</b> @item.GirisTarihi.AddYears(1).ToString("dd.MM.yyyy")
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+
+                        <div id="favoriteHeart" class="favorite-heart" style="display: none;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <style>
+                            .favorite-heart {
+                                position: fixed;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                font-size: 100px;
+                                color: red;
+                                opacity: 0;
+                                pointer-events: none;
+                                z-index: 9999;
+                                transition: opacity 0.5s, transform 0.5s;
+                            }
+
+                                .favorite-heart.show {
+                                    opacity: 1;
+                                    transform: translate(-50%, -50%) scale(1.5);
+                                }
+
+                        </style>
+
+
+                        <!-- JavaScript -->
+                        <script>
+                                                      // WhatsApp paylaşımı
+                            function shareOnWhatsApp(link) {
+                                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`;
+                                window.open(whatsappUrl, '_blank');
+                            }
+
+                                                      function toggleFavorite(ilanId) {
+                                const heartIcon = document.getElementById(`heart-icon-${ilanId}`);
+                                const isFavorited = heartIcon.classList.contains('favorited');
+
+                                $.ajax({
+                                    url: '/Ilan/addFavorite',
+                                    type: 'POST',
+                                    data: { id: ilanId, favorited: !isFavorited },
+                                    success: function (response) {
+                                        if (response.success) {
+                                            // Durumu tersine çevir
+                                            heartIcon.classList.toggle('favorited');
+
+                                            // Kalp ikonunu göster
+                                            const favoriteHeart = document.getElementById("favoriteHeart");
+                                            favoriteHeart.style.display = 'block';  // Kalp ikonunu görünür yap
+
+                                            // Animasyonu başlat
+                                            favoriteHeart.classList.add("show");
+
+                                            // 2 saniye sonra animasyonu kaldır
+                                            setTimeout(function () {
+                                                favoriteHeart.classList.remove("show");
+                                                favoriteHeart.style.display = 'none';  // Kalp ikonunu tekrar gizle
+                                            }, 2000);
+                                        } else {
+                                            alert(response.message);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("İşlem sırasında bir hata oluştu.");
+                                    }
+                                });
+                            }
+
+
+                        </script>
+                        <hr style="border-top: 2px solid #007bff;">
+
+                        <!-- Detaylar Bölümü -->
+                        <div class="details-container">
+                            @if (ilan.Area > 0)
+                            {
+                                <span class="detail-item">M²: <strong>@ilan.Area</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.AdaNo))
+                            {
+                                <span class="detail-item">Ada No: <strong>@ilan.AdaNo</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.ParselNo))
+                            {
+                                <span class="detail-item">Parsel No: <strong>@ilan.ParselNo</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.OdaSayisi))
+                            {
+                                <span class="detail-item">Oda Sayısı: <strong>@ilan.OdaSayisi</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.YatakSayisi))
+                            {
+                                <span class="detail-item">Yatak Sayısı: <strong>@ilan.YatakSayisi</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.BinaYasi))
+                            {
+                                <span class="detail-item">Bina Yaşı: <strong>@ilan.BinaYasi</strong></span>
+                            }
+                            @if (!string.IsNullOrEmpty(ilan.NetMetrekare))
+                            {
+                                <span class="detail-item">Net M²: <strong>@ilan.NetMetrekare</strong></span>
+                            }
+                        </div>
+                        <hr style="border-top: 2px solid #007bff;">
+
+                        <!-- Tab Başlıkları -->
+                        <div class="tabs">
+                            <button class="tab-button active" onclick="showTab('description')">Açıklama</button>
+                            <button class="tab-button" onclick="showTab('features')">Özellikler</button>
+                             <button class="tab-button" onclick="showTab('location')">Konum</button>
+                        </div>
+
+                        <!-- İçerik Alanı -->
+                        <div id="description" class="tab-content" style="display: block; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; ; overflow-y: auto;">
+                            <h3 style="margin: 0; color: #0197f6;">İlan Açıklaması</h3>
+                            <p style="white-space: pre-wrap; word-wrap: break-word; margin: 10px 0;">@ilan.Description</p>
+                        </div>
+
+
+                        <div id="features" class="tab-content" style="display: none; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; background-color: white;">
+                            <h3 style="margin: 0; color: #0197f6;">İlan Özellikleri</h3>
+                            <div class="features-grid">
+                                @if (ilan.Area != 0)
+                                {
+                                    <div><strong style="color: #0197f6;">Metrekare:</strong> @ilan.Area</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.AdaNo))
+                                {
+                                    <div><strong style="color: #0197f6;">Ada No:</strong> @ilan.AdaNo</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.ParselNo))
+                                {
+                                    <div><strong style="color: #0197f6;">Parsel No:</strong> @ilan.ParselNo</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.KonutDurumu))
+                                {
+                                    <div><strong style="color: #0197f6;">Konut Durumu:</strong> @ilan.KonutDurumu</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.BrutMetrekare))
+                                {
+                                    <div><strong style="color: #0197f6;">Brüt Metrekare:</strong> @ilan.BrutMetrekare</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.NetMetrekare))
+                                {
+                                    <div><strong style="color: #0197f6;">Net Metrekare:</strong> @ilan.NetMetrekare</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.OdaSayisi))
+                                {
+                                    <div><strong style="color: #0197f6;">Oda Sayısı:</strong> @ilan.OdaSayisi</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.BinaYasi))
+                                {
+                                    <div><strong style="color: #0197f6;">Bina Yaşı:</strong> @ilan.BinaYasi</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.KatSayisi))
+                                {
+                                    <div><strong style="color: #0197f6;">Kat Sayısı:</strong> @ilan.KatSayisi</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.BulunduguKat))
+                                {
+                                    <div><strong style="color: #0197f6;">Bulunduğu Kat:</strong> @ilan.BulunduguKat</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.MulkTipi))
+                                {
+                                    <div><strong style="color: #0197f6;">Mülk Tipi:</strong> @ilan.MulkTipi</div>
+                                }
+                                @if (ilan.Aidat != 0)
+                                {
+                                    <div><strong style="color: #0197f6;">Aidat:</strong> @ilan.Aidat</div>
+                                }
+                                @if (ilan.TasınmazNumarasi != 0)
+                                {
+                                    <div><strong style="color: #0197f6;">Taşınmaz Numarası:</strong> @ilan.TasınmazNumarasi</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.PaftaNo))
+                                {
+                                    <div><strong style="color: #0197f6;">Pafta No:</strong> @ilan.PaftaNo</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Isitma))
+                                {
+                                    <div><strong style="color: #0197f6;">Isıtma Tipi:</strong> @ilan.Isitma</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.BanyoSayisi))
+                                {
+                                    <div><strong style="color: #0197f6;">Banyo Sayısı:</strong> @ilan.BanyoSayisi</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.AraziNiteliği))
+                                {
+                                    <div><strong style="color: #0197f6;">Arazi Niteliği:</strong> @ilan.AraziNiteliği</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Balkon))
+                                {
+                                    <div><strong style="color: #0197f6;">Balkon:</strong> @ilan.Balkon</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Asansor))
+                                {
+                                    <div><strong style="color: #0197f6;">Asansör:</strong> @ilan.Asansor</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Otopark))
+                                {
+                                    <div><strong style="color: #0197f6;">Otopark:</strong> @ilan.Otopark</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Esyali))
+                                {
+                                    <div><strong style="color: #0197f6;">Eşya Durumu:</strong> @ilan.Esyali</div>
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Takas))
+                                {
+                                    <div><strong style="color: #0197f6;">Takas:</strong> @ilan.Takas</div>
+                                }
+                               @if (ilan.PricePerSquareMeter > 0)
+                                {
+                                    <div><strong style="color: #0197f6;">M² Fiyatı:</strong> @ilan.PricePerSquareMeter</div>
+                                }
+                               @if (ilan.LastActionDate.HasValue)
+                                {
+                                    <div><strong style="color: #0197f6;">Son Değişiklik Tarihi:</strong> @ilan.LastActionDate.Value.ToString("dd.MM.yyyy HH:mm")</div>
+                                }
+                                else
+                                {
+                                    <div><strong style="color: #0197f6;">Son Değişiklik Tarihi:</strong> @ilan.GirisTarihi.ToString("dd.MM.yyyy HH:mm")</div>
+                                }
+                            </div>
+                        </div>
+                        <!-- Konum -->
+                        <div id="location" class="tab-content" style="display:block; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; width: 100%; max-width: 1000px; background-color: white;">
+                            <h3 style="margin: 0; color: #0197f6;">Konum</h3>
+
+                            <!-- İlan Konumunu Gösteren Harita -->
+                            <div id="map-container" style="margin-top: 20px;">
+                                <div>
+                                    <h4 style="color: #0197f6;">İlan Konumu</h4>
+                                    <div id="map" style="width: 100%; height: 350px;"></div> <!-- İlan Konumu Haritası -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places&callback=initMap&v=weekly" defer></script>
+
+                        <script>
+                            // Razor'dan güvenli adres üretimi (boşsa sehir/semt/mahalleKoy birleştir)
+                            var ilanAdres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((ilan?.Konum ?? ($"{ilan?.mahalleKoy} {ilan?.semt} {ilan?.sehir}")).Trim()));
+
+                            // global callback (Google API callback calls this)
+                            window.initMap = function () {
+                                if (!ilanAdres || ilanAdres.trim().length === 0) {
+                                    console.warn('Adres bilgisi boş. Harita gösterilemiyor.');
+                                    return;
+                                }
+
+                                var geocoder = new google.maps.Geocoder();
+                                geocoder.geocode({ address: ilanAdres }, function (results, status) {
+                                    if (status === 'OK' && results && results.length) {
+                                        var latLng = results[0].geometry.location;
+                                        var map = new google.maps.Map(document.getElementById('map'), {
+                                            zoom: 14,
+                                            center: latLng,
+                                            mapTypeControl: false,
+                                            streetViewControl: false
+                                        });
+                                        new google.maps.Marker({
+                                            map: map,
+                                            position: latLng,
+                                            title: 'İlan Konumu'
+                                        });
+                                    } else {
+                                        // Fallback: Iframe embed ile göster (API kısıtı/adres hatası durumunda)
+                                        var iframeSrc = 'https://www.google.com/maps?q=' + encodeURIComponent(ilanAdres) + '&output=embed';
+                                        var mapDiv = document.getElementById('map');
+                                        mapDiv.innerHTML = '<iframe src="' + iframeSrc + '" width="100%" height="350" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
+                                    }
+                                });
+                            }
+
+                            // Not needed: API script will call initMap via callback param
+                        </script>
+
+
+                        <style>
+                            /* InfoWindow tasarımını güzelleştirme */
+                            .gm-style-iw {
+                                background-color: #fff;
+                                border-radius: 10px;
+                                padding: 10px;
+                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                                border: 2px solid #0197f6;
+                                padding-right: 20px;
+                            }
+
+                                .gm-style-iw > div {
+                                    color: #333;
+                                    font-family: Arial, sans-serif;
+                                }
+
+                                .gm-style-iw div b {
+                                    color: #0197f6;
+                                }
+
+                            /* Kapatma butonunu küçültme */
+                            .gm-style-iw-close-btn {
+                                width: 20px !important;
+                                height: 20px !important;
+                                background-size: 20px !important;
+                            }
+                        </style>
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+
+    <!-- Kullanıcı bilgileri container -->
+<!-- Kullanıcı bilgileri container -->
+<div class="user-info-container">
+    @if (Model.User != null)
+    {
+        <!-- Profil Fotoğrafı -->
+        @if (!string.IsNullOrEmpty(Model.User.ProfilePicturePath))
+        {
+            <img src="@("https://www.sevval.com/" + Model.User.ProfilePicturePath)"
+                 alt="Profil Fotoğrafı"
+                 class="profile-picture"
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.png';" />
+        }
+        else if (!string.IsNullOrEmpty(Model.CompanyOwnerProfilePicturePath))
+        {
+            <img src="@("https://www.sevval.com/" + Model.CompanyOwnerProfilePicturePath)"
+                 alt="Şirket Sahibi Profil Fotoğrafı"
+                 class="profile-picture"
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.png';" />
+        }
+        else
+        {
+            <!-- Eğer hiç fotoğraf yolu yoksa, varsayılan ikonu göster -->
+            <!-- Varsayılan ikon yerine doğrudan varsayılan bir resim gösteriyoruz -->
+            <img src="https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
+                 alt="Varsayılan Profil Fotoğrafı"
+                 class="profile-picture" />
+        }
+
+        <!-- Kullanıcı Bilgileri -->
+        <div class="user-details">
+            <h4>Profil Bilgileri</h4>
+            <p>@Model.User.FirstName @Model.User.LastName</p>
+            <p>
+                <a href="tel:@Model.User.PhoneNumber"
+                   onclick="updatePhoneCallCount(@Model._Ilanlar[0].Id);">
+                    @Model.User.PhoneNumber
+                </a>
+            </p>
+            <p>@Model.User.Email</p>
+
+            <!-- İkonlar -->
+            <div class="user-icons">
+                <!-- WhatsApp Iconu -->
+                <a href="javascript:void(0)" class="whatsapp-icon" target="_blank"
+                   onclick="sendWhatsAppMessage('@Model.User.PhoneNumber')">
+                    <img src="https://img.icons8.com/fluency/48/000000/whatsapp.png" alt="WhatsApp" width="32" />
+                </a>
+
+                <!-- Arama Iconu -->
+                <a href="tel:@Model.User.PhoneNumber" class="call-icon" onclick="updatePhoneCallCount(@Model._Ilanlar[0].Id)">
+                    <img src="https://img.icons8.com/fluency/48/000000/phone.png" alt="Call" width="32" />
+                </a>
+
+                <script>
+                    function updatePhoneCallCount(ilanId) {
+                        // AJAX isteği gönder
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("UpdateTelefonAramaSayisi", "Ilan")',  // Controller adı burada belirtilmeli
+                            data: { id: ilanId },
+                            success: function(response) {
+                                if (response.success) {
+                                    console.log("Telefon arama sayısı başarıyla artırıldı.");
+                                }
+                            },
+                            error: function(error) {
+                                console.error("Bir hata oluştu.");
+                            }
+                        });
+                    }
+
+                    function sendWhatsAppMessage(phoneNumber) {
+                        // Telefon numarasındaki geçersiz karakterleri temizliyoruz
+                        var cleanedNumber = phoneNumber.replace(/\D/g, ''); // Sadece rakamları alıyoruz (boşluk, - gibi karakterleri siliyoruz)
+
+                        // Eğer numara 10 haneli değilse, hata mesajı gösterebiliriz
+                        if (cleanedNumber.length === 10) {
+                            // Türkiye için numara başında '0' olmalı
+                            if (cleanedNumber.charAt(0) !== '0') {
+                                cleanedNumber = '0' + cleanedNumber; // Numaranın başına 0 ekliyoruz
+                            }
+
+                            var formattedNumber = "90" + cleanedNumber.substring(1); // Türkiye ülke kodu 90 ile başlayan numara
+
+                            // Sayfanın linkini alıyoruz
+                            var pageLink = window.location.href;
+
+                            // Otomatik mesaj içeriği
+                            var message = "Merhaba Şevval Emlak sitesinden size ulaşıyorum. İlanınız hakkında daha detaylı bilgi almak istiyorum. " + encodeURIComponent(pageLink);
+
+                            // WhatsApp'a yönlendirme
+                            window.open('https://wa.me/' + formattedNumber + '?text=' + message, '_blank');
+                        } else {
+                            // alert('Geçerli bir telefon numarası girin.'); // Talimatlara göre alert yerine console.error kullanıldı
+                            console.error('Geçerli bir telefon numarası girin.');
+                        }
+                    }
+                </script>
+
+                <!-- Mesaj Iconu -->
+                <a href="#" class="ilan-mesaj-ikonu"
+                   data-email="@Model.User.Email"
+                   data-adsoyad="@Model.User.FirstName @Model.User.LastName">
+                    <img src="https://img.icons8.com/fluency/48/000000/sms.png" alt="Message" width="32" />
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+    <!-- Mesaj Gönderme Modalı -->
+    <div id="messageModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.5); z-index: 9999; font-family: Arial, sans-serif;">
+        <div style="background: white; padding: 24px; border-radius: 10px; width: 420px; margin: 100px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            <h2 style="margin-top: 0; color: #333;">📩 Mesaj Gönder</h2>
+            <p style="margin-bottom: 8px; font-weight: bold; color: #555;">
+                Alıcı: <span id="receiverInfo" style="font-weight: normal; color: #000;"></span>
+            </p>
+            <textarea id="messageContent" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; font-size: 14px;"></textarea>
+            <div style="margin-top: 16px; text-align: right;">
+                <button id="sendMessageBtn" style="background-color: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; margin-right: 8px;">
+                    Gönder
+                </button>
+                <button onclick="document.getElementById('messageModal').style.display='none'" style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer;">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            let receiverEmail = "";
+            let receiverFullName = "";
+            let ilanId = null;
+
+            $('.ilan-mesaj-ikonu').click(function (e) {
+                e.preventDefault();
+
+                receiverEmail = $(this).data('email');
+                receiverFullName = $(this).data('adsoyad');
+
+                const pathParts = window.location.pathname.split('/');
+                ilanId = parseInt(pathParts[pathParts.length - 1]);
+
+                $('#receiverInfo').text(receiverFullName + ' (' + receiverEmail + ')');
+                $('#messageModal').show();
+            });
+
+            $('#sendMessageBtn').click(function () {
+                const content = $('#messageContent').val();
+
+                if (!content) {
+                    alert("Lütfen mesaj içeriği giriniz.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Message/Send',
+                    method: 'POST',
+                    data: {
+                        receiverEmail: receiverEmail,
+                        receiverFullName: receiverFullName,
+                        content: content,
+                        ilanId: ilanId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert("Mesaj gönderildi.");
+                            window.location.href = response.redirectUrl; // Yönlendirme burada
+                        } else {
+                             alert("Mesaj gönderilirken hata oluştu.");
+                        }
+                        $('#messageModal').hide();
+                        $('#messageContent').val('');
+                    },
+                    error: function () {
+                        alert("Mesaj gönderilirken hata oluştu.");
+                    }
+                });
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function updatePhoneCallCount(ilanId) {
+            // AJAX isteği gönder
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("UpdateTelefonAramaSayisi", "Ilan")',  // Controller adı burada belirtilmeli
+                data: { id: ilanId },
+                success: function(response) {
+                    if (response.success) {
+                        console.log("Telefon arama sayısı başarıyla artırıldı.");
+                    }
+                },
+                error: function(error) {
+                    console.error("Bir hata oluştu.");
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .phone-icon {
+            color: white; /* Beyaz renk */
+        }
+    </style>
+
+
+    <script>
+        function sendWhatsAppMessage(phoneNumber) {
+            var message = "Merhaba Şevval Emlak sitesinden size ulaşıyorum. İlan hakkında bilgi almak istiyorum. ";
+            var pageLink = window.location.href;
+            var encodedMessage = encodeURIComponent(message + pageLink);
+
+            // Cihazın mobil olup olmadığını kontrol et
+            if (window.innerWidth <= 800) {
+                // Mobil cihazlardaysa WhatsApp uygulaması üzerinden mesaj gönder
+                window.location.href = "whatsapp://send?phone=" + phoneNumber + "&text=" + encodedMessage;
+            } else {
+                // Masaüstü cihazdaysa WhatsApp Web üzerinden mesaj gönder
+                window.open("https://web.whatsapp.com/send?phone=" + phoneNumber + "&text=" + encodedMessage, "_blank");
+            }
+        }
+    </script>
+
+
+
+    </div>
+
+
+
+    </div>
+
+
+
+
+    <!-- Yorum Ekleme ve Yorumlar Alanı -->
+    <div class="yorum-alani-container">
+        <!-- İlan Bilgileri -->
+        @* <div class="sidebar">
+            <h3 class="sidebar-titlee">Firma Bilgileri</h3>
+
+            @if (Model.User.IsConsultant)
+            {
+                <div class="firma-bilgileri">
+                    <h4 class="firma-title">Firma Bilgileri</h4>
+                    <p><b>Firma Adı:</b> @Model.CompanyName</p>
+                    <p><b>Firma Konumu:</b> @Model.CompanyLocation</p>
+                    <p><b>Firmanın Toplam İlan Sayısı:</b> @Model.CompanyTotalIlanCount</p>
+                </div>
+
+            }
+        </div> *@
+
+
+
+<div class="company-info-container">
+    <div class="membership-duration">
+        @if (Model.RegistrationDate != null)
+        {
+            var membershipDuration = DateTime.Now.Subtract(Model.RegistrationDate.Value);
+            var membershipYears = Math.Floor(membershipDuration.TotalDays / 365);
+            var membershipMonths = Math.Floor((membershipDuration.TotalDays % 365) / 30);
+
+            <div class="membership-badge">
+                @if (membershipYears > 0)
+                {
+                    <span class="badge badge-primary">@membershipYears. YIL</span>
+                }
+                @if (membershipMonths > 0)
+                {
+                    <span class="badge badge-primary">@membershipMonths. AY</span>
+                }
+            </div>
+        }
+    </div>
+    @if (Model.CompanyName != null)
+    {
+        <!-- Firma sahibinin logosunu (profil fotoğrafı) ekleme -->
+        @if (!string.IsNullOrEmpty(Model.CompanyOwnerProfilePicturePath))
+        {
+            <div class="company-logo">
+                <img src="@Url.Content(Model.CompanyOwnerProfilePicturePath)"
+                     alt="Firma Sahibi Profili"
+                     onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/14385/14385352.png';" />
+            </div>
+        }
+        else
+        {
+            <!-- Eğer CompanyOwnerProfilePicturePath boşsa, varsayılan bir resim göster -->
+            <div class="company-logo">
+                <img src="https://cdn-icons-png.flaticon.com/128/14385/14385352.png"
+                     alt="Varsayılan Firma Profili" />
+            </div>
+        }
+
+        <h4>@Model.CompanyName</h4>
+        <p>Toplam İlan Sayısı: @Model.CompanyTotalIlanCount</p>
+        <a href="@Url.Action("RedirectToStore", "Ilan", new { email = Model.User.Email })" class="btn btn-primary">Mağaza Sayfasına Git</a>
+    }
+</div>
+<style>
+    .membership-badge {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .badge {
+        display: inline-block;
+        background-color: #007bff; /* Mavi */
+        color: #fff; /* Beyaz */
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 1.15rem;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
+
+
+
+
+
+        <!-- Yorumlar -->
+        <div class="yorumlar-alani">
+            <!-- Yorum Ekleme Butonu -->
+            <button id="yorum-ekle-butonu" class="yorum-ekle-butonu">Yorum Ekleyin</button>
+
+            <!-- Yorum Ekleme Formu -->
+            <div class="yorum-ekleme-alani" id="yorum-ekleme-formu" style="display: none;">
+                <h3 class="yorum-form-baslik">Yorum Ekleyin</h3>
+                <form method="post" action="@Url.Action("YorumEkle", "Ilan")" class="yorum-form">
+                    <input type="hidden" name="ilanId" value="@Model._Ilanlar.FirstOrDefault()?.Id" />
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <textarea name="yorum" rows="4" class="yorum-textarea" required placeholder="Yorumunuzu buraya yazın..."></textarea>
+                    }
+                    else
+                    {
+                        <label for="ad" class="yorum-label">Ad:</label>
+                        <input type="text" name="ad" required class="yorum-input" placeholder="Adınızı girin..." />
+
+                        <label for="soyad" class="yorum-label">Soyad:</label>
+                        <input type="text" name="soyad" required class="yorum-input" placeholder="Soyadınızı girin..." />
+
+                        <textarea name="yorum" rows="4" class="yorum-textarea" required placeholder="Yorumunuzu buraya yazın..."></textarea>
+                    }
+
+                    <button type="submit" class="yorum-button">Yorum Yap</button>
+                </form>
+            </div>
+
+            <h3 class="yorumlar-baslik">Yorumlar</h3>
+
+            @foreach (var yorum in Model.Yorumlar)
+            {
+                <div class="yorum-card">
+                    @if (yorum.Kullanici != null)
+                    {
+                        <p class="yorum-yazan"><strong>@yorum.Kullanici.FirstName @yorum.Kullanici.LastName</strong> - @yorum.YorumTarihi.ToString("dd.MM.yyyy")</p>
+                    }
+                    else
+                    {
+                        <p class="yorum-yazan"><strong>Anonim Kullanıcı</strong> - @yorum.YorumTarihi.ToString("dd.MM.yyyy")</p>
+                    }
+                    <p class="yorum-metni">@yorum.Yorum</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <style>
+
+    .forbidden-word-highlight {
+        border: 2px solid red !important; 
+        color: red !important; 
+    }
+</style>
+
+
+<script>
+    // ForbiddenWords.txt dosyasını yükle
+    let forbiddenWords = [];
+    fetch('/ForbiddenWords.txt') // wwwroot klasöründeki dosyanın yolu
+        .then(response => {
+            if (!response.ok) {
+                console.error('ForbiddenWords.txt dosyası bulunamadı veya erişilemiyor.');
+                return '';
+            }
+            return response.text();
+        })
+        .then(text => {
+            forbiddenWords = text.split('\n').map(word => word.trim().toLowerCase()).filter(word => word.length > 0);
+            console.log('Yasaklı kelimeler yüklendi:', forbiddenWords.length);
+        })
+        .catch(error => console.error('ForbiddenWords.txt yüklenirken hata oluştu:', error));
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Yorum textarea'sını bul
+        const commentTextareas = document.querySelectorAll('.yorum-textarea');
+
+        commentTextareas.forEach(textarea => {
+            textarea.addEventListener('input', function () {
+                const text = this.value.toLowerCase();
+                let hasForbiddenWord = false;
+
+                // Her yasaklı kelimeyi kontrol et
+                for (const word of forbiddenWords) {
+                    // Kelimenin boşluklarla ayrılmış tam bir kelime olup olmadığını kontrol et
+                    const regex = new RegExp(`\\b${word}\\b`, 'g');
+                    if (regex.test(text)) {
+                        hasForbiddenWord = true;
+                        break;
+                    }
+                }
+
+                if (hasForbiddenWord) {
+                    // Yasaklı kelime varsa kırmızı yap ve içeriği temizle
+                    this.classList.add('forbidden-word-highlight');
+                    this.value = ''; // İçeriği anında temizle
+                    // Kullanıcıya bir geri bildirim gösterilebilir (örneğin bir mesaj)
+                    // alert('Yasaklı kelime kullandınız. Lütfen yorumunuzu tekrar gözden geçirin.');
+                    // Kullanıcıya bildirim göstermek için bir mesaj kutusu kullanın
+                    showCustomMessage('Yasaklı kelime kullandınız. Lütfen yorumunuzu tekrar gözden geçirin.', 'error');
+                } else {
+                    // Yasaklı kelime yoksa normal haline dön
+                    this.classList.remove('forbidden-word-highlight');
+                }
+            });
+        });
+
+        // Custom mesaj kutusu fonksiyonu (alert yerine)
+        function showCustomMessage(message, type = 'info') {
+            let messageBox = document.getElementById('customMessageBox');
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'customMessageBox';
+                Object.assign(messageBox.style, {
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    padding: '15px 25px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    zIndex: '1000',
+                    maxWidth: '300px',
+                    textAlign: 'center',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '1rem',
+                    color: '#fff',
+                    transition: 'opacity 0.5s ease-in-out',
+                    opacity: '0'
+                });
+                document.body.appendChild(messageBox);
+            }
+
+            // Mesaj türüne göre renk ayarı
+            if (type === 'error') {
+                messageBox.style.backgroundColor = '#dc3545'; // Kırmızı
+            } else if (type === 'success') {
+                messageBox.style.backgroundColor = '#28a745'; // Yeşil
+            } else {
+                messageBox.style.backgroundColor = '#007bff'; // Mavi
+            }
+
+            messageBox.textContent = message;
+            messageBox.style.opacity = '1';
+
+            // 3 saniye sonra mesajı gizle
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+            }, 3000);
+        }
+    });
+</script>
+
+
+    <
+    <div class="random-ilanlar-container">
+        <h3 class="random-ilanlar-title">Danışman`ın Diğer İlanları</h3>
+        <div class="random-ilanlar-list">
+            @foreach (var ilan in Model.RandomIlanlar)
+            {
+                var ilanFotograf = Model._Fotograflar.FirstOrDefault(f => f.IlanId == ilan.Id);
+
+                <div class="random-ilan-card">
+                    <div class="ilan-image-container">
+                        @if (ilanFotograf != null && !string.IsNullOrEmpty(ilanFotograf.Url))
+                        {
+                            <img src="@("https://www.sevval.com/" + ilanFotograf.Url)"
+                                 alt="@ilan.Title" class="ilan-image" />
+                        }
+                        else
+                        {
+                            <div class="default-camera-icon">
+                                <i class="fa fa-camera" aria-hidden="true"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="ilan-info">
+                        <h4 class="ilan-title">
+                            <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })">@ilan.Title</a>
+                        </h4>
+                        <p class="ilan-price"><strong>Fiyat: @ilan.Price.ToString("N0") TL</strong></p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+
+
+
+    <script>
+                // Yorum Ekleme Butonuna Tıklandığında Formu Göster
+        document.getElementById("yorum-ekle-butonu").addEventListener("click", function() {
+            var form = document.getElementById("yorum-ekleme-formu");
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block"; // Formu göster
+                document.getElementById("yorum-ekle-butonu").textContent = "Yorum Yaz"; // Buton metnini değiştir
+            } else {
+                form.style.display = "none"; // Formu gizle
+                document.getElementById("yorum-ekle-butonu").textContent = "Yorum Ekleyin"; // Buton metnini eski haline getir
+            }
+        });
+
+    </script>
+
+
+
+
+
+
+    <script>
+        var currentIndex = 0;
+        var photos = @Html.Raw(
+            Json.Serialize(Model._Fotograflar.Select(f => f.Url).ToList())
+        );
+        var slideshowInterval;
+        var isSlideshowPaused = false;
+        var pauseTimeout;
+        var slideshowButton;
+
+        (function initializePhotoWindow() {
+            var photoWindow = document.getElementById("photoWindow");
+            slideshowButton = document.getElementById("slideshowButton");
+
+            if (photos.length === 0) {
+                displayCameraIcon(photoWindow);
+            } else if (photos.length === 1) {
+                var singleImage = document.createElement("img");
+                singleImage.src = "https://www.sevval.com/" + photos[0];
+                singleImage.classList.add("gallery-image");
+                photoWindow.appendChild(singleImage);
+            } else {
+                // Sorunun çözümü: İlk resmin yüklenmesini garanti altına al
+                var initialImage = document.createElement("img");
+                initialImage.src = "https://www.sevval.com/" + photos[currentIndex];
+                initialImage.classList.add("gallery-image");
+                photoWindow.appendChild(initialImage);
+                initialImage.addEventListener("click", toggleSlideshow);
+                //Resmin Opacity'sini 1 yap.
+                initialImage.style.opacity=1;
+            }
+            updatePhotoCountDisplay();
+        })();
+
+        function updatePhotoCountDisplay() {
+            const photoCountDisplay = document.getElementById("photoCountDisplay");
+            if (photoCountDisplay && photos.length > 1) {
+                const displayedIndex = (currentIndex % photos.length) + 1;
+                photoCountDisplay.innerText = `${displayedIndex}/${photos.length}`;
+            }
+        }
+
+        function changePhoto(direction) {
+            if (photos.length <= 1) return;
+
+            var oldIndex = currentIndex;
+            currentIndex += direction;
+
+            if (currentIndex < 0) {
+                currentIndex = photos.length - 1;
+            } else if (currentIndex >= photos.length) {
+                currentIndex = 0;
+            }
+
+            var photoWindow = document.getElementById("photoWindow");
+            var newImage = document.createElement("img");
+            newImage.src = "https://www.sevval.com/" + photos[currentIndex];
+            newImage.classList.add("gallery-image");
+            photoWindow.innerHTML = "";
+            photoWindow.appendChild(newImage);
+            mixIn(newImage);
+            updatePhotoCountDisplay();
+            newImage.addEventListener("click", toggleSlideshow);
+        }
+
+        function mixIn(newImage) {
+            newImage.style.opacity = 0;
+            newImage.style.transition = "opacity 1s ease-in-out";
+            setTimeout(() => (newImage.style.opacity = 1), 100);
+        }
+
+        function displayCameraIcon(photoWindow) {
+            photoWindow.innerHTML = "";
+            var noPhotoText = document.createElement("div");
+            noPhotoText.innerText = "İLAN FOTOĞRAFI YOK";
+
+            // Tasarım detayları
+            noPhotoText.style.fontFamily =
+                '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
+            noPhotoText.style.fontWeight = "bold";
+            noPhotoText.style.fontSize = "22px";
+            noPhotoText.style.color = "#007bff";
+            noPhotoText.style.textAlign = "center";
+            noPhotoText.style.padding = "20px";
+            noPhotoText.style.border = "2px solid #007bff";
+            noPhotoText.style.borderRadius = "10px";
+            noPhotoText.style.backgroundColor = "#ffffff";
+            noPhotoText.style.boxShadow = "0 4px 10px rgba(0, 123, 255, 0.2)";
+            noPhotoText.style.maxWidth = "80%";
+            noPhotoText.style.margin = "0 auto";
+            noPhotoText.style.transition = "all 0.3s ease";
+
+            photoWindow.appendChild(noPhotoText);
+        }
+
+        function startSlideshow() {
+            if (isSlideshowPaused || photos.length <= 1) return;
+            slideshowInterval = setInterval(() => changePhoto(1), 5000);
+            slideshowButton.innerHTML = '<i class="fa fa-pause"></i>';
+        }
+
+        function toggleSlideshow() {
+            if (photos.length <= 1) return;
+
+            if (isSlideshowPaused) {
+                isSlideshowPaused = false;
+                clearTimeout(pauseTimeout);
+                startSlideshow();
+            } else {
+                isSlideshowPaused = true;
+                clearInterval(slideshowInterval);
+                pauseTimeout = setTimeout(() => {
+                    isSlideshowPaused = false;
+                    startSlideshow();
+                }, 40000);
+                slideshowButton.innerHTML = '<i class="fa fa-play"></i>';
+            }
+        }
+
+        function showGallery(type, event) {
+            document.querySelectorAll(".gallery-section").forEach(section => {
+                section.style.display = "none";
+            });
+
+            if (type === "photo") {
+                document.getElementById("photo-gallery").style.display = "block";
+            } else if (type === "video") {
+                document.getElementById("video-gallery").style.display = "block";
+            } else if (type === "youtube") {
+                document.getElementById("youtube-gallery").style.display = "block";
+            }
+
+            document.querySelectorAll(".option-button").forEach(button => {
+                button.classList.remove("active");
+            });
+
+            event.target.closest(".option-button").classList.add("active");
+
+            if (type !== "video") {
+                stopAllVideos();
+            }
+        }
+
+        function stopAllVideos() {
+            var videos = document.querySelectorAll("video");
+            videos.forEach(video => {
+                video.pause();
+                video.currentTime = 0;
+            });
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll(".tab-content").forEach(content => {
+                content.style.display = "none";
+            });
+
+            document.getElementById(tabName).style.display = "block";
+
+            document.querySelectorAll(".tab-button").forEach(button => {
+                button.classList.remove("active");
+            });
+
+            document
+                .querySelector(button[('onclick="showTab(\'${tabName}\')')])
+                .classList.add("active");
+        }
+
+        window.onload = function () {
+            showTab("description");
+
+            var videoGallery = document.getElementById("video-gallery");
+            var videoButton = document.getElementById("video-button");
+
+            if (!videoGallery || !videoGallery.querySelector("video")) {
+                videoButton.classList.add("inactive");
+                videoButton.style.backgroundColor = "#ccc";
+                videoButton.style.cursor = "not-allowed";
+                videoButton.onclick = function (event) {
+                    event.preventDefault();
+                };
+            } else {
+                videoButton.classList.remove("inactive");
+                videoButton.style.backgroundColor = "";
+                videoButton.style.cursor = "";
+                videoButton.onclick = function () {
+                    showGallery("video", event);
+                };
+            }
+
+            document.getElementById("photo-gallery").style.display = "block";
+            document.querySelector(".option-button.active").classList.add("active");
+            var photoWindow = document.getElementById("photoWindow");
+            if(photos.length>0){ // bu koşul eklendi.
+                var firstImage = document.createElement("img");
+                firstImage.src = "https://www.sevval.com/" + photos[0];
+                firstImage.classList.add("gallery-image");
+                photoWindow.appendChild(firstImage);
+
+                firstImage.style.opacity = 1; // opacity 1 e ayarlandı
+            }
+
+            updatePhotoPreview();
+        };
+    </script>
+
+
+
+
+
+    <!-- WhatsApp Logo -->
+    <a id="whatsapp-link-8" href="#" target="_blank" class="whatsapp-float">
+        <img src="~/sablon/img/724destek.png" alt="WhatsApp" class="whatsapp-image">
+    </a>
+
+    <script>
+        // Kullanıcı cihazını tespit et
+        const isMobile8 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const whatsappNumber8 = "905393756389";
+        const message8 = "Merhaba,%20Şevval%20Emlak%20Sitenizden%20Size%20Ulaşıyorum";
+
+        // Doğru linki oluştur
+        const whatsappLink8 = isMobile8
+            ? `https://wa.me/${whatsappNumber8}?text=${message8}` // Mobilde uygulama
+            : `https://web.whatsapp.com/send?phone=${whatsappNumber8}&text=${message8}`; // Tarayıcıda WhatsApp Web
+
+        // Bağlantıyı ayarla
+        document.getElementById("whatsapp-link-8").href = whatsappLink8;
+    </script>
+
+    <style>
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px; /* Ekranın altından 20px yukarıda */
+            right: 20px; /* Ekranın sağından 20px içeride */
+            z-index: 1001; /* Üstte görünmesini sağlamak için yüksek bir z-index */
+        }
+
+        .whatsapp-image {
+            width: 90px; /* Resmin genişliği */
+            height: auto; /* Yüksekliği orantılı olarak ayarla
+                                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
+            transition: transform 0.3s; /* Hover efekti için geçiş süresi */
+        }
+
+            .whatsapp-image:hover {
+                transform: scale(1.1); /* Üzerine gelindiğinde büyütme efekti */
+            }
+    </style>
+
+
+    @if (Model._Ilanlar != null && Model._Ilanlar.Any())
+    {
+        <div class="view-count-container">
+            <div class="view-count-box">
+                <p class="view-count-text">Bu İlanın Görüntülenme Sayısı: @Model._Ilanlar.FirstOrDefault().GoruntulenmeSayisi</p>
+            </div>
+        </div>
+    }
+
+
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content footer-contact">
+                <h2 class="footer-title">İletişim Bilgileri</h2>
+                <p class="footer-info">Adres: Güney Mh, Saatçi Sk, No:9/A Kocaeli/Körfez</p>
+                <p class="footer-info">
+                    Telefon: <a href="tel:+902129555541" class="footer-link">0212 955 55 41</a>
+                </p>
+                <p class="footer-info">
+                    Talep ve Öneri:
+                    <a id="contact-email" href="#" class="footer-link">sevvaltalep@gmail.com</a>
+                </p>
+
+                <script>
+                    document.getElementById("contact-email").addEventListener("click", function (event) {
+                        event.preventDefault(); // Bağlantıyı varsayılan olarak çalıştırmayı durdurur.
+
+                        const email = "sevvaltalep@gmail.com";
+                        const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+                        if (mobileRegex.test(navigator.userAgent)) {
+                            // Mobil cihazlarda Gmail uygulamasını açmaya çalış
+                            window.location.href = `mailto:${email}`;
+                        } else {
+                            // Masaüstü cihazlarda Gmail web sitesine yönlendir
+                            window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`, "_blank");
+                        }
+                    });
+                </script>
+
+            </div>
+
+            <div class="footer-section">
+                <h2 class="footer-title">Bizi Takip Edin</h2>
+                <div class="social-icons">
+                    <a href="https://www.kisa.link/wmZoa" class="social-icon" target="_blank">
+                        <img src="~/images/youtubelogo.png" alt="Youtube">
+                    </a>
+                    <a href="https://www.instagram.com/sevvalcom?igsh=ZThycHI4eXp1dHlw" class="social-icon" target="_blank">
+                        <img src="~/images/instagramlogo.png" alt="Instagram">
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61576226942639" class="social-icon" target="_blank">
+                        <img src="~/images/facebooklogo.png" alt="Facebook">
+                    </a>
+                    <a href="https://www.kisa.link/KWiFP" class="social-icon" target="_blank">
+                        <img src="~/images/tiktoklogo.png" alt="TikTok">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+
+
+    <!-- JavaScript ile Sekmeler Arası Geçiş -->
+    <script>
+            document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Aktif olan tab'ı ve içerikleri güncelle
+                const isActive = this.classList.contains('active');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.media-window, .info-content').forEach(content => content.classList.remove('active'));
+
+                if (!isActive) {
+                    this.classList.add('active');
+                    const contentClass = this.classList[1].split('-')[0] + '-window';
+                        document.querySelector('.' + contentClass).classList.add('active');
+                }
+            });
+        });
+    </script>
+    <!-- Ziyaretçi Takip Kodları -->
+    <script>
+        // Ziyaretçinin siteye girişini kaydetmek için
+        document.addEventListener('DOMContentLoaded', function () {
+            // API'ye POST isteği gönderme fonksiyonu
+            function sendVisitorEntry() {
+                fetch('/api/Visitor/enter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Gerekiyorsa ek başlıklar (örneğin, kimlik doğrulama tokenı)
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Ziyaretçi girişi başarıyla kaydedildi.');
+                    } else {
+                        console.error('Ziyaretçi girişi kaydedilirken hata oluştu:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ziyaretçi girişi isteği gönderilirken ağ hatası oluştu:', error);
+                });
+            }
+
+            // Sayfa yüklendiğinde ziyaretçi girişi API'sini çağır
+            sendVisitorEntry();
+        });
+
+        // Ziyaretçinin siteden ayrılışını kaydetmek için
+        // `beforeunload` ve `unload` olayları, kullanıcı sayfadan ayrılırken tetiklenir.
+        // `navigator.sendBeacon` yöntemi, sayfa kapatılırken veya değiştirilirken güvenilir bir şekilde veri göndermek için idealdir.
+        window.addEventListener('beforeunload', function (event) {
+            // Beacon API ile çıkış isteği gönderme
+            // sendBeacon, sayfa kapatılsa bile isteğin tamamlanmasını garanti eder.
+            // JSON verisi yerine boş bir Blob gönderebiliriz, çünkü sunucu IP adresini zaten HttpContext'ten alıyor.
+            navigator.sendBeacon('/api/Visitor/exit', new Blob([''], { type: 'text/plain' }));
+            console.log('Ziyaretçi çıkış beacon isteği gönderildi.');
+        });
+    </script>
+
+</body>
+</html>

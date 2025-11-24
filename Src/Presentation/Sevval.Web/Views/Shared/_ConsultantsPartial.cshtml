@@ -1,0 +1,47 @@
+@model IList<Sevval.Application.Features.Consultant.Queries.GetConsultantsByCompany.GetConsultantsByCompanyQueryResponse>
+
+<h4>Danışmanlarımız ve Firma Sahibi</h4>
+<div class="danisman-container">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var consultant in Model)
+        {
+            <div class="user-card mb-4">
+                <div class="user-card-body">
+                    <div class="consultant-profile-img-container mb-3">
+                        @if (!string.IsNullOrEmpty(consultant.ProfilePhoto))
+                        {
+                            <img src="@consultant.ProfilePhoto" alt="Profil Fotoğrafı" class="img-fluid rounded-circle consultant-profile-img">
+                        }
+                        else
+                        {
+                            <div class="text-center bg-light rounded-circle consultant-profile-img-placeholder">
+                                <i class="fas fa-user fa-3x text-muted"></i>
+                            </div>
+                        }
+                    </div>
+
+                    <h5 class="user-card-title">
+                        <a href="@Url.Action("UserIlanlar", "Ilan", new { email = consultant.Email })">
+                            @consultant.FirstName @consultant.LastName
+                        </a>
+                    </h5>
+
+                    <p class="user-card-text">
+                        Danışman
+                    </p>
+
+                    <p class="user-card-text">
+                        @consultant.TotalAnnouncementCount ilanı var.
+                    </p>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center">
+            <p class="text-muted">Bu firmaya ait danışman bulunamadı.</p>
+        </div>
+    }
+</div>

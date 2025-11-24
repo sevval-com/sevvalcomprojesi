@@ -1,0 +1,86 @@
+﻿@model List<IlanModel>
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arama Sonuçları</title>
+    <link rel="stylesheet" href="~/css/videos.css">
+    <link rel="stylesheet" href="~/css/navbar.css">
+</head>
+<body>
+    <h1>Arama Sonuçları</h1>
+
+    @if (Model.Any())
+    {
+        <div class="container">
+            <table class="custom-table">
+                <tbody>
+                    @foreach (var ilan in Model)
+                    {
+                        <tr onclick="window.location.href='@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })'">
+                            <!-- Fotoğraf kısmını kaldırdık -->
+                            <td class="info-cell">
+                                <div class="price">@ilan.Price.ToString("N0") TL</div>
+                                <div class="title">@ilan.Title</div>
+                                <div class="location-info">@ilan.sehir / @ilan.semt / @ilan.mahalleKoy</div>
+                                <div class="details">
+                                    @if (ilan.Area > 0)
+                                    {
+                                        <span class="detail-item">M²: <strong>@ilan.Area</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.AdaNo))
+                                    {
+                                        <span class="detail-item">Ada No: <strong>@ilan.AdaNo</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.ParselNo))
+                                    {
+                                        <span class="detail-item">Parsel No: <strong>@ilan.ParselNo</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.OdaSayisi))
+                                    {
+                                        <span class="detail-item">Oda Sayısı: <strong>@ilan.OdaSayisi</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.YatakSayisi))
+                                    {
+                                        <span class="detail-item">Yatak Sayısı: <strong>@ilan.YatakSayisi</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.BinaYasi))
+                                    {
+                                        <span class="detail-item">Bina Yaşı: <strong>@ilan.BinaYasi</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(ilan.NetMetrekare))
+                                    {
+                                        <span class="detail-item">Net M²: <strong>@ilan.NetMetrekare</strong></span>
+                                        <span class="separator"></span>
+                                    }
+                                </div>
+                                <div class="ilan-id">İlan Numarası: @ilan.Id</div>
+                                <span>Kategori: @ilan.Category</span><br />
+                                <span>Görüntülenme: @ilan.GoruntulenmeSayisi</span>
+                            </td>
+                            <td class="date-cell">
+                                <div class="date-info">@ilan.GirisTarihi.ToString("dd.MM.yyyy")</div>
+                                <button type="button" class="close-button" onclick="silIlan(@ilan.Id, event)">×</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>Aradığınız kriterlere uygun ilan bulunamadı.</p>
+    }
+
+    <script src="~/js/scripts.js"></script> <!-- JS dosyanız varsa -->
+</body>
+</html>

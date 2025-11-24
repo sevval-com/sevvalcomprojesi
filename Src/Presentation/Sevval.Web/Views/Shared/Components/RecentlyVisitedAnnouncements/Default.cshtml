@@ -1,0 +1,90 @@
+@model List<Sevval.Application.Features.RecentlyVisitedAnnouncement.Queries.GetRecentlyVisitedAnnouncement.GetRecentlyVisitedAnnouncementQueryResponse>
+
+@if (Model != null && Model.Any())
+{
+    <div class="recently-visited-section">
+        <h3 class="section-title">Son Gezdiğim İlanlar</h3>
+        <div class="recently-visited-grid">
+            @foreach (var ilan in Model)
+            {
+                <div class="result-item">
+                    <div class="result-image">
+                        <!-- Fotoğrafı tıklanabilir yapmak için <a> etiketi ekliyoruz -->
+                        <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.AnnouncementId })">
+                            @if (string.IsNullOrEmpty(ilan.IlanVitrinImageUrl))
+                            {
+                                <i class="fa fa-camera" style="font-size: 50px; color: #007bff;"></i>
+                            }
+                            else
+                            {
+                                <img src="@ilan.IlanVitrinImageUrl" alt="@ilan.IlanBasligi"
+                                     loading="lazy"
+                                     onerror="this.src='/ImageFiles/kurumsalbosfoto.png'" />
+                            }
+                            <span class="result-price">@ilan.IlanFiyati.ToString("N0") TL</span>
+                            @{
+                                var isNew = (DateTime.Now - ilan.GirisTarihi).TotalDays <= 3; // Yeni ilan kontrolü
+                            }
+                            @if (isNew)
+                            {
+                                <span class="new-badge">Yeni</span> <!-- Yeni Etiketi -->
+                            }
+                        </a>
+                    </div>
+                    <div class="result-details">
+                        <h3>
+                            <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.AnnouncementId })" style="text-decoration: none; color: black;">
+                                @ilan.IlanBasligi
+                            </a>
+                        </h3>
+
+                        @{
+                            var details = new List<string>();
+
+                            if (ilan.Area > 0)
+                                details.Add($"M²: <strong>{ilan.Area}</strong>");
+
+                            if (!string.IsNullOrEmpty(ilan.AdaNo))
+                                details.Add($"Ada No: <strong>{ilan.AdaNo}</strong>");
+
+                            if (!string.IsNullOrEmpty(ilan.ParselNo))
+                                details.Add($"Parsel No: <strong>{ilan.ParselNo}</strong>");
+
+                            if (!string.IsNullOrEmpty(ilan.OdaSayisi))
+                                details.Add($"Oda Sayısı: <strong>{ilan.OdaSayisi}</strong>");
+
+                            if (!string.IsNullOrEmpty(ilan.BinaYasi))
+                                details.Add($"Bina Yaşı: <strong>{ilan.BinaYasi}</strong>");
+
+                            if (!string.IsNullOrEmpty(ilan.NetMetrekare))
+                                details.Add($"Net M²: <strong>{ilan.NetMetrekare}</strong>");
+                        }
+
+                        @if (details.Any())
+                        {
+                            <p class="result-description">
+                                @foreach (var detail in details)
+                                {
+                                    <span class="detail-item">@Html.Raw(detail)</span>
+                                }
+                            </p>
+                        }
+
+                        <p class="result-description"> @ilan.Category / @ilan.KonutDurumu / @ilan.MulkTipi </p>
+                        <p class="result-description"> @ilan.sehir / @ilan.semt / @ilan.mahalleKoy </p>
+                        <p> <b>Tarih:</b> @ilan.GirisTarihi.ToString("dd.MM.yyyy") - @ilan.GirisTarihi.ToString("HH:mm") </p>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        @if (Model.Count > 6)
+        {
+            <div class="view-all-container">
+                <a href="#" class="view-all-btn">Tümünü Gör (@Model.Count İlan)</a>
+            </div>
+        }
+    </div>
+}
+
+

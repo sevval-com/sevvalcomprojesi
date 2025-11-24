@@ -1,0 +1,381 @@
+@model sevvalemlak.Models.LoginViewModel
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="~/css/modern-login.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Göz İkonu için Font Awesome Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/social-login.css" />
+
+    <style>
+        .back-to-home {
+            background-color: #007bff; /* Canlı kırmızı */
+            padding: 5px 20px; /* Butonun iç boşluğunu büyütme */
+            text-align: center;
+            border-radius: 60px; /* Daha yuvarlak köşeler */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Daha belirgin gölge */
+            transition: all 0.3s ease-in-out; /* Geçiş efekti */
+            font-family: 'Arial', sans-serif; /* Modern font */
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+            .back-to-home a {
+                color: white;
+                text-decoration: none;
+                font-size: 18px; /* Font boyutunu artırdık */
+                font-weight: 600;
+                letter-spacing: 1px; /* Harf aralığını açtık */
+                display: inline-block;
+                transition: all 0.3s ease-in-out;
+            }
+
+            .back-to-home:hover {
+                background-color: #007bff; /* Hoverda rengin açılması */
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Hoverda gölgenin güçlenmesi */
+                transform: translateY(-8px); /* Yüksekliğe animasyon */
+            }
+
+            .back-to-home a:hover {
+                color: #fffff; /* Hoverda metin rengini altın yap */
+                transform: scale(1.1); /* Hoverda metni büyütme */
+            }
+
+            .back-to-home a:active {
+                transform: scale(1); /* Butona tıklandığında boyutunu eski haline getirme */
+            }
+    </style>
+
+
+    <style>
+        .contact-method-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .contact-option {
+            padding: 10px 20px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+            .contact-option:hover {
+                background-color: #007bff;
+                color: #ffffff;
+            }
+
+            .contact-option.active {
+                background-color: #007bff;
+                color: #ffffff;
+            }
+
+        .form-control {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <!-- Enhanced responsive styles -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive wrapper adjustments */
+        .responsive-wrapper {
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive form adjustments */
+        .responsive-form {
+            padding: 30px 25px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        /* Form elements responsiveness */
+        .form-group {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+            .form-control:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            }
+
+        /* Button styles */
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+            .btn-primary:hover {
+                background-color: #0069d9;
+                transform: translateY(-2px);
+            }
+
+            .btn-primary:active {
+                transform: translateY(0);
+            }
+
+        /* Social button container */
+        .social-button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .social-button-item {
+            flex: 1 1 200px;
+        }
+
+        /* Footer responsiveness */
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+            .footer p {
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .footer a {
+                color: #007bff;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .footer a:hover {
+                    color: #0056b3;
+                    text-decoration: underline;
+                }
+
+        /* Remember me checkbox */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .remember-me input {
+                margin-right: 8px;
+            }
+
+        /* Separator with text */
+        .separator-with-text {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #777;
+        }
+
+            .separator-with-text:before,
+            .separator-with-text:after {
+                content: '';
+                flex: 1;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .separator-with-text span {
+                margin: 0 10px;
+                font-size: 14px;
+            }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper responsive-wrapper">
+        <div class="form-section responsive-form">
+            <h1 style="text-align: center; margin-block: .5rem;">Sevval.com</h1>
+            <h2 style="margin-block: .5rem;">Giriş Yap</h2>
+
+            <form asp-action="Login" method="post" autocomplete="off" onsubmit="return validateCaptcha();">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+
+                <div class="form-group">
+                    <label for="Email">E-posta Adresi</label>
+                    <input asp-for="Email" class="form-control" placeholder="E-posta adresinizi girin" id="email-input" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+
+                <!-- Şifre Alanı -->
+                <div class="form-group password-container">
+                    <label asp-for="Password">Şifre</label>
+                    <div style="position: relative;">
+                        <input asp-for="Password" class="form-control" type="password" id="password-input" placeholder="Şifrenizi girin" />
+                        <span class="toggle-password" onclick="togglePasswordVisibility()">
+                            <i class="fa fa-eye-slash" id="eye-icon" style="color: gray; position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Beni Hatırla -->
+                <div class="form-group remember-me">
+                    <input type="checkbox" id="RememberMe" />
+                    <label for="RememberMe">Beni Hatırla</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Giriş Yap</button>
+
+
+               @*  <!-- Sosyal Medya Giriş -->
+                <div class="social-buttons">
+                    <div class="separator-with-text">
+                        <span>veya sosyal medya ile giriş yapın</span>
+                    </div>
+                    <div class="social-button-container">
+                        <div class="social-button-item">
+                            <a href="@Url.Action("LoginWithGoogle", "Account",new { Type = "Bireysel" })" class="btn-google w-100 d-flex align-items-center justify-content-center">
+                                <i class="fab fa-google mr-2"></i> Google ile Giriş
+                            </a>
+                        </div>
+                        <div class="social-button-item">
+                            <a href="@Url.Action("LoginWithApple", "Account",new { Type =  "Bireysel" })" class="btn-apple w-100 d-flex align-items-center justify-content-center">
+                                <i class="fab fa-apple mr-2"></i> Apple ile Giriş
+                            </a>
+                        </div>
+                    </div>
+                </div> *@
+
+
+                @*  <!-- Google reCAPTCHA -->
+                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                <div class="g-recaptcha" data-sitekey="6LfTlroqAAAAAEbbjHfYciwLjcJQ_E8aPBhOVJoM" data-type="image" id="recaptcha"></div>
+
+                <script>
+                // Local ortamda mı kontrol et
+                if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                document.getElementById("recaptcha").style.display = "none"; // Gizle
+                }
+
+                function validateCaptcha() {
+                if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                return true; // Localde doğrulama gerektirme
+                }
+
+                var response = grecaptcha.getResponse();
+                if (response.length === 0) {
+                alert("Lütfen robot olmadığınızı doğrulayın!");
+                return false;
+                }
+                return true;
+                }
+                </script> *@
+
+
+
+                <!-- Kayıt Ol ve Şifremi Unuttum -->
+                <div class="footer">
+                    <p>Hesabınız yok mu? <a href="/Account/Register">Kayıt Olun</a></p>
+                    <p><a asp-controller="Account" asp-action="SendNewCode" style="padding: 20px 0;">Şifremi Unuttum?</a></p>
+                    <button class="btn btn-primary"><a href="/" style="color: white; text-decoration: none;">Ana Sayfa</a></button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Bu fonksiyon şu anda sadece e-posta seçeneği için çalışacak
+        function selectMethod(method) {
+            var emailButton = document.getElementById("email-option");
+            var emailInput = document.getElementById("email-input");
+
+            if (method === 'email') {
+                emailInput.placeholder = "E-posta adresinizi girin";
+                emailButton.classList.add("active");
+            }
+        }
+
+    </script>
+    <script>
+        // Şifreyi göster/gizle işlevi
+        function togglePasswordVisibility() {
+            var passwordField = document.getElementById('password-input');
+            var eyeIcon = document.getElementById('eye-icon');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';  // Şifreyi görünür yap
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');  // Göz açık olacak
+            } else {
+                passwordField.type = 'password';  // Şifreyi gizle
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');  // Göz kapalı olacak
+            }
+        }
+    </script>
+</body>
+</html>

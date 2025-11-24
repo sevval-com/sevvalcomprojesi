@@ -1,0 +1,157 @@
+﻿/* Genel Stil Ayarları */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Açık gri Bootstrap arka planı */
+    color: #212529; /* Koyu metin rengi */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Bölümü (Index.cshtml ile uyumlu) */
+.header-bg {
+    background-color: #007bff; /* Bootstrap mavisi */
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* İçerik Kartı */
+.blog-details-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 50px auto; /* Merkezleme ve üst/alt boşluk */
+    max-width: 900px; /* Maksimum genişlik */
+}
+
+.blog-details-title {
+    color: #007bff; /* Mavi başlık */
+    font-weight: 700;
+    font-size: 2.8rem; /* Daha büyük başlık */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.blog-details-image {
+    width: 100%;
+    height: 400px; /* Daha yüksek görsel */
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-details-meta {
+    font-size: 0.9rem;
+    color: #6c757d; /* Gri metin */
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Küçük ekranlarda sarmalama */
+}
+
+    .blog-details-meta span {
+        margin-right: 15px;
+        margin-bottom: 5px; /* Küçük ekranlarda alt boşluk */
+    }
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #343a40;
+    margin-bottom: 40px;
+}
+
+    .blog-content p {
+        margin-bottom: 1.5em; /* Paragraflar arası boşluk */
+    }
+
+/* Butonlar */
+.back-btn {
+    background-color: #6c757d; /* Gri buton */
+    border-color: #6c757d;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 10px 20px;
+    border-radius: 50px; /* Daha oval buton */
+    font-weight: 500;
+}
+
+    .back-btn:hover {
+        background-color: #5a6268;
+        border-color: #5a6268;
+        transform: translateY(-2px);
+    }
+
+.admin-action-btn {
+    font-size: 0.95rem;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .admin-action-btn.edit {
+        background-color: #ffc107; /* Sarımsı renk */
+        color: #343a40;
+    }
+
+        .admin-action-btn.edit:hover {
+            background-color: #e0a800;
+            transform: scale(1.05);
+        }
+
+    .admin-action-btn.delete {
+        background-color: #dc3545; /* Kırmızı renk */
+        color: white;
+    }
+
+        .admin-action-btn.delete:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+/* Footer Bölümü (Index.cshtml ile uyumlu) */
+.footer-bg {
+    background-color: #343a40; /* Koyu gri footer */
+    color: white;
+    padding: 20px 0;
+    margin-top: auto; /* Footer'ı alta sabitle */
+    text-align: center;
+}
+
+/* Animasyonlar (Index.cshtml ile uyumlu) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Başlık için animasyon */
+.animated-heading {
+    animation: scaleIn 0.6s ease-out;
+    display: inline-block; /* Animasyon için gerekli */
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

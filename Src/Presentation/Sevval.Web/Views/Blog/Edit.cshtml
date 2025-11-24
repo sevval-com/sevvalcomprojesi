@@ -1,0 +1,122 @@
+﻿@model YourProjectName.Models.Blog
+@{
+    ViewData["Title"] = $"Yazıyı Düzenle: {Model.Title}"; // SEO dostu sekme başlığı
+    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+
+    // Admin olarak görünecek ek e-posta adresleri
+    var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
+    var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO için meta açıklaması -->
+    <meta name="description" content="Şevval Emlak Blog'da '@Model.Title' başlıklı blog yazısını düzenleme sayfası." />
+    <!-- SEO için anahtar kelimeler -->
+    <meta name="keywords" content="blog yazısı düzenle, @(Model.Title), gayrimenkul blogu, emlak, emlakçılık, Şevval Blog" />
+    <!-- Yazar bilgisi -->
+    <meta name="author" content="Şevval" />
+    <!-- Sayfa başlığı -->
+    <title>@ViewData["Title"] - Şevval Emlak Blog</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- İsteğe bağlı, ikonlar için -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- EditBlog.css dosyasını buraya bağlıyoruz -->
+    <link rel="stylesheet" href="~/css/EditBlog.css">
+</head>
+<body>
+    <!-- Header Bölümü (Diğer sayfalarla aynı stil) -->
+    <header class="header-bg py-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
+                <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
+            </div>
+            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+            {
+                <nav>
+                    <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
+                    </a>
+                </nav>
+            }
+        </div>
+    </header>
+
+    <main class="container my-5 flex-grow-1 animate-fade-in">
+        <div class="edit-form-card">
+            <h1 class="form-title animated-heading">Blog Yazısını Düzenle</h1>
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ImageUrl" /> @* Mevcut görsel yolunu koru *@
+                <input type="hidden" asp-for="PublishDate" /> @* Yayınlanma tarihini koru *@
+                <div class="form-group">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-input" placeholder="Blog başlığını girin" />
+                    <span asp-validation-for="Title" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ShortDescription" class="form-label"></label>
+                    <textarea asp-for="ShortDescription" class="form-textarea" rows="3" placeholder="Kısa açıklama girin"></textarea>
+                    <span asp-validation-for="ShortDescription" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Content" class="form-label"></label>
+                    <textarea asp-for="Content" class="form-textarea" rows="10" placeholder="Blog içeriğini buraya yazın"></textarea>
+                    <span asp-validation-for="Content" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="newImageFile" class="form-label">Yeni Görsel Yükle</label>
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mb-3">
+                            <p class="text-muted mb-1">Mevcut Görsel:</p>
+                            <img src="@Model.ImageUrl" alt="Mevcut Görsel" class="current-image-preview">
+                        </div>
+                    }
+                    <input type="file" name="newImageFile" id="newImageFile" accept="image/*" class="file-input" />
+                    <span class="text-muted text-sm mt-1">Sadece görsel dosyaları (jpg, png, gif vb.) yükleyebilirsiniz. Yeni bir görsel seçilmezse mevcut görsel korunur.</span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Author" class="form-label"></label>
+                    <input asp-for="Author" class="form-input" placeholder="Yazar adını girin" />
+                    <span asp-validation-for="Author" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Category" class="form-label"></label>
+                    <input asp-for="Category" class="form-input" placeholder="Kategori girin" />
+                    <span asp-validation-for="Category" class="validation-error"></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <button type="submit" class="btn submit-btn">
+                        <i class="bi bi-check-circle me-2"></i> Güncelle
+                    </button>
+                    <a href="@Url.Action("Index", "Blog")" class="back-to-list-btn">
+                        <i class="bi bi-arrow-left me-2"></i> Listeye Geri Dön
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer Bölümü (Diğer sayfalarla aynı stil) -->
+    <footer class="footer-bg text-center">
+        <div class="container">
+            <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
+            <p class="small mt-1">Modern ve İlham Veren Blog Deneyimi.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS ve bağımlılıkları -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

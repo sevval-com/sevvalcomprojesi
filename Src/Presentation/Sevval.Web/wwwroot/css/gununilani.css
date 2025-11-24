@@ -1,0 +1,132 @@
+﻿/* Genel Ayarlar */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f9ff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Konteyner */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 255, 0.1);
+}
+
+/* Başlık */
+h1 {
+    font-size: 2rem;
+    color: #0066cc;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Tablo */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+    .table thead {
+        background-color: #0066cc;
+        color: #ffffff;
+        text-transform: uppercase;
+        font-weight: bold;
+        text-align: center;
+        border-bottom: 3px solid #004b99;
+    }
+
+    .table th, .table td {
+        padding: 18px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.3s ease;
+    }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f4f9ff;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e6f0ff;
+        }
+
+        .table tbody tr[style*="color: red;"] {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+
+/* Butonlar */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    text-align: center;
+    display: inline-block;
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #0066cc;
+    box-shadow: 0 6px 12px rgba(0, 102, 204, 0.3);
+}
+
+    .btn-primary:hover {
+        background-color: #004b99;
+        transform: translateY(-2px);
+    }
+
+.btn-secondary {
+    background-color: #b3c7e6;
+}
+
+    .btn-secondary:hover {
+        background-color: #99b8d9;
+    }
+
+.btn-danger {
+    background-color: #ff4d4d;
+}
+
+    .btn-danger:hover {
+        background-color: #e60000;
+    }
+
+/* Medya Sorguları (Mobil Uyumluluk) */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .table th, .table td {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+}

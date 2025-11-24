@@ -1,0 +1,570 @@
+﻿/* Genel Sayfa Tasarımı */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #e3f2fd;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Başlık */
+.title {
+    text-align: center;
+    color: #1565c0;
+    font-size: 32px;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Kayıt Formu Container */
+.register-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 40px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+ 
+
+label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1565c0;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Giriş Alanları */
+.form-control {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #1565c0;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    background-color: #f7f9fb;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+    .form-control:focus {
+        border-color: #0d47a1;
+        background-color: #ffffff;
+        box-shadow: 0 0 5px rgba(13, 71, 161, 0.3);
+    }
+
+/* Şifre Göster/Gizle */
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #1565c0;
+}
+
+/* Buton */
+.btn-primary {
+    width: 100%;
+    padding: 16px;
+    background-color: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+    .btn-primary:hover {
+        background-color: #0d47a1;
+        transform: scale(1.05);
+    }
+
+/* Harita Konteyneri */
+.map-container {
+    height: 400px;
+    width: 100%;
+    display: none;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: 1px solid #1565c0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Arka Plan Kaplaması */
+.overlay {
+    display: none; /* Başlangıçta görünmez */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Karartma efekti */
+    backdrop-filter: blur(5px); /* Bulanıklaştırma efekti */
+    z-index: 999; /* Mesaj penceresi altında */
+}
+
+/* Mesaj Penceresi */
+.message {
+    display: none; /* Başlangıçta görünmez */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #1565c0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: #1565c0;
+    font-size: 20px;
+    font-weight: 600;
+    z-index: 1000; /* Arka plan kaplamasından daha üstte */
+    width: 400px;
+}
+
+/* Türkiye Konum Arama Kutusu */
+#search-box {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 10px;
+    border-radius: 25px;
+    box-shadow: 0px 4px 8px rgba(0, 123, 255, 0.3);
+    width: 250px;
+    z-index: 2000;
+    display: none;
+}
+
+    #search-box input {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        outline: none;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(90deg, #009cfb, #0056b3);
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+    .logo img {
+        width: 50px;
+        height: auto;
+        margin-right: 10px;
+    }
+
+    .logo span {
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.line {
+    height: 4px;
+    width: 25px;
+    background-color: white;
+    margin: 3px 0;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: bold;
+        position: relative;
+        padding: 5px 0;
+        transition: color 0.3s, transform 0.3s;
+    }
+
+        .nav-links a:hover {
+            color: #5fff00;
+            transform: scale(1.1);
+        }
+
+/* Dropdown Menü */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 180px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.dropdown:hover .dropdown-content {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.dropdown-content li {
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .dropdown-content li a {
+        color: #009cfb;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 16px;
+        display: block;
+    }
+
+        .dropdown-content li a:hover {
+            background-color: rgba(0, 156, 251, 0.1);
+            color: #0056b3;
+        }
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+    .auth-buttons a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .auth-buttons .login {
+        border: 1px solid white;
+    }
+
+    .auth-buttons .post-ad {
+        background-color: white;
+        color: #009cfb;
+        font-weight: bold;
+        padding: 8px 15px;
+        border-radius: 4px;
+    }
+
+    .auth-buttons a:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+        transform: scale(1.05);
+    }
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        background-color: white;
+        padding: 10px 0;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .nav-links.active {
+            display: flex;
+        }
+
+        .nav-links li {
+            width: 100%;
+        }
+
+        .nav-links a {
+            text-align: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: black;
+        }
+
+    .hamburger {
+        display: flex;
+        position: fixed;
+        top: 25px;
+        right: 20px;
+        z-index: 1000;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Pop-up penceresi stili */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+/* Pop-up içeriği stili */
+.popup-content {
+    background: linear-gradient(90deg, #1e88e5, #2196f3); /* Mavi tonları kullanıldı */
+    width: 40%; /* Genişlik ayarlandı */
+    height: 70vh; /* Yükseklik %70 ekranın */
+    display: flex;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+/* Sol ve sağ bölümler */
+.left-section, .right-section {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Sağ bölümdeki ayırıcı */
+.right-section {
+    border-left: 2px solid #fff; /* Sağ tarafla sol tarafı ayıran çizgi */
+}
+
+
+/* Buton stilleri */
+.button {
+    margin: 15px 0;
+    padding: 15px 25px;
+    background: #fff;
+    color: #1e88e5; /* Mavi tonları kullanıldı */
+    text-decoration: none;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+    width: 80%;
+}
+
+    .button:hover {
+        background: #f1f1f1;
+        transform: translateY(-2px);
+    }
+
+    .button:focus {
+        outline: none;
+    }
+
+/* Kapat butonu */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px; /* Butonun genişliği */
+    height: 40px; /* Butonun yüksekliği */
+    font-size: 30px;
+    color: #fff;
+    background: none;
+    border: 2px solid #fff; /* Butonun kenarlığı */
+    text-align: center; /* Yazıyı ortalamak için */
+    cursor: pointer;
+    display: flex; /* İçeriği ortalamak için */
+    align-items: center; /* İçeriği dikey ortalamak için */
+    justify-content: center; /* İçeriği yatay ortalamak için */
+}
+
+    .close-button:hover {
+        color: #d32f2f;
+        border-color: #d32f2f; /* Hover durumunda kenarlık rengi değişiyor */
+    }
+
+/* Fade-in animasyonu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Mobil cihazlar için düzenlemeler */
+@media only screen and (max-width: 768px) {
+    .popup-content {
+        width: 90%; /* Pop-up genişliği mobilde %90'a düştü */
+        height: auto; /* Yükseklik içeriğe göre otomatik olacak şekilde ayarlandı */
+        flex-direction: column; /* İçeriğin dikey hizalanması */
+        padding: 15px; /* İçerik için padding biraz küçültüldü */
+    }
+
+    .left-section, .right-section {
+        padding: 10px; /* İçerik boşlukları küçültüldü */
+    }
+
+    .button {
+        width: 100%; /* Butonlar tam genişlik olacak şekilde ayarlandı */
+        padding: 12px 20px; /* Buton padding'i küçültüldü */
+        font-size: 16px; /* Buton yazı boyutu küçültüldü */
+    }
+
+    h2 {
+        font-size: 22px; /* Başlık boyutu küçültüldü */
+    }
+}
+
+/* Daha küçük cihazlar için (örneğin telefonlar) */
+@media only screen and (max-width: 480px) {
+    .popup-content {
+        width: 95%; /* Pop-up genişliği daha küçük cihazlarda %95 olacak */
+        padding: 10px; /* Daha az padding */
+    }
+
+    h2 {
+        font-size: 18px; /* Başlık boyutu daha da küçültüldü */
+    }
+
+    .button {
+        padding: 8px 10px; /* Buton padding'i daha da küçültüldü */
+        font-size: 14px; /* Buton yazı boyutu küçültüldü */
+    }
+}
+
+/* Modal Stili */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 109%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 620px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+    .close-button:hover {
+        color: red;
+    }
+
+/* Mobil Ekranlar İçin Uyarlama */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%; /* Mobil ekranlar için daha dar genişlik */
+        max-height: 85vh; /* Mobil ekran için maksimum yüksekliği biraz artırdık */
+        padding: 15px; /* Mobil cihazlarda iç boşluğu biraz küçülttük */
+    }
+
+    .close-button {
+        font-size: 20px; /* Mobil cihazlar için daha küçük buton */
+    }
+}

@@ -1,0 +1,101 @@
+@model Sevval.Application.Features.AboutUs.Queries.GetAboutUs.GetAboutUsQueryResponse
+
+<h4 class="aboutUs-title">Hakkımızda</h4>
+<div class="aboutUs-content">
+    <p><strong>Şirket İsmi:</strong> @Model.CompanyName</p>
+    <p><strong>Şirketin Bulunduğu Bölge:</strong> @Model.City / @Model.District</p>
+
+    <hr class="aboutUs-divider">
+
+    <h5 class="aboutUs-subtitle">Firma Sahibi Bilgileri:</h5>
+    <p><strong>İsim Soyisim:</strong> @Model.FirstName @Model.LastName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Telefon No:</strong> @(Model.PhoneNumber?.StartsWith("0") == true ? Model.PhoneNumber : "0" + Model.PhoneNumber)</p>
+
+    <hr class="aboutUs-divider">
+
+    <!-- Harita Konumu | Details'taki embed yaklaşımıyla -->
+    @{ 
+        var addressText = !string.IsNullOrWhiteSpace(Model.GoogleMapsAddress)
+            ? Model.GoogleMapsAddress
+            : ($"{Model.City} {(string.IsNullOrWhiteSpace(Model.District) ? string.Empty : "/ " + Model.District)} {Model.CompanyName}");
+        var mapQuery = System.Net.WebUtility.UrlEncode(addressText);
+        var hasApiKey = !string.IsNullOrWhiteSpace(Model.GoogleMapsApiKey);
+        var srcUrl = hasApiKey 
+            ? $"https://www.google.com/maps/embed/v1/place?key={Model.GoogleMapsApiKey}&q={mapQuery}"
+            : $"https://www.google.com/maps?q={mapQuery}&output=embed";
+    }
+    <div id="map" class="aboutUs-map">
+        <iframe src="@srcUrl" style="border:0; width:100%; height:100%;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <p class="map-warning">@Model.MapWarningMessage</p>
+
+    <!-- CSS ile Stil Verme -->
+    <style>
+        .map-warning {
+            font-size: 14px;
+            color: red;
+            margin-top: 5px;
+        }
+        /* Harita kutusu - responsive ve modern görünüm */
+        .aboutUs-map {
+            width: 100%;
+            height: 420px; /* desktop */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(11,42,87,.12);
+            border: 1px solid #e9eef7;
+        }
+        @@media (max-width: 768px) {
+            .aboutUs-map { height: 320px; }
+        }
+    </style>
+
+    <!-- Konumun Açık Adresi -->
+    <div id="address" class="aboutUs-address">
+    </div>
+
+    <hr class="aboutUs-divider">
+    <h5 class="aboutUs-subtitle">Belgeler</h5>
+    <div class="row g-3">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold">Seviye 5 Belgesi</div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Level5CertificatePath))
+                    {
+                        <img src="@Model.Level5CertificatePath" alt="Seviye 5 Belgesi" class="img-fluid rounded" />
+                    }
+                    else
+                    {
+                        <img src="/images/placeholders/camera.svg" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold">Yetki/Vergi Belgesi</div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.TaxPlatePath))
+                    {
+                        <img src="@Model.TaxPlatePath" alt="Yetki/Vergi Belgesi" class="img-fluid rounded" />
+                    }
+                    else
+                    {
+                        <img src="/images/placeholders/camera.svg" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var address = '@addressText'.trim();
+        if(address){
+            document.getElementById('address').innerHTML = '<strong>Adres:</strong> ' + address;
+        }
+    })();
+ </script>

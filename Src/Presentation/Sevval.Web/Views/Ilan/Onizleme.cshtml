@@ -1,0 +1,133 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@using Microsoft.AspNetCore.Identity
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İlan Önizlemesi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/araziilan.css" />
+</head>
+<body>
+
+<div class="container">
+    @if (Model._Ilanlar != null && Model._Ilanlar.Count > 0)
+    {
+        var ilan = Model._Ilanlar[0];
+
+        <!-- Başlık ve Fiyat -->
+        <div class="header">
+            <h2 class="title">@ilan.Title</h2>
+            <div class="price-container">
+                <span class="price">@ilan.Price TL</span>
+            </div>
+        </div>
+
+        <!-- Fotoğraf, Video, ve Konum Sekmeleri -->
+        <div class="media-tabs">
+            <div class="tab photo-tab active">Fotoğraf</div>
+            <div class="tab video-tab">Video</div>
+            <div class="tab location-tab">Konum</div>
+        </div>
+
+            <!-- Fotoğraf Alanı -->
+            <div class="photo-container" id="photo-container">
+                <div class="photo-gallery">
+                    <div id="photoCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            @foreach (var foto in Model._Fotograflar)
+                            {
+                                <div class="carousel-item @(Model._Fotograflar.First() == foto ? "active" : "")">
+                                    <img src="https://www.sevval.com/@foto.Url" alt="Fotoğraf" class="gallery-image">
+                                </div>
+                            }
+                        </div>
+                        <button class="nav-button left" aria-label="Önceki">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="nav-button right" aria-label="Sonraki">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Video Penceresi -->
+        <div class="media-window video-window">
+            <video controls>
+                <source src="@ilan.VideoLink" type="video/mp4">
+                Video desteği bulunmuyor.
+            </video>
+        </div>
+
+        <!-- Konum Penceresi -->
+        <div class="media-window location-window">
+            <iframe src="https://maps.google.com/maps?q=@ilan.Latitude,@ilan.Longitude&hl=tr&z=14&output=embed" frameborder="0"></iframe>
+        </div>
+
+        <!-- Detaylar -->
+        <div class="details">
+            <span>M²: @ilan.Area</span> |
+            <span>Ada No: @ilan.AdaNo</span> |
+            <span>Parsel No: @ilan.ParselNo</span>
+        </div>
+
+        <!-- Özellikler ve Açıklama Sekmeleri -->
+        <div class="info-tabs">
+            <div class="tab features-tab active">Özellikler</div>
+            <div class="tab description-tab">Açıklama</div>
+        </div>
+
+        <!-- Özellikler İçeriği -->
+        <div class="info-content features-content active">
+            <div class="features-grid">
+                <div>Metrekare: @ilan.Area</div>
+                <div>Ada No: @ilan.AdaNo</div>
+                <div>Parsel No: @ilan.ParselNo</div>
+                <div>Pafta No: @ilan.PaftaNo</div>
+                <div>Kaks: @ilan.Kaks</div>
+                <div>Gabari: @ilan.Gabari</div>
+                <div>Krediye Uygun: @ilan.KrediyeUygunluk</div>
+                <div>Takasa Uygun: @ilan.TakasaUygunluk</div>
+                <div>Arazi Niteliği: @ilan.AraziNiteliği</div>
+                <div>Tapu Durumu: @ilan.TapuDurumu</div>
+                <div>Kimden: @ilan.Kimden</div>
+                <div>Sahibi: @ilan.GayrimenkulSahibi</div>
+            </div>
+        </div>
+
+        <!-- Açıklama İçeriği -->
+        <div class="info-content description-content">
+            <p>@ilan.Description</p>
+        </div>
+    }
+    else
+    {
+        <p>İlan bulunamadı.</p>
+    }
+</div>
+
+<!-- JavaScript ile Sekmeler Arası Geçiş -->
+<script>
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.media-window, .info-content').forEach(content => content.classList.remove('active'));
+
+            this.classList.add('active');
+            const contentClass = this.classList[1].split('-')[0] + '-window';
+            document.querySelector('.' + contentClass).classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>

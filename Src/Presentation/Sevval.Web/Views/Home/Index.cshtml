@@ -1,0 +1,2896 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@model sevvalemlak.Dto.TumIlanlarDTO
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+@section style {
+    <link rel="stylesheet" type="text/css" href="~/css/yorumlar.css" />
+}
+<style>
+    .recently-visited-section {
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #0078d7;
+        margin-bottom: 25px;
+    }
+
+    .recently-visited-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        overflow: hidden;
+    }
+
+    .result-item {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+        .result-item:hover {
+            transform: scale(1);
+            border-color: #0078d7;
+            box-shadow: 0 8px 24px 0 rgba(0, 120, 215, 0.18), 0 2px 8px 0 rgba(0, 120, 215, 0.10);
+        }
+
+    .result-image {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-image i.fa-camera {
+            font-size: 50px;
+            color: #007bff;
+        }
+
+    .result-price {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 120, 215, 0.85);
+        color: #fff;
+        padding: 5px 12px;
+        font-size: 16px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .new-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #007bff;
+        color: white;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+
+    .result-details {
+        padding: 15px;
+        text-align: left;
+    }
+
+        .result-details h3 {
+            font-size: 18px;
+            color: #003d66;
+            margin: 0 0 10px;
+            font-weight: 600;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
+            .result-details h3 a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+                .result-details h3 a:hover {
+                    color: #0078d7;
+                }
+
+    .result-description {
+        font-size: 14px;
+        color: #666;
+        margin: 8px 0;
+        gap: 8px;
+        line-height: 1.4;
+        display: flex;
+    }
+
+    .detail-item {
+        white-space: nowrap;
+    }
+
+    .separator {
+        color: #999;
+        margin: 0 5px;
+    }
+
+    .view-all-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .view-all-btn {
+        display: inline-block;
+        background-color: #0078d7;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .view-all-btn:hover {
+            background-color: #106ebe;
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Responsive tasarım */
+    @@media (max-width: 768px) {
+        .recently-visited-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 24px;
+        }
+
+        .result-image {
+            height: 150px;
+        }
+
+        .result-details {
+            padding: 12px;
+        }
+
+            .result-details h3 {
+                font-size: 16px;
+            }
+
+        .logo img{
+            width: 70px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .recently-visited-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .recently-visited-section {
+            margin: 20px 0;
+            padding: 15px;
+        }
+    }
+
+    /* Modern Daily Offer Styles */
+    #dailyOfferContainer {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 1000px;
+        width: 90%;
+        max-height: 90vh;
+        background: linear-gradient(135deg, #009cfb 0%, #0056b3 100%);
+        border-radius: 20px;
+        padding: 0;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @@keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        backdrop-filter: blur(5px);
+    }
+
+    .modern-close-btn {
+        position: absolute;
+        top: 20px;
+        padding:15px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .modern-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+
+    .daily-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: linear-gradient(45deg, #01e11b, #009cfb);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(1, 225, 27, 0.3);
+    }
+
+    .modern-offer-content {
+        display: flex;
+        min-height: 600px;
+        color: white;
+    }
+
+    .offer-left-content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .offer-right-content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .property-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+        align-items: flex-start;
+    }
+
+    .tag {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        display: inline-block;
+    }
+
+    .tag-category {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .tag-status {
+        background: rgba(76, 175, 80, 0.8);
+        color: white;
+    }
+
+    .tag-subcategory {
+        background: rgba(33, 150, 243, 0.8);
+        color: white;
+    }
+
+    .price-section {
+        margin-bottom: 25px;
+    }
+
+    .price-label {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-bottom: 5px;
+    }
+
+    .price-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .property-title h2 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+        line-height: 1.3;
+        color: white;
+    }
+
+    .location-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .location-section i {
+        color: #01e11b;
+    }
+
+    .property-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 6px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .detail-item i {
+        color: #01e11b;
+        width: 16px;
+    }
+
+    .contact-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+
+    .contact-info {
+        margin-bottom: 20px;
+    }
+
+    .contact-person,
+    .contact-phone,
+    .contact-company {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .contact-person i,
+    .contact-phone i,
+    .contact-company i {
+        color: #01e11b;
+        width: 16px;
+    }
+
+    .contact-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .contact-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .whatsapp-btn {
+        background: #25d366;
+        color: white;
+    }
+
+    .whatsapp-btn:hover {
+        background: #128c7e;
+        transform: translateY(-2px);
+    }
+
+    .call-btn {
+        background: #009cfb;
+        color: white;
+    }
+
+    .call-btn:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .image-slider-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .modern-image-slider {
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+
+    .slider-btn {
+        position: absolute;
+        top: 45%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        padding: 15px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    .slider-btn:hover {
+        transform: translateY(-50%);
+    }
+    .prev-btn {
+        left: -50px;
+    }
+
+    .next-btn {
+        right: -40px;
+    }
+
+    .image-action-buttons {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .slider-slide {
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    .slider-slide img {
+        width: 100%;
+        height: 100% !important;
+        object-fit: contain;
+    }
+
+    .slider-slide.no-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 18px;
+    }
+
+    .slider-slide.no-image i {
+        font-size: 48px;
+        margin-bottom: 10px;
+        opacity: 0.5;
+    }
+
+    .action-buttons {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 40px;
+        background: rgba(0, 0, 0, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: #01e11b;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(1, 225, 27, 0.3);
+    }
+
+        /* Turuncu Buton Stilleri */
+        .action-btn.orange-btn {
+            background: #f39c12; /* Turuncu Arka Plan */
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+
+            .action-btn.orange-btn:hover {
+                background: #e67e22; /* Üzerine Gelince Koyu Turuncu */
+                box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+            }
+
+
+    .action-btn:hover {
+        background: #00c41a;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(1, 225, 27, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .view-count {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px 20px;
+        border-radius: 25px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .view-count i {
+        color: #01e11b;
+        font-size: 16px;
+    }
+
+    .view-count:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    @@media (max-width: 1024px) {
+        .offer-right-content{
+            width: 60%
+        }
+        .offer-left-content{
+            width: 45%;
+        }
+        #dailyOfferContainer{
+            height: max-content;
+        }
+    }
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        #dailyOfferContainer {
+            width: 90%;
+            margin: 5px auto;
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+        .modern-image-slider{
+            height: 170px !important;
+        }
+        .modern-offer-content {
+            flex-direction: column-reverse;
+            min-height: auto;
+            max-height: calc(98vh - 40px);
+            margin-top: 30px;
+        }
+        
+        .offer-right-content{
+            width: 100%;
+            padding: 15px;
+            flex: none;
+            padding-bottom: .5rem !important;
+        }
+        
+        .offer-left-content{
+            width: 100%;
+            padding: 15px;
+            flex: none;
+            padding-top: 0 !important;
+        }
+
+        .image-action-buttons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: .5rem !important;
+        }
+        
+        .view-count{
+            margin-top: 0;
+            margin-left: 10px;
+        }
+        .price-section{
+            margin-bottom: .5rem !important;
+        }
+        .location-section{
+            margin-bottom: .5rem !important;
+        }
+        .modern-image-slider {
+            height: 250px;
+            margin-bottom: 15px;
+        }
+
+        .property-details-grid {
+            display: flex;
+            margin-bottom: .5rem !important;
+        }
+        .contact-section{
+            margin-bottom: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .5rem !important;
+        }
+        .contact-info{
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .contact-company{
+            margin-bottom: 0 !important;
+        }
+        .contact-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .price-value {
+            font-size: 28px;
+        }
+
+        .property-title h2 {
+            font-size: 22px;
+        }
+
+        .slider-btn {
+            width: 35px;
+            height: 35px;
+            font-size: 14px;
+        }
+
+        .prev-btn {
+            left: 5px;
+        }
+
+        .next-btn {
+            right: 5px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        #dailyOfferContainer {
+            width: 90%;
+            margin: 2px auto;
+            max-height: 99vh;
+            overflow-y: auto;
+        }
+
+        .modern-offer-content {
+            min-height: auto;
+            max-height: calc(99vh - 20px);
+        }
+
+        .offer-left-content,
+        .offer-right-content {
+            padding: 0 10px;
+            padding-bottom: 0 !important;
+        }
+        .offer-left-content {
+            padding: 0 10px;
+            padding-bottom: 8px !important;
+        }
+
+        .modern-image-slider {
+            height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .property-title h2 {
+            font-size: 16px;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .price-value {
+            font-size: 20px;
+        }
+
+        .property-details-grid {
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .contact-section {
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .contact-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .view-count {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .image-action-buttons {
+            gap: 0.3rem;
+        }
+
+        .price-value {
+            font-size: 24px;
+        }
+
+        .property-details-grid {
+            gap: 10px;
+        }
+
+        .detail-item {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .contact-section {
+            padding: 15px;
+        }
+
+        .contact-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .view-count {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .slider-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
+        }
+
+        .prev-btn {
+            left: 2px;
+        }
+
+        .next-btn {
+            right: 2px;
+        }
+    }
+</style>
+
+@if (ViewBag.GununIlan != null)
+{
+    <script>
+        (function() {
+            async function refreshDailyOfferViewCount() {
+                try {
+                    const response = await fetch('@Url.Action("GetDailyOfferViewCount", "Home")', { cache: 'no-store' });
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    if (data && data.success) {
+                        const el = document.getElementById('dailyOfferViewCount');
+                        if (el) {
+                            el.innerHTML = '<i class="fas fa-eye"></i> <span>' + data.count + ' görüntülenme</span>';
+                        }
+                    }
+                } catch (e) { }
+            }
+            // İlk açılışta hemen çek, sonra her 60 saniyede bir yenile
+            refreshDailyOfferViewCount();
+            setInterval(refreshDailyOfferViewCount, 60000);
+        })();
+    </script>
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    
+    <div id="dailyOfferContainer">
+        <!-- Modern Close Button -->
+        <button id="closeOfferButton" class="modern-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modern-offer-content">
+            <!-- Left Content -->
+            <div class="offer-left-content">
+                <!-- Property Tags -->
+                <div class="property-tags">
+                    @{
+                        var category = string.IsNullOrWhiteSpace(ViewBag.GununIlan.Category) ? "" : ViewBag.GununIlan.Category;
+                        var status = string.IsNullOrWhiteSpace(ViewBag.GununIlan.KonutDurumu) ? "" : ViewBag.GununIlan.KonutDurumu;
+                        var subCategory = string.IsNullOrWhiteSpace(ViewBag.GununIlan.MulkTipi) ? "" : ViewBag.GununIlan.MulkTipi;
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(category))
+                    {
+                        <span class="tag tag-category">@category</span>
+                    }
+                    @if (!string.IsNullOrEmpty(status))
+                    {
+                        <span class="tag tag-status">@status</span>
+                    }
+                    @if (!string.IsNullOrEmpty(subCategory))
+                    {
+                        <span class="tag tag-subcategory">@subCategory</span>
+                    }
+                </div>
+
+                <!-- Price Section -->
+                <div class="price-section">
+                    <div class="price-label">Fiyat</div>
+                    <div class="price-value">@($"{ViewBag.GununIlan.Price:N0} TL")</div>
+                </div>
+
+                <!-- Title -->
+                <div class="property-title">
+                    <h2>@ViewBag.GununIlan.Title</h2>
+                </div>
+
+                <!-- Location -->
+                @{
+                    List<string> locationList = new List<string>();
+                    locationList.Add(ViewBag.GununIlan.sehir);
+                    locationList.Add(ViewBag.GununIlan.semt);
+                    locationList.Add(ViewBag.GununIlan.mahalleKoy);
+                }
+                <div class="location-section">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>@string.Join(" | ", locationList.Where(a => !string.IsNullOrEmpty(a)))</span>
+                </div>
+
+                <!-- Property Details -->
+                <div class="property-details-grid">
+                    @if (!string.IsNullOrEmpty(ViewBag.GununIlan.Area?.ToString()) && ViewBag.GununIlan.Area?.ToString()!="0")
+                    {
+                        <div class="detail-item">
+                            <i class="fas fa-ruler-combined"></i>
+                            <span>@ViewBag.GununIlan.Area?.ToString("N0") m²</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.GununIlan.AdaNo?.ToString()))
+                    {
+                        <div class="detail-item">
+                            <i class="fas fa-map"></i>
+                            <span>Ada: @ViewBag.GununIlan.AdaNo</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.GununIlan.ParselNo?.ToString()))
+                    {
+                        <div class="detail-item">
+                            <i class="fas fa-map"></i>
+                            <span>Parsel: @ViewBag.GununIlan.ParselNo</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.GununIlan.OdaSayisi?.ToString()) && ViewBag.GununIlan.OdaSayisi?.ToString() != "0")
+                    {
+                        <div class="detail-item">
+                            <i class="fas fa-bed"></i>
+                            <span>@ViewBag.GununIlan.OdaSayisi Oda</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.GununIlan.BinaYasi?.ToString()))
+                    {
+                        <div class="detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>@ViewBag.GununIlan.BinaYasi Yaşında</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <div class="contact-info">
+                        <div class="contact-person">
+                            <i class="fas fa-user"></i>
+                            <span>@ViewBag.KullaniciAdSoyad</span>
+                        </div>
+                        <div class="contact-phone">
+                            <i class="fas fa-phone"></i>
+                            @{
+                                string rawPhone = (ViewBag.GununIlan.PhoneNumber ?? "").ToString();
+                                var sbPhone = new System.Text.StringBuilder();
+                                foreach (var ch in rawPhone)
+                                {
+                                    if (char.IsDigit(ch)) sbPhone.Append(ch);
+                                }
+                                string digits = sbPhone.ToString();
+                                if (digits.StartsWith("90") && digits.Length == 12)
+                                {
+                                    digits = "0" + digits.Substring(2);
+                                }
+                                if (digits.Length == 10)
+                                {
+                                    digits = "0" + digits;
+                                }
+                                string formattedPhone = rawPhone;
+                                if (digits.Length >= 11)
+                                {
+                                    formattedPhone = $"0 {digits.Substring(1,3)} {digits.Substring(4,3)} {digits.Substring(7,2)} {digits.Substring(9,2)}";
+                                }
+                            }
+                            <span>@formattedPhone</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(ViewBag.CompanyName))
+                        {
+                            <div class="contact-company">
+                                <i class="fas fa-building"></i>
+                                <span>@ViewBag.CompanyName</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="contact-buttons">
+                        <button class="contact-btn whatsapp-btn" onclick="sendMessageToWhatsapp()">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button class="contact-btn call-btn" onclick="makeCall()">
+                            <i class="fas fa-phone"></i>
+                            <span>Ara</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content - Image Slider -->
+            <div class="offer-right-content">
+                <div class="image-slider-container">
+                    <div class="modern-image-slider">
+                        @if (ViewBag.Fotograflar != null && ViewBag.Fotograflar.Count > 0)
+                        {
+                            bool gununIlaniEklendi = false;
+                            for (int i = 0; i < ViewBag.Fotograflar.Count; i++)
+                            {
+                                <div class="slider-slide">
+                                    <img src="@ViewBag.Fotograflar[i].Url" alt="Fotoğraf" loading="lazy" width="800" height="400">
+                                </div>
+                                @if (!gununIlaniEklendi && i == (ViewBag.Fotograflar.Count / 2))
+                                {
+                                    <div class="slider-slide">
+                                        <img src="~/ImageFiles/gununilani.png" alt="Günün İlanı" loading="lazy" width="800" height="400">
+                                    </div>
+                                    gununIlaniEklendi = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="slider-slide no-image">
+                                <i class="fas fa-camera"></i>
+                                <span>Fotoğraf Yok</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    <!-- Slider Navigation Buttons -->
+                    <button class="slider-btn prev-btn" onclick="prevSlide()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="slider-btn next-btn" onclick="nextSlide()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- İlana Git Button - Fotoğraf altında -->
+                    <div class="image-action-buttons">
+                        <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ViewBag.GununIlan.Id })" class="action-btn primary-btn">
+                            <i class="fas fa-eye"></i>
+                            <span>İlana Git</span>
+                        </a>
+                        <a href="@Url.Action("GununIlaniSiparisi", "Home")" class="action-btn orange-btn">
+                            <i class="fas fa-star"></i>
+                            <span>Günün İlanı Ver</span>
+                        </a>
+                        <div class="view-count" id="dailyOfferViewCount">
+                <i class="fas fa-eye"></i>
+                <span>@ViewBag.GununIlan.GoruntulenmeSayisi görüntülenme</span>
+            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<!-- Yüzen buton -->
+<a href="#" id="floating-offer-icon" class="floating-offer-link">
+    <img src="~/ImageFiles/GÜNÜNİLANİ.png" alt="Günün İlanı" class="floating-offer-img" loading="lazy" width="100" height="100">
+</a>
+<div class="tagline-container1" style="display: flex;">
+    <h2 class="tagline">VARSA BİZDEN İYİSİ, O DA BİZDEN BİRİSİ</h2>
+</div>
+
+<form asp-action="HizliAra" asp-controller="Ilan" method="post">
+    <!-- Arama ve Seçenekler Kutusu -->
+    <div class="custom-search-container">
+        <!-- Arama Kutusu -->
+        <div class="search-section">
+            <input type="text"
+                   class="custom-search-input"
+                   id="siteSearchInput"
+                   name="anahtarKelime"
+                   placeholder="Aradığınız şeyi yazın..."
+                   value="@ViewBag.AnahtarKelime" />
+            <button type="submit" class="custom-search-button">Ara<i class=" fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </div>
+</form>
+
+<div class="tagline-container">
+    <!-- Seçenekler Penceresi -->
+    <div class="custom-options-container">
+        <div class="options-header">Filtreli Arama</div>
+        <div class="options-tabs">
+            <button class="option-tab" onclick="showOption('konut')">
+                Konut <span class="dropdown-icon"></span>
+            </button>
+            <button class="option-tab" onclick="showOption('arazi')">
+                Arsa <span class="dropdown-icon"></span>
+            </button>
+            <button class="option-tab" onclick="showOption('bahce')">
+                Bahçe <span class="dropdown-icon"></span>
+            </button>
+            <button class="option-tab" onclick="showOption('tarla')">
+                Tarla <span class="dropdown-icon"></span>
+            </button>
+            <button class="option-tab" onclick="showOption('is_yeri')">
+                İş Yeri <span class="dropdown-icon"></span>
+            </button>
+            <button class="option-tab" onclick="showOption('turistik')">
+                Turistik Tesis <span class="dropdown-icon"></span>
+            </button>
+        </div>
+
+        <div class="options-content">
+            <!-- Konut Seçeneği -->
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <div id="konut" class="option-details">
+                    <!-- Konut (Yaşam Alanı) Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="Konut (Yaşam Alanı)">
+
+                    <div class="filter-group">
+                        <!-- Konut Durumu Seçeneği -->
+                        <select name="detayliAramaRequestDTO.KonutDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Devren Satılık">Devren Satılık</option>
+                            <option value="Devren Kiralık">Devren Kiralık</option>
+                        </select>
+
+                        <!-- Mülk Tipi Seçeneği -->
+                        <select name="detayliAramaRequestDTO.MulkTipi">
+                            <option value="Daire">Daire</option>
+                            <option value="Müstakil Ev">Müstakil Ev</option>
+                            <option value="Köy Evi">Köy Evi</option>
+                            <option value="Eski, Kargir Ev">Eski, Kargir Ev</option>
+                            <option value="Dağ Evi">Dağ Evi</option>
+                            <option value="Kerpiç Ev">Kerpiç Ev</option>
+                            <option value="Samanlık">Samanlık</option>
+                            <option value="Kulübe">Kulübe</option>
+                            <option value="Konteyner">Konteyner</option>
+                            <option value="Prefabrik">Prefabrik</option>
+                            <option value="Bungalow">Bungalow</option>
+                            <option value="Tiny House">Tiny House</option>
+                            <option value="Loft Daire">Loft Daire</option>
+                            <option value="Bina">Bina</option>
+                            <option value="Devremülk">Devremülk</option>
+                            <option value="Çiftlik Evi">Çiftlik Evi</option>
+                            <option value="Kooperatif">Kooperatif</option>
+                            <option value="Villa">Villa</option>
+                            <option value="Köşk">Köşk</option>
+                            <option value="Konak">Konak</option>
+                            <option value="Yalı">Yalı</option>
+                            <option value="Ev ve Ahır">Ev ve Ahır</option>
+                            <option value="Rezidans">Rezidans</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="location-group">
+                        <!-- İl Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehir">
+                            <option value="">İl Seçiniz</option>
+                            <!-- Diğer iller buraya eklenebilir -->
+                        </select>
+
+                        <!-- İlçe Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Ilce" id="semt">
+                            <option value="">İlçe Seçiniz</option>
+                            <!-- İlçeler dinamik şekilde yüklenecek -->
+                        </select>
+
+                        <!-- Mahalle/Köy Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalle">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                            <!-- Mahalleler dinamik şekilde yüklenecek -->
+                        </select>
+                    </div>
+                    <div class="price-group">
+                        <!-- Fiyat Seçenekleri -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <div id="arazi" class="option-details">
+                    <!-- Arsa Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="Arsa">
+
+                    <div class="filter-group">
+                        <!-- Arsa Durumu Seçeneği -->
+                        <select name="detayliAramaRequestDTO.ArsaDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Kat Karşılığı">Kat Karşılığı</option>
+                        </select>
+
+                        <!-- Arsa Tipi Seçeneği -->
+                        <select name="detayliAramaRequestDTO.ArsaTipi">
+                            <option value="A-Lejantlı Arsa">A-Lejantlı Arsa</option>
+                            <option value="Bahçe">Bahçe</option>
+                            <option value="Çiftlik">Çiftlik</option>
+                            <option value="Depo Ve Antrepo">Depo Ve Antrepo</option>
+                            <option value="Eğitim">Eğitim</option>
+                            <option value="Enerji Depolama">Enerji Depolama</option>
+                            <option value="Hastane">Hastane</option>
+                            <option value="Kamu Alanı">Kamu Alanı</option>
+                            <option value="Karma">Karma</option>
+                            <option value="Konut">Konut</option>
+                            <option value="Konut + Ticaret">Konut + Ticaret</option>
+                            <option value="Muhtelif Arsa">Muhtelif Arsa</option>
+                            <option value="Özel Kullanım">Özel Kullanım</option>
+                            <option value="Petrol Lejantı">Petrol Lejantı</option>
+                            <option value="Sanayi">Sanayi</option>
+                            <option value="Sağlık">Sağlık</option>
+                            <option value="Sera">Sera</option>
+                            <option value="Sit Alanı">Sit Alanı</option>
+                            <option value="Spor Alanı">Spor Alanı</option>
+                            <option value="Tarım">Tarım</option>
+                            <option value="Ticaret">Ticaret</option>
+                            <option value="Toplu Konut">Toplu Konut</option>
+                            <option value="Turizm">Turizm</option>
+                            <option value="Turizm Arsa">Turizm Arsa</option>
+                            <option value="Yeşil Alan">Yeşil Alan</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="location-group">
+                        <!-- İl Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehirArsa">
+                            <option value="">İl Seçiniz</option>
+                        </select>
+
+                        <!-- İlçe Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Ilce" id="semtArsa">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+
+                        <!-- Mahalle/Köy Seçeneği -->
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalleArsa">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="price-group">
+                        <!-- Fiyat Seçenekleri -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <!-- Bahçe Seçeneği -->
+                <div id="bahce" class="option-details">
+                    <!-- Bahçe (Meyve Bahçesi) Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="Bahçe">
+
+                    <div class="filter-group">
+                        <!-- Satılık, Kiralık, Kat Karşılığı Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.BahceDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Kat Karşılığı">Kat Karşılığı</option>
+                        </select>
+
+                        <!-- Meyve Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.MeyveTuru">
+                            <option value="Ahududu">Ahududu</option>
+                            <option value="Armut">Armut</option>
+                            <option value="Avokado">Avokado</option>
+                            <option value="Ayva">Ayva</option>
+                            <option value="Badem">Badem</option>
+                            <option value="Böğürtlen">Böğürtlen</option>
+                            <option value="Ceviz">Ceviz</option>
+                            <option value="Çilek">Çilek</option>
+                            <option value="Dut">Dut</option>
+                            <option value="Elma">Elma</option>
+                            <option value="Erik">Erik</option>
+                            <option value="Fındık">Fındık</option>
+                            <option value="Greyfurt">Greyfurt</option>
+                            <option value="Hurma">Hurma</option>
+                            <option value="İğde">İğde</option>
+                            <option value="Kayısı">Kayısı</option>
+                            <option value="Kestane">Kestane</option>
+                            <option value="Kivi">Kivi</option>
+                            <option value="Kızılcık">Kızılcık</option>
+                            <option value="Kiraz">Kiraz</option>
+                            <option value="Karışık">Karışık</option>
+                            <option value="Lavanta">Lavanta</option>
+                            <option value="Limon">Limon</option>
+                            <option value="Mandalina">Mandalina</option>
+                            <option value="Muşmula">Muşmula</option>
+                            <option value="Muz">Muz</option>
+                            <option value="Nar">Nar</option>
+                            <option value="Portakal">Portakal</option>
+                            <option value="Şeftali">Şeftali</option>
+                            <option value="Üzüm">Üzüm</option>
+                            <option value="Vişne">Vişne</option>
+                            <option value="Zeytin">Zeytin</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="location-group">
+                        <!-- İl, İlçe, Mahalle Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehirBahce">
+                            <option value="">İl Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Ilce" id="semtBahce">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalleBahce">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="price-group">
+                        <!-- Fiyat Aralığı -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <!-- Tarla Seçeneği -->
+                <div id="tarla" class="option-details">
+                    <!-- Tarla Kategorisi Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="Tarla">
+
+                    <div class="filter-group">
+                        <!-- Satılık, Kiralık, Kat Karşılığı Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.TarlaDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Kat Karşılığı">Kat Karşılığı</option>
+                        </select>
+
+                        <!-- Tarla Ürün Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.UrunTuru">
+                            <option value="Ayçiçeği">Ayçiçeği</option>
+                            <option value="Bakla">Bakla</option>
+                            <option value="Bamya">Bamya</option>
+                            <option value="Bağ">Bağ</option>
+                            <option value="Bezelye">Bezelye</option>
+                            <option value="Çay">Çay</option>
+                            <option value="Çilek">Çilek</option>
+                            <option value="Fasulye">Fasulye</option>
+                            <option value="Ispanak">Ispanak</option>
+                            <option value="Kabak">Kabak</option>
+                            <option value="Marul">Marul</option>
+                            <option value="Patlıcan">Patlıcan</option>
+                            <option value="Salatalık">Salatalık</option>
+                            <option value="Sarımsak">Sarımsak</option>
+                            <option value="Tarla+Bağ">Tarla+Bağ</option>
+                            <option value="Tütün">Tütün</option>
+                            <option value="Yer Fıstığı">Yer Fıstığı</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="location-group">
+                        <!-- İl, İlçe, Mahalle Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehirTarla">
+                            <option value="">İl Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Ilce" id="semtTarla">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalleTarla">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="price-group">
+                        <!-- Fiyat Aralığı -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <!-- İş Yeri Seçeneği -->
+                <div id="is_yeri" class="option-details">
+                    <!-- İş Yeri Kategorisi Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="İş Yeri">
+
+                    <div class="filter-group">
+                        <!-- İş Yeri Durum Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.IsYeriDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Devren Satılık">Devren Satılık</option>
+                            <option value="Devren Kiralık">Devren Kiralık</option>
+                        </select>
+
+                        <!-- İş Yeri Türü -->
+                        <select name="detayliAramaRequestDTO.IsYeriTuru">
+                            <option value="Akaryakıt İstasyonu">Akaryakıt İstasyonu</option>
+                            <option value="Apartman Dairesi">Apartman Dairesi</option>
+                            <option value="Aşevi">Aşevi</option>
+                            <option value="Atölye">Atölye</option>
+                            <option value="AVM">AVM</option>
+                            <option value="Bakkal">Bakkal</option>
+                            <option value="Beyaz Eşya">Beyaz Eşya</option>
+                            <option value="Bina">Bina</option>
+                            <option value="Büfe">Büfe</option>
+                            <option value="Büro & Ofis">Büro & Ofis</option>
+                            <option value="Çay Bahçesi">Çay Bahçesi</option>
+                            <option value="Çiftlik">Çiftlik</option>
+                            <option value="Depo & Antrepo">Depo & Antrepo</option>
+                            <option value="Dershane">Dershane</option>
+                            <option value="Düğün Salonu">Düğün Salonu</option>
+                            <option value="Dükkan & Mağaza">Dükkan & Mağaza</option>
+                            <option value="Eczane">Eczane</option>
+                            <option value="Enerji Santrali">Enerji Santrali</option>
+                            <option value="Fabrika & Üretim Tesisi">Fabrika & Üretim Tesisi</option>
+                            <option value="Fırın & Tatlıcı">Fırın & Tatlıcı</option>
+                            <option value="Garaj & Park Yeri">Garaj & Park Yeri</option>
+                            <option value="Genel">Genel</option>
+                            <option value="Hamam & Sauna">Hamam & Sauna</option>
+                            <option value="Hastane">Hastane</option>
+                            <option value="Huzurevi">Huzurevi</option>
+                            <option value="İmalathane">İmalathane</option>
+                            <option value="İş Hanı Katı & Ofisi">İş Hanı Katı & Ofisi</option>
+                            <option value="Kahvehane">Kahvehane</option>
+                            <option value="Kamu Binası">Kamu Binası</option>
+                            <option value="Kantin">Kantin</option>
+                            <option value="Kır & Kahvaltı Bahçesi">Kır & Kahvaltı Bahçesi</option>
+                            <option value="Kıraathane">Kıraathane</option>
+                            <option value="Komple Bina">Komple Bina</option>
+                            <option value="Konfeksiyon">Konfeksiyon</option>
+                            <option value="Market">Market</option>
+                            <option value="Maden Ocağı">Maden Ocağı</option>
+                            <option value="Müstakil İş Yeri">Müstakil İş Yeri</option>
+                            <option value="Otopark">Otopark</option>
+                            <option value="Pastane">Pastane</option>
+                            <option value="Pazar Yeri">Pazar Yeri</option>
+                            <option value="Plaza">Plaza</option>
+                            <option value="Plaza Katı & Ofisi">Plaza Katı & Ofisi</option>
+                            <option value="Radyo İstasyonu & TV Kanalı">Radyo İstasyonu & TV Kanalı</option>
+                            <option value="Restoran & Lokanta">Restoran & Lokanta</option>
+                            <option value="Rezidans">Rezidans</option>
+                            <option value="Rezidans Katı & Ofisi">Rezidans Katı & Ofisi</option>
+                            <option value="Sağlık Merkezi">Sağlık Merkezi</option>
+                        </select>
+                    </div>
+
+                    <div class="location-group">
+                        <!-- İl, İlçe, Mahalle Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehirIsYeri">
+                            <option value="">İl Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Ilce" id="semtIsYeri">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalleIsYeri">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="price-group">
+                        <!-- Fiyat Aralığı -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+            <form asp-action="HizliAra" asp-controller="Ilan" method="post">
+                <!-- Turistik Tesis Seçeneği -->
+                <div id="turistik" class="option-details">
+                    <!-- Turistik Tesis Kategorisi Sabit Değeri -->
+                    <input type="hidden" name="detayliAramaRequestDTO.Kategori" value="Turistik Tesis">
+
+                    <div class="filter-group">
+                        <!-- Satılık, Kiralık, Devren Satılık, Devren Kiralık Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.TesisDurumu">
+                            <option value="Satılık">Satılık</option>
+                            <option value="Kiralık">Kiralık</option>
+                            <option value="Devren Satılık">Devren Satılık</option>
+                            <option value="Devren Kiralık">Devren Kiralık</option>
+                        </select>
+
+                        <!-- Turistik Tesis Türleri -->
+                        <select name="detayliAramaRequestDTO.TesisTuru">
+                            <option value="1 Yıldızlı Otel">1 Yıldızlı Otel</option>
+                            <option value="2 Yıldızlı Otel">2 Yıldızlı Otel</option>
+                            <option value="3 Yıldızlı Otel">3 Yıldızlı Otel</option>
+                            <option value="4 Yıldızlı Otel">4 Yıldızlı Otel</option>
+                            <option value="5 Yıldızlı Otel">5 Yıldızlı Otel</option>
+                            <option value="Apart">Apart</option>
+                            <option value="Bungalov">Bungalov</option>
+                            <option value="Butik Otel">Butik Otel</option>
+                            <option value="Dağ Evi">Dağ Evi</option>
+                            <option value="Devremülk">Devremülk</option>
+                            <option value="Kamp Alanı">Kamp Alanı</option>
+                            <option value="Tiny House">Tiny House</option>
+                            <option value="Yazlık">Yazlık</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="location-group">
+                        <!-- İl, İlçe, Mahalle Seçenekleri -->
+                        <select name="detayliAramaRequestDTO.Il" id="sehirTuristik">
+                            <option value="">İl Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Ilce" id="semtTuristik">
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <select name="detayliAramaRequestDTO.Mahalle" id="mahalleTuristik">
+                            <option value="">Mahalle/Köy Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="price-group">
+                        <!-- Fiyat Aralığı -->
+                        <input type="text" name="detayliAramaRequestDTO.EnDusukFiyat" placeholder="Minimum TL">
+                        <input type="text" name="detayliAramaRequestDTO.EnYuksekFiyat" placeholder="Maximum TL">
+                    </div>
+
+                    <button type="submit" class="search-button">Ara</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div class="background-murat" style="background-image: url('/ImageFiles/arkaplan.webp');">
+    <!-- Diğer HTML içeriğiniz buraya gelebilir -->
+</div>
+
+
+
+
+
+<!-- Yazı ekleme alanı -->
+
+
+<div class="popups-container">
+
+    <!-- Ücretsiz Hizmet Penceresi -->
+    <div class="service-popup" id="service-popup" onclick="window.location.href='@Url.Action("MulkumuSatmakIstiyorum", "Form")'">
+        <span class="label">Ücretsiz Hizmet</span>
+        <img src="~/images/satmakistiyorum.png" alt="Mülk Resmi" class="property-image" loading="lazy" width="200" height="150">
+        <h3>MÜLKÜMÜ SATMAK İSTİYORUM</h3>
+        <p>Mülk bilgilerini girin. Değerlendirip, o bölgedeki profesyonel üyelerimizden en az 20 emlakçıya&nbsp;yönlendirelim</p>
+        <!-- Bilgilendirme Simgesi -->
+        <div class="info-icon" data-tooltip="Bu form, mülkünüzü satma sürecinizi kolaylaştırmak için tasarlandı. Mülk bilgilerinizi girdikten sonra, hızlı bir değerlendirme yapılacak ve en kısa sürede sizinle iletişime geçilecektir. Doğrulama sonrası çokça telefon alabilirsiniz. Mülkünüzü satması için 20 emlakçı sizi arayabilir. Dilediğiniz emlakçıya teslim edebilirsiniz.
+                 Umarım&nbsp;beğenirsiniz!">
+            <span>!</span>
+        </div>
+    </div>
+    <!-- Ücretsiz Hizmet Penceresi -->
+    <div class="service-popup-2" id="servicePopup" onclick="window.location.href='@Url.Action("YatirimYapmakIstiyorum", "Form")'">
+        <span class="label-2">Ücretsiz Hizmet</span>
+        <img src="~/images/banabul.png" alt="Mülk Resmi" class="property-image-2" loading="lazy" width="200" height="150">
+        <h3>YATIRIM YAPMAK <br />İSTİYORUM</h3>
+        <p>Aradığınız mülkün özelliklerini girin. <br />Size en uygun mülkü bulalım</p>
+    </div>
+
+    <!-- ŞevvalDrone Hizmet Penceresi -->
+    <div class="sevvaldrone-popup" id="sevvaldrone-popup">
+    <span class="label">300₺</span>
+        <div class="drone-icon">
+            <!-- Güncellenmiş Drone İkonu (PNG) -->
+            <img src="https://cdn-icons-png.flaticon.com/128/7504/7504454.png"
+                 alt="Drone İkonu"
+                 loading="lazy"
+                 width="80" height="80"
+                 onerror="this.onerror=null;this.src='https://placehold.co/128x128/6366f1/ffffff?text=Drone';"
+                 class="w-full h-full object-contain rounded-full">
+        </div>
+        <h3>ŞEVVALDRONE</h3>
+        <p>Mülkünüzü ŞevvalDrone ile hızlıca videolandırın</p>
+    </div>
+
+</div>
+
+<!-- Video Gösterme Modalı -->
+<div id="video-modal" class="video-modal">
+    <div class="video-modal-content">
+        <button class="close-button" id="close-video-modal">&times;</button>
+        <iframe id="youtube-video-player" width="560" height="315" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <p class="order-text">Sipariş Ver</p>
+        <a href="#" class="whatsapp-button" id="whatsapp-order-button">
+            <i class="fab fa-whatsapp"></i> WhatsApp'tan Mesaj Gönder
+        </a>
+    </div>
+</div>
+
+<script>
+    // Sayıyı noktalarla formatlayan fonksiyon
+    function formatNumber(number) {
+        return number.toLocaleString('tr-TR'); // Türkçe formatı kullanır
+    }
+    // Toplam ve aktif ziyaretçi sayısını güncelleyen fonksiyon
+    async function updateVisitorCounts() {
+        try {
+            // Aktif ziyaretçi sayısını al
+            const activeResponse = await fetch('/api/visitor/active');
+            const activeCount = await activeResponse.json();
+            // Toplam ziyaretçi sayısını al
+            const totalResponse = await fetch('/api/visitor/total');
+            const totalCount = await totalResponse.json();
+            // Sayıları HTML'de güncelle ve formatla (navbar için)
+            document.getElementById('active-visitors-navbar').textContent = formatNumber(activeCount);
+            document.getElementById('total-visitors-navbar').textContent = formatNumber(totalCount);
+        } catch (error) {
+            console.error('Ziyaretçi sayıları güncellenirken hata oluştu:', error);
+        }
+    }
+    // Kullanıcı siteye girdiğinde ziyaretçi kaydını oluştur
+    async function recordVisitor() {
+        try {
+            await fetch('/api/visitor/enter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (error) {
+            console.error('Ziyaretçi kaydı oluşturulurken hata oluştu:', error);
+        }
+    }
+    // Kullanıcı siteyi kapattığında ziyaretçi kaydını sil
+    async function exitVisitor(visitorId) {
+        try {
+            await fetch(`/api/visitor/exit?visitorId=${visitorId}`, {
+                method: 'POST'
+            });
+        } catch (error) {
+            console.error('Ziyaretçi çıkış kaydı oluşturulurken hata oluştu:', error);
+        }
+    }
+    // Sayfa yüklendiğinde ziyaretçi kaydını oluştur ve sayıları güncelle
+    document.addEventListener('DOMContentLoaded', () => {
+        recordVisitor(); // Ziyaretçi kaydını oluştur
+        updateVisitorCounts(); // İlk güncellemeyi yap
+        // Her 5 saniyede bir güncellemeleri tekrarla
+        setInterval(updateVisitorCounts, 5000);
+        // Kullanıcı siteyi kapattığında ziyaretçi kaydını sil
+        window.addEventListener('beforeunload', () => {
+            const visitorId = localStorage.getItem('visitorId'); // Kullanıcıya özel bir ID tutuyorsanız
+            if (visitorId) {
+                exitVisitor(visitorId);
+            }
+        });
+
+             // ŞevvalDrone popup'ı ve video modalı için event listener'lar
+        const sevvalDronePopup = document.getElementById('sevvaldrone-popup');
+        const videoModal = document.getElementById('video-modal');
+        const closeVideoModalButton = document.getElementById('close-video-modal');
+        const youtubeVideoPlayer = document.getElementById('youtube-video-player');
+        const whatsappOrderButton = document.getElementById('whatsapp-order-button');
+
+        const videoUrl = "https://www.youtube.com/embed/4GOC1El49Qk?autoplay=1&loop=1&playlist=4GOC1El49Qk&mute=1";
+
+
+        sevvalDronePopup.addEventListener('click', () => {
+            // Not: videoUrl zaten autoplay parametresini içeriyor, bu yüzden tekrar eklemeye gerek yok.
+            youtubeVideoPlayer.src = videoUrl; // Videoyu oynat
+            videoModal.style.display = 'flex';
+        });
+
+        closeVideoModalButton.addEventListener('click', () => {
+            youtubeVideoPlayer.src = ""; // Videoyu durdur
+            videoModal.style.display = 'none';
+        });
+
+        videoModal.addEventListener('click', (event) => {
+            if (event.target === videoModal) {
+                youtubeVideoPlayer.src = ""; // Videoyu durdur
+                videoModal.style.display = 'none';
+            }
+        });
+
+        whatsappOrderButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            const phoneNumber = "905066601624"; // 0506 660 16 24 numarasının ülke kodu ile hali
+            const message = encodeURIComponent("ŞevvalDrone hizmeti almak istiyorum");
+            let whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
+
+            // Mobil cihaz kontrolü
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // Mobil cihazlar için direkt WhatsApp uygulaması açma denemesi
+                // WhatsApp Business için özel bir URL olmasa da, wa.me genellikle doğru uygulamayı açar
+                whatsappLink = `whatsapp://send?phone=${phoneNumber}&text=${message}`;
+            } else {
+                // Bilgisayar için WhatsApp Web
+                whatsappLink = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
+            }
+            window.open(whatsappLink, '_blank');
+        });
+    });
+</script>
+
+<!-- Resim ekleme alanı -->
+<div class="image-container" style="margin-top: 0px;">
+</div>
+
+<div class="listings-popup">
+    <h2 style="color: #0d6efd">İlanlarımız</h2>
+
+    @await Component.InvokeAsync("AnnouncementCards")
+
+    <!-- Recently Visited Announcements Section -->
+    @if (User.Identity.IsAuthenticated)
+    {
+        @await Component.InvokeAsync("RecentlyVisitedAnnouncements")
+        @await Component.InvokeAsync("SuitableAnnouncements")
+    }
+
+    @await Component.InvokeAsync("CityAnnouncements", Model.SehirIlanSayilari)
+
+    <div class="advisor-container">
+        <h3 class="text-center text-white">Üyelerimiz</h3>
+        <div class="advisor-wrapper" onmouseover="enableMouseScroll(this)" onmouseout="disableMouseScroll(this)">
+            @foreach (var user in Model.Users
+            .Where(u => !string.IsNullOrEmpty(u.UserTypes)
+            && !string.IsNullOrEmpty(u.ProfilePicturePath)))
+            {
+                <div class="advisor-card">
+                    <div class="advisor-img-wrapper">
+                        <img src="@user.ProfilePicturePath" class="advisor-img" alt="Profil Fotoğrafı"
+                             loading="lazy" width="80" height="80"
+                             onerror="this.src='/images/profil.png'">
+                    </div>
+                    <div class="advisor-info">
+                        @{
+                            string fullName = user.FirstName + " " + user.LastName;
+                            string truncatedName = fullName.Length > 15 ? fullName.Substring(0, 15) + "..." : fullName;
+                        }
+                        <h5 class="advisor-name">@truncatedName</h5>
+                        <p class="advisor-email">@user.UserTypes</p>
+                        <a href="@Url.Action("UserIlanlar", "Ilan", new { email = user.Email })" class="advisor-btn">Sayfaya Git</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+    <!-- WhatsApp Logo -->
+    <a id="whatsapp-link-8" href="#" target="_blank" class="whatsapp-float">
+        <img src="~/sablon/img/724destek.png" alt="WhatsApp" class="whatsapp-image" loading="lazy" width="90" height="90">
+    </a>
+
+
+    <div class="comments-section">
+
+        @{
+            var random = new Random();
+            var shuffledComments = Model.Comments.OrderBy(x => random.Next()).Take(3).ToList();
+        }
+
+        <h3>Son Yorumlar</h3>
+        <div class="comments-container">
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="comment-card" id="comment-@comment.Id">
+                    <p class="comment-user">
+                        <strong>@comment.UserFullName</strong>
+                        <span class="comment-date">(@comment.CreatedAt.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR")))</span>
+                        @if (User.Identity.IsAuthenticated &&
+                       (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                        {
+                            <button class="comment-delete-btn" data-comment-id="@comment.Id">&#10005;</button>
+                        }
+                    </p>
+                    <p class="comment-content">@Html.Raw(comment.Content)</p>
+                </div>
+            }
+        </div>
+        <a href="@Url.Action("TumYorumlar", "Home")" class="show-more-btn" id="show-more-btn">Tüm Yorumlar</a>
+        <!-- Yorum ekleme formu aşağı taşındı -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-action="AddComment" method="post" class="comment-form">
+                <textarea name="content" rows="4" placeholder="Yorumunuzu yazın..."></textarea>
+                <button type="submit">Yorum Yap</button>
+            </form>
+        }
+        else
+        {
+            <!-- Üye olmayan kullanıcı için isim, soyisim ve yorum alanlarını içeren form -->
+            <form asp-action="AddComment" method="post" class="comment-form">
+                <input type="text" name="firstName" placeholder="İsim" required />
+                <input type="text" name="lastName" placeholder="Soyisim" required />
+                <textarea name="content" rows="4" placeholder="Yorumunuzu yazın..." required></textarea>
+                <button type="submit">Yorum Yap</button>
+            </form>
+        }
+        
+    </div>
+
+
+    <div class="gif-container">
+        <a href="https://www.instagram.com/tunalavanta/" target="_blank" rel="noopener noreferrer">
+            <img src="~/sablon/img/lavanta.gif" alt="Instagram GIF" class="centered-gif" loading="lazy" width="300" height="300">
+        </a>
+    </div>
+
+    <!-- İletişim Penceresi -->
+    <div class="contact-popup">
+        <div class="contact-left">
+            <img src="~/images/şevvalemlak.png" alt="İletişim Resmi" class="contact-image" loading="lazy" width="300" height="200">
+        </div>
+        <div class="contact-right">
+            <h2>Bizimle İletişime Geçin</h2>
+            <p>Sizin için en iyi yatırıma yardımcı olalım! Satın almak, kiralamak veya satmak istiyorsanız, deneyimli danışmanlarımızla iletişime geçerek hemen adım atın.</p>
+            <a id="whatsapp-link-7" class="whatsapp-button" target="_blank">
+                <img src="~/sablon/img/WhatsApp_icon.png" alt="WhatsApp İkonu" class="whatsapp-icon" loading="lazy" width="24" height="24">
+                7/24 WhatsApp Destek
+            </a>
+
+            <script>
+                // Kullanıcı cihazını tespit et
+                const isMobile7 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const whatsappNumber7 = "905070775666";
+                const message7 = "Merhaba,%20Şevval%20Emlak%20Sitesinden%20Size%20Ulaşıyorum";
+
+                // Doğru linki oluştur
+                const whatsappLink7 = isMobile7
+                    ? `https://wa.me/${whatsappNumber7}?text=${message7}` // Mobilde uygulama
+                    : `https://web.whatsapp.com/send?phone=${whatsappNumber7}&text=${message7}`; // Tarayıcıda WhatsApp Web
+
+                // Bağlantıyı ayarla
+                document.getElementById("whatsapp-link-7").href = whatsappLink7;
+            </script>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="~/js/home.js"></script>
+    
+    <script>
+        
+
+        const input = document.getElementById("siteSearchInput");
+
+        let ilanSayisi = @Model.TotalIlanlar; // Controller'dan gelen TotalIlanlar değerini alıyoruz
+
+       
+
+        // Sayıyı noktalı şekilde formatlamak
+        let formattedIlanSayisi = ilanSayisi.toLocaleString('tr-TR');
+
+        let messages = [
+            "Aradığınız şeyi yazın...",
+            `"${formattedIlanSayisi}" ilan arasında aramanızı yapın...`,  // Noktalı değer eklendi
+            "Satılık ilanlar arasında aramanızı yapın...",
+            "Kiralık ilanlar arasında aramanızı yapın...",
+            "Konut ilanları arasında aramanızı yapın...",
+            "Arsa ilanları arasında aramanızı yapın...",
+            "Bahçe ilanları arasında aramanızı yapın...",
+            "Tarla ilanları arasında aramanızı yapın...",
+            "İş Yeri ilanları arasında aramanızı yapın...",
+            "Turistik Tesis ilanları arasında aramanızı yapın..."
+        ];
+
+
+        let currentMessageIndex = 0;
+        let charIndex = 0;
+
+        // Daktilo efektini başlatan fonksiyon
+        function typewriterEffect() {
+            if (charIndex < messages[currentMessageIndex].length) {
+                input.setAttribute(
+                    "placeholder",
+                    messages[currentMessageIndex].substring(0, charIndex + 1)
+                );
+                charIndex++;
+                setTimeout(typewriterEffect, 50); // Harfler arası süre (50ms)
+            } else {
+                setTimeout(() => {
+                    currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+                    charIndex = 0;
+                    typewriterEffect();
+                }, 3000); // Mesajın tamamının gösterilme süresi (3 saniye)
+            }
+        }
+
+        // İlan sayısını backend'den alıp daktilo efektini başlatma
+        async function fetchIlanSayisi() {
+            try {
+                // Backend API çağrısı
+                const response = await fetch("/api/ilan-sayisi"); // API endpoint
+                const result = await response.json();
+
+
+
+                ilanSayisi = result?.data?.totalCount?.toLocaleString('tr-TR'); // Gelen JSON'daki ilan sayısını alır
+                messages[1] = `"${ilanSayisi}" ilan arasında aramanızı yapın...`; // İlan sayısı mesajını günceller
+            } catch (error) {
+                console.error("İlan sayısı alınamadı:", error);
+            }
+        }
+
+        fetchIlanSayisi().then(() => {
+            typewriterEffect(); // API'den ilan sayısını aldıktan sonra daktilo efektini başlat
+        });
+    </script>
+
+
+    <script>
+        function searchSite() {
+            var searchQuery = document.getElementById('siteSearchInput').value; // Arama kutusundaki metni al
+            if (searchQuery.trim() !== "") {
+                // Arama sonuçlarını yeni bir sayfada göster
+                window.location.href = '/search-results.html?q=' + encodeURIComponent(searchQuery); // Arama terimi URL'ye eklenecek
+            } else {
+                alert("Lütfen bir şeyler arayın.");
+            }
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#show-more-btn").click(function () {
+                $(".hidden-comment").toggle();
+                var btnText = $(this).text() === "Tümünü Göster" ? "Daha Az Göster" : "Tümünü Göster";
+                $(this).text(btnText);
+            });
+
+            $(".comment-delete-btn").click(function () {
+                var commentId = $(this).data("comment-id");
+                $.ajax({
+                    url: '/Home/DeleteComment',
+                    type: 'POST',
+                    data: { commentId: commentId },
+                    success: function () {
+                        $("#comment-" + commentId).remove();
+                    },
+                    error: function () {
+                        alert("Yorum silinirken bir hata oluştu.");
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('giris-buton').addEventListener('click', function (event) {
+            event.preventDefault();
+            document.getElementById('popup-giris').style.display = 'flex';
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('popup-giris').addEventListener('click', function (event) {
+            if (event.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Kapatma butonuna tıklandığında pop-up penceresini kapat
+        document.getElementById('pencere-kapat').addEventListener('click', function () {
+            document.getElementById('popup-giris').style.display = 'none';
+        });
+        function toggleHamburgerMenu() {
+            // Menü öğesinin görünür olup olmadığını kontrol et
+            if (document.querySelector('.naav-linkss')) {
+                document.querySelector('.naav-linkss').classList.toggle('active');
+            }
+        }
+
+    </script>
+    <script>
+        function submitHizliAraKategori(kategori) {
+            // Yeni bir form oluşturuluyor
+            const form = document.createElement("form");
+            form.method = "post";
+            form.action = "/Ilan/HizliAra"; // Controller ve action bilgisi
+
+            // Kategori verisi için bir input ekleniyor
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "kategori";
+            input.value = kategori;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            // Form gönderiliyor
+            form.submit();
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'tr' }, 'google_translate_element');
+        }
+    </script>
+
+
+
+    <script>
+        function showOption(optionId) {
+            const selectedDetail = document.getElementById(optionId);
+
+            // Eğer seçilen detay zaten aktifse, onu kapat
+            if (selectedDetail.classList.contains('active')) {
+                selectedDetail.classList.remove('active');
+                // Herhangi bir aktif detay kaldı mı kontrol et, yoksa filter-open sınıfını kaldır
+                const anyActive = document.querySelector('.option-details.active') !== null;
+                if (!anyActive) {
+                    document.body.classList.remove('filter-open');
+                }
+            } else {
+                // Diğer tüm detayları kapat
+                const allDetails = document.querySelectorAll('.option-details');
+                allDetails.forEach(detail => detail.classList.remove('active'));
+
+                // Seçilen detayı aç
+                selectedDetail.classList.add('active');
+                // Filtre açık durumunu işaretle
+                document.body.classList.add('filter-open');
+            }
+        }
+
+        // Dışarı tıklandığında filtre menülerini kapat
+        function closeAllFilters() {
+            const allDetails = document.querySelectorAll('.option-details');
+            allDetails.forEach(detail => detail.classList.remove('active'));
+            document.body.classList.remove('filter-open');
+        }
+
+        // Document click event listener
+        document.addEventListener('click', function(event) {
+            const customOptionsContainer = document.querySelector('.custom-options-container');
+            const optionTabs = document.querySelectorAll('.option-tab');
+            
+            // Eğer tıklanan element filtre container'ının içinde değilse
+            if (!customOptionsContainer.contains(event.target)) {
+                closeAllFilters();
+            }
+        });
+
+
+        // JSON verisini yüklemek için AJAX kullanımı
+        $(document).ready(function () {
+            $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+                // Tüm kategori alanları için il seçeneği doldur
+                ['sehir', 'sehirArsa', 'sehirBahce', 'sehirTarla', 'sehirIsYeri', 'sehirTuristik'].forEach(function (id) {
+                    data.forEach(function (city) {
+                        $(`#${id}`).append(new Option(city.Il, city.Il));
+                    });
+                });
+                // İl değiştiğinde ilgili kategorinin ilçelerini doldur
+                ['sehir', 'sehirArsa', 'sehirBahce', 'sehirTarla', 'sehirIsYeri', 'sehirTuristik'].forEach(function (id) {
+                    $(`#${id}`).change(function () {
+                        var selectedCity = $(this).val();
+                        var relatedSemt = $(this).attr('id').replace('sehir', 'semt');
+                        var relatedMahalle = $(this).attr('id').replace('sehir', 'mahalle');
+                        // İlçeleri ve mahalleleri temizle
+                        $(`#${relatedSemt}`).empty().append('<option value="">İlçe Seçiniz</option>');
+                        $(`#${relatedMahalle}`).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+                        // İlgili ili bul ve ilçeleri ekle
+                        var selectedCityData = data.find(c => c.Il === selectedCity);
+                        if (selectedCityData) {
+                            selectedCityData.Ilce.forEach(function (district) {
+                                $(`#${relatedSemt}`).append(new Option(district.Ilce, district.Ilce));
+                            });
+                        }
+                    });
+                });
+                // İlçe değiştiğinde ilgili kategorinin mahallelerini doldur
+                ['semt', 'semtArsa', 'semtBahce', 'semtTarla', 'semtIsYeri', 'semtTuristik'].forEach(function (id) {
+                    $(`#${id}`).change(function () {
+                        var relatedSehir = $(this).attr('id').replace('semt', 'sehir');
+                        var relatedMahalle = $(this).attr('id').replace('semt', 'mahalle');
+                        var selectedCity = $(`#${relatedSehir}`).val();
+                        var selectedDistrict = $(this).val();
+                        // Mahalleleri temizle
+                        $(`#${relatedMahalle}`).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+                        // İlgili il ve ilçeyi bul ve mahalleleri ekle
+                        var selectedCityData = data.find(c => c.Il === selectedCity);
+                        if (selectedCityData) {
+                            var selectedDistrictData = selectedCityData.Ilce.find(d => d.Ilce === selectedDistrict);
+                            if (selectedDistrictData) {
+                                selectedDistrictData.Semt.forEach(function (neighborhood) {
+                                    neighborhood.Mahalle.forEach(function (mah) {
+                                        $(`#${relatedMahalle}`).append(new Option(mah.Mahalle, mah.Mahalle));
+                                    });
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+        document.getElementById("contact-email").addEventListener("click", function (event) {
+            event.preventDefault(); // Bağlantıyı varsayılan olarak çalıştırmayı durdurur.
+
+            const email = "sevvaltalep@gmail.com";
+            const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+            if (mobileRegex.test(navigator.userAgent)) {
+                // Mobil cihazlarda Gmail uygulamasını açmaya çalış
+                window.location.href = `mailto:${email}`;
+            } else {
+                // Masaüstü cihazlarda Gmail web sitesine yönlendir
+                window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`, "_blank");
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const floatingButton = document.getElementById('floating_button');
+            const translateElement = document.getElementById('google_translate_element');
+            let clickCount = 0; // Tıklama sayacı
+
+            // Çeviri elementini başlangıçta gizli yap
+            translateElement.style.display = "none";
+
+            floatingButton.addEventListener('click', function () {
+                clickCount++;
+
+                if (clickCount === 1) {
+                    // İlk tıklamada çeviri elementini göster
+                    translateElement.style.display = "block";
+                } else if (clickCount === 3) {
+                    // Üçüncü tıklamada her şeyi gizle ve sayacı sıfırla
+                    translateElement.style.display = "none";
+                    clickCount = 0;
+                }
+            });
+
+            // Çeviri elementindeki dil seçme işlemi (içerikteki bir tıklama simülasyonu)
+            translateElement.addEventListener('click', function () {
+                console.log("Dil seçimi yapıldı!"); // İsteğe bağlı olarak işlev ekleyin
+            });
+        });
+    </script>
+
+    <script>
+        function formatPhoneNumber(phone) {
+            phone = phone.replace(/\D/g, ''); // Sadece rakamları al
+            if (phone.length === 10) {
+                return phone.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+            }
+            return phone; // Hatalı uzunlukta ise değiştirme
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let phoneElement = document.getElementById("formattedPhone");
+            if (phoneElement) {
+                let rawPhone = phoneElement.innerText.trim();
+                phoneElement.innerText = formatPhoneNumber(rawPhone);
+            }
+        });
+    </script>
+
+    <script>
+        (async function(){
+            try {
+                const isMobile8 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const message8 = "Merhaba,%20Şevval%20Emlak%20Sitenizden%20Size%20Ulaşıyorum";
+
+                let data = null;
+                try {
+                    const apiResp = await fetch(`${window.API_BASE}/contact-info`);
+                    if (apiResp.ok) {
+                        const apiJson = await apiResp.json();
+                        data = (apiJson && apiJson.isSuccessfull) ? { ...apiJson.data } : null;
+                    }
+                } catch {}
+
+                try {
+                    const ov = await fetch('/api/contact-info/overrides', { credentials: 'include' });
+                    if (ov.ok) {
+                        const ovJson = await ov.json();
+                        const overrides = (ovJson && ovJson.success && ovJson.data) ? (ovJson.data.overrides || {}) : {};
+                        if (!data) data = {};
+                        Object.keys(overrides).forEach(k => { data[k] = overrides[k] || data[k]; });
+                    }
+                } catch {}
+
+                const whatsappNumber8 = (data && data.whatsAppNumber) ? String(data.whatsAppNumber) : "";
+                const waClean8 = whatsappNumber8.replace(/\D+/g, '');
+                if (waClean8) {
+                    const encodedMsg8 = encodeURIComponent("Merhaba, Şevval Emlak Sitenizden Size Ulaşıyorum");
+                    const whatsappLink8 = isMobile8
+                        ? `https://wa.me/${waClean8}?text=${encodedMsg8}`
+                        : `https://web.whatsapp.com/send?phone=${waClean8}&text=${encodedMsg8}`;
+                    document.getElementById("whatsapp-link-8").href = whatsappLink8;
+                }
+            } catch {}
+        })();
+    </script>
+
+
+    <script>
+        function submitHizliAraSehir(sehir) {
+            const form = document.createElement("form");
+            form.method = "post";
+            form.action = "/Ilan/HizliAra";
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "Il";
+            input.value = sehir;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        let isScrolling = false;
+
+        function enableMouseScroll(element) {
+            element.addEventListener('wheel', function (e) {
+                // Dikey kaydırmayı engellemek için preventDefault kullanılır
+                e.preventDefault();
+
+                if (!isScrolling) {
+                    isScrolling = true;
+
+                    if (e.deltaY > 0) {
+                        element.scrollBy({ left: 500, behavior: 'smooth' }); // Sağ yön kaydırma
+                    } else {
+                        element.scrollBy({ left: -500, behavior: 'smooth' }); // Sol yön kaydırma
+                    }
+
+                    // Kaydırma bitiminden sonra isScrolling'ı sıfırla
+                    setTimeout(() => isScrolling = false, 100);
+                }
+            }, { passive: false }); // passive: false, preventDefault kullanılabilmesi için gerekli
+        }
+
+        function disableMouseScroll(element) {
+            element.removeEventListener('wheel', enableMouseScroll);
+        }
+
+
+
+
+    </script>
+
+
+
+
+    
+
+
+    <script>
+
+        let isPlaying = false;
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const musicIcon = document.getElementById('musicIcon');
+
+        function toggleMusic() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                musicIcon.classList.remove('fa-pause'); // Pause ikonunu kaldır
+                musicIcon.classList.add('fa-play'); // Play ikonunu ekle
+                isPlaying = false;
+            } else {
+                backgroundMusic.play();
+                musicIcon.classList.remove('fa-play'); // Play ikonunu kaldır
+                musicIcon.classList.add('fa-pause'); // Pause ikonunu ekle
+                isPlaying = true;
+            }
+        }
+
+
+
+
+        document.getElementById("toggle-offer-btn").addEventListener("click", function () {
+            var offerContainer = document.querySelector(".daily-offer-container");
+            offerContainer.classList.toggle("open");
+            offerContainer.style.display = offerContainer.classList.contains("open") ? "block" : "none"; // Pencereyi aç/kapa
+
+            // Eğer pencere açılırsa, gören kişi sayısını artır
+            if (offerContainer.classList.contains("open")) {
+                viewerCount++; // İlanı gören kişi sayısını artır
+                document.getElementById("viewer-number").innerText = viewerCount; // Sayıyı güncelle
+            }
+        });
+
+        // Kapatma butonu
+        document.getElementById("close-popup").addEventListener("click", function () {
+            var offerContainer = document.querySelector(".daily-offer-container");
+            offerContainer.style.display = "none"; // Kapatır
+        });
+
+        // Fotoğraf slayt gösterisi işlevi
+        let viewerCount = 0; // İlanı gören kişi sayısı
+
+
+
+        function toggleAdvancedSearch() {
+            var advancedSearch = document.getElementById("advancedSearchText");
+            if (advancedSearch.style.display === "none") {
+                advancedSearch.style.display = "block";
+            } else {
+                advancedSearch.style.display = "none";
+            }
+        }
+
+
+        // Detaylı arama penceresini açma/kapatma fonksiyonu
+        function toggleAdvancedSearch() {
+            var dropdown = document.getElementById("advancedSearchDropdown");
+            if (dropdown.style.display === "none" || dropdown.style.display === "") {
+                dropdown.style.display = "block"; // Aç
+            } else {
+                dropdown.style.display = "none"; // Kapat
+            }
+        }
+
+        // Kullanıcı detaylı arama dışında bir yere tıkladığında kapatma
+        window.onclick = function (event) {
+            var dropdown = document.getElementById("advancedSearchDropdown");
+            if (!event.target.matches('.search-icon-button') && !event.target.matches('#advancedSearchDropdown') && !dropdown.contains(event.target)) {
+                dropdown.style.display = "none"; // Kapat
+            }
+        }
+
+
+
+
+
+        function showErenPopup() {
+            document.getElementById("erenPopup").style.display = "block";
+        }
+
+        function closeErenPopup() {
+            document.getElementById("erenPopup").style.display = "none";
+        }
+
+
+        function showKorayPopup() {
+            document.getElementById("korayPopup").style.display = "block";
+        }
+
+        function closeKorayPopup() {
+            document.getElementById("korayPopup").style.display = "none";
+        }
+
+
+        function showFahriPopup() {
+            document.getElementById('fahriPopup').style.display = 'block';
+        }
+
+        function closeFahriPopup() {
+            document.getElementById('fahriPopup').style.display = 'none';
+        }
+
+        function showBurakPopup() {
+            document.getElementById("burakPopup").style.display = "block";
+        }
+
+        function closeBurakPopup() {
+            document.getElementById("burakPopup").style.display = "none";
+        }
+
+
+        function showIlkayPopup() {
+            document.getElementById("ilkayPopup").style.display = "block";
+        }
+
+        function closeIlkayPopup() {
+            document.getElementById("ilkayPopup").style.display = "none";
+        }
+
+
+        function showEmirhanPopup() {
+            document.getElementById('emirhanPopup').style.display = 'block'; // Pop-up'ı göster
+        }
+
+        function closeEmirhanPopup() {
+            document.getElementById('emirhanPopup').style.display = 'none'; // Pop-up'ı gizle
+        }
+
+
+        function showForm() {
+            document.getElementById('formPopup').style.display = 'block';
+        }
+
+        function closeForm() {
+            resetForm(); // Formu sıfırla
+            document.getElementById('formPopup').style.display = 'none'; // Form penceresini kapat
+        }
+
+        function handlePropertyTypeChange() {
+            const propertyType = document.getElementById('propertyType').value;
+            document.getElementById('residentialQuestions').style.display = propertyType === 'Konut' ? 'block' : 'none';
+            document.getElementById('landQuestions').style.display = propertyType === 'Arazi' ? 'block' : 'none';
+        }
+
+        // Boyut ayarlama fonksiyonu
+        function setPopupSize(width, height) {
+            const formContainer = document.getElementById('formContainer');
+            if (width) formContainer.style.width = width;
+            if (height) formContainer.style.height = height;
+        }
+
+        // Form sıfırlama fonksiyonu
+        function resetForm() {
+            // Tüm form alanlarını sıfırlama
+            document.getElementById('propertyType').selectedIndex = 0; // Mülk tipini varsayılan değere getir
+            document.getElementById('roomCount').value = ''; // Oda sayısını sıfırla
+            document.getElementById('areaSize').value = ''; // Metrekareyi sıfırla
+            document.getElementById('buildingAge').value = ''; // Bina yaşını sıfırla
+            document.getElementById('buildingFloors').value = ''; // Bina kat sayısını sıfırla
+            document.getElementById('floorNumber').value = ''; // Konut kat sayısını sıfırla
+            document.getElementById('landType').value = ''; // Arazi niteliğini sıfırla
+            document.getElementById('landSize').value = ''; // Arazi metrekareyi sıfırla
+            document.getElementById('distanceFromVillage').value = ''; // Köye uzaklığı sıfırla
+            document.getElementById('roadCondition').value = ''; // Yol durumunu sıfırla
+
+            // Soru kutularını gizle
+            document.getElementById('residentialQuestions').style.display = 'none';
+            document.getElementById('landQuestions').style.display = 'none';
+        }
+
+        // Form gönderme fonksiyonu
+        function submitForm() {
+            const propertyType = document.getElementById('propertyType').value; // Seçilen mülk tipi
+            let message = "Merhaba, Şevval Emlak Sitenizden Size Ulaşıyorum. Yatırım Yapmak İstiyorum, Yatırım Yapmak İçin Aradığım Mülkün Özellikleri Şunlar:\n\n";
+            message += `Mülk Tipi: ${propertyType}\n\n`; // Mülk tipini ekle
+
+            if (propertyType === 'Konut') {
+                message += `Oda Sayısı: ${document.getElementById('roomCount').value}\n`;
+                message += `Metrekare: ${document.getElementById('areaSize').value}\n`;
+                message += `Bina Yaşı: ${document.getElementById('buildingAge').value}\n`;
+                message += `Bina Kat Sayısı: ${document.getElementById('buildingFloors').value}\n`;
+                message += `Konut Kat Sayısı: ${document.getElementById('floorNumber').value}\n`;
+            } else if (propertyType === 'Arazi') {
+                message += `Arazi Niteliği: ${document.getElementById('landType').value}\n`;
+                message += `Arazi Metrekare: ${document.getElementById('landSize').value}\n`;
+                message += `Köye Uzaklığı: ${document.getElementById('distanceFromVillage').value}\n`;
+                message += `Yol Durumu: ${document.getElementById('roadCondition').value}\n`;
+            }
+
+            // WhatsApp mesaj bağlantısını oluştur
+            const phoneNumber = '05070775666'; // WhatsApp numarası
+            const encodedMessage = encodeURIComponent(message); // Mesajı encode et
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+            // Yeni sekmede WhatsApp'ı aç
+            window.open(whatsappUrl, '_blank');
+
+            closeForm(); // Formu kapatma
+        }
+
+
+
+        // Tüm bilgileri saklamak için bir nesne oluştur
+        const propertyData = {
+            type: '',
+            roomCount: '',
+            houseArea: '',
+            houseAge: '',
+            buildingFloors: '',
+            propertyFloor: '',
+            fenced: false, // Boolean türünde başlangıç
+            distanceToVillage: '',
+            hasRoad: false, // Boolean türünde başlangıç
+            landArea: '',
+            block: '',
+            parcel: ''
+        };
+
+        function openPopup() {
+            document.getElementById("popup").style.display = "flex";
+        }
+
+        function closePopup() {
+            // Pop-up'ı kapat
+            document.getElementById("popup").style.display = "none";
+
+            // Form adımlarını sıfırla
+            resetForm();
+        }
+
+        function resetForm() {
+            // Tüm form adımlarını gizle
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`form-step-${i}`).style.display = 'none';
+            }
+
+            // İlk adımı göster
+            document.getElementById('form-step-1').style.display = 'block';
+
+            // Adım durumunu sıfırla
+            updateStepIndicators(1);
+
+            // Property data nesnesini sıfırla
+            Object.keys(propertyData).forEach(key => {
+                propertyData[key] = Array.isArray(propertyData[key]) ? [] : '';
+            });
+        }
+
+        function nextStep(currentStep) {
+            // Mevcut adımı gizle
+            document.getElementById(`form-step-${currentStep}`).style.display = 'none';
+            const nextStep = currentStep + 1;
+
+            // Sonraki adımı göster
+            document.getElementById(`form-step-${nextStep}`).style.display = 'block';
+
+            // Adım durumunu güncelle
+            updateStepIndicators(nextStep);
+        }
+
+        function updateStepIndicators(step) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((stepElement, index) => {
+                stepElement.classList.toggle('active', index < step); // Aktif sınıfı ekleyip kaldırma
+            });
+        }
+
+        function changeStep(step) {
+            const type = document.getElementById("property-type").value;
+            propertyData.type = type; // Mülk tipini kaydet
+
+            if (type === "konut") {
+                document.getElementById("property-info").innerHTML = `
+                                                                                    <input type="text" placeholder="Oda Sayısı" onchange="propertyData.roomCount = this.value">
+                                                                                    <input type="text" placeholder="Konut Alanı (m²)" onchange="propertyData.houseArea = this.value">
+                                                                                    <input type="text" placeholder="Konut Yaşı" onchange="propertyData.houseAge = this.value">
+                                                                                    <input type="text" placeholder="Bina Kat Sayısı" onchange="propertyData.buildingFloors = this.value">
+                                                                                    <input type="text" placeholder="Bulunduğu Kat" onchange="propertyData.propertyFloor = this.value">
+                                                                                `;
+            } else if (type === "arazi") {
+                document.getElementById("property-info").innerHTML = `
+                                                                                    <input type="text" placeholder="Arazi Alanı (m²)" onchange="propertyData.landArea = this.value">
+                                                                                    <input type="text" placeholder="Ada" onchange="propertyData.block = this.value">
+                                                                                    <input type="text" placeholder="Parsel" onchange="propertyData.parcel = this.value">
+                                                                                            <input type="text" placeholder="Köye Uzaklık (km)" onchange="propertyData.distanceToVillage = this.value">
+                                                                                            <label><input type="checkbox" onchange="propertyData.hasRoad = this.checked"> Yola Sıfır mı?</label>
+                                                                                    <label><input type="checkbox" onchange="propertyData.fenced = this.checked"> Çitli mi?</label>
+
+                                                                                `;
+            }
+        }
+
+        function submitInfo() {
+            // Mesajı oluşturmak için boş bir dize başlat
+            let message = "Merhaba, Şevval Emlak sitesinden size ulaşıyorum. Mülk Bilgilerim şu şekilde:\n";
+
+            // Doldurulmuş bilgileri kontrol et ve mesajı oluştur
+            if (propertyData.type) {
+                message += `Mülk Tipi: ${propertyData.type}\n`;
+            }
+            if (propertyData.roomCount) {
+                message += `Oda Sayısı: ${propertyData.roomCount}\n`;
+            }
+            if (propertyData.houseArea) {
+                message += `Konut Alanı: ${propertyData.houseArea} m²\n`;
+            }
+            if (propertyData.houseAge) {
+                message += `Konut Yaşı: ${propertyData.houseAge}\n`;
+            }
+            if (propertyData.buildingFloors) {
+                message += `Bina Kat Sayısı: ${propertyData.buildingFloors}\n`;
+            }
+            if (propertyData.propertyFloor) {
+                message += `Bulunduğu Kat: ${propertyData.propertyFloor}\n`;
+            }
+            if (propertyData.fenced !== '') {
+                message += `Çitli mi: ${propertyData.fenced ? "Evet" : "Hayır"}\n`;
+            }
+            if (propertyData.distanceToVillage) {
+                message += `Köye Uzaklık: ${propertyData.distanceToVillage} km\n`;
+            }
+            if (propertyData.hasRoad !== '') {
+                message += `Yola Sıfır mı: ${propertyData.hasRoad ? "Evet" : "Hayır"}\n`;
+            }
+            if (propertyData.landArea) {
+                message += `Arazi Alanı: ${propertyData.landArea} m²\n`;
+            }
+            if (propertyData.block) {
+                message += `Ada: ${propertyData.block}\n`;
+            }
+            if (propertyData.parcel) {
+                message += `Parsel: ${propertyData.parcel}\n`;
+            }
+
+            // WhatsApp mesajı için URL oluştur
+            const phoneNumber = "05070775666";
+            const whatsappMessage = encodeURIComponent(message.trim());
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${whatsappMessage}`;
+
+            // Yeni sekmede WhatsApp aç
+            window.open(whatsappUrl, '_blank');
+
+            // Kullanıcıya bilgi mesajı
+            alert('Bilgileriniz WhatsApp üzerinden gönderildi.');
+            closePopup();
+        }
+
+
+        // Sayfa yüklendiğinde fonksiyonu başlat
+        window.onload = updateVisitorCounts;
+
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('login-button').addEventListener('click', function (event) {
+            event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+            document.getElementById('login-popup').style.display = 'flex'; // Pop-up'ı aç
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('login-popup').addEventListener('click', function (event) {
+            if (event.target === this) { // Eğer dış alana tıklandıysa
+                this.style.display = 'none'; // Pop-up'ı kapat
+            }
+        });
+
+        // Kapat butonuna tıklandığında pop-up'ı kapat
+        document.getElementById('close-popup').addEventListener('click', function () {
+            document.getElementById('login-popup').style.display = 'none'; // Pop-up'ı kapat
+        });
+
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     const container = document.querySelector(".reviews-container");
+        //     const reviews = document.querySelectorAll(".review-box");
+
+        //     // Tüm yorumları kopyalayıp tekrar sonuna ekliyoruz
+        //     reviews.forEach(review => {
+        //         const clone = review.cloneNode(true);
+        //         container.appendChild(clone);
+        //     });
+        // });
+
+        // Hamburger menü açma/kapama
+        document.getElementById("hamburger").onclick = function () {
+            var navLinks = document.getElementById("nav-links");
+            navLinks.classList.toggle("active");
+        };
+    </script>
+
+    <script>
+        // Eski slider kodu kaldırıldı - yeni slider kodu yukarıda
+
+
+
+
+
+
+
+    </script>
+    <script>
+
+        function formatPhoneNumberv1(phoneNumber) {
+
+            
+
+            const digitsOnly = phoneNumber.replace(/\D/g, '');
+
+
+            if (digitsOnly.startsWith('0') && digitsOnly.length === 11) {
+                // Convert 0XXX to 90XXX format
+                const withCountryCode = '90' + digitsOnly.substring(1);
+                const areaCode = withCountryCode.substring(2, 5);
+                const firstPart = withCountryCode.substring(5, 8);
+                const secondPart = withCountryCode.substring(8, 10);
+                const thirdPart = withCountryCode.substring(10, 12);
+
+                return `+90${areaCode}${firstPart}${secondPart}${thirdPart}`;
+            }
+
+            // Check if it's a Turkish number (starts with 90)
+            if (digitsOnly.startsWith('90') && digitsOnly.length === 12) {
+                // Format: +90 (XXX) XXX XX XX
+                const countryCode = digitsOnly.substring(0, 2);
+                const areaCode = digitsOnly.substring(2, 5);
+                const firstPart = digitsOnly.substring(5, 8);
+                const secondPart = digitsOnly.substring(8, 10);
+                const thirdPart = digitsOnly.substring(10, 12);
+
+                return `+${countryCode}${areaCode}${firstPart}${secondPart}${thirdPart}`;
+            }
+
+            // If it doesn't match Turkish format, return original with + prefix if not present
+            if (phoneNumber.startsWith('+')) {
+                return phoneNumber;
+            } else {
+                return `+${phoneNumber}`;
+            }
+        }
+        
+        // WhatsApp mesajı gönderme fonksiyonu
+        function sendMessageToWhatsapp() {
+            // Telefon numarasını ViewBag'den al
+            var phoneNumber = '@ViewBag?.GununIlan?.PhoneNumber';
+
+             phoneNumber = formatPhoneNumberv1(phoneNumber);
+                        
+          
+            // Mesaj içeriği
+            var message = encodeURIComponent("Merhaba Şevval Emlak Sitesinden Size Ulaşıyorum İlan Hakkında Bilgi Almak İstiyorum");
+
+            // Eğer mobil cihazda tıklanıyorsa, WhatsApp uygulaması açılır
+            if (window.innerWidth <= 800) {
+                window.location.href = `https://wa.me/${phoneNumber}?text=${message}`;
+            } else {
+                // Bilgisayar üzerinden tıklanıyorsa, WhatsApp web açılır
+                window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+            }
+        }
+
+        // Telefon arama fonksiyonu
+        function makeCall() {
+            // Telefon numarasını ViewBag'den al
+            var phoneNumber = '@ViewBag?.GununIlan?.PhoneNumber';
+
+            // Telefon numarasının başında 0 yoksa ekle
+            if (phoneNumber.charAt(0) !== '0') {
+                phoneNumber = '0' + phoneNumber;
+            }
+
+            // Arama uygulaması için telefon numarasını hazırla
+            var callUrl = `tel:${phoneNumber}`;
+
+            // Telefon uygulamasını aç
+            window.location.href = callUrl;
+        }
+
+    </script>
+
+
+    <script>
+        // Günün İlanı açma işlevi (yüzen buton tıklanması durumunda)
+        document.getElementById("floating-offer-icon").addEventListener("click", function (event) {
+            event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+            showDailyOfferModal(); // Modal'ı aç
+        });
+
+
+        window.onload = function () {
+            // Modal'ı otomatik aç
+            showDailyOfferModal();
+        };
+
+        function showDailyOfferModal() {
+            document.getElementById("modalBackdrop").style.display = "block";
+            document.getElementById("dailyOfferContainer").style.display = "block";
+            document.body.style.overflow = "hidden"; // Sayfa kaydırmayı engelle
+        }
+
+        function hideDailyOfferModal() {
+            document.getElementById("modalBackdrop").style.display = "none";
+            document.getElementById("dailyOfferContainer").style.display = "none";
+            document.body.style.overflow = "auto"; // Sayfa kaydırmayı geri aç
+        }
+
+
+        // Modal backdrop'a tıklanınca pencereyi kapat
+        document.getElementById("modalBackdrop").addEventListener('click', function () {
+            hideDailyOfferModal();
+        });
+
+        // Pencereyi kapatma işlevi
+        document.getElementById("closeOfferButton").addEventListener("click", function () {
+            hideDailyOfferModal();
+        });
+
+        // ESC tuşuna basınca pencereyi kapat
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                hideDailyOfferModal();
+            }
+        });
+
+        // Modern slider için JavaScript
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slider-slide');
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.display = i === index ? 'block' : 'none';
+            });
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+        
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+        
+        // İlk slaytı göster
+        if (slides.length > 0) {
+            showSlide(0);
+        }
+        
+        // Otomatik slider
+        setInterval(nextSlide, 5000); // 3 saniyede bir değişsin
+
+        // Lazy Loading ve Shimmer Efekti Yönetimi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm lazy loading görsellerini bul
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            
+            lazyImages.forEach(function(img) {
+                // Başlangıçta shimmer efekti ekle
+                img.classList.add('img-loading');
+                
+                // Görsel yüklendiğinde shimmer efektini kaldır
+                img.addEventListener('load', function() {
+                    this.classList.remove('img-loading');
+                });
+                
+                // Görsel yüklenirken hata olursa shimmer efektini kaldır
+                img.addEventListener('error', function() {
+                    this.classList.remove('img-loading');
+                });
+            });
+            
+            // Intersection Observer ile lazy loading performansını artır
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            if (img.dataset.src) {
+                                img.src = img.dataset.src;
+                                img.removeAttribute('data-src');
+                                observer.unobserve(img);
+                            }
+                        }
+                    });
+                });
+                
+                // Lazy loading görsellerini gözlemle
+                lazyImages.forEach(img => {
+                    imageObserver.observe(img);
+                });
+            }
+        });
+
+    </script>
+
+}

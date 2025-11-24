@@ -1,0 +1,332 @@
+﻿/* Genel Stil */
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: linear-gradient(135deg, #eef2f3, #8e9eab);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-y: auto; /* Mobil için dikey kaydırmayı aktif tut */
+}
+
+/* Sadece bilgisayar ekranları için (genişlik 768 piksel ve üzeri) */
+@media (min-width: 768px) {
+    body {
+        overflow: hidden; /* Bilgisayarda kaydırmayı engelle */
+    }
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 1200px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    scale: 0.9;
+    position: relative;
+    top: -80px;
+}
+
+.form-section, .preview-section {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box; /* Ekledik: padding'in genişliği etkilememesi için */
+    min-width: 300px; /* Ekledik: İçerik taşmasını önlemek için */
+}
+
+.form-section {
+    margin-left: 30px;
+    border-left: 1px solid #ddd;
+}
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h2 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: -0.02em;
+    text-align: center; /* Ekledik: Başlığı ortalamak için */
+}
+
+/* Form Stilleri */
+.input-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #34495e;
+    font-size: 1.1em;
+}
+
+input[type="text"], select {
+    width: calc(100% - 30px);
+    padding: 14px 18px;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+    font-size: 1.1em;
+}
+
+    input[type="text"]:focus, select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        outline: none;
+    }
+
+input.error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 16px 35px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    width: 100%;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+    button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+/* Afiş Önizleme Stilleri */
+.preview-poster {
+    width: 370px;
+    height: 540px;
+    background: linear-gradient(to bottom, #004aad, #80c1ff);
+    color: #fff;
+    padding: 25px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+    border: 2px solid #fff;
+    margin: 20px auto;
+}
+
+.preview-text {
+    margin: 8px 0;
+    font-size: 2.2em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;           /* Satır atlamasını engeller */
+    overflow: hidden;              /* Taşmayı gizler */
+    text-overflow: ellipsis;       /* Gerekirse "..." koyar */
+
+    display: inline-block;         /* Font scaling için gerekli */
+    max-width: 100%;               /* Taşmayı önlemek için */
+    font-size: clamp(1em, 5vw, 2.2em);  /* Otomatik font küçültme */
+}
+
+
+#previewIlanTuru {
+    font-size: 5em;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.preview-text-line {
+    border-top: 2px solid rgba(255, 255, 255, 0.5);
+    margin: 18px auto;
+    width: 95%;
+    align-self: center;
+}
+
+#previewWeb {
+    font-size: 1.5em;
+    position: relative;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+form {
+    margin-top: 30px;
+}
+
+/* Yeni Stiller */
+.phone-name-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 25px;
+    flex-wrap: wrap; /* Ekledik: Taşmayı önlemek için */
+}
+
+    .phone-name-wrapper .input-group {
+        width: 48%;
+        margin-bottom: 0;
+    }
+
+.alert {
+    color: #ff4d4d;
+    margin-top: 12px;
+    font-size: 0.95em;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+#saveAcikAdres.fa-check-circle {
+    font-size: 1.6em;
+    color: #28a745;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+    #saveAcikAdres.fa-check-circle:hover {
+        color: #1e7e34;
+        transform: scale(1.1);
+    }
+
+    #saveAcikAdres.fa-check-circle:active {
+        transform: scale(0.9);
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Media sorgusu: 768px ve altı için (mobil cihazlar) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* Genel padding'i azalttık. */
+    }
+
+    .container {
+        flex-direction: column;
+        padding: 20px;
+        margin: 10px; /* container margin'ini ayarladık */
+    }
+
+    .form-section, .preview-section {
+        width: 100%;
+        margin-left: 0;
+        border-left: none;
+        padding: 15px; /* section padding */
+    }
+
+    .form-section {
+        margin-bottom: 20px; /* form ile preview arası boşluk eklendi */
+    }
+
+    .preview-poster {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    h2 {
+        font-size: 2.2em;
+    }
+
+    .phone-name-wrapper {
+        flex-direction: column;
+    }
+
+        .phone-name-wrapper .input-group {
+            width: 100%;
+        }
+
+    input[type="text"], select {
+        font-size: 1em; /* input font size */
+        padding: 12px 15px;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 14px 25px;
+    }
+
+    .preview-text {
+        font-size: 1.8em;
+    }
+
+    #previewIlanTuru {
+        font-size: 3.5em
+    }
+
+    #previewWeb {
+        font-size: 1.2em
+    }
+}
+
+/* Ekstra küçük ekranlar için (320px ve altı) */
+@media (max-width: 320px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .preview-text {
+        font-size: 1.4em;
+    }
+
+    #previewIlanTuru {
+        font-size: 2.5em;
+    }
+
+    input[type="text"], select {
+        font-size: 0.9em;
+        padding: 10px 12px;
+    }
+
+    button {
+        font-size: 0.9em;
+        padding: 12px 20px;
+    }
+}

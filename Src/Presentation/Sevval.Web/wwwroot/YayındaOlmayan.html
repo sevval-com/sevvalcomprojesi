@@ -1,0 +1,678 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser>
+    UserManager
+
+    @{
+    var user = await UserManager.GetUserAsync(User); // Giriş yapan kullanıcı
+    var userEmail = user?.Email; // Kullanıcının e-postası
+    var userAds = Model._Ilanlar
+    .Where(i => i.Email == userEmail) // Kullanıcının ilanları
+    .ToList();
+
+    Layout = null; // Layout kullanılmıyor
+    }
+
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>İlan Detayı</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="~/css/kullanici-paneli.css" />
+        <link rel="stylesheet" href="~/css/ilanlar.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    </head>
+    <body>
+
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="logo">
+                    <a href="/">
+                        <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                    </a>
+                    <span>Şevval Emlak</span>
+                </div>
+                <div class="hamburger" id="hamburger">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+                <ul class="nav-linkss" id="nav-links">
+                    <li><a href="@Url.Action(" Index", "Home" )">Ana Sayfa</a></li>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                    <li>
+                        <a href="@Url.Action(" Panel", "Ilan" )">Mağazam</a>
+                    </li>
+                    }
+
+                    <li><a href="@Url.Action(" KardesFirmalar", "Home" )">Kardeş Firmalar</a></li>
+                    <li class="dropdown">
+                        <a href="#">Hakkımızda</a>
+                        <ul class="dropdown-content">
+                            <li><a href="@Url.Action(" About", "Home" )">Biz Kimiz</a></li>
+                            <li><a href="@Url.Action(" Channels", "Home" )">Diğer Kanallarımız</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="@Url.Action(" Videos", "Home" )">Videolar</a>
+                    </li>
+
+                    
+
+                </ul>
+                <div class="auth-buttons">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                    var currentUser = await UserManager.GetUserAsync(User);
+
+                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                    if (currentUser != null)
+                    {
+                    <div class="dropdown">
+                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                        <ul class="dropdown-content">
+                            <li><a href="@Url.Action(" Panel", "Ilan" )">Raporlar</a></li>
+                            <li><a href="@Url.Action(" Ilanlar", "Ilan" )">İlanlar</a></li>
+                            <li><a href="@Url.Action(" Danismanlar", "Ilan" )">Danışmanlar</a></li>
+                            <li><a href="@Url.Action(" Sozlesmeler", "Ilan" )">Sözleşmeler</a></li>
+                            <li><a href="@Url.Action(" Akademi", "Ilan" )">Şevval Akademi</a></li>
+                            <li><a href="@Url.Action(" Settings", "Ilan" )">Ayarlar</a></li>
+                            @if (User.Identity.IsAuthenticated &&
+                            (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+
+                            {
+                            <li><a href="@Url.Action(" UyeKontrol", "Ilan" )">Üye Kontrol</a></li>
+                            }
+                            <li><a href="~/create-listing.html">İlan Ver</a></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    }
+                    else
+                    {
+                    <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                    }
+                    }
+                    else
+                    {
+                    <a href="#" class="login" id="login-button">Giriş Yap</a>
+                    }
+
+
+                    <!-- İlan Ver butonu ve Ücretsiz etiketi -->
+                    <div class="post-ad-container">
+                        <span class="free-tag">Ücretsiz</span>
+                        <a href="@(!User.Identity.IsAuthenticated ? Url.Action(" Login", "Account" ) : Url.Action("KategoriSecim", "Ilan" ))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                    </div>
+
+                </div>
+        </nav>
+
+        <style>
+            .post-ad-container {
+                position: relative;
+                display: inline-block;
+            }
+
+            .free-tag {
+                position: absolute;
+                top: -10px;
+                left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
+                background-color: #007bff; /* Mavi arka plan */
+                color: white; /* Beyaz metin rengi */
+                font-size: 10px;
+                font-weight: bold;
+                padding: 3px 8px;
+                border-radius: 4px;
+                transform: rotate(-10deg); /* Hafif eğik bir görünüm */
+                z-index: 1;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+            }
+
+            .post-ad {
+                display: inline-block;
+                background-color: #ffffff; /* Beyaz arka plan */
+                color: #007bff; /* Mavi yazı rengi */
+                padding: 10px 15px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                border: 1px solid #007bff; /* Mavi çerçeve */
+                transition: 0.3s ease;
+            }
+
+                .post-ad:hover {
+                    background-color: #007bff; /* Hoverda mavi arka plan */
+                    color: white; /* Hoverda beyaz metin */
+                }
+
+            .coming-soon-tag {
+                position: absolute;
+                top: 25px;
+                left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
+                background-color: #007bff; /* Mavi arka plan */
+                color: white; /* Beyaz metin rengi */
+                font-size: 10px;
+                font-weight: bold;
+                padding: 3px 8px;
+                border-radius: 4px;
+                transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
+                z-index: 1;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+            }
+        </style>
+
+
+        <!-- Pop-up Penceresi -->
+        <div id="login-popup" class="popup">
+            <div class="popup-content">
+                <button class="close-button" id="close-popup">&times;</button> <!-- Kapat Butonu -->
+                <div class="left-section">
+                    <h2>Bireysel Kullanıcı</h2>
+                    <a href="@Url.Action(" Login", "Account" )" class="button">Giriş Yap</a>
+                    <a href="@Url.Action(" Register", "Account" )" class="button">Üye Ol</a>
+                </div>
+                <div class="right-section">
+                    <h2>Emlakçı Girişi</h2>
+                    <a href="#" class="button">Giriş Yap</a>
+                    <a href="#" class="button">Üye Ol</a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('login-button').addEventListener('click', function (event) {
+            event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+            document.getElementById('login-popup').style.display = 'flex'; // Pop-up'ı aç
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('login-popup').addEventListener('click', function (event) {
+            if (event.target === this) { // Eğer dış alana tıklandıysa
+                this.style.display = 'none'; // Pop-up'ı kapat
+            }
+        });
+        </script>
+
+        <!-- Alt Bar -->
+        <div class="alt-bar">
+            <ul class="alt-bar-list">
+                <li><a href="@Url.Action(" Panel", "Ilan" )">Raporlar</a></li>
+                <li><a href="@Url.Action(" Ilanlar", "Ilan" )">İlanlar</a></li>
+                @*
+                <li><a href="@Url.Action(" Mesajlar", "Ilan" )">Mesajlar</a></li> *@
+                <li><a href="@Url.Action(" Danismanlar", "Ilan" )">Danışmanlar</a></li>
+                @*
+                <li><a href="">Hakkımızda</a></li>
+                *@            @*
+                <li class="office-menu">
+                    <a href="#">Ofis/Hesap</a>
+                    <ul class="office-menu-content">
+                        <a href="#">Paketim</a>
+                        <a href="#">Ödemelerim</a>
+                        <a href="#">Doping Satın Al</a>
+                        <a href="#">Sipariş Ver</a>
+                        <a href="#">Kart Bilgilerim</a>
+                        <a href="#">Dopinglerim</a>
+                        <a href="#">Favorilerim</a>
+                        <a href="#">Beğendiklerim</a>
+                    </ul>
+                </li> *@
+                <li><a href="@Url.Action(" Sozlesmeler", "Ilan" )">Sözleşmeler</a></li>
+                <li><a href="@Url.Action(" Akademi", "Ilan" )">Şevval Akademi</a></li>
+                @*
+                <li><a href="@Url.Action(" ŞevvalHat", "Ilan" )">ŞevvalHat</a></li> *@
+                @*
+                <li><a href="@Url.Action(" Hizmetler", "Ilan" )">Hizmetler</a></li> *@
+                <li><a href="@Url.Action(" Settings", "Account" )">Ayarlar</a></li>
+            </ul>
+        </div>
+
+
+
+
+
+        <div class="container mt-5">
+
+            <!-- Toplam İlan Sayısı -->
+            @if (Model._Ilanlar != null && Model._Ilanlar.Any())
+            {
+            <div class="row mb-3">
+                <div class="col-12 text-center">
+                    <div class="total-ads-count">
+                        <p class="total-ads-count-text fs-4">Toplam İlan Sayısı</p>
+                        <p class="total-ads-count-number fs-2 fw-bold">@Model.TotalIlanCount</p>
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- Arama Çubuğu -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8">
+                    <div class="input-group shadow-lg rounded-pill">
+                        <span class="input-group-text bg-primary text-white rounded-start-pill">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control rounded-end-pill" placeholder="İlanlarda ara..." onkeyup="filterAds()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtreleme Seçenekleri -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-auto">
+                    <button class="btn btn-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterActive" value="active">
+                        <i class="fas fa-circle-check fa-sm me-2"></i> Yayında Olanlar
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterDeleted" value="deleted" onclick="window.location.href='@Url.Action(" YayındaOlmayan", "Ilan" )'">
+                        <i class="fas fa-eye-slash fa-sm me-2"></i> Yayında Olmayanlar
+                    </button>
+                </div>
+
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterArchived" value="archived">
+                        <i class="fas fa-calendar-times fa-sm me-2"></i> Süresi Geçenler
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterInactive" value="inactive">
+                        <i class="fas fa-trash fa-sm me-2"></i> Silinenler
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterRejected" value="rejected">
+                        <i class="fas fa-times-circle fa-sm me-2"></i> Reddedilenler
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-lg filter-btn rounded-0 shadow-lg px-3" id="filterArchive" value="archive">
+                        <i class="fas fa-box fa-sm me-2"></i> Arşiv
+                    </button>
+                </div>
+            </div>
+
+
+
+
+            @foreach (var ilan in Model._Ilanlar.OrderByDescending(x => x.Id))
+            {
+            var fotograf = Model._Fotograflar?.FirstOrDefault(x => x.IlanId == ilan.Id);
+
+            <div class="col-12 mb-4 ilan-kart" data-id="@ilan.Id" data-title="@ilan.Title.ToLower()">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="row g-0">
+                        <!-- Fotoğraf -->
+                        <div class="col-lg-4 col-md-5">
+                            <div class="h-100 d-flex align-items-center justify-content-center">
+                                @if (fotograf != null)
+                                {
+                                <img src="https://www.sevval.com/@fotograf.Url"
+                                     alt="Fotoğraf"
+                                     class="img-fluid rounded-start"
+                                     style="max-height: 300px; object-fit: cover; width: 100%;"
+                                     data-id="@ilan.Id">
+                                }
+                                else
+                                {
+                                <div class="text-center p-5 bg-light rounded-start">
+                                    <i class="fas fa-camera fa-5x text-muted"></i>
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 col-md-4 p-4">
+                            <h4 class="text-primary font-weight-bold" onclick="window.location.href='@Url.Action(" ilansayfasi", "Ilan" , new { id=ilan.Id })'">
+                                @ilan.Title
+                            </h4>
+                            <p class="text-muted">@ilan.sehir / @ilan.semt / @ilan.mahalleKoy</p>
+                            <div id="price-container-@ilan.Id">
+                                <p class="text-danger fs-5 fw-bold">
+                                    <span id="price-text-@ilan.Id">@ilan.Price.ToString("N0") TL</span>
+                                    <input type="number" id="price-input-@ilan.Id" class="form-control d-none" value="@ilan.Price" />
+                                    <i class="fa fa-edit ms-16 edit-price" data-id="@ilan.Id" style="color: #007bff; cursor: pointer;"></i>
+                                    <i class="fa fa-check ms-16 d-none save-price" data-id="@ilan.Id" style="color: #28a745; cursor: pointer;"></i>
+                                    <i class="fa fa-times ms-16 d-none cancel-price" data-id="@ilan.Id" style="color: #dc3545; cursor: pointer;"></i>
+                                    <div class="d-flex flex-wrap mt-3">
+                                        @if (ilan.Area > 0)
+                                        {
+                                        <span class="badge bg-info text-white me-2">M²: @ilan.Area</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(ilan.AdaNo))
+                                        {
+                                        <span class="badge bg-secondary text-white me-2">Ada No: @ilan.AdaNo</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(ilan.ParselNo))
+                                        {
+                                        <span class="badge bg-secondary text-white me-2">Parsel No: @ilan.ParselNo</span>
+                                        }
+                                    </div>
+                                    <br />
+                                <p class="text-muted">İlan Sahibi: @ilan.FirstName @ilan.LastName</p>
+                                <p class="text-muted">Giriş Tarihi: @ilan.GirisTarihi.ToString("dd.MM.yyyy") - @ilan.GirisTarihi.ToString("HH:mm")</p>
+                                <p class="text-muted">İlan Numarası:@ilan.Id</p>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-3 d-flex flex-column justify-content-center p-4">
+                            <a href="@Url.Action(" Edit", "Ilan" , new { id=ilan.Id })"
+                               class="btn btn-outline-primary btn-lg mb-3 rounded-pill shadow-sm">Düzenle</a>
+
+                            <a href="javascript:void(0);"
+                               class="btn btn-outline-danger btn-lg mb-3 rounded-pill shadow-sm delete-ilan"
+                               data-id="@ilan.Id">Sil</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            }
+
+
+            <script>
+                    // CSRF Token Al
+                    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    // Fiyat Düzenleme
+                    document.querySelectorAll('.edit-price').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const ilanId = this.getAttribute('data-id');
+                            document.querySelector(`#price-text-${ilanId}`).classList.add("d-none");
+                            document.querySelector(`#price-input-${ilanId}`).classList.remove("d-none");
+                            this.classList.add("d-none");
+                            document.querySelector(`.save-price[data-id="${ilanId}"]`).classList.remove("d-none");
+                            document.querySelector(`.cancel-price[data-id="${ilanId}"]`).classList.remove("d-none");
+                        });
+                    });
+
+                    // Cancel butonuna tıklanınca fiyat düzenleme iptal edilir
+                    document.querySelectorAll('.cancel-price').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const ilanId = this.getAttribute('data-id');
+                            document.querySelector(`#price-text-${ilanId}`).classList.remove("d-none");
+                            document.querySelector(`#price-input-${ilanId}`).classList.add("d-none");
+                            document.querySelector(`.edit-price[data-id="${ilanId}"]`).classList.remove("d-none");
+                            this.classList.add("d-none");
+
+                            // Save butonunu gizle
+                            document.querySelector(`.save-price[data-id="${ilanId}"]`).classList.add("d-none");
+                        });
+                    });
+
+                    // Fiyatı Kaydet
+                    document.querySelectorAll('.save-price').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const ilanId = this.getAttribute('data-id');
+                            const priceInput = document.querySelector(`#price-input-${ilanId}`);
+                            const newPrice = parseFloat(priceInput.value);
+
+                            // Fiyat kontrolü
+                            if (newPrice < 1000) {
+                                alert("Fiyat En Az 1.000 TL Olabilir");
+                                return;
+                            }
+
+                            fetch('/Ilan/UpdatePrice', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'RequestVerificationToken': csrfToken
+                                },
+                                body: JSON.stringify({ ilanId, newPrice })
+                            }).then(response => response.json())
+                                .then(data => {
+                                    document.querySelector(`#price-text-${ilanId}`).textContent = `${data.newPrice.toLocaleString()} TL`;
+                                    document.querySelector(`#price-text-${ilanId}`).classList.remove("d-none");
+                                    priceInput.classList.add("d-none");
+                                    document.querySelector(`.edit-price[data-id="${ilanId}"]`).classList.remove("d-none");
+                                    this.classList.add("d-none");
+                                    document.querySelector(`.cancel-price[data-id="${ilanId}"]`).classList.add("d-none");
+                                });
+                        });
+                    });
+
+                    // İlan Silme
+                    document.querySelectorAll('.delete-ilan').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const ilanId = this.getAttribute('data-id');
+                            if (confirm("Bu ilanı silmek istediğinizden emin misiniz?")) {
+                                fetch('/Ilan/Delete', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'RequestVerificationToken': csrfToken
+                                    },
+                                    body: JSON.stringify({ ilanId })
+                                }).then(response => {
+                                    if (response.ok) {
+                                        this.closest('.ilan-kart').remove();
+                                    } else {
+                                        alert("Silme işlemi sırasında bir hata oluştu.");
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // İlan Düzenleme
+                    document.querySelectorAll('.edit-ilan').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const ilanId = this.getAttribute('data-id');
+                            const ilanCategory = this.getAttribute('data-category'); // Get the category
+                            let editUrl;
+
+                            // Determine the edit URL based on the category
+                            switch (ilanCategory) {
+                                case 'Konut':
+                                    editUrl = '@Url.Action("KonutIlanEdit", "Ilan")';
+                                    break;
+                                case 'IsYeri':
+                                    editUrl = '@Url.Action("IsYeriIlanEdit", "Ilan")';
+                                    break;
+                                case 'Arazi':
+                                    editUrl = '@Url.Action("AraziIlanEdit", "Ilan")';
+                                    break;
+                                case 'Bag':
+                                    editUrl = '@Url.Action("BagIlanEdit", "Ilan")';
+                                    break;
+                                case 'Bahce':
+                                    editUrl = '@Url.Action("BahceIlanEdit", "Ilan")';
+                                    break;
+                                case 'Tarla':
+                                    editUrl = '@Url.Action("TarlaIlanEdit", "Ilan")';
+                                    break;
+                                case 'TuristikTesis':
+                                    editUrl = '@Url.Action("TuristikTesisIlanEdit", "Ilan")';
+                                    break;
+                                case 'DevreMulk':
+                                    editUrl = '@Url.Action("DevreMulkIlanEdit", "Ilan")';
+                                    break;
+                                case 'Buro':
+                                    editUrl = '@Url.Action("BuroIlanEdit", "Ilan")';
+                                    break;
+                                case 'Ofis':
+                                    editUrl = '@Url.Action("OfisIlanEdit", "Ilan")';
+                                    break;
+                                case 'CiftlikEvi':
+                                    editUrl = '@Url.Action("CiftlikEviIlanEdit", "Ilan")';
+                                    break;
+                                case 'Mustakil':
+                                    editUrl = '@Url.Action("MustakilIlanEdit", "Ilan")';
+                                    break;
+                                case 'Villa':
+                                    editUrl = '@Url.Action("VillaIlanEdit", "Ilan")';
+                                    break;
+                                case 'Yazlik':
+                                    editUrl = '@Url.Action("YazlikIlanEdit", "Ilan")';
+                                    break;
+                                default:
+                                    alert('Geçersiz kategori');
+                                    return;
+                            }
+
+                            // Redirect to the edit page
+                            window.location.href = `${editUrl}?id=${ilanId}`;
+                        });
+                    });
+            </script>
+
+
+
+
+            }
+
+        </div>
+
+
+        <style>
+            .total-ads-count {
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                padding: 10px 15px;
+                display: inline-block;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                max-width: 200px; /* Daha küçük bir genişlik */
+                width: 100%;
+            }
+
+            .total-ads-count-number {
+                font-size: 1.5rem; /* Daha küçük font büyüklüğü */
+                font-weight: 600;
+                color: #007bff;
+                margin: 0;
+            }
+
+            .total-ads-count-text {
+                font-size: 0.9rem; /* Daha küçük açıklama metni */
+                color: #6c757d;
+                margin-top: 2px;
+                margin-bottom: 0; /* Daha yakın olmaları için */
+            }
+        </style>
+
+        <!-- Sayfalama -->
+        <div class="col-12 text-center mt-4">
+            <ul class="pagination" id="pagination">
+                <!-- İlk sayfa butonu -->
+                @if (Model.CurrentPage > 1)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action(" Ilanlar", new { page=1 })">İlk</a>
+                </li>
+                }
+
+                <!-- Önceki sayfa butonu -->
+                @if (Model.CurrentPage > 1)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action(" Ilanlar", new { page=Model.CurrentPage - 1 })">«</a>
+                </li>
+                }
+
+                <!-- Dinamik sayfa numaraları -->
+                @{
+                int totalPages = Model.TotalPages;
+                int currentPage = Model.CurrentPage;
+                int visiblePages = 5; // Gösterilecek kutucuk sayısı
+                int startPage = Math.Max(1, currentPage - (visiblePages / 2));
+                int endPage = Math.Min(totalPages, startPage + visiblePages - 1);
+
+                if (endPage - startPage < visiblePages - 1)
+                {
+                startPage = Math.Max(1, endPage - visiblePages + 1);
+                }
+                }
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                <li class="page-item @(i == Model.CurrentPage ? " active" : "" )">
+                    <a class="page-link" href="@Url.Action(" Ilanlar", new { page=i })">@i</a>
+                </li>
+                }
+
+                <!-- Sonraki sayfa butonu -->
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action(" Ilanlar", new { page=Model.CurrentPage + 1 })">»</a>
+                </li>
+                }
+
+                <!-- Son sayfa butonu -->
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action(" Ilanlar", new { page=Model.TotalPages })">Son</a>
+                </li>
+                }
+            </ul>
+        </div>
+
+
+        <style>
+            .pagination {
+                display: flex;
+                justify-content: center; /* Sayfa numaralarını ortalar */
+                list-style-type: none;
+                padding: 0;
+            }
+
+                .pagination .page-item {
+                    margin: 0 5px;
+                }
+
+                    .pagination .page-item a {
+                        text-decoration: none;
+                        padding: 8px 16px;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        color: #007bff;
+                    }
+
+                    .pagination .page-item.active a {
+                        background-color: #007bff;
+                        color: white;
+                    }
+
+                    .pagination .page-item a:hover {
+                        background-color: #0056b3;
+                        color: white;
+                    }
+        </style>
+
+
+
+        <ul id="pagination" class="pagination"></ul>
+
+
+
+        <!-- JavaScript -->
+        <script>
+            function filterAds() {
+                const searchValue = document.getElementById('searchInput').value.toLowerCase();
+                const ads = document.querySelectorAll('.ilan-kart');
+                ads.forEach(ad => {
+                    const title = ad.getAttribute('data-title');
+                    ad.style.display = title.includes(searchValue) ? '' : 'none';
+                });
+            }
+        </script>
+
+
+
+
+    </body>
+</html>

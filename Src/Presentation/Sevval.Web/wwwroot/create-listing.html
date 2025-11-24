@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - EmlakBurada</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="create-listing.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <header>
+        
+    </header>
+
+    <main class="create-listing-container">
+        <div class="auth-container" id="authSection">
+            <h2>İlan Vermek İçin Kimlik Doğrulama</h2>
+            <p>Lütfen ilan vermek istediğiniz kişilik türünü seçin:</p>
+            
+            <div class="auth-buttons">
+                <a href="https://www.turkiye.gov.tr/ticaret-eids-tasinmaz-ilani-yetkilendirme-islemleri?hizmet=Ekrani" 
+                   target="_blank" 
+                   class="edevlet-btn">
+                    <img src="e-devlet-logo.png" alt="E-Devlet Logo">
+                    Gerçek Kişi (Şahıs) Olarak Doğrula
+                </a>
+                
+                <a href="https://www.turkiye.gov.tr/ticaret-eids-tasinmaz-ilani-yetkilendirme-islemleri-tuzel-kisi?tuzel=Kisi" 
+                   target="_blank" 
+                   class="edevlet-btn company-btn">
+                    <img src="e-devlet-logo.png" alt="E-Devlet Logo">
+                    Tüzel Kişi (Şirket) Olarak Doğrula
+                </a>
+            </div>
+            
+            <div class="auth-info error">
+                <p><strong>Önemli:</strong> İlan verebilmek için E-Devlet üzerinden yetkilendirme yapmanız zorunludur.</p>
+                <p>Yetkilendirme olmadan ilan verme işlemi gerçekleştirilemez.</p>
+            </div>
+        </div>
+
+        <div id="listingFormSection" style="display: none;">
+            <h1>Yeni İlan Oluştur</h1>
+            
+            <form class="listing-form">
+                <div class="form-group">
+                    <label for="title">İlan Başlığı*</label>
+                    <input type="text" id="title" required placeholder="Örn: Kadıköy'de 3+1 Satılık Daire">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="property-type">Emlak Tipi*</label>
+                        <select id="property-type" required>
+                            <option value="">Seçiniz</option>
+                            <option value="apartment">Daire</option>
+                            <option value="house">Müstakil Ev</option>
+                            <option value="land">Arsa</option>
+                            <option value="commercial">İşyeri</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">İlan Tipi*</label>
+                        <select id="status" required>
+                            <option value="">Seçiniz</option>
+                            <option value="sale">Satılık</option>
+                            <option value="rent">Kiralık</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="text" name="TasinmazNo" required />
+                <select name="IlanSahibiTipi" required>
+                    <option value="Malik">Mal Sahibi</option>
+                    <option value="Hisim">Birinci/İkinci Derece Hısım</option>
+                    <option value="YetkiliEmlakci">Yetkili Emlak İşletmesi</option>
+                </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Fiyat*</label>
+                        <input type="number" id="price" required placeholder="TL">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Net m²*</label>
+                        <input type="number" id="area" required placeholder="m²">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rooms">Oda Sayısı*</label>
+                        <select id="rooms" required>
+                            <option value="">Seçiniz</option>
+                            <option value="1+0">1+0</option>
+                            <option value="1+1">1+1</option>
+                            <option value="2+1">2+1</option>
+                            <option value="3+1">3+1</option>
+                            <option value="4+1">4+1</option>
+                            <option value="5+">5+ </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="floor">Bulunduğu Kat</label>
+                        <input type="number" id="floor" placeholder="Kat">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Adres*</label>
+                    <input type="text" id="address" required placeholder="Mahalle, İlçe, İl">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Açıklama*</label>
+                    <textarea id="description" rows="5" required placeholder="İlan açıklamasını giriniz..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="images">Fotoğraflar*</label>
+                    <div class="image-upload-container">
+                        <input type="file" id="images" multiple accept="image/*" required>
+                        <div class="upload-text">
+                            Fotoğrafları sürükleyip bırakın veya seçmek için tıklayın
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group features-group">
+                    <label>Özellikler</label>
+                    <div class="features-grid">
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Asansör
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Otopark
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Balkon
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Güvenlik
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Eşyalı
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox"> Doğalgaz
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">İlanı Yayınla</button>
+                    <button type="reset" class="reset-btn">Formu Temizle</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="unauthorizedMessage" style="display: none;" class="unauthorized-warning">
+            <p>⚠️ E-Devlet yetkilendirmesi olmadan ilan veremezsiniz.</p>
+            <p>Lütfen önce E-Devlet üzerinden yetkilendirme işlemini tamamlayın.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>İletişim</h4>
+                <p>Email: info@emlakburada.com</p>
+                <p>Tel: 0212 345 67 89</p>
+            </div>
+            <div class="footer-section">
+                <h4>Sosyal Medya</h4>
+                <p>Facebook</p>
+                <p>Instagram</p>
+                <p>Twitter</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 EmlakBurada. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // E-Devlet'ten gelen yetki kontrolü
+        checkAuthorization();
+
+        // Form submit olayını yakala
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                if (!isAuthorized()) {
+                    e.preventDefault();
+                    showUnauthorizedMessage();
+                }
+            });
+        }
+    });
+
+    function checkAuthorization() {
+        // E-Devlet'ten gelen yetki token'ı kontrolü
+        const authToken = getAuthTokenFromEDevlet();
+
+        if (isValidAuthToken(authToken)) {
+            showListingForm();
+        } else {
+            showAuthSection();
+        }
+    }
+
+    function isValidAuthToken(token) {
+        // Token var mı kontrol et
+        if (!token || !token.kullaniciKodu || !token.yetkilendirmeToken) {
+            return false;
+        }
+
+        // Backend'e token doğrulama isteği gönder
+        return fetch('/api/dogrula-edevlet-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(token)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Token geçerli ise session'a kaydet
+                    sessionStorage.setItem('eDevletAuth', JSON.stringify(token));
+                    return true;
+                }
+                return false;
+            })
+            .catch(error => {
+                console.error('Token doğrulama hatası:', error);
+                return false;
+            });
+    }
+
+    function getAuthTokenFromEDevlet() {
+        // URL'den gelen parametreleri al
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // E-Devlet'ten dönecek parametreler
+        const kullaniciKodu = urlParams.get('kullaniciKodu');
+        const yetkilendirmeToken = urlParams.get('yetkilendirmeToken');
+        const tcKimlikNo = urlParams.get('tcKimlikNo');
+        const vergiNo = urlParams.get('vergiNo'); // Tüzel kişiler için
+
+        // Token bilgilerini bir objede topla
+        return {
+            kullaniciKodu,
+            yetkilendirmeToken,
+            tcKimlikNo,
+            vergiNo
+        };
+    }
+
+    function showListingForm() {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('unauthorizedMessage').style.display = 'none';
+        document.getElementById('listingFormSection').style.display = 'block';
+    }
+
+    function showAuthSection() {
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('listingFormSection').style.display = 'none';
+        document.getElementById('unauthorizedMessage').style.display = 'none';
+    }
+
+    function showUnauthorizedMessage() {
+        document.getElementById('unauthorizedMessage').style.display = 'block';
+        // Sayfayı yukarı kaydır
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function isAuthorized() {
+        // E-Devlet yetki kontrolü
+        return false; // Şu an için hep false dönüyor
+    }
+
+    function startEDevletAuth() {
+        const eDevletUrl = 'https://www.turkiye.gov.tr/ticaret-eids-tasinmaz-ilani-yetkilendirme-islemleri?' + new URLSearchParams({
+            firmaKodu: '4100907',
+            returnUrl: 'https://sevvalemlak.com.tr/Ilan/KategoriSecim'
+        }).toString();
+
+        window.open(eDevletUrl, '_blank');
+    } 
+</script>
+    <script>
+    function checkVerification() {
+        if (confirm('E-Devlet üzerinden doğrulama işlemini tamamladınız mı?')) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('listingFormSection').style.display = 'block';
+        }
+    }
+    </script>
+</body>
+</html> 

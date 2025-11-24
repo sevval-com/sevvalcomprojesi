@@ -1,0 +1,1239 @@
+@model sevvalemlak.csproj.Dto.Company.CompanyDetailDto
+
+<title>Üye Detayları</title>
+<link rel="stylesheet" href="~/css/firmalar.css" />
+<!-- Modern İkonlar için Font Awesome 6 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!--
+    MODERN STİLLER BAŞLANGIÇ
+    Tüm stil bloklarını tek bir yerde topladım ve yeniden düzenledim.
+    Animasyonlar, gölgeler ve modern bir görünüm için iyileştirmeler eklendi.
+-->
+<style>
+    /* Genel Sayfa Ayarları ve Animasyonlar */
+    body {
+        background-color: #f9f9f9; /* Sayfa arka planını hafifçe gri yaptık */
+    }
+
+    .container-section {
+        overflow-x: hidden; /* Yatay kaydırmayı engelle */
+    }
+
+    /* İçeriklerin yumuşak geçişi için animasyon */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-container,
+    .aboutUs-container {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Şehir Filtresi (Eski #cityFilter .btn stilleri) */
+    /* Bu bölüm component'ten geldiği için ana şehir butonlarına entegre edildi */
+    #cityFilter .badge {
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+
+    /* Yeni/Pasif İlan Etiketleri */
+    .new-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: #007bff;
+        color: white;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 50px; /* Daha modern oval etiket */
+        z-index: 2;
+        box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+    }
+
+    .inactive-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: #6c757d;
+        color: white;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 50px;
+        z-index: 2;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Pasif İlan Görünümü */
+    .inactive-ilan {
+        opacity: 0.7;
+        filter: grayscale(80%);
+        transition: all 0.3s ease;
+    }
+
+        .inactive-ilan:hover {
+            opacity: 1;
+            filter: grayscale(0);
+        }
+
+        .inactive-ilan .ilan-info h4 {
+            color: #999 !important;
+        }
+
+        .inactive-ilan .ilan-info p {
+            color: #ccc !important;
+        }
+
+    .inactive-image {
+        position: relative;
+    }
+
+
+    /* Profil Bölümü */
+    .profile-section {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: -100px; /* Profil resmini banner'ın üzerine daha çok çıkardık */
+        margin-bottom: 30px;
+        padding: 0 20px;
+    }
+
+    .profile-picture {
+        position: relative;
+        z-index: 10;
+        width: 160px; /* Büyüttük */
+        height: 160px; /* Büyüttük */
+    }
+
+    .profile-img {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 50%;
+        border: 5px solid #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        object-fit: cover;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+    .company-info {
+        padding: 25px 30px;
+        border-radius: 20px; /* Daha yuvarlak */
+        min-width: 500px;
+        max-width: 800px;
+        width: 100%;
+        background: #ffffff;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        margin-top: -80px; /* Resmin yarısı kartın içinde */
+        padding-top: 90px; /* Resim için üstten boşluk */
+        border: 1px solid #eee;
+    }
+
+    .company-name {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 8px 0;
+        text-align: center;
+    }
+
+    .company-location {
+        font-size: 17px;
+        color: #7f8c8d;
+        margin: 0 0 20px 0;
+        text-align: center;
+        font-weight: 500;
+    }
+
+        .company-location i {
+            margin-right: 5px;
+            color: #007bff;
+        }
+
+    .company-stats {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .stat-item i {
+            font-size: 20px;
+        }
+
+    .stat-label {
+        font-size: 15px;
+    }
+
+    .stat-value {
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    /* Çalıştığımız Şehirler Bölümü */
+    .working-cities-integrated {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .cities-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 20px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+        .cities-title i {
+            color: #007bff;
+            font-size: 18px;
+        }
+
+    .working-cities-integrated .cities-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .working-cities-integrated .city-button {
+        background: white;
+        border: 1px solid #e0e0e0;
+        color: #555;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .working-cities-integrated .city-button:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+            .working-cities-integrated .city-button:hover .city-count {
+                background: #fff;
+                color: #007bff;
+            }
+
+        .working-cities-integrated .city-button.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+            .working-cities-integrated .city-button.active .city-count {
+                background: #fff;
+                color: #007bff;
+            }
+
+    .working-cities-integrated .city-count {
+        background: #f0f0f0;
+        color: #6c757d;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    /* "Daha Fazla Göster" Butonu */
+    #toggleCitiesBtn {
+        border-radius: 50px;
+        font-weight: 500;
+        padding: 6px 15px;
+        transition: all 0.3s ease;
+    }
+
+        #toggleCitiesBtn:hover {
+            transform: translateY(-2px);
+        }
+
+
+    /* Tab Butonları (Hakkımızda vs.) */
+    .options-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 30px auto;
+        background: #fff;
+        border-radius: 15px;
+        padding: 10px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+        max-width: 700px;
+        width: 100%;
+        border: 1px solid #eee;
+    }
+
+    .option-box {
+        flex: 1;
+        padding: 15px 20px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        position: relative;
+        background: transparent;
+        color: #6c757d;
+        border: none;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 50px;
+    }
+
+        .option-box:hover {
+            color: #007bff;
+            background: #f0f6ff;
+        }
+
+        .option-box.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-box i {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .option-box.active i {
+            transform: scale(1.1);
+        }
+
+    /* Ana İçerik Kutuları */
+    .content-container {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 20px;
+        border: 1px solid #eee;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    }
+
+    /* Bölüm Başlıkları (Tüm İlanlar, Hakkımızda vs.) */
+    .section-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        text-align: center;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 2px;
+        }
+
+    /* İlan Kartları */
+    .ilanlar-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid */
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .ilan-card {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+        position: relative;
+        display: flex;
+        flex-direction: column; /* Kart içeriğini dikeyde hizala */
+    }
+
+        .ilan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+    .ilan-image {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+        .ilan-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+    .ilan-card:hover .ilan-image img {
+        transform: scale(1.08);
+    }
+
+    .ilan-image .no-image {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f4f4f4;
+    }
+
+    .ilan-price {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 123, 255, 0.9);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .ilan-info {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Kartın alt kısmının esnemesini sağlar */
+    }
+
+        .ilan-info h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            text-align: left;
+            padding-bottom: 0;
+            min-height: 56px; /* 2 satırlık başlık alanı */
+        }
+
+            .ilan-info h4::after {
+                display: none;
+            }
+
+        .ilan-info .text-muted {
+            text-align: left !important;
+        }
+
+    .result-description {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .detail-item {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #495057;
+        margin-right: 8px;
+        margin-bottom: 5px;
+        display: inline-block;
+        border: 1px solid #eee;
+    }
+
+        .detail-item strong {
+            color: #333;
+        }
+
+    .separator {
+        color: #dee2e6;
+        font-weight: 300;
+        margin: 0 5px;
+    }
+
+    .ilan-info p {
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+
+    /* İlan Kartı Alt Bilgisi (Footer) */
+    .ilan-card-footer {
+        padding: 15px 20px;
+        margin-top: auto; /* Bu, footer'ı kartın en altına iter */
+        font-size: 13px;
+        color: #6c757d;
+        border-top: 1px solid #f0f0f0;
+        background: #fcfcfc;
+    }
+
+        .ilan-card-footer p {
+            margin: 0;
+        }
+
+        .ilan-card-footer b {
+            color: #555;
+        }
+
+    .image-container {
+        max-height: 300px; /* Banner yüksekliğini biraz artırdık */
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+        .image-container .image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    /* Sayfalama Kontrolleri */
+    .pagination-controls .pagination .page-link {
+        color: #007bff;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 0.9rem;
+        margin: 0 3px;
+        border-radius: 10px; /* Daha yuvarlak */
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+        .pagination-controls .pagination .page-link:hover {
+            color: #0056b3;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+    .pagination-controls .pagination .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    }
+
+    .pagination-controls .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+
+    .pagination-controls .form-select {
+        border: 1px solid #007bff;
+        border-radius: 10px;
+        padding: 0.5rem 2.25rem 0.5rem 0.9rem;
+        color: #007bff;
+        background-color: white;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+        .pagination-controls .form-select:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+    .pagination-controls .form-label {
+        color: #495057;
+        font-weight: 500;
+    }
+
+    /* Hakkımızda Bölümü */
+    .aboutUs-container {
+        background: none;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+        .aboutUs-container p {
+            color: #495057;
+            font-size: 16px;
+            line-height: 1.8; /* Okunabilirliği artır */
+            margin-bottom: 25px;
+            text-align: justify;
+        }
+
+        .aboutUs-container .card {
+            border: 1px solid #eee;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            background: #fff;
+            height: 100%;
+        }
+
+            .aboutUs-container .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            }
+
+        .aboutUs-container .card-body {
+            padding: 30px;
+        }
+
+        .aboutUs-container .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .aboutUs-container .card-title i {
+                color: #007bff;
+                font-size: 22px;
+                width: 30px;
+                text-align: center;
+            }
+
+        .aboutUs-container .card-text {
+            color: #6c757d;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+    /* Responsive İyileştirmeler */
+    @@media (max-width: 768px) {
+        .profile-section {
+            margin-top: -80px;
+        }
+
+        .profile-picture {
+            width: 140px;
+            height: 140px;
+        }
+
+        .company-info {
+            min-width: auto;
+            width: 100%;
+            padding: 20px;
+            margin-top: -70px;
+            padding-top: 80px;
+        }
+
+        .company-name {
+            font-size: 26px;
+        }
+
+        .company-location {
+            font-size: 15px;
+        }
+
+        .working-cities-integrated .city-button {
+            padding: 8px 14px;
+            font-size: 13px;
+            gap: 5px;
+        }
+
+        .cities-title {
+            font-size: 18px;
+        }
+
+        .options-container {
+            margin: 20px 10px;
+            padding: 5px;
+            gap: 5px;
+        }
+
+        .option-box {
+            padding: 12px 10px;
+            font-size: 14px;
+            flex-direction: column; /* İkon ve metni alt alta */
+            gap: 4px;
+            min-height: 60px;
+        }
+
+            .option-box i {
+                font-size: 18px;
+                margin-right: 0;
+            }
+
+        .content-container {
+            padding: 20px 15px;
+            margin-top: 15px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .ilanlar-container {
+            grid-template-columns: 1fr; /* Mobilde tek sütun */
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ilan-image {
+            height: 200px;
+        }
+
+        .ilan-info {
+            padding: 15px;
+        }
+
+            .ilan-info h4 {
+                font-size: 18px;
+                min-height: auto;
+            }
+
+        .danisman-container {
+            grid-template-columns: 1fr !important;
+        }
+
+        .user-card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .consultant-profile-img-container {
+            margin: 0 !important;
+        }
+
+        .pagination-controls .pagination {
+            flex-wrap: wrap;
+        }
+
+        .pagination-controls .page-item {
+            margin-bottom: 5px;
+        }
+    }
+</style>
+<!-- STİLLER BİTİŞ -->
+
+
+<section class="container-section">
+    <div class="container pt-4">
+        <!-- Banner Resmi -->
+        <div class="image-container">
+            @if (!string.IsNullOrEmpty(Model.About?.BannerPicturePath))
+            {
+                <img src="@Model.About.BannerPicturePath" alt="Banner Resmi" class="image">
+            }
+            else
+            {
+                var cityName = Model.About?.City?.ToUpper();
+                var cityImagePath = $"/sehirler/{cityName}.jpeg";
+                <img src="@cityImagePath" alt="@Model.About?.City Banner Resmi" class="image"
+                     onerror="this.onerror=null; this.src='https://placehold.co/1200x300/007bff/FFFFFF?text=Sevval+Emlak';">
+            }
+        </div>
+
+        <!-- Profil ve Firma Bilgileri -->
+        <div class="profile-section">
+            <div class="profile-picture">
+                <img src="@(string.IsNullOrEmpty(Model.About?.ProfilePicturePath) ?
+                                          "/images/common/defaultuser.png" :
+                                          Model.About?.ProfilePicturePath)"
+                     alt="Profil Fotoğrafı" class="profile-img" onerror="this.onerror=null; this.src='/images/common/defaultuser.png';">
+            </div>
+
+            <div class="company-info">
+                <h2 class="company-name">@Model.About?.CompanyName</h2>
+                <p class="company-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    @Model.About?.City / @Model.About?.District
+                </p>
+                <div class="company-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-home"></i>
+                        <span class="stat-label">Toplam İlan:</span>
+                        <span class="stat-value">@Model.TotalCount Adet</span>
+                    </div>
+                </div>
+
+                <!-- Çalıştığımız Şehirler -->
+                <div class="working-cities-integrated">
+                    <h4 class="cities-title">
+                        <i class="fas fa-building-flag"></i>
+                        Çalıştığımız Bölgeler
+                    </h4>
+                    <div class="cities-container" id="cityFilter">
+                        <button class="city-button active" onclick="filterListingsByCity('all', this);">
+                            <i class="fas fa-globe"></i>
+                            Tüm Şehirler
+                        </button>
+                        <!-- Component'ten gelen şehirler buraya basılacak -->
+                        @await Component.InvokeAsync("WorkingCities", Model.UserId)
+                    </div>
+                    <!-- Daha Fazlası Butonu (JS ile yönetilecek) -->
+                    <div class="text-center mt-3">
+                        <button id="toggleCitiesBtn" class="btn btn-outline-primary" style="display: none;">
+                            Daha Fazlası <i class="fas fa-chevron-down ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Tab Seçenekleri -->
+        <div class="options-container">
+            <button class="option-box active" onclick="showContent('allListings')">
+                <i class="fas fa-th-large"></i>
+                Tüm İlanlar
+            </button>
+            <button class="option-box" onclick="showContent('consultants')">
+                <i class="fas fa-users"></i>
+                Danışmanlar
+            </button>
+            <button class="option-box" onclick="showContent('aboutUs')">
+                <i class="fas fa-info-circle"></i>
+                Hakkımızda
+            </button>
+        </div>
+
+        <!-- ======================= -->
+        <!-- İÇERİK ALANLARI         -->
+        <!-- ======================= -->
+        <!-- 1. Tüm İlanlar -->
+        <div id="allListings" class="content-container" style="display:block;">
+            <h4 class="section-title">Firmanın Tüm İlanları</h4>
+
+            @if (Model.Announcements != null && Model.Announcements.Any())
+            {
+                <div class="ilanlar-container" id="ilanContainer">
+                    @foreach (var ilan in Model.Announcements)
+                    {
+                        var p = ilan.Images;
+                        var isNew = (DateTime.Now - ilan.GirisTarihi).TotalDays <= 3;
+
+                        <div class="ilan-card @(ilan.Status != "active" ? "inactive-ilan" : "")" data-city="@ilan.sehir">
+                            @if (ilan.Status == "active")
+                            {
+                                <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" style="text-decoration: none;">
+                                    <div class="ilan-image">
+                                        @if (p != null && p.Count > 0)
+                                        {
+                                            <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                        }
+                                        else
+                                        {
+                                            <div class="no-image">
+                                                <i class="fas fa-camera fa-5x text-muted"></i>
+                                            </div>
+                                        }
+                                        <span class="ilan-price">@ilan.Price.ToString("N0") TL</span>
+                                        @if (isNew)
+                                        {
+                                            <span class="new-badge">Yeni</span>
+                                        }
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="ilan-image inactive-image">
+                                    @if (p != null && p.Count > 0)
+                                    {
+                                        <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                    }
+                                    else
+                                    {
+                                        <div class="no-image">
+                                            <i class="fas fa-camera fa-5x text-muted"></i>
+                                        </div>
+                                    }
+                                    <span class="ilan-price">@ilan.Price.ToString("N0") TL</span>
+                                    <span class="inactive-badge">Pasif</span>
+                                </div>
+                            }
+
+                            <div class="ilan-info">
+                                <h4>@ilan.Title</h4>
+                                @{
+                                    var details = new List<string>();
+                                }
+                                @if (!string.IsNullOrEmpty(ilan.Area)) { details.Add($"M²: <strong>{ilan.Area}</strong>"); }
+                                @if (!string.IsNullOrEmpty(ilan.AdaNo)) { details.Add($"Ada: <strong>{ilan.AdaNo}</strong>"); }
+                                @if (!string.IsNullOrEmpty(ilan.ParselNo)) { details.Add($"Parsel: <strong>{ilan.ParselNo}</strong>"); }
+                                @if (!string.IsNullOrEmpty(ilan.OdaSayisi)) { details.Add($"Oda Sayısı: <strong>{ilan.OdaSayisi}</strong>"); }
+                                @if (!string.IsNullOrEmpty(ilan.BinaYasi)) { details.Add($"Bina Yaşı: <strong>{ilan.BinaYasi}</strong>"); }
+                                @if (!string.IsNullOrEmpty(ilan.NetMetrekare)) { details.Add($"Net M²: <strong>{ilan.NetMetrekare}</strong>"); }
+                                @if (details.Any())
+                                {
+                                    <div class="result-description">
+                                        @foreach (var detail in details)
+                                        {
+                                            <span class="detail-item">@Html.Raw(detail)</span>
+                                        }
+                                    </div>
+                                }
+                                <p class="text-muted" style="font-size: 13px;">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    @ilan.FirstName @ilan.LastName
+                                </p>
+                            </div>
+
+                            <div class="ilan-card-footer">
+                                @if (!string.IsNullOrEmpty(ilan.IlanNo))
+                                {
+                                    <p class="text-muted d-inline-block me-2"><b>İlan No:</b> @ilan.IlanNo</p>
+                                }
+                                <p class="text-muted d-inline-block">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    @ilan.sehir / @ilan.semt
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Bu firmaya ait aktif ilan bulunamadı.</h5>
+                </div>
+            }
+
+            <!-- Server-side Pagination Controls -->
+            @if (Model.TotalPages > 0)
+            {
+                <div class="pagination-controls mt-5" id="serverPaginationControls" style="display:block!important">
+                    <div class="row align-items-center">
+                        <!-- Sayfa Başına Adet -->
+                        <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                            <label for="pageSizeSelect" class="form-label me-2">Sayfa başına:</label>
+                            <select id="pageSizeSelect" asp-for="@Model.PageSize" class="form-select d-inline-block" style="width: auto;"
+                                    onchange="changePageSize(this.value)">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+
+                        <!-- Sayfalama Linkleri -->
+                        <div class="col-md-8">
+                            <nav aria-label="İlan sayfalama">
+                                <ul class="pagination justify-content-center justify-content-md-end mb-0">
+                                    <!-- First Page -->
+                                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Details", new { id = Model.UserId, page = 1, size = Model.PageSize })" aria-label="İlk sayfa">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Previous Page -->
+                                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Details", new { id = Model.UserId, page = Model.CurrentPage - 1, size = Model.PageSize })" aria-label="Önceki sayfa">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+
+                                    @{
+                                        int startPage = Math.Max(1, Model.CurrentPage - 2);
+                                        int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                                        if (endPage - startPage < 4)
+                                        {
+                                            if (startPage == 1) { endPage = Math.Min(Model.TotalPages, startPage + 4); }
+                                            else if (endPage == Model.TotalPages) { startPage = Math.Max(1, endPage - 4); }
+                                        }
+                                    }
+
+                                    <!-- Page Numbers -->
+                                    @for (int i = startPage; i <= endPage; i++)
+                                    {
+                                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Details", new { id = Model.UserId, page = i, size = Model.PageSize })">@i</a>
+                                        </li>
+                                    }
+
+                                    <!-- Next Page -->
+                                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Details", new { id = Model.UserId, page = Model.CurrentPage + 1, size = Model.PageSize })" aria-label="Sonraki sayfa">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Last Page -->
+                                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Details", new { id = Model.UserId, page = Model.TotalPages, size = Model.PageSize })" aria-label="Son sayfa">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- 2. Danışmanlar -->
+        <div id="consultants" class="content-container" style="display:none;">
+            <!-- JS ile yüklenecek -->
+            <div id="consultants-content">
+            </div>
+        </div>
+
+        <!-- 3. Hakkımızda -->
+        <div id="aboutUs" class="aboutUs-container" style="display:none;">
+            <!-- Component'ten yüklenecek -->
+            @await Component.InvokeAsync("AboutUs", Model?.About)
+        </div>
+
+
+        <!-- ======================= -->
+        <!-- SCRIPT'LER            -->
+        <!-- ======================= -->
+        <script>
+            // Aktif tab'ı ve içeriği yöneten fonksiyon
+            function showContent(sectionId) {
+                // Tüm içerikleri gizle
+                document.querySelectorAll('.content-container, .aboutUs-container').forEach(function (content) {
+                    content.style.display = 'none';
+                });
+
+                // Tüm tab butonlarından 'active' sınıfını kaldır
+                document.querySelectorAll('.option-box').forEach(function (option) {
+                    option.classList.remove('active');
+                });
+
+                // İlgili içeriği göster
+                var selectedContent = document.getElementById(sectionId);
+                if (selectedContent) {
+                    selectedContent.style.display = 'block';
+                }
+
+                // Aktif tab butonunu işaretle
+                var selectedOption = document.querySelector('.option-box[onclick="showContent(\'' + sectionId + '\')"]');
+                if (selectedOption) {
+                    selectedOption.classList.add('active');
+                }
+
+                // Eğer "Danışmanlar" tıklandıysa ve içerik henüz yüklenmediyse yükle
+                if (sectionId === 'consultants') {
+                    var consultantsContent = document.getElementById('consultants-content');
+                    // 'data-loaded' attribute'ü ile daha önce yüklenip yüklenmediğini kontrol et
+                    if (consultantsContent.dataset.loaded !== 'true') {
+                        loadConsultants();
+                    }
+
+                    // Diğerlerini tekrar gizle (emin olmak için)
+                    document.getElementById('aboutUs').style.display = 'none';
+                    document.getElementById('allListings').style.display = 'none';
+                    selectedContent.style.display = 'block'; // Danışmanlar container'ını göster
+                }
+            }
+
+            // Danışmanları AJAX ile yükle
+            function loadConsultants() {
+                var userId = '@Model.UserId';
+                var consultantsContent = document.getElementById('consultants-content');
+
+                consultantsContent.innerHTML = '<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2">Danışmanlar yükleniyor...</p></div>';
+
+                fetch('/Ilan/GetConsultants?userId=' + userId)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        consultantsContent.innerHTML = html;
+                        consultantsContent.dataset.loaded = 'true'; // Yüklendi olarak işaretle
+                    })
+                    .catch(error => {
+                        console.error('Error loading consultants:', error);
+                        consultantsContent.innerHTML = '<div class="text-center text-danger p-5"><i class="fas fa-exclamation-triangle fa-2x"></i><p class="mt-2">Danışmanlar yüklenirken bir hata oluştu.</p></div>';
+                    });
+            }
+
+            // Sayfa ilk yüklendiğinde "Tüm İlanlar" içeriğini göster
+            window.onload = function () {
+                showContent('allListings');
+            };
+
+            // Sayfa boyutu değiştirme fonksiyonu
+            function changePageSize(newSize) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('size', newSize);
+                currentUrl.searchParams.set('page', '1'); // Sayfa boyutunu değiştirince 1. sayfaya dön
+                window.location.href = currentUrl.toString();
+            }
+
+            // Şehre göre ilanları filtrele
+            function filterListingsByCity(city, element) {
+                // Tüm butonlardan 'active' sınıfını kaldır
+                document.querySelectorAll('#cityFilter .city-button').forEach(function (btn) {
+                    btn.classList.remove('active');
+                });
+
+                // Tıklanan butona 'active' sınıfını ekle
+                element.classList.add('active');
+
+                // İlanları filtrele
+                var listings = document.querySelectorAll('.ilan-card');
+                var visibleCount = 0;
+                if (city === 'all') {
+                    listings.forEach(function (listing) {
+                        listing.style.display = 'flex'; // grid/flex kullandığımız için 'block' yerine 'flex'
+                        visibleCount++;
+                    });
+                } else {
+                    listings.forEach(function (listing) {
+                        if (listing.getAttribute('data-city') === city) {
+                            listing.style.display = 'flex';
+                            visibleCount++;
+                        } else {
+                            listing.style.display = 'none';
+                        }
+                    });
+                }
+
+                // TODO: Eğer hiç ilan bulunamazsa bir mesaj gösterebiliriz.
+                // Örneğin:
+                // var container = document.getElementById('ilanContainer');
+                // if(visibleCount === 0) { ... }
+
+
+                // Filtreleme sonrası ilanların olduğu bölüme yumuşak kaydır
+                setTimeout(function () {
+                    smoothScrollTo(document.querySelector('#allListings'), 500);
+                }, 300);
+            }
+
+            // Yumuşak kaydırma fonksiyonu
+            function smoothScrollTo(target, duration) {
+                if (!target) return;
+                var start = window.pageYOffset;
+                var end = target.getBoundingClientRect().top + start - 100; // Üstten 100px boşluk bırak
+                var distance = end - start;
+                var startTime = performance.now();
+
+                function scrollStep(currentTime) {
+                    var elapsed = currentTime - startTime;
+                    var progress = Math.min(elapsed / duration, 1);
+                    var ease = 0.5 * (1 - Math.cos(Math.PI * progress)); // easeInOutSine
+
+                    window.scrollTo(0, start + distance * ease);
+
+                    if (elapsed < duration) {
+                        requestAnimationFrame(scrollStep);
+                    }
+                }
+                requestAnimationFrame(scrollStep);
+            }
+
+
+            // === YENİ: "Daha Fazla Şehir" Fonksiyonu ===
+            document.addEventListener('DOMContentLoaded', function() {
+                const cityContainer = document.getElementById('cityFilter');
+                if (!cityContainer) return; // Eğer container yoksa çalışma
+
+                const toggleBtn = document.getElementById('toggleCitiesBtn');
+                const allCities = cityContainer.querySelectorAll('.city-button'); // "Tüm Şehirler" dahil
+
+                // "Tüm Şehirler" butonunu (ilkini) saymıyoruz.
+                const cityButtonsOnly = Array.from(allCities).slice(1);
+
+                const initialShowCount = 5; // Sadece şehir butonlarından 5 tane göster
+
+                if (cityButtonsOnly.length > initialShowCount) {
+                    // Fazla olanları gizle
+                    for (let i = initialShowCount; i < cityButtonsOnly.length; i++) {
+                        cityButtonsOnly[i].style.display = 'none';
+                    }
+
+                    toggleBtn.style.display = 'inline-block';
+                    toggleBtn.dataset.state = 'more'; // 'more' = daha fazlasını göster, 'less' = daha az göster
+
+                    toggleBtn.addEventListener('click', function() {
+                        if (toggleBtn.dataset.state === 'more') {
+                            // Hepsini göster
+                            for (let i = initialShowCount; i < cityButtonsOnly.length; i++) {
+                                // .city-button stilinde 'display: flex' kullandığımız için 'flex' yapıyoruz.
+                                cityButtonsOnly[i].style.display = 'flex';
+                            }
+                            toggleBtn.innerHTML = 'Daha Az Göster <i class="fas fa-chevron-up ms-1"></i>';
+                            toggleBtn.dataset.state = 'less';
+                        } else {
+                            // Tekrar gizle
+                            for (let i = initialShowCount; i < cityButtonsOnly.length; i++) {
+                                cityButtonsOnly[i].style.display = 'none';
+                            }
+                            toggleBtn.innerHTML = 'Daha Fazlası <i class="fas fa-chevron-down ms-1"></i>';
+                            toggleBtn.dataset.state = 'more';
+                        }
+                    });
+                }
+            });
+
+        </script>
+
+    </div>
+</section>

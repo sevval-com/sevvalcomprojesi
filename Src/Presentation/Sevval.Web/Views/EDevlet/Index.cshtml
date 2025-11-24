@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "E-Devlet Doğrulama";
+    Layout = null; // Layout kullanılmıyor
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">E-Devlet Doğrulama</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle"></i>
+                        İlan verebilmek için E-Devlet üzerinden kimlik doğrulaması yapmanız gerekmektedir.
+                    </div>
+                    <form action="@Url.Action("DogrulamaBaslat", "EDevlet")" method="get">
+                        <div class="form-group mb-3">
+                            <label for="vergiNo">Vergi Numarası:</label>
+                            <input type="text" class="form-control" id="vergiNo" name="vergiNo"
+                                   pattern="\d{10}" title="Vergi numarası 10 haneli olmalıdır" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="gsmNo">GSM Numarası:</label>
+                            <input type="tel" class="form-control" id="gsmNo" name="gsmNo"
+                                   pattern="5[0-9]{9}" title="GSM numarası 5 ile başlamalı ve 10 haneli olmalıdır"
+                                   placeholder="5XX XXX XX XX" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-government"></i> E-Devlet ile Doğrula
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,12 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace sevvalemlak.wwwroot.css
+{
+    public class aramaekranı : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
+}

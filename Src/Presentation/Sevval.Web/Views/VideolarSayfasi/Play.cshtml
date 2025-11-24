@@ -1,0 +1,819 @@
+﻿@using Sevval.Web.Models
+@using System.Text.RegularExpressions
+@inject Microsoft.AspNetCore.Identity.UserManager<Sevval.Domain.Entities.ApplicationUser> UserManager
+@model VideoPlayViewModel
+@{
+    ViewData["Title"] = Model.Video.VideoAdi;
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+    var currentUser = await UserManager.GetUserAsync(User);
+    Func<string, Microsoft.AspNetCore.Html.IHtmlContent> FormatDescription = (description) =>
+    {
+        if (string.IsNullOrEmpty(description))
+        {
+            return new Microsoft.AspNetCore.Html.HtmlString("<p class='text-gray-500'>Bu video için açıklama eklenmemiş.</p>");
+        }
+        var urlRegex = new Regex(@"(https?:\/\/[^\s]+)");
+        var formatted = urlRegex.Replace(description, match => $"<a href='{match.Value}' target='_blank' class='text-blue-500 hover:underline font-semibold'>{match.Value}</a>");
+        return new Microsoft.AspNetCore.Html.HtmlString(formatted.Replace("\n", "<br />"));
+    };
+}
+<style>
+    @@media (max-width: 768px){
+    div[role="menu"]{
+            height: 60px !important;
+            overflow-y: scroll !important;
+        }
+    .comment-buttons button{
+        padding: 0 8px !important;
+        max-width: 120px !important;
+    }
+    .edit-btn, .delete-btn{
+        max-width: 90px !important;
+    }
+    }
+</style>
+<div class="bg-slate-100 font-sans">
+    <div class="container mx-auto max-w-screen-2xl px-4 lg:px-8 py-8">
+    <div class="w-full lg:w-[68%] mb-2">
+                <nav class="text-sm text-slate-600" aria-label="Breadcrumb">
+                    <ol class="flex flex-wrap items-center gap-2">
+                        <li>
+                            <a href="@Url.Action("Index","Home")" class="hover:text-blue-600">Ana sayfa</a>
+                        </li>
+                        <li class="text-slate-400">›</li>
+                        <li>
+                            <a href="@Url.Action("Index","VideolarSayfasi")" class="hover:text-blue-600">Videolar</a>
+                        </li>
+                        <li class="text-slate-400">›</li>
+                        <li>
+                            <a href="@Url.Action("Index","VideolarSayfasi", new { kategori = Model.Video.Kategori })" class="hover:text-blue-600">@Model.Video.Kategori</a>
+                        </li>
+                        <li class="text-slate-400">›</li>
+                        <li class="text-slate-800 font-semibold truncate max-w-full" title="@Model.Video.VideoAdi">@Model.Video.VideoAdi</li>
+                    </ol>
+                </nav>
+            </div>
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Breadcrumb -->
+            
+            <!-- Ana İçerik Alanı -->
+            <div class="w-full lg:w-[68%]">
+                <!-- Video Oynatıcı -->
+                <div class="aspect-w-16 bg-black rounded-2xl shadow-lg mb-4">
+                    @if (Model.Video.IsYouTube)
+                    {
+                        <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="@Model.Video.VideoYolu"></div>
+                    }
+                    else
+                    {
+                        <video id="player" playsinline webkit-playsinline x5-playsinline controls class="w-full h-full object-cover" poster="@Url.Content(Model.Video.KapakFotografiYolu ?? string.Empty)" preload="metadata">
+                            <source src="@Url.Content(Model.Video.VideoYolu)" type="video/mp4">
+                        </video>
+                    }
+                </div>
+                <!-- Başlık ve Aksiyonlar -->
+                <div class="bg-white rounded-2xl shadow-md p-5">
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-tight clamp-2 break-anywhere">@Model.Video.VideoAdi</h1>
+                    <!-- Açıklama: Başlığın hemen altında -->
+                    <div id="description-box" class="text-slate-600 text-sm mt-2 prose prose-sm max-w-none relative max-h-14 overflow-hidden transition-all duration-300">
+                        @FormatDescription(Model.Video.VideoAciklamasi)
+                    </div>
+                    <button id="description-toggler" class="text-blue-600 font-semibold text-sm mt-1 hover:underline">daha fazla</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3">
+                        <div class="text-slate-500 text-sm mb-3 sm:mb-0">
+                            <span>@Model.Video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
+                            <span class="mx-2 font-bold text-slate-300">•</span>
+                            <span>@Model.Video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
+                        </div>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center bg-slate-100 rounded-full">
+                                <button id="likeButton" data-videoid="@Model.Video.Id" class="flex w-full items-center gap-1.5 px-4 py-1 rounded-l-full group transition text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == true ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                        <i class="fas fa-thumbs-up text-base"></i>
+                                        <span id="likeCount" class="font-semibold text-xs">@Model.Video.BegeniSayisi</span>
+                                    </button>
+                                    <div class="border-l border-slate-300 h-5"></div>
+                                <button id="dislikeButton" data-videoid="@Model.Video.Id" class="flex w-full items-center gap-1.5 px-4 py-1 rounded-r-full group transition text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == false ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                        <i class="fas fa-thumbs-down text-base"></i>
+                                        <span id="dislikeCount" class="font-semibold text-xs">@Model.Video.DislikeSayisi</span>
+                                    </button>
+                                </div>
+                            @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com")
+                                {
+                                    <a href="@Url.Action("Edit","VideolarSayfasi", new { id = Model.Video.Id })" class="bg-yellow-600 w-full h-[50px] flex items-center justify-center px-8 hover:bg-yellow-700 text-white font-semibold py-1 px-3 rounded-full shadow-sm text-sm edit-btn">Düzenle</a>
+                                    <form asp-action="Delete" asp-controller="VideolarSayfasi" method="post" onsubmit="return confirm('Bu videoyu silmek istediğinize emin misiniz?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@Model.Video.Id" />
+                                        <button type="submit" class="bg-red-600 w-full px-8 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-full shadow-sm text-sm delete-btn">Sil</button>
+                                    </form>
+                                }
+                            </div>
+                    </div>
+                    <div class="border-t border-slate-200 my-4"></div>
+                    <!-- Yükleyen Bilgisi -->
+                    <div class="flex items-center gap-4">
+                            <img src="@Url.Content("~/images/LOGO mavi.png")"
+                                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                                 alt="Sevval.com" />
+                        <div class="w-full">
+                            <p class="font-bold text-slate-800 text-base">Sevval.com</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Yorumlar Bölümü -->
+                <div class="bg-white rounded-2xl shadow-md p-5 mt-6">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4">@Model.Yorumlar.Sum(y => 1 + y.Yanitlar.Count()) Yorum</h2>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="flex items-start gap-4 mb-6">
+                            <img src="@(currentUser?.ProfilePicturePath ?? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(currentUser?.FirstName)}+{Uri.EscapeDataString(currentUser?.LastName)}&background=0f172a&color=fff&bold=true")" class="w-10 h-10 rounded-full flex-shrink-0" />
+                            <form id="mainCommentForm" class="w-full comment-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="videoId" value="@Model.Video.Id" />
+                                <textarea name="yorumMetni" class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition p-2.5 text-sm" rows="1" placeholder="Yorum ekle..."></textarea>
+                                <div class="comment-buttons text-right mt-2 hidden">
+                                    <button type="button" class="cancel-comment text-slate-600 font-semibold py-2 px-4 rounded-full hover:bg-slate-100 transition text-sm">İptal</button>
+                                    <button type="submit" class="bg-slate-800 text-white font-semibold py-2 px-5 ml-0 rounded-full hover:bg-slate-900 transition disabled:bg-slate-400 text-sm" disabled>Yorum Yap</button>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex items-start gap-4 mb-6">
+                            <img src="https://ui-avatars.com/api/?name=Ziyaret%C3%A7i&background=0f172a&color=fff&bold=true" class="w-10 h-10 rounded-full flex-shrink-0" />
+                            <form id="mainCommentForm" class="w-full comment-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="videoId" value="@Model.Video.Id" />
+                                <textarea name="yorumMetni" class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition p-2.5 text-sm" rows="1" placeholder="Yorum yapmak için giriş yapın..."></textarea>
+                                <div class="comment-buttons text-right mt-2">
+                                    <a href="@Url.Action("Login","Account", new { returnUrl = Context.Request.Path + Context.Request.QueryString })" class="bg-slate-800 text-white font-semibold py-2 px-5 rounded-full hover:bg-slate-900 transition text-sm">Giriş Yap</a>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    <div id="commentsList" class="space-y-5">
+                        @foreach (var yorum in Model.Yorumlar)
+                        {
+                            <div class="comment-thread relative">
+                                @await Html.PartialAsync("_YorumPartial", yorum)
+                                @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com")
+                                {
+                                    <button type="button" class="delete-comment absolute w-[90px] -top-2 right-0 text-red-600 text-xs font-bold hover:underline" data-comment-id="@yorum.Id">Sil</button>
+                                }
+                                <div class="yanitlar-container pl-10 mt-4 space-y-4 border-l-2 border-slate-200 ml-4">
+                                    @foreach (var yanit in yorum.Yanitlar.OrderBy(y => y.YorumTarihi))
+                                    {
+                                        <div class="relative">
+                                        @await Html.PartialAsync("_YorumPartial", yanit)
+                                            @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com")
+                                            {
+                                                <button type="button" class="delete-comment w-[90px] absolute -top-2 right-0 text-red-600 text-[11px] font-bold hover:underline" data-comment-id="@yanit.Id">Sil</button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                <div class="yanit-form-container pl-14 mt-3"></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Kenar Çubuğu - Öneri Videoları -->
+            <aside class="w-full lg:w-[32%] lg:flex-shrink-0">
+                <div class="sticky top-6 space-y-4">
+                    <!-- Önerilen Videolar -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Önerilen Videolar</h3>
+                        <div id="suggestedVideosContainer" class="space-y-4">
+                            <!-- Önerilen videolar buraya yüklenecek -->
+                            <div class="flex items-center justify-center py-8">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                <span class="ml-2 text-gray-500">Yükleniyor...</span>
+                                    </div>
+                                    </div>
+                                </div>
+                    <!-- Mevcut OneriVideolar bölümü geçici olarak kaldırıldı - API'den gelecek -->
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+<!-- Yorum HTML Şablonu -->
+<div id="comment-template" style="display: none;">
+    <div class="comment-container flex items-start gap-4" data-comment-id="__COMMENT_ID__">
+        <img src="__PROFILE_PICTURE__" class="w-10 h-10 rounded-full flex-shrink-0" alt="__USER_NAME__ profili" />
+        <div class="flex-1">
+            <div class="flex items-center gap-2 mb-0.5">
+                <p class="font-semibold text-slate-800 text-sm">__USER_NAME__</p>
+                <span class="video-owner-badge-placeholder"></span>
+                <span class="text-slate-400 text-xs">__COMMENT_DATE__</span>
+            </div>
+            <p class="text-slate-700 text-sm">__COMMENT_TEXT__</p>
+            <div class="mt-2">
+                <button class="reply-button text-xs font-bold text-slate-500 hover:underline">YANITLA</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <style>
+        /* Mobilde Plyr menü ve tooltiplerinin kesilmesini önle */
+        .plyr { position: relative; z-index: 1; }
+        .plyr__controls, .plyr__menu__container, .plyr__tooltip, .plyr__control--overlaid {
+            z-index: 10010 !important;
+        }
+        /* Menü konteyneri taşmasın */
+        .plyr__menu__container { overflow: visible !important; }
+        /* Aspect container ve iç sarmalayıcılar taşmayı gösterebilsin */
+        .aspect-w-16, .plyr__video-wrapper, .plyr__video-embed { overflow: visible !important; }
+        /* iOS adres çubuğu ile çakışmayı azaltmak için küçük marj */
+        @@media (max-width: 768px){
+            .plyr__menu__container { margin-bottom: 8px; }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = new Plyr('#player', {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+                tooltips: { controls: true, seek: true },
+                fullscreen: { enabled: true, fallback: true, iosNative: true },
+                clickToPlay: true,
+                muted: false,
+                autoplay: false,
+                youtube: {
+                    rel: 0,
+                    modestbranding: 1,
+                    playsinline: 1
+                },
+                i18n: {
+                    restart: 'Baştan oynat',
+                    rewind: 'Geri sar {seektime}s',
+                    play: 'Oynat',
+                    pause: 'Duraklat',
+                    fastForward: 'İleri sar {seektime}s',
+                    seek: 'Zaman çubuğu',
+                    seekLabel: '{currentTime} / {duration}',
+                    played: 'Oynatıldı',
+                    buffered: 'Önbelleğe alındı',
+                    currentTime: 'Şu anki süre',
+                    duration: 'Süre',
+                    volume: 'Ses',
+                    mute: 'Sesi kapat',
+                    unmute: 'Sesi aç',
+                    enableCaptions: 'Altyazıları aç',
+                    disableCaptions: 'Altyazıları kapat',
+                    download: 'İndir',
+                    enterFullscreen: 'Tam ekran',
+                    exitFullscreen: 'Tam ekrandan çık',
+                    frameTitle: '{title} oynatıcı',
+                    settings: 'Ayarlar',
+                    speed: 'Hız',
+                    normal: 'Normal',
+                    quality: 'Kalite',
+                    loop: 'Döngü'
+                }
+            });
+
+            // iOS/Android mobilde tam ekranın çalışmasını garantiye al
+            try {
+                const container = document.querySelector('.aspect-w-16');
+                if (container) {
+                    container.style.position = 'relative';
+                    container.style.overflow = 'visible';
+                }
+                const videoWrapper = document.querySelector('.plyr__video-wrapper');
+                if (videoWrapper) {
+                    videoWrapper.style.overflow = 'visible';
+                }
+            } catch (e) { /* no-op */ }
+
+            // Sesin kapalı görünmesini önlemek için kullanıcı etkileşiminden sonra sesi aç
+            const ensureUnmuted = () => {
+                try {
+                    if (typeof player.muted !== 'undefined') player.muted = false;
+                    const vol = localStorage.getItem('plyr-volume');
+                    if (vol) player.volume = Math.max(0.1, Math.min(1, parseFloat(vol)));
+                } catch (e) { /* no-op */ }
+            };
+            player.on('play', ensureUnmuted);
+            player.on('ready', () => {
+                // YouTube iframe'inde playsinline & allowfullscreen bayrakları
+                const iframe = document.querySelector('iframe');
+                if (iframe) {
+                    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                    iframe.setAttribute('allowfullscreen', '');
+                    iframe.setAttribute('playsinline', '');
+                    iframe.setAttribute('webkit-playsinline', '');
+                }
+            });
+
+            // Android: fullscreen'e geçerken yatay (landscape) kilitle, çıkarken geri bırak
+            const tryLockLandscape = async () => {
+                try {
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape');
+                    }
+                } catch (e) { /* çoğu tarayıcıda gesture/https gerektirir */ }
+            };
+            const tryUnlock = async () => {
+                try {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        await screen.orientation.unlock();
+                    } else if (screen.orientation) {
+                        await screen.orientation.lock('any');
+                    }
+                } catch (e) { }
+            };
+            player.on('enterfullscreen', () => {
+                tryLockLandscape();
+            });
+            player.on('exitfullscreen', () => {
+                tryUnlock();
+            });
+            // Fullscreen tooltip: state'e göre tek bir tooltip göster
+            (function(){
+                const fsBtn = document.querySelector('.plyr__controls [data-plyr="fullscreen"]');
+                if (!fsBtn) return;
+                const updateFsTooltip = () => {
+                    const label = player.fullscreen && player.fullscreen.active ? 'Tam ekrandan çık' : 'Tam ekran';
+                    fsBtn.setAttribute('aria-label', label);
+                    const tips = fsBtn.querySelectorAll('.plyr__tooltip');
+                    if (tips.length) {
+                        tips[0].textContent = label; // ilkini kullan
+                        for (let i = 1; i < tips.length; i++) tips[i].remove(); // fazlalıkları sil
+                    }
+                };
+                player.on('enterfullscreen', updateFsTooltip);
+                player.on('exitfullscreen', updateFsTooltip);
+                // İlk kurulum
+                updateFsTooltip();
+            })();
+            const descBox = document.getElementById('description-box');
+            const descToggler = document.getElementById('description-toggler');
+            if(descBox && descToggler && descBox.scrollHeight > descBox.clientHeight) {
+                descToggler.addEventListener('click', () => {
+                    if(descBox.classList.contains('max-h-14')) {
+                        descBox.classList.remove('max-h-14');
+                        descToggler.textContent = 'daha az';
+                    } else {
+                        descBox.classList.add('max-h-14');
+                        descToggler.textContent = 'daha fazla';
+                    }
+                });
+            } else if (descToggler) {
+                descToggler.style.display = 'none';
+            }
+            document.addEventListener('focusin', function(e) {
+                if (e.target.matches('.comment-form textarea')) {
+                    e.target.closest('.comment-form').querySelector('.comment-buttons').style.display = 'block';
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('.cancel-comment')) {
+                    const form = e.target.closest('.comment-form');
+                    form.querySelector('textarea').value = '';
+                    if (!form.id) {
+                        form.parentElement.remove();
+                    } else {
+                        form.querySelector('.comment-buttons').style.display = 'none';
+                    }
+                }
+                if (e.target.matches('.reply-button')) {
+                    const commentElement = e.target.closest('.comment-container');
+                    const parentId = commentElement.dataset.commentId;
+                    const replyFormContainer = commentElement.closest('.comment-thread').querySelector('.yanit-form-container');
+                    const existingForm = replyFormContainer.querySelector('.comment-form');
+                    if(existingForm) {
+                        existingForm.remove();
+                        return;
+                    }
+                    const mainForm = document.getElementById('mainCommentForm');
+                    const replyForm = mainForm.cloneNode(true);
+                    replyForm.id = `reply-form-${parentId}`;
+                    replyForm.insertAdjacentHTML('beforeend', `<input type="hidden" name="parentYorumId" value="${parentId}" />`);
+                    replyFormContainer.appendChild(replyForm);
+                    replyForm.querySelector('textarea').focus();
+                }
+                if (e.target.matches('.delete-comment') || e.target.closest('.delete-comment')) {
+                    const btn = e.target.closest('.delete-comment');
+                    const commentId = btn?.dataset.commentId;
+                    if (!commentId) return;
+                    if (!confirm('Bu yorumu silmek istediğinize emin misiniz?')) return;
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    const token = tokenInput ? tokenInput.value : '';
+                    fetch('/VideolarSayfasi/DeleteComment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': token },
+                        body: `id=${encodeURIComponent(commentId)}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) {
+                            const container = document.querySelector(`.comment-container[data-comment-id='${commentId}']`);
+                            const thread = container ? container.closest('.comment-thread') : null;
+                            (thread || container)?.remove();
+                        } else {
+                            alert(data.message || 'Yorum silinemedi');
+                        }
+                    }).catch(() => alert('Yorum silinirken bir hata oluştu'));
+                }
+            });
+            const IS_AUTH = @(User.Identity.IsAuthenticated.ToString().ToLower());
+            const LOGIN_URL = '@Url.Action("Login","Account", new { returnUrl = Context.Request.Path + Context.Request.QueryString })';
+            document.addEventListener('submit', function(e) {
+                if (e.target.matches('.comment-form')) {
+                    e.preventDefault();
+                    if (!IS_AUTH) {
+                        window.location.href = LOGIN_URL;
+                        return;
+                    }
+                    handleCommentSubmit(e.target);
+                }
+            });
+            const handleCommentSubmit = (form) => {
+                const formData = new FormData(form);
+                const submitButton = form.querySelector('button[type="submit"]');
+                const commentTextValue = formData.get('yorumMetni');
+                if(!commentTextValue.trim() || submitButton.disabled) return;
+                submitButton.disabled = true;
+                fetch('/VideolarSayfasi/YorumEkle', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                }).then(res => res.json()).then(data => {
+                    if(data.success) {
+                        const newCommentHtml = createCommentElement(data);
+                        if (data.parentYorumId) {
+                            const parentComment = document.querySelector(`.comment-container[data-comment-id='${data.parentYorumId}']`);
+                            const repliesContainer = parentComment.closest('.comment-thread').querySelector('.yanitlar-container');
+                            repliesContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+                            form.parentElement.remove();
+                        } else {
+                            document.getElementById('commentsList').insertAdjacentHTML('afterbegin', `<div class="comment-thread">${newCommentHtml}<div class="yanitlar-container pl-10 mt-4 space-y-4 border-l-2 border-slate-200 ml-4"></div><div class="yanit-form-container pl-14 mt-3"></div></div>`);
+                             form.reset();
+                             form.querySelector('.comment-buttons').style.display = 'none';
+                        }
+                    } else { console.error(data.message); }
+                }).catch(err => console.error('Yorum eklenirken hata oluştu:', err))
+                .finally(() => { if (submitButton) submitButton.disabled = false; });
+            };
+            function createCommentElement(data) {
+                const templateNode = document.getElementById('comment-template');
+                let html = templateNode.firstElementChild.outerHTML;
+                const escapeHTML = str => str ? str.replace(/[&<>'"]/g, tag => ({'&': '&amp;','<': '&lt;','>': '&gt;',"'": '&#39;','"': '&quot;'}[tag] || tag)) : '';
+                html = html.replace(/__COMMENT_ID__/g, data.yorumId);
+                html = html.replace(/__PROFILE_PICTURE__/g, data.profilResmi);
+                html = html.replace(/__USER_NAME__/g, escapeHTML(data.kullaniciAdi));
+                html = html.replace(/__COMMENT_DATE__/g, data.yorumTarihi);
+                html = html.replace(/__COMMENT_TEXT__/g, escapeHTML(data.yorumMetni));
+                const ownerBadgePlaceholder = `<span class="video-owner-badge-placeholder"></span>`;
+                const ownerBadgeHtml = `<i class="fas fa-check-circle text-blue-500 text-xs" title="Video Sahibi"></i>`;
+                if (data.isVideoOwner) {
+                     html = html.replace(ownerBadgePlaceholder, ownerBadgeHtml);
+                } else {
+                     html = html.replace(ownerBadgePlaceholder, '');
+                }
+                return html;
+            }
+            const handleVote = async (isLike) => {
+                const videoId = document.getElementById('likeButton').dataset.videoid;
+                
+                // Client IP adresini al
+                let clientIp = 'Unknown';
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    clientIp = ipData.ip;
+                } catch (error) {
+                    console.warn('IP adresi alınamadı, varsayılan değer kullanılıyor:', error);
+                }
+                
+                // API endpoint'e istek gönder (same-origin API_BASE ile)
+                const apiBase = window.API_BASE || '/api/proxy';
+                fetch(`${apiBase}/videos/${videoId}/vote`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*'
+                    },
+                    body: JSON.stringify({ 
+                        isLike: isLike,
+                        ipAddress: clientIp
+                    })
+                }).then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                }).then(data => {
+                    if(data.success) {
+                        document.getElementById('likeCount').textContent = data.likeCount;
+                        document.getElementById('dislikeCount').textContent = data.dislikeCount;
+                        const likeButton = document.getElementById('likeButton');
+                        const dislikeButton = document.getElementById('dislikeButton');
+                        likeButton.classList.remove('text-blue-600', 'bg-blue-100');
+                        dislikeButton.classList.remove('text-blue-600', 'bg-blue-100');
+                        if(data.voteStatus === true) {
+                            likeButton.classList.add('text-blue-600', 'bg-blue-100');
+                        } else if (data.voteStatus === false) {
+                            dislikeButton.classList.add('text-blue-600', 'bg-blue-100');
+                        }
+                    } else { 
+                        console.error(data.message || 'Oylama başarısız');
+                        alert(data.message || 'Oylama sırasında bir hata oluştu');
+                    }
+                }).catch(err => {
+                    console.error('Oylama sırasında bir hata oluştu:', err);
+                    alert('Oylama sırasında bir hata oluştu: ' + err.message);
+                });
+            };
+            const likeButton = document.getElementById('likeButton');
+            const dislikeButton = document.getElementById('dislikeButton');
+            if (likeButton) likeButton.addEventListener('click', () => handleVote(true));
+            if (dislikeButton) dislikeButton.addEventListener('click', () => handleVote(false));
+            
+            // Önerilen videoları yükle
+            loadSuggestedVideos();
+        });
+
+        // Kategori ikonları
+        const categoryIcons = {
+            'Eğitim': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.114 11.114 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path></svg>`,
+                color: 'bg-blue-100 text-blue-800 border-blue-200'
+            },
+            'Teknoloji': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-purple-100 text-purple-800 border-purple-200'
+            },
+            'Emlak': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>`,
+                color: 'bg-green-100 text-green-800 border-green-200'
+            },
+            'Seyahat': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-orange-100 text-orange-800 border-orange-200'
+            },
+            'Sağlık': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-red-100 text-red-800 border-red-200'
+            },
+            'Spor': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-indigo-100 text-indigo-800 border-indigo-200'
+            },
+            'Yemek': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path></svg>`,
+                color: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+            },
+            'Müzik': {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-pink-100 text-pink-800 border-pink-200'
+            }
+        };
+
+        // Kategori badge'i oluştur
+        function getCategoryBadge(category) {
+            const normalizedCategory = category ? category.replace(/\.$/, '') : 'Diğer';
+            const categoryData = categoryIcons[normalizedCategory] || {
+                icon: `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>`,
+                color: 'bg-gray-100 text-gray-800 border-gray-200'
+            };
+            
+            return `<span class="category-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${categoryData.color}">
+                ${categoryData.icon}
+                ${normalizedCategory}
+            </span>`;
+        }
+
+        // Önerilen videoları yükle
+        async function loadSuggestedVideos() {
+            try {
+                const currentVideoId = @Model.Video.Id;
+                const currentCategory = @Html.Raw(Json.Serialize(Model.Video.Kategori));
+                
+                console.log('API Base:', window.API_BASE);
+                console.log('Current Video ID:', currentVideoId);
+                console.log('Current Category:', currentCategory);
+                
+                const url = `${window.API_BASE}/videos/suggested?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory)}&limit=6`;
+                console.log('Request URL:', url);
+                
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                if (data.success && data.videos.length > 0) {
+                    renderSuggestedVideos(data.videos);
+                } else {
+                    showNoVideosMessage();
+                }
+            } catch (error) {
+                console.error('Önerilen videolar yüklenemedi:', error);
+                showErrorMessage();
+            }
+        }
+
+        // Hata mesajı göster
+        function showErrorMessage() {
+            const container = document.getElementById('suggestedVideosContainer');
+            if (container) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-red-500 text-sm">Önerilen videolar yüklenemedi</div>
+                        <button onclick="loadSuggestedVideos()" class="mt-2 text-blue-500 hover:underline text-sm">Tekrar Dene</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Video bulunamadı mesajı göster
+        function showNoVideosMessage() {
+            const container = document.getElementById('suggestedVideosContainer');
+            if (container) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-gray-500 text-sm">Henüz önerilen video bulunmuyor</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Önerilen videoları render et
+        function renderSuggestedVideos(videos) {
+            const container = document.getElementById('suggestedVideosContainer');
+            if (!container) return;
+
+            const videosHtml = videos.map(video => `
+                <a href="/VideolarSayfasi/Play/${video.id}" class="group flex flex-col video-card" data-video-id="${video.id}">
+                    <!-- Video Thumbnail -->
+                    <div class="relative w-full video-thumb">
+                        <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
+                            ${getVideoThumbnail(video)}
+                        </div>
+                        <div class="shine"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-blue-700/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                                <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Bilgileri -->
+                    <div class="p-4 flex items-start gap-4 w-full">
+                        <div class="flex flex-col w-full">
+                            <h3 class="font-bold text-2xl text-start text-blue-900 group-hover:text-blue-600 transition-colors whitespace-nowrap" title="${video.videoAdi.trim()}">
+                                ${video.videoAdi.trim().length > 47 ? video.videoAdi.trim().substring(0, 47) + "..." : video.videoAdi.trim()}
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <img src="${video.yukleyenKullanici.profilePicturePath || `https://ui-avatars.com/api/?name=${encodeURIComponent(video.yukleyenKullanici.firstName)}+${encodeURIComponent(video.yukleyenKullanici.lastName)}&background=1E3A8A&color=fff&font-size=0.33`}" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="${video.yukleyenKullanici.firstName} profili" />
+                                <p class="text-sm text-gray-600 mt-1 truncate" title="${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}">
+                                    ${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}
+                                </p>
+                            </div>
+                            <span class="video-meta-chip upload-date">${formatDate(video.yuklenmeTarihi)}</span>
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-1.5 relative">
+                                <span class="video-meta-chip">${formatNumber(video.goruntulenmeSayisi)} Görüntülenme</span>
+                                <div class="ml-auto flex items-center gap-2">
+                                    <span class="video-meta-chip" title="Beğeni">
+                                        <i class="fas fa-thumbs-up" style="margin-right:6px"></i>
+                                        ${formatNumber(video.begeniSayisi)}
+                                    </span>
+                                    <span class="video-meta-chip" title="Beğenilmeme">
+                                        <i class="fas fa-thumbs-down" style="margin-right:6px"></i>
+                                        ${formatNumber(video.dislikeSayisi)}
+                                    </span>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 gap-4">
+                    ${videosHtml}
+                </div>
+            `;
+        }
+
+        // Video thumbnail'ını al
+        function getVideoThumbnail(video) {
+            if (video.kapakFotografiYolu) {
+                return `<img src="${video.kapakFotografiYolu}" alt="${video.videoAdi}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />`;
+            } else if (video.isYouTube) {
+                return `<img src="https://img.youtube.com/vi/${video.videoYolu}/hqdefault.jpg" alt="${video.videoAdi}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />`;
+            } else {
+                return `<video preload="metadata" muted class="w-full h-full object-cover"><source src="${video.videoYolu}#t=1" type="video/mp4"></video>`;
+            }
+        }
+
+        // Yardımcı fonksiyonlar
+        function formatDuration(videoPath) {
+            // Video süresini hesaplama (basit implementasyon)
+            return "0:00";
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+    </script>
+
+    <!-- YASAKLI KELİME KONTROL SCRIPTI (REVİZE EDİLDİ) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let forbiddenWords = [];
+            let forbiddenRegex = null;
+
+            async function loadForbiddenWords() {
+                try {
+                    const response = await fetch('/ForbiddenWords.txt');
+                    if (!response.ok) throw new Error('Yasaklı kelimeler dosyası alınamadı.');
+                    const text = await response.text();
+                    forbiddenWords = text.split(/\r?\n/).filter(word => word.trim() !== '').map(word => word.toLowerCase());
+                     if (forbiddenWords.length > 0) {
+                        const escapedWords = forbiddenWords.map(word => word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+                        forbiddenRegex = new RegExp(`\\b(${escapedWords.join('|')})\\b`, 'gi');
+                    }
+                } catch (error) {
+                    console.error('Yasaklı kelimeler yüklenemedi:', error);
+                }
+            }
+
+            function updateSubmitButtonState(form) {
+                const textarea = form.querySelector('textarea');
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (!textarea || !submitButton) return;
+
+                submitButton.disabled = textarea.value.trim() === '';
+            }
+
+            function sanitizeInput(textarea) {
+                const form = textarea.closest('.comment-form');
+                if (!form || !forbiddenRegex) return;
+
+                const originalValue = textarea.value;
+                if (!originalValue) return;
+
+                const originalCursorPos = textarea.selectionStart;
+
+                const textBeforeCursor = originalValue.substring(0, originalCursorPos);
+                const sanitizedTextBeforeCursor = textBeforeCursor.replace(forbiddenRegex, '');
+                const removedCharsBeforeCursor = textBeforeCursor.length - sanitizedTextBeforeCursor.length;
+
+                const sanitizedValue = originalValue.replace(forbiddenRegex, '');
+
+                if (originalValue !== sanitizedValue) {
+                    const newCursorPos = originalCursorPos - removedCharsBeforeCursor;
+                    textarea.value = sanitizedValue;
+                    textarea.setSelectionRange(newCursorPos, newCursorPos);
+
+                    textarea.classList.add('forbidden-input-flash');
+                    setTimeout(() => {
+                        textarea.classList.remove('forbidden-input-flash');
+                    }, 500);
+                }
+
+                updateSubmitButtonState(form);
+            }
+
+            loadForbiddenWords().then(() => {
+                document.body.addEventListener('input', (event) => {
+                    if (event.target.matches('.comment-form textarea[name="yorumMetni"]')) {
+                        sanitizeInput(event.target);
+                    }
+                });
+
+                const mainForm = document.getElementById('mainCommentForm');
+                if (mainForm) {
+                    updateSubmitButtonState(mainForm);
+                }
+            });
+        });
+    </script>
+    <style>
+        .forbidden-input-flash {
+            transition: box-shadow 0.1s ease-in-out, border-color 0.1s ease-in-out;
+            border-color: #ef4444 !important; /* red-500 */
+            box-shadow: 0 0 0 2px rgb(239 68 68 / 40%) !important;
+            outline: none !important;
+        }
+    </style>
+}

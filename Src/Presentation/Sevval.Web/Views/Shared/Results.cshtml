@@ -1,0 +1,46 @@
+﻿@model List<string> 
+<div class="container mt-5">
+    <h2>Arama Sonuçları</h2>
+
+    @if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <p class="text-danger">@ViewBag.Message</p>
+    }
+
+    @if (Model.Any())
+    {
+        <ul class="search-results-list">
+            @foreach (var result in Model)
+            {
+                <li>
+                    <a href="/Details/@result">@result</a> <!-- Örneğin tıklanabilir sonuçlar -->
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Aradığınız kriterlere uygun sonuç bulunamadı.</p>
+    }
+</div>
+
+<style>
+    .search-results-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .search-results-list li {
+        margin: 10px 0;
+    }
+
+    .search-results-list a {
+        text-decoration: none;
+        color: #007bff;
+        font-size: 18px;
+    }
+
+    .search-results-list a:hover {
+        text-decoration: underline;
+    }
+</style>

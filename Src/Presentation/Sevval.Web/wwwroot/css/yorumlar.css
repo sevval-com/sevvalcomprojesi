@@ -1,0 +1,316 @@
+﻿/* Genel Yorumlar Bölümü */
+.comments-section {
+    font-family: 'Poppins', sans-serif;
+    margin: 48px auto;
+    max-width: 1200px;
+    padding: 24px 24px 8px 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+    .comments-section:hover {
+        box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
+    }
+
+    /* Başlık */
+    .comments-section h2 {
+        text-align: center;
+        font-size: 28px;
+        color: #0b5ed7;
+        margin: 8px 0 20px 0;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+
+    /* Başlık süs çizgisi */
+    .comments-section h2::after {
+        content: "";
+        display: block;
+        width: 72px;
+        height: 4px;
+        margin: 10px auto 0 auto;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #0b5ed7 0%, #4dabf7 100%);
+    }
+
+/* Yorum Kartları Konteyneri - 4 Sütunlu Grid Sistemi */
+.comments-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 8px 0 24px 0;
+}
+
+/* Yorum Kartı */
+.comment-card {
+    background: #ffffff;
+    padding: 18px 18px 16px 18px;
+    border-radius: 12px;
+    border: 1px solid #e7e7ec;
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
+    position: relative;
+}
+
+    .comment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(16, 24, 40, 0.12);
+    }
+
+/* Kullanıcı Bilgileri */
+
+.comment-user {
+    font-size: 15px;
+    color: #1f2937;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+    .comment-user strong {
+        color: #0b5ed7;
+        font-size: 16px;
+    }
+
+.comment-date {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Yorum İçeriği */
+.comment-content {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+}
+
+
+/* Responsive Tasarım */
+@media (max-width: 1024px) {
+    .comments-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .comments-section {
+        padding: 16px 16px 4px 16px;
+        margin: 32px 12px;
+    }
+    .comments-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* Form alanı ve butonları */
+.comment-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+    margin: 4px 0 20px 0;
+}
+
+.comment-form input[type="text"],
+.comment-form textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+}
+
+.comment-form textarea {
+    grid-column: 1 / -1;
+    min-height: 120px;
+    resize: vertical;
+}
+
+.comment-form input[type="text"]:focus,
+.comment-form textarea:focus {
+    border-color: #0b5ed7;
+    box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.15);
+}
+
+.comment-form button[type="submit"] {
+    background: linear-gradient(180deg, #0b5ed7 0%, #0a58ca 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 6px 14px rgba(11, 94, 215, 0.25);
+}
+
+.comment-form button[type="submit"]:hover {
+    background: linear-gradient(180deg, #0a58ca 0%, #094fb8 100%);
+}
+
+.comment-form button[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+/* Yönetici silme butonu */
+.comment-delete-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.comment-delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.08);
+    color: #b02a37;
+}
+
+/* Tüm Yorumlar butonu */
+.show-more-btn {
+    display: inline-block;
+    margin: 0 auto 8px auto;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #0b5ed7;
+    color: #0b5ed7;
+    text-decoration: none;
+    background: #f8fafc;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.show-more-btn:hover {
+    background: #0b5ed7;
+    color: #fff;
+    border-color: #0b5ed7;
+}
+
+/* İkinci başlık (Son Yorumlar) */
+.comments-section h3 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 10px 0 10px 0;
+}
+
+.comments-section h3::after {
+    content: "";
+    display: block;
+    width: 56px;
+    height: 3px;
+    margin: 8px auto 2px auto;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0b5ed7 0%, #4dabf7 100%);
+}
+
+/* Kart görsel iyileştirmeleri */
+.comment-card {
+    backdrop-filter: saturate(120%);
+}
+
+.comment-card:hover {
+    border-color: #d0e3ff;
+}
+
+/* Yüzen Dil Seç Butonu */
+#floating_button {
+    position: absolute;
+    top: 15px;
+    left: 139px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    scale: 0.8;
+}
+
+    #floating_button:hover {
+        background-color: #45a049; /* Hover efektinde buton rengi değişimi */
+    }
+
+/* Dil Seçme öğesinin başlangıçta gizli olmasını sağlar */
+#google_translate_element {
+    display: none;
+    position: fixed;
+    top: 38px;
+    left: -79px;
+    background-color: #4caf50;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 9998;
+    width: 305%;
+    max-width: 4000px;
+}
+
+
+@media (max-width: 768px) {
+    /* Butonun mobilde konumu ve boyutu */
+    #floating_button {
+        top: 10px;
+        left: 20px; /* Butonu daha içeri al */
+        padding: 8px 16px; /* Butonun boyutunu küçült */
+        font-size: 14px; /* Yazı boyutunu küçült */
+        scale: 0.7; /* Butonun genel boyutunu küçült */
+    }
+
+        /* Hover efekti aynı kalabilir */
+        #floating_button:hover {
+            background-color: #45a049;
+        }
+
+    /* Dil Seçme öğesi mobilde daha dar bir görünüm sağlar */
+    #google_translate_element {
+        top: 48px; /* Butonun altına hizala */
+        left: 10px; /* Ortaya hizala */
+        width: 90%; /* Daha dar bir genişlik */
+        max-width: 100%; /* Ekran boyutuna göre genişlik */
+        padding: 8px; /* İç boşluğu küçült */
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Daha küçük ekranlar için */
+    #floating_button {
+        top: 26px;
+        left: 86px;
+        padding: 6px 12px;
+        font-size: 12px;
+        scale: 1;
+        display: none;
+    }
+
+    #google_translate_element {
+        top: 40px;
+        left: 5px;
+        width: 95%;
+        padding: 6px; /* Daha dar iç boşluk */
+        font-size: 12px; /* Daha küçük yazı */
+    }
+}
+

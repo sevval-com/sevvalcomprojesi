@@ -1,0 +1,76 @@
+@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="logo">
+            <a href="@Url.Action("Index", "Home")" class="home-link">
+                <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                <span>Şevval Emlak</span>
+            </a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="@Url.Action("Index", "Home")" class="nav-link">Ana Sayfa</a></li>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <a href="@Url.Action("Panel", "Ilan")" class="nav-link">Mağazam</a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Settings", "Account")" class="nav-link">Hesap Ayarları</a>
+                </li>
+                @if (User.Identity.Name == "sftumen41@gmail.com")
+                {
+                    <li>
+                        <a href="@Url.Action("Index", "Category")" class="nav-link">Kategori Yönetimi</a>
+                    </li>
+                }
+            }
+            <li><a href="@Url.Action("Firmalar", "Home")" class="nav-link">Firmalar</a></li>
+            <li class="dropdown">
+                <a href="#" class="nav-link">Hakkımızda</a>
+                <ul class="dropdown-content">
+                    <li><a href="@Url.Action("About", "Home")">Biz Kimiz</a></li>
+                    <li><a href="@Url.Action("Channels", "Home")">Diğer Kanallarımız</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<style>
+.home-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+    
+    hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+});
+</script>

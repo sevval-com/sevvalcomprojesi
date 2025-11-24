@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f6f9;
+        }
+        .message-container {
+            text-align: center;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 80%;
+            max-width: 450px;
+        }
+        .message-container h1 {
+            font-size: 26px;
+            color: #4CAF50;
+        }
+        .message-container p {
+            font-size: 16px;
+            color: #555555;
+            margin: 15px 0;
+        }
+        .message-container button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 14px;
+            color: #ffffff;
+            background-color: #4CAF50;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .message-container button:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-container">
+        <h1>Kurumsal Talebi</h1>
+        <p>Kurumsal Talebi Başarıyla Reddedildi.</p>
+        <form method="get" action="/">
+            <button type="submit">Ana Sayfaya Dön</button>
+        </form>
+    </div>
+</body>
+</html>

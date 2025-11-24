@@ -1,0 +1,101 @@
+﻿@model YourProjectName.Models.Blog
+@{
+    ViewData["Title"] = $"Yazıyı Sil: {Model.Title}"; // SEO dostu sekme başlığı
+    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+
+    // Admin olarak görünecek ek e-posta adresleri
+    var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
+    var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO için meta açıklaması -->
+    <meta name="description" content="Şevval Emlak Blog'da '@Model.Title' başlıklı blog yazısını silme onayı sayfası." />
+    <!-- SEO için anahtar kelimeler -->
+    <meta name="keywords" content="blog yazısı sil, @(Model.Title), gayrimenkul blogu, emlak, emlakçılık, Şevval Blog" />
+    <!-- Yazar bilgisi -->
+    <meta name="author" content="Şevval" />
+    <!-- Sayfa başlığı -->
+    <title>@ViewData["Title"] - Şevval Emlak Blog</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- İsteğe bağlı, ikonlar için -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- DeleteBlog.css dosyasını buraya bağlıyoruz -->
+    <link rel="stylesheet" href="~/css/DeleteBlog.css">
+</head>
+<body>
+    <!-- Header Bölümü (Diğer sayfalarla aynı stil) -->
+    <header class="header-bg py-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
+                <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
+            </div>
+            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+            {
+                <nav>
+                    <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
+                    </a>
+                </nav>
+            }
+        </div>
+    </header>
+
+    <main class="container my-5 flex-grow-1 animate-fade-in">
+        <div class="delete-card">
+            <h1 class="delete-title animated-heading">Blog Yazısını Sil</h1>
+            <h3 class="delete-confirmation-text">Bu blog yazısını silmek istediğinizden emin misiniz?</h3>
+            <hr class="mb-4" />
+            <dl class="delete-info-list row">
+                <dt class="col-sm-4">Başlık:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Title)</dd>
+
+                <dt class="col-sm-4">Kısa Açıklama:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ShortDescription)</dd>
+
+                <dt class="col-sm-4">Yazar:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Author)</dd>
+
+                <dt class="col-sm-4">Yayınlanma Tarihi:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.PublishDate)</dd>
+
+                <dt class="col-sm-4">Kategori:</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Category)</dd>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <dt class="col-sm-4">Görsel:</dt>
+                    <dd class="col-sm-8"><img src="@Model.ImageUrl" alt="@Model.Title" class="delete-image-preview"></dd>
+                }
+            </dl>
+            <form asp-action="Delete" class="d-flex justify-content-between align-items-center">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn confirm-delete-btn">
+                    <i class="bi bi-trash-fill me-2"></i> Evet, Sil
+                </button>
+                <a href="@Url.Action("Index", "Blog")" class="btn cancel-delete-btn">
+                    <i class="bi bi-x-circle me-2"></i> İptal
+                </a>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer Bölümü (Diğer sayfalarla aynı stil) -->
+    <footer class="footer-bg text-center">
+        <div class="container">
+            <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
+            <p class="small mt-1">Modern ve İlham Veren Blog Deneyimi.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS ve bağımlılıkları -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

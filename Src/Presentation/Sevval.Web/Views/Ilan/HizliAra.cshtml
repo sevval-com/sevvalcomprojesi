@@ -1,0 +1,830 @@
+﻿@model List<IlanHizliAraResponseDTO>
+@{
+    ViewData["Title"] = "Arama Sonuçları";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Gerekli Kütüphaneler -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    :root {
+        --primary-color: #009cfb;
+        --primary-hover: #0083d6;
+        --secondary-color: #0056b3;
+        --bg-light: #f0f2f5; /* Biraz daha koyu gri, içerik öne çıksın */
+        --text-dark: #1a1a1a;
+        --border-radius: 12px;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --card-hover-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    body {
+        background-color: var(--bg-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-dark);
+    }
+
+    /* --- Container Düzenlemeleri (Masaüstü Genişliği için) --- */
+    .custom-container {
+        padding-left: 15px;
+        padding-right: 15px;
+        max-width: 100%;
+    }
+
+    @@media (min-width: 1400px) {
+        .custom-container {
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+    }
+
+    /* --- Filtre Alanı Tasarımı (Yenilenmiş) --- */
+    .filter-sidebar {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        position: sticky;
+        top: 100px;
+        z-index: 90;
+        border: 1px solid #e1e4e8;
+    }
+
+    .filter-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .filter-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .accordion-item {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .accordion-button {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #444;
+        padding: 16px 20px;
+        background: transparent;
+        box-shadow: none !important;
+    }
+
+        .accordion-button:not(.collapsed) {
+            color: var(--primary-color);
+            background-color: rgba(0, 156, 251, 0.03);
+        }
+
+    .accordion-body {
+        padding: 15px 20px 20px;
+        background-color: #fafafa;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 156, 251, 0.1);
+        }
+
+    /* --- İlan Kartı Tasarımı (Genişletilmiş) --- */
+    .ad-card {
+        background: white;
+        border-radius: var(--border-radius);
+        border: 1px solid #eef2f5;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        width: 100%; /* Mobil hizalama sorunu için */
+    }
+
+        .ad-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: transparent;
+        }
+
+    .card-img-wrapper {
+        position: relative;
+        padding-top: 60%; /* 16:9'a yakın oran */
+        overflow: hidden;
+        background-color: #e9ecef;
+    }
+
+    .card-img-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .ad-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    /* Etiketler */
+    .status-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: white;
+        z-index: 2;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .bg-satilik {
+        background-color: #28a745;
+    }
+
+    .bg-kiralik {
+        background-color: #ffc107;
+        color: #333;
+    }
+
+    .price-badge {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: white;
+        color: var(--primary-color);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .action-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        cursor: pointer;
+        transition: 0.2s;
+        z-index: 3;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+    /* Kart İçerik */
+    .card-body {
+        padding: 18px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ad-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 8px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 3em; /* Sabit yükseklik hizalama için */
+    }
+
+    .location-info {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .feature-item {
+        text-align: center;
+    }
+
+    .feature-label {
+        font-size: 0.7rem;
+        color: #888;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .feature-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+        .feature-value i {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+        }
+
+    /* Kart Footer */
+    .card-footer-custom {
+        padding: 12px 18px;
+        background-color: #fbfbfb;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #777;
+    }
+
+    .company-info {
+        font-weight: 600;
+        color: var(--secondary-color);
+        max-width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Mobil Filtre Butonu */
+    .mobile-filter-trigger {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 156, 251, 0.4);
+        border: none;
+        display: none;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Responsive Düzenlemeler */
+    @@media (max-width: 991px) {
+        .mobile-filter-trigger {
+            display: flex;
+        }
+        /* Mobilde ilan kartları tam genişlik */
+        .result-item {
+            width: 100%;
+        }
+    }
+
+    /* Mobilde gutter ayarı */
+    @@media (max-width: 768px) {
+        .g-4, .gx-4 {
+            --bs-gutter-x: -0.5rem;
+        }
+    }
+
+    /* Mobilde ilan kartı hizalaması için ek düzeltme */
+    .row.g-4 {
+        justify-content: center; /* Grid öğelerini ortala */
+    }
+
+    .col-lg-9 {
+        width: 100%; /* Eğer sidebar yoksa genişle */
+    }
+
+    @@media (min-width: 992px) {
+        .col-lg-9 {
+            width: 75%; /* Sidebar varsa */
+        }
+    }
+</style>
+
+<div class="custom-container py-4">
+
+    <button class="mobile-filter-trigger d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilter">
+        <i class="fas fa-filter"></i> Filtrele
+    </button>
+
+    <div class="row g-4">
+        <!-- SOL FİLTRE (Desktop) -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="filter-sidebar">
+                <div class="filter-header">
+                    <h5 class="filter-title"><i class="fas fa-sliders-h text-primary"></i> Filtreleme</h5>
+                </div>
+
+                <form method="post" action="@Url.Action("HizliAra", "Ilan")">
+                    <div class="accordion accordion-flush" id="desktopFilters">
+
+                        <!-- Arama -->
+                        <div class="p-3 border-bottom bg-white">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" name="AnahtarKelime" class="form-control bg-light border-start-0" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
+                            </div>
+                        </div>
+
+                        <!-- Kategori -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterCat">
+                                    Kategori
+                                </button>
+                            </h2>
+                            <div id="filterCat" class="accordion-collapse collapse show" data-bs-parent="#desktopFilters">
+                                <div class="accordion-body">
+                                    <select name="Kategori" class="form-select form-select-sm">
+                                        <option value="">Tümü</option>
+                                        <option value="Konut (Yaşam Alanı)">Konut</option>
+                                        <option value="Arsa">Arsa</option>
+                                        <option value="Arazi">Arazi</option>
+                                        <option value="Bahçe">Bahçe</option>
+                                        <option value="Tarla">Tarla</option>
+                                        <option value="Turistik Tesis">Turistik Tesis</option>
+                                        <option value="İş Yeri">İş Yeri</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fiyat -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterPrice">
+                                    Fiyat (TL)
+                                </button>
+                            </h2>
+                            <div id="filterPrice" class="accordion-collapse collapse" data-bs-parent="#desktopFilters">
+                                <div class="accordion-body">
+                                    <div class="d-flex gap-2">
+                                        <input type="number" name="EnDusukFiyat" class="form-control form-control-sm" placeholder="En Az">
+                                        <input type="number" name="EnYuksekFiyat" class="form-control form-control-sm" placeholder="En Çok">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metrekare -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterArea">
+                                    Metrekare (m²)
+                                </button>
+                            </h2>
+                            <div id="filterArea" class="accordion-collapse collapse" data-bs-parent="#desktopFilters">
+                                <div class="accordion-body">
+                                    <div class="d-flex gap-2">
+                                        <input type="number" name="EnAzMetrekare" class="form-control form-control-sm" placeholder="Min">
+                                        <input type="number" name="EnCokMetrekare" class="form-control form-control-sm" placeholder="Max">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Konum -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterLoc">
+                                    Konum
+                                </button>
+                            </h2>
+                            <div id="filterLoc" class="accordion-collapse collapse" data-bs-parent="#desktopFilters">
+                                <div class="accordion-body">
+                                    <input type="text" class="form-control form-control-sm mb-2" id="province-search-d" placeholder="İl Ara...">
+                                    <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
+                                        <ul class="list-unstyled m-0 small" id="province-list-d"></ul>
+                                    </div>
+                                    <input type="hidden" name="Il" id="selectedProvinceD" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="p-3 bg-white border-top rounded-bottom">
+                        <button type="submit" class="btn btn-primary w-100 btn-sm fw-bold py-2">
+                            Filtreleri Uygula
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MOBİL FİLTRE (Offcanvas) -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasFilter">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title fw-bold">Filtrele</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+                <form method="post" action="@Url.Action("HizliAra", "Ilan")">
+                    <div class="accordion accordion-flush" id="mobileFilters">
+
+                        <div class="p-3 bg-light border-bottom">
+                            <input type="text" name="AnahtarKelime" class="form-control" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
+                        </div>
+
+                        <!-- Aynı Kategori Yapısı Mobil İçin -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#mFilterCat">Kategori</button>
+                            </h2>
+                            <div id="mFilterCat" class="accordion-collapse collapse show" data-bs-parent="#mobileFilters">
+                                <div class="accordion-body">
+                                    <select name="Kategori" class="form-select">
+                                        <option value="">Tümü</option>
+                                        <option value="Konut (Yaşam Alanı)">Konut</option>
+                                        <option value="Arsa">Arsa</option>
+                                        <option value="Arazi">Arazi</option>
+                                        <!-- Diğerleri -->
+                                        <option value="İş Yeri">İş Yeri</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mFilterPrice">Fiyat</button>
+                            </h2>
+                            <div id="mFilterPrice" class="accordion-collapse collapse" data-bs-parent="#mobileFilters">
+                                <div class="accordion-body">
+                                    <div class="row g-2">
+                                        <div class="col-6"><input type="number" name="EnDusukFiyat" class="form-control" placeholder="Min TL"></div>
+                                        <div class="col-6"><input type="number" name="EnYuksekFiyat" class="form-control" placeholder="Max TL"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mFilterLoc">Konum</button>
+                            </h2>
+                            <div id="mFilterLoc" class="accordion-collapse collapse" data-bs-parent="#mobileFilters">
+                                <div class="accordion-body">
+                                    <input type="text" class="form-control mb-2" id="province-search-m" placeholder="İl Ara...">
+                                    <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                        <ul class="list-unstyled m-0" id="province-list-m"></ul>
+                                    </div>
+                                    <input type="hidden" name="Il" id="selectedProvinceM" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="p-3 mt-auto border-top">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sonuçları Göster</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SAĞ SONUÇLAR -->
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">Arama Sonuçları</h4>
+                    <p class="text-muted small mb-0">Toplam <strong>@Model.Count</strong> ilan bulundu</p>
+                </div>
+                <div class="d-none d-md-block">
+                    <select class="form-select form-select-sm" style="min-width: 150px;">
+                        <option>Sıralama: Önerilen</option>
+                        <option>Fiyat Artan</option>
+                        <option>Fiyat Azalan</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (Model.Count > 0)
+            {
+                <div class="row g-3 g-lg-4">
+                    @foreach (var ilan in Model.OrderByDescending(i => i.GirisTarihi))
+                    {
+                        bool isLand = new[] { "Tarla", "Bağ", "Bahçe", "Arsa", "Arazi" }.Contains(ilan.Category);
+                        string firmaAdi = string.IsNullOrEmpty(ilan.FirmaAdi) ? "Şevval Emlak" : ilan.FirmaAdi;
+                        string tarihFormat = ilan.GirisTarihi.ToString("dd.MM.yyyy");
+                        string konumFormat = $"{ilan.sehir} / {ilan.semt} / {ilan.mahalleKoy}";
+
+                        /*
+                        GRID AYARI:
+                        col-12: Mobilde tam genişlik (tek sütun)
+                        col-md-6: Tablette 2 sütun
+                        col-xl-4: Masaüstünde 3 sütun
+                        col-xxl-4: Geniş ekranda 3 sütun (Kullanıcı daha geniş kart istediği için 3 yaptık, önceden 4'tü)
+                        */
+                        <div class="col-12 col-md-6 col-xl-4 col-xxl-4 result-item">
+                            <div class="ad-card h-100">
+
+                                <!-- Resim -->
+                                <div class="card-img-wrapper">
+                                    <span class="status-badge @(ilan.KonutDurumu == "Kiralık" ? "bg-kiralik" : "bg-satilik")">
+                                        @ilan.KonutDurumu
+                                    </span>
+
+                                    <button class="action-btn" onclick="copyAdLink(event, @ilan.Id)" title="Linki Kopyala">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+
+                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="d-block h-100">
+                                        @if (!string.IsNullOrEmpty(ilan.IlanVitrinImageUrl))
+                                        {
+                                            <img src="@ilan.IlanVitrinImageUrl" class="card-img-top" alt="@ilan.IlanBasligi" loading="lazy">
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                                <i class="fas fa-image fa-3x opacity-25"></i>
+                                            </div>
+                                        }
+                                    </a>
+
+                                    <div class="price-badge">@ilan.IlanFiyati.ToString("N0") ₺</div>
+                                </div>
+
+                                <!-- Bilgi -->
+                                <div class="card-body">
+                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="text-decoration-none">
+                                        <h3 class="ad-title" title="@ilan.IlanBasligi">@ilan.IlanBasligi</h3>
+                                    </a>
+
+                                    <div class="location-info">
+                                        <i class="fas fa-map-marker-alt text-danger"></i>
+                                        <span>@konumFormat</span>
+                                    </div>
+
+                                    <div class="features-grid">
+                                        @if (isLand)
+                                        {
+                                            <div class="feature-item">
+                                                <span class="feature-label">Alan</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-vector-square"></i> @(ilan.Area > 0 ? ilan.Area.ToString("N0") : "-") m²
+                                                </div>
+                                            </div>
+                                            <div class="feature-item" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                                                <span class="feature-label">Ada</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-map"></i> @(string.IsNullOrEmpty(ilan.AdaNo) ? "-" : ilan.AdaNo)
+                                                </div>
+                                            </div>
+                                            <div class="feature-item">
+                                                <span class="feature-label">Parsel</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-th"></i> @(string.IsNullOrEmpty(ilan.ParselNo) ? "-" : ilan.ParselNo)
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="feature-item">
+                                                <span class="feature-label">Oda</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-door-open"></i> @(string.IsNullOrEmpty(ilan.OdaSayisi) ? "-" : ilan.OdaSayisi)
+                                                </div>
+                                            </div>
+                                            <div class="feature-item" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                                                <span class="feature-label">Brüt</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-ruler-combined"></i> @(string.IsNullOrEmpty(ilan.BrutMetrekare) ? "-" : ilan.BrutMetrekare) m²
+                                                </div>
+                                            </div>
+                                            <div class="feature-item">
+                                                <span class="feature-label">Bina Yaşı</span>
+                                                <div class="feature-value">
+                                                    <i class="fas fa-building"></i> @(string.IsNullOrEmpty(ilan.BinaYasi) ? "-" : ilan.BinaYasi)
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="card-footer-custom">
+                                    <div class="company-info" title="@firmaAdi">
+                                        <i class="fas fa-user-tie me-1"></i> @firmaAdi
+                                    </div>
+                                    <div>
+                                        <i class="far fa-clock me-1"></i> @tarihFormat
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Sayfalama -->
+                <div class="d-flex justify-content-center mt-5 mb-5">
+                    <ul class="pagination" id="paginationControls"></ul>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 my-4 bg-white rounded shadow-sm">
+                    <i class="fas fa-search fa-4x text-muted opacity-25 mb-3"></i>
+                    <h4>İlan Bulunamadı</h4>
+                    <p class="text-muted">Arama kriterlerinizi değiştirerek tekrar deneyin.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // --- İL/İLÇE YÜKLEME VE ARAMA ---
+    document.addEventListener("DOMContentLoaded", function () {
+        showPage(1);
+
+        // JSON Yolu: Blob URL hatasını önlemek için absolute path kullanıyoruz
+        const jsonPath = "/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json";
+        // encodeURI ile Türkçe karakterleri kodluyoruz
+        // + Parantezleri manuel düzeltiyoruz
+        const safeUrl = new URL(encodeURI(jsonPath).replace(/\(/g, '%28').replace(/\)/g, '%29'), window.location.origin).href;
+
+        fetch(safeUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('JSON yüklenemedi');
+                return response.json();
+            })
+            .then(data => {
+                loadProvincesToList(data, 'province-list-d', 'selectedProvinceD');
+                loadProvincesToList(data, 'province-list-m', 'selectedProvinceM');
+                setupSearchListener('province-search-d', 'province-list-d');
+                setupSearchListener('province-search-m', 'province-list-m');
+            })
+            .catch(error => console.error("Hata:", error));
+    });
+
+    function setupSearchListener(inputId, listId) {
+        const input = document.getElementById(inputId);
+        if(!input) return;
+        input.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const items = document.querySelectorAll(`#${listId} li`);
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+    }
+
+    function loadProvincesToList(data, listId, hiddenInputId) {
+        const ul = document.getElementById(listId);
+        if (!ul) return;
+        ul.innerHTML = "";
+
+        data.forEach(city => {
+            const li = document.createElement("li");
+            li.className = "p-2 border-bottom cursor-pointer";
+            li.style.cursor = "pointer";
+            li.textContent = city.Il;
+
+            li.onclick = () => {
+                document.getElementById(hiddenInputId).value = city.Il;
+                // Seçim efekti
+                Array.from(ul.children).forEach(c => {
+                    c.style.backgroundColor = "transparent";
+                    c.style.color = "#333";
+                });
+                li.style.backgroundColor = "#009cfb";
+                li.style.color = "white";
+            };
+            ul.appendChild(li);
+        });
+    }
+
+    // --- LİNK KOPYALAMA ---
+    function copyAdLink(event, id) {
+        event.preventDefault();
+        event.stopPropagation();
+        const link = window.location.origin + '/Ilan/ilansayfasi/' + id;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(link).then(() => showToast('Link kopyalandı!'));
+        } else {
+            // Fallback
+            let ta = document.createElement('textarea');
+            ta.value = link;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Link kopyalandı!');
+        }
+    }
+
+    function showToast(message) {
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+        })
+        Toast.fire({ icon: 'success', title: message })
+    }
+
+    // --- SAYFALAMA ---
+    const itemsPerPage = 12;
+    const items = document.querySelectorAll('.result-item');
+    const totalItems = items.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let currentPage = 1;
+
+    function showPage(page) {
+        if (totalItems === 0) return;
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+
+        items.forEach((item, index) => {
+            if (index >= start && index < end) {
+                item.style.display = 'block';
+                item.classList.add('animate__animated', 'animate__fadeIn');
+            } else {
+                item.style.display = 'none';
+                item.classList.remove('animate__animated', 'animate__fadeIn');
+            }
+        });
+
+        currentPage = page;
+        updatePaginationUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updatePaginationUI() {
+        const pagination = document.getElementById('paginationControls');
+        pagination.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        let prevDisabled = currentPage === 1 ? 'disabled' : '';
+        pagination.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" onclick="showPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                let activeClass = i === currentPage ? 'active' : '';
+                pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="showPage(${i})">${i}</a></li>`;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                pagination.innerHTML += `<li class="page-item disabled"><span class="page-link border-0">...</span></li>`;
+            }
+        }
+
+        let nextDisabled = currentPage === totalPages ? 'disabled' : '';
+        pagination.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" onclick="showPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></a></li>`;
+    }
+</script>

@@ -1,0 +1,572 @@
+/********** Template CSS **********/
+:root {
+    --primary: #00B98E;
+    --secondary: #FF6922;
+    --light: #EFFDF5;
+    --dark: #0E2E50;
+}
+
+.back-to-top {
+    position: fixed;
+    display: none;
+    right: 45px;
+    bottom: 45px;
+    z-index: 99;
+}
+
+
+/*** Spinner ***/
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease-out, visibility 0s linear .5s;
+    z-index: 99999;
+}
+
+    #spinner.show {
+        transition: opacity .5s ease-out, visibility 0s linear 0s;
+        visibility: visible;
+        opacity: 1;
+    }
+
+
+/*** Button ***/
+.btn {
+    transition: .5s;
+}
+
+    .btn.btn-primary,
+    .btn.btn-secondary {
+        color: #FFFFFF;
+    }
+
+.btn-square {
+    width: 38px;
+    height: 38px;
+}
+
+.btn-sm-square {
+    width: 32px;
+    height: 32px;
+}
+
+.btn-lg-square {
+    width: 48px;
+    height: 48px;
+}
+
+.btn-square,
+.btn-sm-square,
+.btn-lg-square {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    border-radius: 50px;
+}
+
+
+/*** Navbar ***/
+.nav-bar {
+    position: relative;
+    margin-top: 45px;
+    padding: 0 3rem;
+    transition: .5s;
+    z-index: 9999;
+}
+
+    .nav-bar.sticky-top {
+        position: sticky;
+        padding: 0;
+        z-index: 9999;
+    }
+
+.navbar {
+    box-shadow: 0 0 30px rgba(0, 0, 0, .08);
+}
+
+    .navbar .dropdown-toggle::after {
+        border: none;
+        content: "\f107";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        vertical-align: middle;
+        margin-left: 5px;
+        transition: .5s;
+    }
+
+    .navbar .dropdown-toggle[aria-expanded=true]::after {
+        transform: rotate(-180deg);
+    }
+
+.navbar-light .navbar-nav .nav-link {
+    margin-right: 30px;
+    padding: 25px 0; /* Dikey padding ayarý */
+    color: #FFFFFF; /* Varsayýlan yazý rengi beyaz */
+    font-size: 15px;
+    text-transform: uppercase;
+    outline: none;
+    display: flex; /* Flex kullanarak hizalama */
+    align-items: center; /* Dikey olarak ortala */
+}
+
+    .navbar-light .navbar-nav .nav-link:hover,
+    .navbar-light .navbar-nav .nav-link.active {
+        color: var(--primary);
+    }
+
+.navbar-light .navbar-nav .nav-item {
+    display: flex; /* Flex kullanarak hizalama */
+    align-items: center; /* Dikey olarak ortala */
+    height: 100%; /* Yüksekliði eþitle */
+}
+
+@media (max-width: 991.98px) {
+    .nav-bar {
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar-light .navbar-nav .nav-link {
+        margin-right: 0;
+        padding: 10px 0; /* Dikey padding ayarý */
+    }
+
+    .navbar-light .navbar-nav {
+        border-top: 1px solid #EEEEEE;
+    }
+}
+
+.navbar-light .navbar-brand {
+    height: 75px;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--dark);
+    font-weight: 500;
+}
+
+@media (min-width: 992px) {
+    .navbar .nav-item .dropdown-menu {
+        display: block;
+        top: 100%;
+        margin-top: 0;
+        transform: rotateX(-75deg);
+        transform-origin: 0% 0%;
+        opacity: 0;
+        visibility: hidden;
+        transition: .5s;
+    }
+
+    .navbar .nav-item:hover .dropdown-menu {
+        transform: rotateX(0deg);
+        visibility: visible;
+        transition: .5s;
+        opacity: 1;
+    }
+}
+
+/* Kullanýcý Paneli ve Ýlan Ver özel stili */
+.navbar-nav .dropdown-toggle {
+    color: green; /* Kullanýcý Paneli rengi yeþil */
+}
+
+.navbar-nav .nav-link:last-child {
+    color: green; /* Ýlan Ver rengi yeþil */
+}
+
+
+/*** Header ***/
+@media (min-width: 992px) {
+    .header {
+        margin-top: -120px;
+    }
+}
+
+.header-carousel .owl-nav {
+    position: absolute;
+    top: 50%;
+    left: -25px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+}
+
+    .header-carousel .owl-nav .owl-prev,
+    .header-carousel .owl-nav .owl-next {
+        margin: 7px 0;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        background: var(--primary);
+        border-radius: 40px;
+        font-size: 20px;
+        transition: .5s;
+    }
+
+        .header-carousel .owl-nav .owl-prev:hover,
+        .header-carousel .owl-nav .owl-next:hover {
+            background: var(--dark);
+        }
+
+@media (max-width: 768px) {
+    .header-carousel .owl-nav {
+        left: 25px;
+    }
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: #DDDDDD;
+}
+
+
+/*** Icon ***/
+.icon {
+    padding: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF !important;
+    border-radius: 50px;
+    border: 1px dashed var(--primary) !important;
+}
+
+
+/*** About ***/
+.about-img img {
+    position: relative;
+    z-index: 2;
+}
+
+.about-img::before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: -50%;
+    width: 100%;
+    height: 100%;
+    background: var(--primary);
+    transform: skew(20deg);
+    z-index: 1;
+}
+
+
+/*** Category ***/
+.cat-item div {
+    background: #FFFFFF;
+    border: 1px dashed rgba(0, 185, 142, .3);
+    transition: .5s;
+}
+
+.cat-item:hover div {
+    background: var(--primary);
+    border-color: transparent;
+}
+
+.cat-item div * {
+    transition: .5s;
+}
+
+.cat-item:hover div * {
+    color: #FFFFFF !important;
+}
+
+/* Ara kutusu için stil */
+.input-arama {
+    margin-bottom: 20px; /* Aþaðýda boþluk býrakýr */
+    /* Ýsteðe baðlý diðer stiller */
+}
+
+/* Ýlan Tipi kutusu için stil */
+.select-ilan-tipi {
+    margin-bottom: 20px; /* Aþaðýda boþluk býrakýr */
+    /* Ýsteðe baðlý diðer stiller */
+}
+
+/* Þehir kutusu için stil */
+.select-sehir {
+    margin-bottom: 20px; /* Aþaðýda boþluk býrakýr */
+    /* Ýsteðe baðlý diðer stiller */
+}
+
+/* Buton için özel stil */
+.btn {
+    margin-top: 15px; /* Butonu yukarýda konumlandýrýr */
+}
+
+/*** Property List ***/
+.nav-pills .nav-item .btn {
+    color: var(--dark);
+}
+
+    .nav-pills .nav-item .btn:hover,
+    .nav-pills .nav-item .btn.active {
+        color: #FFFFFF;
+    }
+
+.property-item {
+    box-shadow: 0 0 30px rgba(0, 0, 0, .08);
+}
+
+    .property-item img {
+        transition: .5s;
+    }
+
+    .property-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .property-item .border-top {
+        border-top: 1px dashed rgba(0, 185, 142, .3) !important;
+    }
+
+    .property-item .border-end {
+        border-right: 1px dashed rgba(0, 185, 142, .3) !important;
+    }
+
+
+/*** Team ***/
+.team-item {
+    box-shadow: 0 0 30px rgba(0, 0, 0, .08);
+    transition: .5s;
+}
+
+    .team-item .btn {
+        color: var(--primary);
+        background: #FFFFFF;
+        box-shadow: 0 0 30px rgba(0, 0, 0, .15);
+    }
+
+        .team-item .btn:hover {
+            color: #FFFFFF;
+            background: var(--primary);
+        }
+
+    .team-item:hover {
+        border-color: var(--secondary) !important;
+    }
+
+        .team-item:hover .bg-primary {
+            background: var(--secondary) !important;
+        }
+
+            .team-item:hover .bg-primary i {
+                color: var(--secondary) !important;
+            }
+
+
+/*** Testimonial ***/
+.testimonial-carousel {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .testimonial-carousel {
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+}
+
+.testimonial-item {
+    background: #F7F7F7;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, .08);
+}
+
+    .testimonial-item .testimonial-img {
+        position: relative;
+        top: -60px;
+        left: 15px;
+    }
+
+    .testimonial-item .rating {
+        color: var(--primary);
+    }
+
+    .testimonial-item p {
+        margin: 0;
+    }
+
+
+/*** Blog ***/
+.blog-item {
+    box-shadow: 0 0 30px rgba(0, 0, 0, .08);
+}
+
+    .blog-item img {
+        transition: .5s;
+    }
+
+    .blog-item:hover img {
+        transform: scale(1.1);
+    }
+
+
+/*** Footer ***/
+.footer {
+    padding: 60px 0;
+    background: var(--dark);
+    color: #FFFFFF;
+}
+
+    .footer .footer-widget {
+        padding: 30px 0;
+    }
+
+        .footer .footer-widget h5 {
+            color: #FFFFFF;
+        }
+
+        .footer .footer-widget ul li a {
+            color: #DDDDDD;
+            transition: .5s;
+        }
+
+            .footer .footer-widget ul li a:hover {
+                color: #FFFFFF;
+            }
+
+    .footer .social {
+        display: flex;
+        align-items: center;
+    }
+
+        .footer .social a {
+            color: #FFFFFF;
+            margin: 0 10px;
+            font-size: 18px;
+        }
+
+            .footer .social a:hover {
+                color: var(--primary);
+            }
+
+    .footer .copyright {
+        text-align: center;
+    }
+
+
+/*** Responsive ***/
+@media (max-width: 991.98px) {
+    .footer .footer-widget {
+        padding: 15px 0;
+    }
+}
+
+/* Ýlan Kategorileri için stil ayarlarý */
+.ilan-kategorileri {
+    display: flex; /* Flexbox kullanarak hizalama */
+    justify-content: space-around; /* Eþit aralýklarla hizalama */
+    flex-wrap: wrap; /* Taþma durumunda alt satýra geçme */
+}
+
+    .ilan-kategorileri .kategori {
+        flex: 1; /* Esnek alan */
+        min-width: 150px; /* Minimum geniþlik ayarý */
+        max-width: 200px; /* Maksimum geniþlik ayarý */
+        margin: 10px; /* Kategori arasý boþluk */
+        padding: 20px; /* Kategori içi boþluk */
+        text-align: center; /* Yazýyý ortalama */
+        border: 1px solid var(--primary); /* Sýnýr rengi */
+        border-radius: 10px; /* Köþe yuvarlama */
+        background-color: #FFFFFF; /* Arka plan rengi */
+        transition: background-color 0.3s; /* Renk geçiþi */
+    }
+
+        .ilan-kategorileri .kategori:hover {
+            background-color: var(--primary); /* Üzerine gelindiðinde arka plan rengi deðiþir */
+            color: #FFFFFF; /* Üzerine gelindiðinde yazý rengi deðiþir */
+        }
+/* Zoom efekti */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.fade.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Modal genel stil */
+.modal-dialog {
+    max-width: 700px; /* Pop-up geniþliði ayarlanabilir */
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    border-radius: 15px;
+    background-color: #007BFF; /* Arka plan rengi mavi */
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-body {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #007BFF; /* Mavi arka plan */
+    color: white; /* Yazýlar beyaz olacak */
+}
+
+    .modal-body h3 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white; /* Yazýlar beyaz */
+    }
+
+    /* Ortadaki çizgi */
+    .modal-body .col-md-6 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+        .modal-body .col-md-6:first-child {
+            border-right: 2px solid white; /* Ortadaki beyaz çizgi */
+        }
+
+    /* Buton stili */
+    .modal-body .btn {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        width: 55%; /* Buton geniþliði yan yana */
+        margin: 10px;
+        text-align: center;
+    }
+
+    .modal-body .btn-light {
+        background-color: white;
+        color: #007BFF; /* Mavi buton yazýsý */
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .modal-body .btn-light:hover {
+            background-color: #f0f0f0; /* Hover efekti */
+        }
+
+/* Responsive düzenleme */
+@media (max-width: 768px) {
+    .modal-body {
+        flex-direction: column;
+    }
+
+        .modal-body .col-md-6 {
+            border: none; /* Mobilde çizgi kaldýrýlýr */
+        }
+
+        .modal-body .btn {
+            width: 75%; /* Mobilde buton geniþliði */
+        }
+}

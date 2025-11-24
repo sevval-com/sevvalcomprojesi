@@ -1,0 +1,26 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+
+    <h2>Fotoğraf Yükleme</h2>
+
+ <form asp-action="Yukle" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="uploadedFiles">Fotoğrafları Seçin:</label>
+            <input type="file" id="fromFiles" name="fromFiles" multiple class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Yükle</button>
+</form>
+
+</body>
+</html>

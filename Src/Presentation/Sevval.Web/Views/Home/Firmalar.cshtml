@@ -1,0 +1,943 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@model sevvalemlak.csproj.Dto.Company.CompanySearchDto
+@{
+    // Sayfalama ve filtre verilerini değişkenlere alalım
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    bool hasPreviousPage = ViewBag.HasPreviousPage ?? false;
+    bool hasNextPage = ViewBag.HasNextPage ?? false;
+    int pageSize = ViewBag.PageSize ?? 20;
+    string currentSearch = ViewBag.CurrentSearch as string;
+    string currentProvince = ViewBag.CurrentProvince as string;
+    string currentDistrict = ViewBag.CurrentDistrict as string;
+    string currentSortBy = ViewBag.CurrentSortBy as string;
+
+    int totalItems = ViewBag.TotalItems ?? 0;
+    int startItem = totalItems > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
+    int endItem = Math.Min(currentPage * pageSize, totalItems);
+
+    // Sayfalama için sayfa numarası aralığını hesapla
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
+
+    if (endPage - startPage < 4)
+    {
+        if (startPage == 1)
+        {
+            endPage = Math.Min(totalPages, startPage + 4);
+        }
+        else if (endPage == totalPages)
+        {
+            startPage = Math.Max(1, endPage - 4);
+        }
+    }
+}
+
+<!-- Dış CSS dosyaları -->
+<link rel="stylesheet" href="~/css/kardesfirmalar.css">
+<link rel="stylesheet" href="~/css/anasayfa.css">
+<link rel="icon" type="image/png" href="~/images/favlogo.png">
+
+<!--
+    YENİ MAVİ & BEYAZ ANİMASYONLU TASARIM
+    İstediğiniz yerleşim düzeni (Filtreler üstte, arama altta)
+    ve daha fazla animasyon (başlıkta shimmer, kartta glow) eklendi.
+-->
+<style>
+    /* === KÖK DEĞİŞKENLER (YENİ TEMA - MAVİ/BEYAZ) === */
+    :root {
+        --brand-primary: #3B82F6; /* Tailwind Blue 500 */
+        --brand-primary-hover: #2563EB; /* Tailwind Blue 600 */
+        --brand-secondary: #60A5FA; /* Tailwind Blue 400 */
+        --brand-primary-glow: rgba(59, 130, 246, 0.4); /* Mavi Parlama efekti */
+
+        --text-dark: #1F2937; /* Tailwind Gray 800 */
+        --text-light: #4B5563; /* Tailwind Gray 600 */
+        --text-white: #ffffff;
+        
+        --bg-body: #F8FAFC; /* Çok hafif mavi-gri (Slate 50) */
+        --bg-white: #ffffff;
+        --border-color: #E2E8F0; /* Tailwind Slate 200 */
+        
+        /* Modern Gölgeler */
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+        --radius-md: 8px;
+        --radius-lg: 16px;
+        --transition-fast: 0.2s ease;
+        --transition-std: 0.3s ease;
+    }
+
+    /* === ANİMASYON KEYFRAMES === */
+    @@keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes popIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @@keyframes shine {
+        0% { background-position: 200% 0 }
+        100% { background-position: -200% 0 }
+    }
+    
+    /* YENİ BAŞLIK ANİMASYONU */
+    @@keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    /* === TEMEL SAYFA STİLLERİ === */
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+        background-color: var(--bg-body);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+
+    /* === YENİ BAŞLIK (ORTALI VE ANİMASYONLU) === */
+    .page-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin: 24px 0 20px 0;
+        letter-spacing: .6px;
+        text-align: center;
+        
+        /* Shimmer Efekti */
+        background: linear-gradient(90deg, var(--text-dark), var(--brand-secondary), var(--text-dark));
+        background-size: 200% auto;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        animation: shimmer 4s linear infinite, fadeInDown 0.8s ease-out;
+    }
+
+    /* === KONTROL PANELİ (YENİ YERLEŞİM) === */
+    .controls-form {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 32px;
+        
+        /* Panel giriş animasyonu */
+        animation: fadeInUp 0.8s ease-out 0.2s;
+        animation-fill-mode: backwards;
+    }
+    
+    /* Filtreler (ÜST SIRA) */
+    .filter-row {
+        display: grid;
+        grid-template-columns: 1fr; /* Mobil: Tek sütun */
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 14px;
+    }
+
+    .filter-select {
+        height: 44px;
+        padding: 0 12px;
+        font-size: 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background-color: var(--bg-white);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234B5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px var(--brand-primary-glow);
+    }
+
+    /* Arama Çubuğu (ORTA SIRA) */
+    .search-row {
+        display: flex;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .search-input {
+        flex-grow: 1;
+        height: 48px;
+        padding: 0 16px;
+        font-size: 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+        transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        box-shadow: var(--shadow-sm);
+        -webkit-appearance: none;
+        background: var(--bg-white);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px var(--brand-primary-glow);
+        z-index: 2;
+    }
+    
+    .search-input::placeholder { color: var(--text-light); opacity: 0.8; }
+
+    .search-btn {
+    height: 48px;
+    padding: 0 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid var(--brand-primary);
+    background: var(--brand-primary);
+    color: var(--text-white);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    margin-left: -1px;
+    margin-top: 6px;
+    z-index: 1;
+    box-shadow: var(--shadow-sm);
+    }
+
+    .search-btn:hover {
+        background: var(--brand-primary-hover);
+        border-color: var(--brand-primary-hover);
+    }
+
+    /* Genel Buton Stili (Filtrele/Temizle) */
+    .btn {
+        height: 44px;
+        padding: 0 20px;
+        font-size: 16px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        transition: all var(--transition-fast);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: var(--text-white);
+    }
+    .btn-primary:hover {
+        background: var(--brand-primary-hover);
+        border-color: var(--brand-primary-hover);
+        color: var(--text-white);
+    }
+
+    .btn-secondary {
+        background: var(--bg-white);
+        border-color: var(--border-color);
+        color: var(--text-light);
+    }
+    .btn-secondary:hover {
+        border-color: var(--text-light);
+        color: var(--text-dark);
+    }
+
+    /* Buton Grubu (ALT SIRA) */
+    .button-group {
+        display: flex;
+        flex-direction: column; /* Mobil: Alt alta */
+        gap: 12px;
+    }
+
+
+    /* === FİRMA KARTLARI (YENİ PARLAMA EFEKTİ) === */
+    .user-grid {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+        margin-top: 12px;
+    }
+
+    .user-card {
+        position: relative;
+        background: var(--bg-white);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: 22px 20px 18px 20px;
+        transition: transform var(--transition-std), box-shadow var(--transition-std);
+        isolation: isolate;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        opacity: 0; /* Animasyon için başlangıçta gizli */
+    }
+
+    /* Yeni Parlama Efekti (Mavi) */
+    .user-card::after {
+        content: '';
+        position: absolute;
+        width: 150%;
+        height: 150%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, var(--brand-primary-glow), transparent 70%);
+        opacity: 0;
+        filter: blur(20px);
+        transition: opacity var(--transition-std);
+        z-index: -1;
+    }
+
+    .user-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--border-color);
+    }
+
+    .user-card:hover::after {
+        opacity: 0.8; /* Parlamayı göster */
+    }
+
+    /* Üyelik Rozeti */
+    .badge-year {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: #fff;
+        padding: 6px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 999px;
+        box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25); /* Mavi gölge */
+        z-index: 1;
+    }
+
+    /* Profil Resmi */
+    .img-box {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        position: relative;
+        display: inline-block;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    .img-box.loading::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #f3f6ff 25%, #e9efff 50%, #f3f6ff 75%);
+        background-size: 200% 100%;
+        animation: shine 1.2s linear infinite;
+        box-shadow: 0 0 0 4px var(--bg-white), 0 0 0 6px rgba(59, 130, 246, 0.1); /* Mavi'ye uyarlandı */
+    }
+
+    .user-profile-picture {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #fff;
+        border: 2px solid #EFF6FF; /* Light Blue 50 */
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px var(--bg-white), 0 0 0 6px rgba(59, 130, 246, 0.15); /* Mavi'ye uyarlandı */
+        transition: box-shadow var(--transition-std), transform var(--transition-std);
+    }
+
+    .user-card:hover .user-profile-picture {
+        box-shadow: 0 0 0 4px var(--bg-white), 0 0 0 8px rgba(59, 130, 246, 0.25); /* Mavi'ye uyarlandı */
+        transform: scale(1.03);
+    }
+
+    /* Kart İçeriği */
+    .user-name {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-dark);
+        letter-spacing: .2px;
+        margin: 4px 0 2px 0;
+        text-transform: uppercase;
+    }
+    .user-name a { color: inherit; text-decoration: none; }
+    .user-name a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .user-location {
+        margin: 2px 0 8px 0;
+        font-size: 14px;
+        color: var(--text-light);
+    }
+
+    .announcement-minimal {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #EFF6FF; /* Blue 50 */
+        border: 1px solid #DBEAFE; /* Blue 100 */
+        color: var(--brand-primary-hover);
+        font-weight: 700;
+        font-size: 13px;
+        transition: all var(--transition-fast);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.12); /* Mavi gölge */
+        text-decoration: none;
+    }
+    .announcement-minimal:hover {
+        background: var(--brand-primary);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .user-registration-date {
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--text-light);
+        line-height: 1.5;
+    }
+
+    /* === SAYFALAMA (PAGINATION) === */
+    .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 32px 0 16px 0;
+    }
+
+    .pagination-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 4px 12px;
+        font-size: 16px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-white);
+        color: var(--brand-primary); /* Mavi yazı */
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .pagination-btn:hover {
+        background-color: #EFF6FF; /* Çok açık mavi */
+        border-color: var(--brand-primary);
+    }
+    .pagination-btn.active {
+        background-color: var(--brand-primary);
+        color: var(--text-white);
+        border-color: var(--brand-primary);
+        font-weight: 700;
+    }
+    .pagination-btn[disabled], .pagination-btn.disabled {
+        background-color: #F3F4F6; /* Gray 100 */
+        color: var(--text-light);
+        cursor: not-allowed;
+        border-color: var(--border-color);
+    }
+    .pagination-ellipsis {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        color: var(--text-light);
+    }
+
+    .pagination-info {
+        text-align: center;
+        margin-top: 10px;
+        color: var(--text-light);
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    /* === TIKLAMA/BASMA EFEKTİ === */
+    .press-feedback {
+        transition: transform .12s ease, opacity .12s ease;
+    }
+    .press-feedback:active {
+        transform: scale(0.97);
+        opacity: .8;
+    }
+
+    /* === RESPONSIVE TASARIM === */
+
+    /* Tablet (768px ve üstü) */
+    @@media (min-width: 768px) {
+        .page-title {
+            font-size: 3rem;
+            margin: 32px 0 24px 0;
+        }
+
+        .filter-row {
+            grid-template-columns: 1fr 1fr; /* 2 sütun */
+        }
+        
+        .button-group {
+            flex-direction: row; /* Yan yana */
+            justify-content: flex-end; /* Sağa yasla */
+        }
+    }
+    
+    /* Küçük Masaüstü (1024px ve üstü) */
+    @@media (min-width: 1024px) {
+        .filter-row {
+             grid-template-columns: 1fr 1fr 1fr; /* Filtreler 3 sütun */
+        }
+    }
+
+</style>
+
+
+<div class="container">
+
+    <!-- YENİ BAŞLIK (ORTALI) -->
+    <h1 class="page-title">FİRMALAR</h1>
+
+    <!-- Arama ve Filtreleme Formu (YENİ YERLEŞİM) -->
+    <form method="get" action="@Url.Action("Firmalar", "Home")" class="controls-form">
+        
+        <!-- Filtreler (ÜST SIRA) -->
+        <div class="filter-row">
+            <!-- İl Filtresi -->
+            <div class="filter-group">
+                <label for="provinceFilter">İl:</label>
+                <select asp-for="Province" id="provinceFilter" class="filter-select">
+                    <option value="">Tüm İller</option>
+                    <!-- JS ile doldurulacak -->
+                </select>
+            </div>
+
+            <!-- İlçe Filtresi -->
+            <div class="filter-group">
+                <label for="districtFilter">İlçe:</label>
+                <select asp-for="District" id="districtFilter" class="filter-select">
+                    <option value="">Tüm İlçeler</option>
+                    <!-- JS ile doldurulacak -->
+                </select>
+            </div>
+
+            <!-- Sıralama Filtresi -->
+            <div class="filter-group">
+                <label for="sortByFilter">Sıralama:</label>
+                <select asp-for="SortBy" id="sortByFilter" class="filter-select">
+                    <option value="">Varsayılan</option>
+                    <option value="company_asc">Firma Adı (A-Z)</option>
+                    <option value="company_desc">Firma Adı (Z-A)</option>
+                    <option value="announcement_asc">İlan Sayısı (Az-Çok)</option>
+                    <option value="announcement_desc">İlan Sayısı (Çok-Az)</option>
+                    <option value="date_asc">Üyelik Tarihi (Eski-Yeni)</option>
+                    <option value="date_desc">Üyelik Tarihi (Yeni-Eski)</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Arama Çubuğu (ORTA SIRA) -->
+        <div class="search-row">
+            <input type="text"
+                   name="search"
+                   value="@currentSearch"
+                   placeholder="Firmaları Arayın..."
+                   class="search-input"
+                   id="searchInput" />
+            <button type="submit" class="search-btn press-feedback">Ara</button>
+        </div>
+
+        <!-- Buton Grubu (ALT SIRA) -->
+        <div class="button-group">
+            @if (!string.IsNullOrEmpty(currentSearch) ||
+            !string.IsNullOrEmpty(currentProvince) ||
+            !string.IsNullOrEmpty(currentDistrict) ||
+            !string.IsNullOrEmpty(currentSortBy))
+            {
+                <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
+                   class="btn btn-secondary press-feedback">
+                    Temizle
+                </a>
+            }
+            <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
+        </div>
+
+        <!-- Gizli Alanlar (Form gönderimi için gerekli) -->
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="pageSize" value="@pageSize" />
+        <input type="hidden" asp-for="Province" value="@currentProvince" id="CurrentProvince" />
+        <input type="hidden" asp-for="District" value="@currentDistrict" id="CurrentDistrict" />
+        <input type="hidden" asp-for="SortBy" value="@currentSortBy" />
+    </form>
+
+
+    <!-- Firma Listesi -->
+    <ul class="user-grid" id="userGrid" role="list">
+        @if (Model != null && Model.Companies != null)
+        {
+            foreach (var user in Model.Companies)
+            {
+                <li class="user-card" data-company="@user.CompanyName?.ToUpper()" role="listitem">
+                    <!-- Üyelik Süresi Rozeti -->
+                    <div class="badge-year">
+                        @if (user is not null)
+                        {
+                            var membershipMonths = user.CompanyMembershipDuration + 1;
+                            if (membershipMonths < 12)
+                            {
+                                <span>@membershipMonths. Ay</span>
+                            }
+                            else
+                            {
+                                var membershipYears = membershipMonths / 12;
+                                var remainingMonths = membershipMonths % 12;
+                                if (remainingMonths > 0)
+                                {
+                                    <span>@membershipYears. Yıl @remainingMonths. Ay</span>
+                                }
+                                else
+                                {
+                                    <span>@membershipYears. Yıl</span>
+                                }
+                            }
+                        }
+                    </div>
+
+                    <!-- Profil Resmi -->
+                    <div class="img-box loading" aria-hidden="true">
+                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.png" : user.ProfilePicturePath)"
+                             alt="@user.CompanyName Profil Fotoğrafı"
+                             class="user-profile-picture"
+                             width="100" height="100"
+                             loading="lazy"
+                             onload="this.parentElement.classList.remove('loading')"
+                             onerror="this.src='/ImageFiles/kurumsalbosfoto.png'; this.parentElement.classList.remove('loading')" />
+                    </div>
+
+                    <!-- Firma Adı -->
+                    <p class="user-name">
+                        <a class="press-feedback" href="@Url.Action("Details", "Ilan", new { id = user.Id })" target="_blank" rel="noopener noreferrer">@user.CompanyName</a>
+                    </p>
+
+                    <!-- Konum -->
+                    @{
+                        string location = string.Empty;
+                        if (!string.IsNullOrEmpty(user.City))
+                        {
+                            location += user.City;
+                        }
+                        if (!string.IsNullOrEmpty(user.District))
+                        {
+                            if (!string.IsNullOrEmpty(location))
+                            {
+                                location += " / ";
+                            }
+                            location += user.District;
+                        }
+                    }
+                    <p class="user-location">@location</p>
+
+                    <!-- İlan Sayısı -->
+                    <p class="user-announcement-count">
+                        <span class="announcement-minimal">@user.TotalAnnouncement İlan</span>
+                    </p>
+                    
+                    <!-- Diğer Bilgiler -->
+                    <p class="user-registration-date">
+                        Üyelik Tarihi: @user.RegistrationDate?.ToString("dd.MM.yyyy")<br />
+                        Firma No: @user.UserOrder?.ToString("D4")
+                    </p>
+                </li>
+            }
+        }
+    </ul>
+
+    <!-- Sayfalama Kontrolleri -->
+    <div class="pagination-controls">
+        <!-- Önceki Butonu -->
+        @if (hasPreviousPage)
+        {
+            <a href="@Url.Action("Firmalar", "Home", new { page = currentPage - 1, pageSize = pageSize,
+            search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+               class="pagination-btn press-feedback">‹ Önceki</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled" disabled>‹ Önceki</span>
+        }
+
+        <!-- İlk sayfa ... -->
+        @if (startPage > 1)
+        {
+            <a href="@Url.Action("Firmalar", "Home", new { page = 1, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+               class="pagination-btn press-feedback">1</a>
+            @if (startPage > 2)
+            {
+                <span class="pagination-ellipsis">...</span>
+            }
+        }
+
+        <!-- Sayfa Numaraları -->
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            @if (i == currentPage)
+            {
+                <span class="pagination-btn active">@i</span>
+            }
+            else
+            {
+                <a href="@Url.Action("Firmalar", "Home", new { page = i, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+                   class="pagination-btn press-feedback">@i</a>
+            }
+        }
+
+        <!-- Son sayfa ... -->
+        @if (endPage < totalPages)
+        {
+            @if (endPage < totalPages - 1)
+            {
+                <span class="pagination-ellipsis">...</span>
+            }
+            <a href="@Url.Action("Firmalar", "Home", new { page = totalPages, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+               class="pagination-btn press-feedback">@totalPages</a>
+        }
+
+        <!-- Sonraki Butonu -->
+        @if (hasNextPage)
+        {
+            <a href="@Url.Action("Firmalar", "Home", new { page = currentPage + 1, pageSize = pageSize,
+            search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+               class="pagination-btn press-feedback">Sonraki ›</a>
+        }
+        else
+        {
+            <span class="pagination-btn disabled" disabled>Sonraki ›</span>
+        }
+    </div>
+
+    <!-- Sayfalama Bilgisi -->
+    <div class="pagination-info">
+        @if (totalItems > 0)
+        {
+            <span>@startItem - @endItem arası gösteriliyor (Toplam @totalItems firma)</span>
+        }
+        else
+        {
+            <span>Firma bulunamadı</span>
+        }
+    </div>
+
+</div> <!-- .container sonu -->
+
+
+@section Scripts {
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gerekli DOM elementlerini seç
+        const searchInput = document.getElementById('searchInput');
+        const filterForm = document.querySelector('form.controls-form');
+        const provinceFilter = document.getElementById('provinceFilter');
+        const districtFilter = document.getElementById('districtFilter');
+        const sortByFilter = document.getElementById('sortByFilter');
+
+        // Modal JS kodları kaldırıldı.
+        
+        // 'ViewBag' ile gelen sayaç değerleri
+        let firmCount = parseInt('@(ViewBag.TotalFirmCount ?? 0)', 10);
+        let totalUserCount = parseInt('@(ViewBag.TotalUserCount ?? 0)', 10);
+
+        // Arama fonksiyonu (formu gönderir)
+        function performSearch() {
+            if (filterForm) {
+                filterForm.submit();
+            }
+        }
+
+        // Arama inputunda Enter'a basıldığında formu submit et
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
+        }
+
+        // Daktilo efekti
+        var messages = [
+            `"${firmCount}" Firma Arasından Aramanızı Yapın...`,
+            `Sitemizde "${firmCount}" Firma ve "${totalUserCount}" Danışman bulunmaktadır...`
+        ];
+        let currentMessageIndex = 0;
+        let charIndex = 0;
+        let typingTimeout;
+
+        function typewriterEffect() {
+            clearTimeout(typingTimeout);
+            if (searchInput && messages.length > 0 && firmCount > 0) {
+                 if (charIndex < messages[currentMessageIndex].length) {
+                    searchInput.setAttribute("placeholder", messages[currentMessageIndex].substring(0, charIndex + 1));
+                    charIndex++;
+                    typingTimeout = setTimeout(typewriterEffect, 50);
+                } else {
+                    typingTimeout = setTimeout(() => {
+                        currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+                        charIndex = 0;
+                        typewriterEffect();
+                    }, 3000);
+                }
+            } else if (searchInput) {
+                 searchInput.setAttribute("placeholder", "Firmaları Arayın...");
+            }
+        }
+        typewriterEffect();
+
+        // Tıklama/Basma efekti
+        function addPressFeedback(selector) {
+            document.querySelectorAll(selector).forEach(function (el) {
+                el.classList.add('press-feedback');
+                el.addEventListener('mousedown', function () { el.classList.add('pressed'); });
+                el.addEventListener('mouseup', function () { el.classList.remove('pressed'); });
+                el.addEventListener('mouseleave', function () { el.classList.remove('pressed'); });
+                el.addEventListener('touchstart', function () { el.classList.add('pressed'); }, { passive: true });
+                el.addEventListener('touchend', function () { el.classList.remove('pressed'); });
+                el.addEventListener('touchcancel', function () { el.classList.remove('pressed'); });
+            });
+        }
+        
+        // Efekt eklenecek elementler
+        addPressFeedback('.pagination-btn, .announcement-minimal, .user-name a, .btn, .search-btn');
+
+        // --- FİLTRE DEĞİŞİKLİKLERİ ---
+        // Bu düzende, filtre değişikliği formu otomatik GÖNDERMEZ.
+        // Kullanıcı "Filtrele" veya "Ara" butonuna basmalıdır.
+        // Sadece il/ilçe bağımlılığı için jQuery kısmı çalışır.
+
+        // --- KART GİRİŞ ANİMASYONU ---
+        const cards = document.querySelectorAll('.user-card');
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = `popIn 0.5s ease-out ${index * 0.05}s forwards`;
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        } else {
+            cards.forEach(card => {
+                card.style.opacity = 1;
+            });
+        }
+
+    });
+
+</script>
+
+<!-- jQuery ve İl/İlçe Doldurma Scripti -->
+<script>
+    $(document).ready(function () {
+        var currentProvince = $('#CurrentProvince').val();
+        var currentDistrict = $('#CurrentDistrict').val();
+
+        $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+            var provinceSelect = $('#provinceFilter');
+
+            // 1. İl (Province) listesini doldur
+            if (provinceSelect.length) {
+                data.sort((a, b) => a.Il.localeCompare(b.Il, 'tr'));
+                data.forEach(function (city) {
+                    provinceSelect.append(new Option(city.Il, city.Il));
+                });
+                
+                if (currentProvince) {
+                    provinceSelect.val(currentProvince);
+                    populateDistricts(currentProvince);
+                }
+            }
+
+            // 2. İl (Province) değiştiğinde ilçeleri (District) güncelle
+            provinceSelect.change(function () {
+                var selectedCity = $(this).val();
+                populateDistricts(selectedCity);
+                // İl değiştiğinde gizli ilçe değerini sıfırla
+                $('#CurrentDistrict').val(''); 
+            });
+
+            // İlçe listesini dolduran yardımcı fonksiyon
+            function populateDistricts(cityName) {
+                var districtSelect = $('#districtFilter');
+                districtSelect.empty().append('<option value="">Tüm İlçeler</option>');
+
+                if (cityName) {
+                    var selectedCityData = data.find(c => c.Il === cityName);
+                    if (selectedCityData && selectedCityData.Ilce) {
+                        selectedCityData.Ilce.sort((a, b) => a.Ilce.localeCompare(b.Ilce, 'tr'));
+                        selectedCityData.Ilce.forEach(function (district) {
+                            districtSelect.append(new Option(district.Ilce, district.Ilce));
+                        });
+                        
+                        // Sadece mevcut il ile eşleşiyorsa mevcut ilçeyi seç
+                        if (cityName === currentProvince && currentDistrict) {
+                             districtSelect.val(currentDistrict);
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
+}

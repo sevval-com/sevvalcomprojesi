@@ -1,0 +1,208 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Genel stiller */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #004e89, #007bff);
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+    .sidebar h4 {
+        font-weight: 600;
+        font-size: 22px;
+        text-transform: uppercase;
+        color: #ffffff;
+        margin-bottom: 20px;
+    }
+
+    .sidebar .nav-link {
+        font-size: 16px;
+        padding: 12px 20px;
+        margin: 5px 0;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            transform: translateX(8px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 18px;
+        }
+
+/* Kontrol Paneli */
+.uye-kontrol-panel {
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Başlık */
+h1 {
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #333333;
+}
+
+/* Filtre Butonları */
+.user-type-filter .form-check-input {
+    display: none;
+}
+
+.user-type-filter .form-check-label .badge {
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border-radius: 25px;
+}
+
+    .user-type-filter .form-check-label .badge:hover {
+        transform: scale(1.1);
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    color: #ffffff;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(90deg, #28a745, #1e7e34);
+    color: #ffffff;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(90deg, #ffc107, #e0a800);
+    color: #212529;
+}
+
+/* Tablo */
+.table {
+    font-size: 15px;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 30px;
+}
+
+    .table thead {
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e9f5ff;
+    transition: background-color 0.3s;
+}
+
+/* Responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.btn-danger {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-danger:hover {
+        background-color: #e60000;
+    }
+
+
+
+/* Mobil uyum için */
+@media only screen and (max-width: 768px) {
+
+    /* Sidebar'ı navbar gibi yapmak */
+    .sidebar {
+        width: 100%; /* Sidebar genişliğini otomatik ayarlıyoruz */
+        position: fixed; /* Sayfanın üst kısmına sabitle */
+        top: 0; /* Üstte sabit kalmasını sağlamak */
+        left: 0;
+        background-color: #333; /* Arka plan rengini değiştirebiliriz */
+        z-index: 9999; /* Diğer öğelerin üstünde olması için */
+        padding: 5px 0; /* Padding değerini küçültüyoruz */
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center; /* Menü öğelerini yatayda ortalamak */
+        flex-wrap: wrap; /* Ekran küçüldükçe öğeleri satırlara yerleştir */
+        height: auto; /* Yüksekliği içerik kadar ayarla */
+        min-height: 60px; /* Minimum yükseklik belirle, sadece başlık veya öğeler olursa sıkışmasın */
+    }
+
+        .sidebar h4 {
+            font-size: 18px; /* Başlık font boyutunu küçültüyoruz */
+            text-align: center;
+            color: white;
+            margin-bottom: 10px; /* Başlık ile menü öğeleri arasındaki boşluğu küçültüyoruz */
+            width: 100%; /* Başlık tam genişlikte olmalı */
+            white-space: nowrap; /* Satır atlamayı engelliyoruz */
+            margin-left: 20px;
+        }
+
+
+        /* Logonun boyutunu küçültmek */
+        .sidebar img {
+            width: 10px; /* Logonun genişliğini küçültüyoruz */
+            height: auto; /* Yüksekliği otomatik olarak ayarla */
+            margin-top: -10px;
+            margin-left: 40px;
+        }
+
+        /* Navbar gibi menü öğeleri */
+        .sidebar .nav-link {
+            font-size: 12px; /* Menü öğelerinin font boyutunu küçültüyoruz */
+            padding: 8px 11px; /* Menü öğelerinin padding'ini küçültüyoruz */
+            text-align: center;
+            color: white;
+            display: inline-block; /* Yatay menü için */
+            margin: 3px; /* Menü öğeleri arasındaki boşluğu küçültüyoruz */
+            border-radius: 5px; /* Köşeleri yuvarlatmak */
+            transition: background-color 0.3s ease;
+            margin-left: 100px;
+        }
+
+            .sidebar .nav-link:hover {
+                background-color: #555; /* Hover rengini değiştirebiliriz */
+            }
+}

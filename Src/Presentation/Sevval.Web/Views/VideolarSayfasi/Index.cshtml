@@ -1,0 +1,309 @@
+﻿ @using Sevval.Web.Models
+ @using Sevval.Domain.Entities
+ @using System.Security.Claims
+@model IEnumerable<Sevval.Web.Models.VideolarSayfasi>
+
+@{
+    ViewData["Title"] = "Videolar";
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+}
+
+<!-- Tailwind CSS Aspect Ratio Plugin Script'i ekleniyor -->
+<script src="https://cdn.tailwindcss.com/nesting/plugin.js"></script>
+
+<div class="w-full min-h-screen bg-blue-50/50 flex font-sans">
+    <style>
+        .video-card { position: relative; background: #ffffff; border-radius: 18px; border: 1px solid rgba(59,130,246,.20); box-shadow: 0 10px 24px rgba(13,110,253,.10), 0 2px 6px rgba(13,110,253,.06); transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; overflow: hidden; background-clip: padding-box; align-items: start;}
+        .video-card::after { content: ""; position: absolute; inset: -10px; border-radius: 22px; background: radial-gradient( circle at 15% 10%, rgba(59,130,246,.30), transparent 40% ), radial-gradient( circle at 85% 0%, rgba(33,150,243,.24), transparent 45% ), radial-gradient( circle at 50% 100%, rgba(13,110,253,.18), transparent 50% ); filter: blur(16px); z-index: -1; opacity: .38; transition: opacity .25s ease, filter .25s ease; }
+        .video-card:hover { transform: translateY(-6px); box-shadow: 0 18px 46px rgba(13,110,253,.22), 0 8px 18px rgba(13,110,253,.12); border-color: rgba(59,130,246,.45); }
+        .video-card:hover::after { opacity: .55; filter: blur(18px); }
+        .video-thumb { position: relative; background: linear-gradient(180deg, #eaf2ff, #ffffff); }
+        .video-thumb .shine { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient( circle at 30% 20%, rgba(59,130,246,.20), transparent 35% ), radial-gradient( circle at 80% 0%, rgba(33,150,243,.18), transparent 35% ); opacity: .35; pointer-events: none; transition: opacity .3s ease; }
+        .video-card:hover .video-thumb .shine { opacity: .55; }
+        .video-meta-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #eef6ff; color: #1e3a8a; border: 1px solid #cfe5ff; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(13,110,253,.12); }
+        @@keyframes borderFlow { to { transform: rotate(360deg); } }
+        .video-upload-button {margin-top: 120px; right:20px; }
+        @@media (max-width: 768px) {
+            .video-upload-button {margin-top: 100px; right:10px; }
+        }
+    </style>
+    <!-- Ana İçerik -->
+    <main class="flex-1 p-6 sm:p-8">
+        <div class="max-w-7xl mx-auto">
+            @{ var claim = User.FindFirst(ClaimTypes.Email); var emailClaim = claim != null ? claim.Value : null; var canUpload = User.Identity.IsAuthenticated && string.Equals(emailClaim, "sftumen41@gmail.com", System.StringComparison.OrdinalIgnoreCase); }
+            @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-action="Upload" class="video-upload-button inline-flex absolute right-0 top-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-1 px-2 sm:py-2 sm:px-4 rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-1.5 sm:gap-2 text-xs sm:text-sm z-20" data-allowed="@canUpload.ToString().ToLower()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        <span>Video Yükle</span>
+                    </a>
+                }
+            <!-- Üst Başlık ve Buton Alanı -->
+            <header class="relative flex flex-col gap-4 sm:gap-6 mb-8 items-center text-center">
+                
+                <div class="flex flex-col items-center">
+                    <h1 class="text-5xl font-extrabold text-blue-900">Videolar</h1>
+                    @if (User.Identity != null && User.Identity.Name == "sftumen41@gmail.com")
+                    {
+                        <div class="mt-4">
+                            <a href="@Url.Action("Index", "Category")" 
+                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors">
+                                <i class="fas fa-cog"></i>
+                                Kategori Yönetimi
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Kategori Chip'leri -->
+                @{ var kategoriSayilari = ViewBag.KategoriSayilari as System.Collections.Generic.IDictionary<string, int>; var kategoriIconlari = ViewBag.KategoriIconlari as System.Collections.Generic.IDictionary<string,string>; var kategoriRenkleri = ViewBag.KategoriRenkleri as System.Collections.Generic.IDictionary<string,string>; }
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="@Url.Action("Index")" class="category-chip inline-flex items-center gap-3 px-5 py-3 rounded-full border text-base font-semibold transition-all @(string.IsNullOrEmpty(ViewBag.SeciliKategori) ? "bg-blue-600 text-white border-blue-600 shadow category-chip--active" : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50")">
+                        <span>Tümü</span>
+                        <span class="text-sm px-2.5 py-1 rounded-full @(string.IsNullOrEmpty(ViewBag.SeciliKategori) ? "bg-white/20" : "bg-blue-100 text-blue-800")">@ViewBag.ToplamVideoSayisi</span>
+                    </a>
+                    @foreach (var kat in ViewBag.Kategoriler)
+                    {
+                        var isActive = kat == ViewBag.SeciliKategori;
+                        var count = kategoriSayilari != null && kategoriSayilari.ContainsKey(kat) ? kategoriSayilari[kat] : 0;
+                        var iconHtml = kategoriIconlari != null && kategoriIconlari.ContainsKey(kat) ? kategoriIconlari[kat] : null;
+                        var colorClass = kategoriRenkleri != null && kategoriRenkleri.ContainsKey(kat) ? kategoriRenkleri[kat] : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50";
+                         <a href="@Url.Action("Index", new { kategori = kat })" class="category-chip inline-flex items-center gap-3 px-5 py-3 rounded-full border text-base font-semibold transition-all @colorClass @(isActive ? "category-chip--active" : string.Empty)">
+                             @{
+                                 if (!string.IsNullOrEmpty(iconHtml))
+                                 {
+                                     var decoded = System.Net.WebUtility.HtmlDecode(iconHtml);
+                                     var svgSource = string.IsNullOrWhiteSpace(decoded) ? iconHtml : decoded;
+                                     var svgStart = svgSource.IndexOf("<svg", System.StringComparison.OrdinalIgnoreCase);
+                                     if (svgStart >= 0)
+                                     {
+                                         var svgOnly = svgSource.Substring(svgStart);
+                                         if (svgOnly.IndexOf("class=", System.StringComparison.OrdinalIgnoreCase) < 0)
+                                         {
+                                             // ensure small size for the chip
+                                             svgOnly = svgOnly.Insert(4, " class=\"w-4 h-4\"");
+                                         }
+                                         @Html.Raw(svgOnly)
+                                     }
+                                 }
+                             }
+                            <span>@kat</span>
+                            <span class="text-sm px-2.5 py-1 rounded-full @(isActive ? "bg-white/20" : "bg-blue-100 text-blue-800")">@count</span>
+                        </a>
+                    }
+                </div>
+            </header>
+            <style>
+                .category-chip--active {
+                    transform: translateY(-1px);
+                }
+                .category-chip:hover {
+                    filter: brightness(0.98);
+                }
+                @@media (max-width: 768px){
+                    .category-chip { padding: 10px 14px; }
+                }
+            </style>
+            <style>
+                /* Aktif kategori için otomatik koyu ton ve beyaz yazı - kategori rengine göre */
+                .category-chip.category-chip--active:is(.bg-blue-50, .bg-blue-100, .text-blue-700, .border-blue-200, .hover\:bg-blue-50) { background-color:#2563eb !important; color:#fff !important; border-color:#2563eb !important; }
+                .category-chip.category-chip--active:is(.bg-red-50, .bg-red-100, .text-red-700, .border-red-200, .hover\:bg-red-50) { background-color:#dc2626 !important; color:#fff !important; border-color:#dc2626 !important; }
+                .category-chip.category-chip--active:is(.bg-green-50, .bg-green-100, .text-green-700, .border-green-200, .hover\:bg-green-50) { background-color:#16a34a !important; color:#fff !important; border-color:#16a34a !important; }
+                .category-chip.category-chip--active:is(.bg-emerald-50, .bg-emerald-100, .text-emerald-700, .border-emerald-200, .hover\:bg-emerald-50) { background-color:#059669 !important; color:#fff !important; border-color:#059669 !important; }
+                .category-chip.category-chip--active:is(.bg-teal-50, .bg-teal-100, .text-teal-700, .border-teal-200, .hover\:bg-teal-50) { background-color:#0d9488 !important; color:#fff !important; border-color:#0d9488 !important; }
+                .category-chip.category-chip--active:is(.bg-cyan-50, .bg-cyan-100, .text-cyan-700, .border-cyan-200, .hover\:bg-cyan-50) { background-color:#0891b2 !important; color:#fff !important; border-color:#0891b2 !important; }
+                .category-chip.category-chip--active:is(.bg-indigo-50, .bg-indigo-100, .text-indigo-700, .border-indigo-200, .hover\:bg-indigo-50) { background-color:#4f46e5 !important; color:#fff !important; border-color:#4f46e5 !important; }
+                .category-chip.category-chip--active:is(.bg-violet-50, .bg-violet-100, .text-violet-700, .border-violet-200, .hover\:bg-violet-50) { background-color:#7c3aed !important; color:#fff !important; border-color:#7c3aed !important; }
+                .category-chip.category-chip--active:is(.bg-purple-50, .bg-purple-100, .text-purple-700, .border-purple-200, .hover\:bg-purple-50) { background-color:#9333ea !important; color:#fff !important; border-color:#9333ea !important; }
+                .category-chip.category-chip--active:is(.bg-pink-50, .bg-pink-100, .text-pink-700, .border-pink-200, .hover\:bg-pink-50) { background-color:#db2777 !important; color:#fff !important; border-color:#db2777 !important; }
+                .category-chip.category-chip--active:is(.bg-rose-50, .bg-rose-100, .text-rose-700, .border-rose-200, .hover\:bg-rose-50) { background-color:#e11d48 !important; color:#fff !important; border-color:#e11d48 !important; }
+                .category-chip.category-chip--active:is(.bg-orange-50, .bg-orange-100, .text-orange-700, .border-orange-200, .hover\:bg-orange-50) { background-color:#ea580c !important; color:#fff !important; border-color:#ea580c !important; }
+                .category-chip.category-chip--active:is(.bg-amber-50, .bg-amber-100, .text-amber-700, .border-amber-200, .hover\:bg-amber-50) { background-color:#d97706 !important; color:#fff !important; border-color:#d97706 !important; }
+                .category-chip.category-chip--active:is(.bg-yellow-50, .bg-yellow-100, .text-yellow-700, .border-yellow-200, .hover\:bg-yellow-50) { background-color:#ca8a04 !important; color:#fff !important; border-color:#ca8a04 !important; }
+                .category-chip.category-chip--active:is(.bg-lime-50, .bg-lime-100, .text-lime-700, .border-lime-200, .hover\:bg-lime-50) { background-color:#65a30d !important; color:#fff !important; border-color:#65a30d !important; }
+                .category-chip.category-chip--active:is(.bg-sky-50, .bg-sky-100, .text-sky-700, .border-sky-200, .hover\:bg-sky-50) { background-color:#0284c7 !important; color:#fff !important; border-color:#0284c7 !important; }
+                .category-chip.category-chip--active:is(.bg-slate-50, .bg-slate-100, .text-slate-700, .border-slate-200, .hover\:bg-slate-50) { background-color:#475569 !important; color:#fff !important; border-color:#475569 !important; }
+                .category-chip.category-chip--active:is(.bg-gray-50, .bg-gray-100, .text-gray-700, .border-gray-200, .hover\:bg-gray-50) { background-color:#4b5563 !important; color:#fff !important; border-color:#4b5563 !important; }
+                .category-chip.category-chip--active:is(.bg-neutral-50, .bg-neutral-100, .text-neutral-700, .border-neutral-200, .hover\:bg-neutral-50) { background-color:#525252 !important; color:#fff !important; border-color:#525252 !important; }
+                .category-chip.category-chip--active:is(.bg-stone-50, .bg-stone-100, .text-stone-700, .border-stone-200, .hover\:bg-stone-50) { background-color:#57534e !important; color:#fff !important; border-color:#57534e !important; }
+            </style>
+
+            <!-- Video Listesi -->
+            @if (Model.Any())
+            {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach (var video in Model)
+                    {
+                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col video-card" data-video-id="@video.Id">
+                            <!-- Video Thumbnail -->
+                            <div class="relative w-full video-thumb">
+                                <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
+                                    @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                    {
+                                        <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
+                                    }
+                                    else if (video.IsYouTube)
+                                    {
+                                        <img src="@("https://img.youtube.com/vi/" + video.VideoYolu + "/hqdefault.jpg")" alt="@video.VideoAdi" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                    }
+                                    else
+                                    {
+                                        <video preload="metadata" muted class="w-full h-full object-cover">
+                                            <source src="@Url.Content(video.VideoYolu)#t=1" type="video/mp4">
+                                        </video>
+                                    }
+                                </div>
+                                <div class="shine"></div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-blue-700/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                    <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                @{
+                                    var watched = ViewBag.WatchedIds as System.Collections.Generic.HashSet<int>;
+                                    var isWatched = watched != null && watched.Contains(video.Id);
+                                    var isNew = video.YuklenmeTarihi >= DateTime.UtcNow.AddMonths(-3);
+                                }
+                                <span class="watched-badge @(isWatched ? string.Empty : "hidden") select-none absolute top-4 right-4 z-10 bg-green-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">İzlendi</span>
+                                <span class="new-badge @((!isWatched && isNew) ? string.Empty : "hidden") select-none absolute top-4 right-4 z-10 bg-blue-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">Yeni</span>
+                            </div>
+
+                            <!-- Video Bilgileri -->
+                            <div class="p-4 flex items-start gap-4 w-full">
+                                
+                                <div class="flex flex-col w-full">
+                                    <h3 class="font-bold text-2xl text-start text-blue-900 group-hover:text-blue-600 transition-colors title-ellipsis" title="@video.VideoAdi.Trim()">
+                                        <span class="title-text">@video.VideoAdi.Trim()</span>
+                                    </h3>
+                                    <div class="flex items-center gap-2">
+                                        <img src="@Url.Content("~/images/LOGO mavi.png")" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="Sevval.com" />
+                                        <p class="text-sm text-gray-600 mt-1 truncate" title="Sevval.com">Sevval.com</p>
+                                    </div>
+                                    
+                                    
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mt-1.5">
+                                        <span class="video-meta-chip">@video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
+                                        
+                                        <div class="ml-auto flex items-center gap-2">
+                                            @{ var _ys = ViewBag.YorumSayilari as System.Collections.Generic.IDictionary<int,int>; var _yc = 0; if (_ys != null && _ys.TryGetValue(video.Id, out var tmp)) { _yc = tmp; } }
+                                        <span class="video-meta-chip" title="Yorumlar">
+                                            <i class="fas fa-comment" style="margin-right:6px"></i>
+                                            <span class="comment-count">@_yc</span>
+                                        </span>
+                                            <span class="video-meta-chip" title="Beğeni">
+                                                <i class="fas fa-thumbs-up" style="margin-right:6px"></i>
+                                                <span class="like-count">@video.BegeniSayisi</span>
+                                            </span>
+                                            <span class="video-meta-chip" title="Beğenilmeme">
+                                                <i class="fas fa-thumbs-down" style="margin-right:6px"></i>
+                                                <span class="dislike-count">@video.DislikeSayisi</span>
+                                            </span>
+                                        </div>
+                                        <span class="video-meta-chip upload-date absolute top-4">@video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+                <nav class="mt-8 flex items-center justify-center gap-2" aria-label="Sayfalama">
+                    @{ var currentCategory = ViewBag.SeciliKategori as string; int page = ViewBag.Page ?? 1; int totalPages = ViewBag.TotalPages ?? 1; int size = ViewBag.Size ?? 12; }
+                    <a class="px-3 py-2 rounded-md border text-sm @(page <= 1 ? "pointer-events-none opacity-50" : "hover:bg-blue-50")" href="@Url.Action("Index", new { kategori = currentCategory, page = Math.Max(1, page-1), size = size })">Önceki</a>
+                    @{
+                        var start = Math.Max(1, page - 2);
+                        var end = Math.Min(totalPages, page + 2);
+                        if (end - start < 4)
+                        {
+                            if (start == 1) end = Math.Min(totalPages, start + 4);
+                            else if (end == totalPages) start = Math.Max(1, end - 4);
+                        }
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == page)
+                        {
+                            <span class="px-3 py-2 rounded-md bg-blue-600 text-white text-sm">@i</span>
+                        }
+                        else
+                        {
+                            <a class="px-3 py-2 rounded-md border text-sm hover:bg-blue-50" href="@Url.Action("Index", new { kategori = currentCategory, page = i, size = size })">@i</a>
+                        }
+                    }
+                    <a class="px-3 py-2 rounded-md border text-sm @(page >= totalPages ? "pointer-events-none opacity-50" : "hover:bg-blue-50")" href="@Url.Action("Index", new { kategori = currentCategory, page = Math.Min(totalPages, page+1), size = size })">Sonraki</a>
+                </nav>
+                <script>
+                    // Dim only watched items; "Yeni" etiketi görseli etkilemez
+                    document.addEventListener('DOMContentLoaded', function(){
+                        document.querySelectorAll('[data-video-id]').forEach(function(card){
+                            const watched = card.querySelector('.watched-badge');
+                            if (watched && !watched.classList.contains('hidden')){
+                                const img = card.querySelector('img, video');
+                                if (img) img.style.filter = 'grayscale(20%) brightness(0.92)';
+                            }
+                        });
+
+                        // Yerel videolarda ilk kareyi göster
+                        document.querySelectorAll('.video-thumb video').forEach(function(v){
+                            try {
+                                v.muted = true;
+                                v.playsInline = true;
+                                v.preload = 'metadata';
+                                const seekTo = 0.2; // saniye
+                                const onSeeked = function(){ v.pause(); v.removeEventListener('seeked', onSeeked); };
+                                v.addEventListener('seeked', onSeeked);
+                                v.addEventListener('loadedmetadata', function(){
+                                    try { if (v.duration && !isNaN(v.duration)) v.currentTime = seekTo; } catch(e){}
+                                });
+                            } catch(e) {}
+                        });
+
+                        // Her kart için detay çağrısı yaparak like/dislike/comment sayılarını güncelle
+                        const base = window.API_BASE || '/api/proxy';
+                        document.querySelectorAll('[data-video-id]').forEach(function(card){
+                            const id = card.getAttribute('data-video-id');
+                            if (!id) return;
+                            fetch(`${base}/videos/${id}`)
+                                .then(r => r.ok ? r.json() : Promise.reject(r.status))
+                                .then(data => {
+                                    if (!data || !data.video) return;
+                                    const like = card.querySelector('.like-count');
+                                    const dislike = card.querySelector('.dislike-count');
+                                    const comments = card.querySelector('.comment-count');
+                                    if (like && typeof data.video.begeniSayisi === 'number') like.textContent = data.video.begeniSayisi;
+                                    if (dislike && typeof data.video.dislikeSayisi === 'number') dislike.textContent = data.video.dislikeSayisi;
+                                    if (comments && Array.isArray(data.yorumlar)) comments.textContent = data.yorumlar.length;
+                                })
+                                .catch(() => {});
+                        });
+                    });
+                </script>
+            }
+            else
+            {
+                <!-- Video Bulunamadı Durumu -->
+                <div class="text-center py-24 col-span-full bg-white rounded-lg shadow-sm border border-blue-100">
+                    <div class="flex justify-center items-center mx-auto w-24 h-24 bg-blue-100 rounded-full mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-blue-800">Henüz Video Yok</h2>
+                    <p class="text-blue-700/80 mt-2">Bu kategoride hiç video bulunamadı. İlk videoyu yükleyerek başlayın!</p>
+                </div>
+            }
+             <script>
+                 // Upload butonu: sadece belirlenen email için izin ver, diğerlerine popup
+                 document.addEventListener('click', function (e) {
+                     const anchor = e.target.closest('a.video-upload-button');
+                     if (!anchor) return;
+                     const allowed = anchor.getAttribute('data-allowed') === 'true';
+                     if (!allowed) {
+                         e.preventDefault();
+                         alert('Çok yakında');
+                     }
+                 });
+             </script>
+        </div>
+    </main>
+</div>
+

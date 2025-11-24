@@ -1,0 +1,130 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+
+<form method="post" asp-action="SaveKonutIlanEdit">
+    <input type="hidden" name="Id" value="@Model._Ilanlar.FirstOrDefault()?.Id" />
+
+    <!-- Temel Bilgiler -->
+    <div class="form-group">
+        <label for="Title">İlan Başlığı</label>
+        <input type="text" id="Title" name="Title" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Title" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Açıklama</label>
+        <textarea id="Description" name="Description" class="form-control" rows="5" required>@Model._Ilanlar.FirstOrDefault()?.Description</textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="Price">Fiyat</label>
+        <input type="number" id="Price" name="Price" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Price" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Category">Kategori</label>
+        <select id="Category" name="Category" class="form-control">
+            <option value="Konut (Yaşam Alanı)" selected>Konut (Yaşam Alanı)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Area">Alan (m²)</label>
+        <input type="number" id="Area" name="Area" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Area" />
+    </div>
+
+    <!-- Konum Bilgileri -->
+    <div class="form-group">
+        <label for="sehir">İl</label>
+        <input type="text" id="sehir" name="sehir" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.sehir" required />
+    </div>
+
+    <div class="form-group">
+        <label for="semt">İlçe</label>
+        <input type="text" id="semt" name="semt" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.semt" required />
+    </div>
+
+    <div class="form-group">
+        <label for="mahalleKoy">Mahalle/Köy</label>
+        <input type="text" id="mahalleKoy" name="mahalleKoy" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.mahalleKoy" required />
+    </div>
+
+    <!-- Detay Bilgileri -->
+    <div class="form-group">
+        <label for="OdaSayisi">Oda Sayısı</label>
+        <input type="text" id="OdaSayisi" name="OdaSayisi" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.OdaSayisi" />
+    </div>
+
+    <div class="form-group">
+        <label for="BinaYasi">Bina Yaşı</label>
+        <input type="text" id="BinaYasi" name="BinaYasi" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.BinaYasi" />
+    </div>
+
+    <div class="form-group">
+        <label for="Isitma">Isıtma</label>
+        <input type="text" id="Isitma" name="Isitma" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Isitma" />
+    </div>
+
+    <div class="form-group">
+        <label for="KatSayisi">Kat Sayısı</label>
+        <input type="text" id="KatSayisi" name="KatSayisi" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.KatSayisi" />
+    </div>
+
+    <div class="form-group">
+        <label for="BulunduguKat">Bulunduğu Kat</label>
+        <input type="text" id="BulunduguKat" name="BulunduguKat" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.BulunduguKat" />
+    </div>
+
+    <div class="form-group">
+        <label for="BanyoSayisi">Banyo Sayısı</label>
+        <input type="text" id="BanyoSayisi" name="BanyoSayisi" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.BanyoSayisi" />
+    </div>
+
+    <!-- Özellikler -->
+    <div class="form-group">
+        <label>Özellikler</label>
+        <div class="form-check">
+            <input type="checkbox" id="Balkon" name="Balkon" class="form-check-input" value="true" @(Model._Ilanlar.FirstOrDefault()?.Balkon == "Var" ? "checked" : "") />
+            <label class="form-check-label" for="Balkon">Balkon</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" id="Asansor" name="Asansor" class="form-check-input" value="true" @(Model._Ilanlar.FirstOrDefault()?.Asansor == "Var" ? "checked" : "") />
+            <label class="form-check-label" for="Asansor">Asansör</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" id="Otopark" name="Otopark" class="form-check-input" value="true" @(Model._Ilanlar.FirstOrDefault()?.Otopark == "Var" ? "checked" : "") />
+            <label class="form-check-label" for="Otopark">Otopark</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" id="Esyali" name="Esyali" class="form-check-input" value="true" @(Model._Ilanlar.FirstOrDefault()?.Esyali == "Var" ? "checked" : "") />
+            <label class="form-check-label" for="Esyali">Eşyalı</label>
+        </div>
+    </div>
+
+    <!-- Diğer Bilgiler -->
+    <div class="form-group">
+        <label for="KullanimDurumu">Kullanım Durumu</label>
+        <input type="text" id="KullanimDurumu" name="KullanimDurumu" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.KullanimDurumu" />
+    </div>
+
+    <div class="form-group">
+        <label for="TapuDurumu">Tapu Durumu</label>
+        <input type="text" id="TapuDurumu" name="TapuDurumu" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.TapuDurumu" />
+    </div>
+
+    <div class="form-group">
+        <label for="KrediyeUygunluk">Krediye Uygunluk</label>
+        <select id="KrediyeUygunluk" name="KrediyeUygunluk" class="form-control">
+           @*  <option value="Evet" @(Model._Ilanlar.FirstOrDefault()?.KrediyeUygunluk == "Evet" ? "selected" : "")>Evet</option>
+            <option value="Hayır" @(Model._Ilanlar.FirstOrDefault()?.KrediyeUygunluk == "Hayır" ? "selected" : "")>Hayır</option> *@
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="TakasaUygunluk">Takasa Uygunluk</label>
+        <select id="TakasaUygunluk" name="TakasaUygunluk" class="form-control">
+           @*  <option value="Evet" @(Model._Ilanlar.FirstOrDefault()?.TakasaUygunluk == "Evet" ? "selected" : "")>Evet</option>
+            <option value="Hayır" @(Model._Ilanlar.FirstOrDefault()?.TakasaUygunluk == "Hayır" ? "selected" : "")>Hayır</option> *@
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

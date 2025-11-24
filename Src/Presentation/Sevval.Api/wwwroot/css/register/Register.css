@@ -1,0 +1,190 @@
+﻿.eye-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+    user-select: none;
+}
+
+.text-danger {
+    color: red;
+}
+
+.back-to-home {
+    background-color: #007bff; /* Canlı mavi */
+    padding: 10px 30px; /* Butonun iç boşluğunu dengeledik */
+    text-align: center;
+    border-radius: 60px; /* Yuvarlak köşeler */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Belirgin gölge */
+    transition: all 0.3s ease-in-out; /* Geçiş efekti */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    display: inline-block;
+    margin-top: 20px;
+    margin-left: auto; /* Soldan boşluk */
+    margin-right: auto; /* Sağdan boşluk */
+    width: fit-content; /* İçeriğe göre genişlik */
+}
+
+    .back-to-home a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px; /* Font boyutunu belirledik */
+        font-weight: 600;
+        letter-spacing: 1px; /* Harf aralığını açtık */
+        display: inline-block;
+        transition: all 0.3s ease-in-out;
+        min-width: 200px;
+    }
+
+    .back-to-home:hover {
+        background-color: #0056b3; /* Hoverda daha koyu mavi */
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Hoverda gölgeyi güçlendirme */
+        transform: translateY(-8px); /* Yüksekliğe animasyon */
+    }
+
+    .back-to-home a:hover {
+        color: #FFFF00; /* Hoverda metin rengini sarı yap */
+        transform: scale(1.1); /* Hoverda metni büyütme */
+    }
+
+    .back-to-home a:active {
+        transform: scale(1); /* Butona tıklanınca boyut eski haline gelir */
+    }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    /*.container {
+        padding: 10px;
+        width: 100%;
+        max-width: 100%;
+    }*/
+
+  /*  .form-card {
+        width: 100%;
+        margin: 0;
+        padding: 15px;
+    }*/
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .password-fields {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+
+    .back-to-home {
+        width: 100%;
+        margin: 20px 0;
+    }
+
+        .back-to-home a {
+            min-width: auto;
+            width: 100%;
+        }
+
+    h2 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-content {
+        padding: 15px 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+
+    .extra-links {
+        text-align: center;
+    }
+}
+.terms-row {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.terms-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.terms-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 16px; /* Yazı boyutu */
+    font-family: 'Arial', sans-serif;
+    color: #333; /* Yazı rengi */
+    flex-wrap: wrap;
+}
+
+    .terms-label input[type="checkbox"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #007bff; /* Çerçeve rengi */
+        border-radius: 4px; /* Hafif yuvarlak köşeler */
+        margin-right: 10px; /* Kutucuk ile yazı arasındaki boşluk */
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+        .terms-label input[type="checkbox"]:checked {
+            background-color: #007bff; /* Seçildiğinde mavi arka plan */
+            border-color: #0056b3; /* Daha koyu çerçeve */
+        }
+
+            .terms-label input[type="checkbox"]:checked::before {
+                content: '✔'; /* İşaret simgesi */
+                color: white;
+                font-weight: bold;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+.checkmark {
+    margin-right: 10px;
+}
+
+#terms-error {
+    font-size: 14px; /* Uyarı yazısı boyutu */
+    margin-top: 5px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .terms-label {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .terms-label {
+        font-size: 13px;
+    }
+}

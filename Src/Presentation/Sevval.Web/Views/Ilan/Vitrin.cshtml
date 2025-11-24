@@ -1,0 +1,16 @@
+﻿@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<h2>İlan Vitrini</h2>
+
+<div class="ilan-vitrin">
+    <!-- Burada ilanların listeleneceği alanı ekleyin -->
+    <div class="ilan-item">
+        <h3>İlan Başlığı</h3>
+        <p>İlan Açıklaması: Bu alanda ilan açıklaması yer alacak.</p>
+        <p>Fiyat: 100.000 TL</p>
+        <a href="@Url.Action("Detay", "Ilan", new { id = 1 })">Detayları Görüntüle</a>
+    </div>
+    <!-- Daha fazla ilan eklemek için yukarıdaki yapıyı tekrarlayabilirsiniz -->
+</div>

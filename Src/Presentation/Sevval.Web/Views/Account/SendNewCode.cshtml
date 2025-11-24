@@ -1,0 +1,71 @@
+@model sevvalemlak.csproj.Dto.Account.SendNewCodeDto
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifrenizi Sıfırlayın</title>
+    <link rel="stylesheet" href="~/css/modern-login.css" />
+    <link rel="stylesheet" href="~/css/forgot-password.css" /> <!-- Yeni CSS dosyası -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery kütüphanesi -->
+</head>
+<body>
+    <div class="login-container">
+        <div class="form-section">
+            <h2>Şifrenizi Sıfırlayın</h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="text-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <form asp-action="SendNewCode" asp-controller="Account" method="post">
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+
+                <div class="form-group" id="emailSection">
+
+                    <label asp-for="Email">E-posta Adresi</label>
+
+                    <input asp-for="Email" class="form-control" />
+
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
+
+                </div>
+
+
+
+
+                <button type="submit" class="btn btn-primary">Kod Gönder</button>
+
+
+            </form>
+
+
+            <div class="footer">
+
+                <p><a href="/Account/Login">Giriş Yapın</a></p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

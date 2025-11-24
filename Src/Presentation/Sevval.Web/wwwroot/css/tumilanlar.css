@@ -1,0 +1,133 @@
+﻿/* Genel Ayarlar */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #1e3a8a; /* Mavi Renk */
+}
+
+/* Form Alanları */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-size: 16px;
+    color: #1e3a8a; /* Mavi Renk */
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-select, .form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #1e3a8a; /* Mavi Renk */
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+    .form-select:focus, .form-control:focus {
+        border-color: #1e3a8a;
+        outline: none;
+        box-shadow: 0 0 5px rgba(30, 58, 138, 0.5);
+    }
+
+/* Tablo */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+    table th, table td {
+        padding: 12px 15px;
+        text-align: left;
+        border: 1px solid #e0e7ff;
+    }
+
+    table th {
+        background-color: #1e3a8a; /* Mavi Renk */
+        color: white;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    table tr:hover {
+        background-color: #e0e7ff; /* Hafif Mavi Gölgeleme */
+    }
+
+/* Butonlar */
+.btn {
+    background-color: #1e3a8a; /* Mavi Renk */
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    .btn:hover {
+        background-color: #3b82f6; /* Hover Durumu için Açık Mavi */
+    }
+
+.btn-info {
+    background-color: #0ea5e9; /* Açık Mavi */
+}
+
+    .btn-info:hover {
+        background-color: #0284c7;
+    }
+
+/* Filtreleme ve Arama */
+#search {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #1e3a8a;
+    margin-top: 10px;
+    background-color: #f8f9fa;
+}
+
+    #search:focus {
+        border-color: #1e3a8a;
+        outline: none;
+        box-shadow: 0 0 5px rgba(30, 58, 138, 0.5);
+    }
+
+/* Flex Düzenlemeleri */
+.d-flex {
+    display: flex;
+}
+
+.align-items-end {
+    align-items: flex-end;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}

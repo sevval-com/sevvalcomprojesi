@@ -1,0 +1,388 @@
+﻿@model Sevval.Web.Models.VideoUploadViewModel
+@{
+    ViewData["Title"] = "Video Yükle";
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+}
+<div class="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full space-y-8">
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl">
+            <div class="text-center mb-8">
+                <i class="fas fa-cloud-upload-alt text-5xl text-blue-600"></i>
+                <h1 class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">Video Yükle</h1>
+                <p class="mt-2 text-sm text-slate-600">Videonuzun detaylarını girerek yayına hazırlayın.</p>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-red-600 bg-red-100 p-4 rounded-lg mb-6"></div>
+            <form id="videoUploadForm" asp-action="Upload" method="post" enctype="multipart/form-data" class="space-y-8">
+                @Html.AntiForgeryToken()
+                <!-- Temel Bilgiler -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4 w-full">Video Detayları</legend>
+                    <div>
+                        <label asp-for="VideoAdi" class="form-label">Başlık</label>
+                        <input asp-for="VideoAdi" class="form-input" placeholder="Videonuza dikkat çekici bir başlık girin" maxlength="200">
+                        <span class="text-xs text-slate-500">Maksimum 200 karakter</span>
+                        <span asp-validation-for="VideoAdi" class="form-error"></span>
+                    </div>
+                    <div>
+                        <label asp-for="VideoAciklamasi" class="form-label">Açıklama</label>
+                        <textarea asp-for="VideoAciklamasi" rows="5" class="form-input" placeholder="Videonuz hakkında bilgi verin..." maxlength="1000"></textarea>
+                        <span class="text-xs text-slate-500">Maksimum 1000 karakter</span>
+                        <span asp-validation-for="VideoAciklamasi" class="form-error"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label asp-for="Kategori" class="form-label">Kategori</label>
+                            @if (User.Identity?.Name == "sftumen41@gmail.com")
+                            {
+                                <a href="@Url.Action("Index", "Category")" 
+                                   class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors">
+                                    <i class="fas fa-cog"></i>
+                                    Kategori Yönetimi
+                                </a>
+                            }
+                        </div>
+                        <select asp-for="Kategori" id="categorySelect" class="form-input">
+                            <option value="" selected>Bir kategori seçin...</option>
+                        </select>
+                        <span asp-validation-for="Kategori" class="form-error"></span>
+                        <p class="text-xs text-slate-500 mt-1">Kategoriler Category sayfasından yönetilir.</p>
+                    </div>
+                </fieldset>
+                <!-- Dosya Yüklemeleri -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4 w-full">Dosyalar</legend>
+                    <!-- Video Kaynağı -->
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-slate-800 mb-4">Video Kaynağı</h3>
+                        <label for="video-upload-input" class="form-label">1. Bilgisayardan Yükle</label>
+                        <input type="file" asp-for="VideoDosyasi" id="video-upload-input" class="form-file" accept="video/*" />
+                        <p class="text-xs text-slate-500 mt-1">Maksimum video dosyası boyutu: 1 GB</p>
+                        <span asp-validation-for="VideoDosyasi" class="form-error"></span>
+                        <div class="my-4 text-center text-sm font-semibold text-slate-400">VEYA</div>
+                        <label asp-for="YouTubeLink" class="form-label">2. YouTube Linki</label>
+                        <input asp-for="YouTubeLink" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
+                        <span asp-validation-for="YouTubeLink" class="form-error"></span>
+                    </div>
+                    <!-- Kapak Fotoğrafı -->
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <label for="cover-upload-input" class="form-label">Kapak Fotoğrafı (Opsiyonel)</label>
+                        <input type="file" asp-for="KapakFotografi" id="cover-upload-input" accept="image/*" class="form-file" />
+                        <p class="text-xs text-slate-500 mt-1">En iyi sonuç için 16:9 oranında bir resim yükleyin. Yüklemezseniz, videodan bir kare otomatik seçilir.</p>
+                        <!-- Önizleme Alanı -->
+                        <div id="preview-container" class="mt-4 hidden">
+                            <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-slate-200">
+                                <img id="cover-preview-image" src="#" alt="Kapak önizlemesi" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- Buton -->
+                <div>
+                    <div class="flex items-center justify-center gap-3">
+                        <button id="uploadSubmitBtn" type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center gap-3 text-lg disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fa fa-check-circle"></i> Videoyu Yayınla
+                        </button>
+                        <span id="uploadPercentWrap" class="hidden text-sm text-slate-600">
+                            <span id="uploadPercent">0</span>%
+                        </span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="mt-3 max-w-3xl mx-auto hidden" id="uploadProgressWrap">
+                        <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="uploadProgressBar" class="h-2 bg-blue-600" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kategori dropdown'ını doldur
+            populateCategoriesDropdown();
+
+            const coverInput = document.getElementById('cover-upload-input');
+            const previewContainer = document.getElementById('preview-container');
+            const previewImage = document.getElementById('cover-preview-image');
+            const videoInput = document.getElementById('video-upload-input');
+            // 1 GB sınır kontrolü (istemci tarafı)
+            if (videoInput) {
+                videoInput.addEventListener('change', function(e){
+                    const file = e.target.files && e.target.files[0];
+                    const MAX = 1024 * 1024 * 1024; // 1 GB
+                    if (file && file.size > MAX) {
+                        alert('❌ Video boyutu 1 GB sınırını aşıyor. Lütfen daha küçük bir dosya seçin.');
+                        e.target.value = '';
+                    }
+                });
+            }
+            coverInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.classList.add('hidden');
+                }
+            });
+
+            // Yükleme yüzdesi için XHR ile gönderim
+            const form = document.getElementById('videoUploadForm');
+            const submitBtn = document.getElementById('uploadSubmitBtn');
+            const percentWrap = document.getElementById('uploadPercentWrap');
+            const progressWrap = document.getElementById('uploadProgressWrap');
+            const bar = document.getElementById('uploadProgressBar');
+            const percentText = document.getElementById('uploadPercent');
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    // İstemci tarafı 1 GB doğrulama (gönderimden önce)
+                    const file = form.querySelector('#video-upload-input')?.files?.[0];
+                    const MAX = 1024 * 1024 * 1024;
+                    if (file && file.size > MAX) {
+                        alert('❌ Video boyutu 1 GB sınırını aşıyor. Lütfen daha küçük bir dosya seçin.');
+                        return;
+                    }
+                    const xhr = new XMLHttpRequest();
+                    const actionUrl = form.getAttribute('action') || window.location.pathname;
+                    percentWrap.classList.remove('hidden');
+                    if (progressWrap) progressWrap.classList.remove('hidden');
+                    if (bar) {
+                        bar.classList.remove('bg-green-600');
+                        bar.classList.add('bg-blue-600');
+                        bar.style.width = '0%';
+                    }
+                    percentText.textContent = '0';
+
+                    xhr.open('POST', actionUrl, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.upload.onloadstart = function() { 
+                        percentWrap.classList.remove('hidden'); 
+                        if (progressWrap) progressWrap.classList.remove('hidden');
+                    };
+
+                    xhr.upload.onprogress = function(event) {
+                        if (event.lengthComputable) {
+                            const percent = Math.round((event.loaded / event.total) * 100);
+                            if (bar) bar.style.width = percent + '%';
+                            percentText.textContent = percent.toString();
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        // Başarılı ya da hatalı yanıt geldiğinde tetiklenir
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            // %100 ve yeşil göster
+                            if (bar) bar.style.width = '100%';
+                            percentText.textContent = '100';
+                            if (bar) { bar.classList.remove('bg-blue-600'); bar.classList.add('bg-green-600'); }
+                            // Başarılı yükleme sonrası yönlendirme varsa takip et
+                            try {
+                                const resp = JSON.parse(xhr.responseText || '{}');
+                                if (resp && resp.redirectUrl) {
+                                    window.location.href = resp.redirectUrl;
+                                }
+                            } catch {}
+                        } else {
+                            alert('❌ Yükleme başarısız: ' + xhr.status);
+                        }
+                        submitBtn.disabled = false;
+                    };
+
+                    xhr.onerror = function() {
+                        alert('❌ Ağ hatası oluştu.');
+                        submitBtn.disabled = false;
+                    };
+
+                    submitBtn.disabled = true;
+                    xhr.send(formData);
+                });
+            }
+        });
+
+        async function populateCategoriesDropdown() {
+            try {
+                const sel = document.getElementById('categorySelect');
+                if (!sel) return;
+                const res = await fetch('/Category/GetCategories');
+                const data = await res.json();
+                if (!data.success) return;
+                const items = data.categories || [];
+                sel.innerHTML = '<option value="">Bir kategori seçin...</option>' + items.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+
+                // Canlıda seçili gelmeme sorununa karşı: URL'deki kategori parametresini uygula (case/trim tolerant)
+                const urlParams = new URLSearchParams(window.location.search);
+                const qsKat = urlParams.get('kategori') || urlParams.get('category') || '';
+                const normalize = s => (s || '').toString().trim().replace(/\.$/, '');
+                const target = normalize(qsKat);
+                if (target) {
+                    const opt = Array.from(sel.options).find(o => normalize(o.value).toLowerCase() === target.toLowerCase());
+                    if (opt) sel.value = opt.value;
+                }
+            } catch (e) { console.error('Kategoriler yüklenemedi', e); }
+        }
+
+        function escapeHtml(str){
+            return (str||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+    </script>
+
+    <!-- YASAKLI KELİME KONTROL SCRIPTI -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let forbiddenWords = [];
+            let forbiddenRegex = null;
+            const validationStates = {};
+            const form = document.querySelector('form[asp-action="Upload"]');
+            if (!form) return;
+
+            const inputsToValidate = form.querySelectorAll('input[name="VideoAdi"], textarea[name="VideoAciklamasi"], input[name="Kategori"]');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            async function loadForbiddenWords() {
+                try {
+                    const response = await fetch('/ForbiddenWords.txt');
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const text = await response.text();
+                    forbiddenWords = text.split(/\r?\n/).filter(word => word.trim() !== '').map(word => word.toLowerCase());
+                    if (forbiddenWords.length > 0) {
+                        const escapedWords = forbiddenWords.map(word => word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+                        forbiddenRegex = new RegExp(`\\b(${escapedWords.join('|')})\\b`, 'gi');
+                    }
+                } catch (error) {
+                    console.error('Could not load forbidden words list:', error);
+                }
+            }
+
+            function updateFormValidity() {
+                const isFormValid = Object.values(validationStates).every(isValid => isValid);
+                if(submitButton) {
+                    submitButton.disabled = !isFormValid;
+                }
+            }
+
+            function checkForbiddenWords(inputElement) {
+                const text = inputElement.value.toLowerCase();
+                const inputName = inputElement.name;
+                const foundWords = new Set();
+
+                if (forbiddenRegex) {
+                     const matches = text.match(forbiddenRegex);
+                     if (matches) {
+                         matches.forEach(match => foundWords.add(match.toLowerCase()));
+                     }
+                }
+
+                let errorContainer = inputElement.parentNode.querySelector('.form-error-forbidden');
+                if (!errorContainer) {
+                    errorContainer = document.createElement('div');
+                    errorContainer.className = 'form-error-forbidden text-red-600 text-sm mt-1';
+                    inputElement.parentNode.insertBefore(errorContainer, inputElement.nextSibling);
+                }
+
+                if (foundWords.size > 0) {
+                    inputElement.classList.add('forbidden-input');
+                    errorContainer.innerHTML = `Yasaklı kelime(ler) içeriyor: <span class="font-semibold">${Array.from(foundWords).join(', ')}</span>`;
+                    validationStates[inputName] = false;
+                } else {
+                    inputElement.classList.remove('forbidden-input');
+                    errorContainer.textContent = '';
+                    validationStates[inputName] = true;
+                }
+                updateFormValidity();
+            }
+
+            loadForbiddenWords().then(() => {
+                inputsToValidate.forEach(input => {
+                    validationStates[input.name] = true; // Başlangıçta geçerli say
+                    input.addEventListener('input', () => checkForbiddenWords(input));
+                     // Sayfa yüklendiğinde mevcut içeriği kontrol et
+                    if(input.value) {
+                        checkForbiddenWords(input);
+                    }
+                });
+            });
+
+             form.addEventListener('submit', (event) => {
+               // Göndermeden önce son bir kez daha tüm alanları kontrol et
+               inputsToValidate.forEach(input => checkForbiddenWords(input));
+               if (submitButton && submitButton.disabled) {
+                   event.preventDefault();
+                   console.log('Form contains forbidden words. Submission blocked.');
+               }
+           });
+        });
+    </script>
+    <style>
+        .form-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .form-input {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: #1e293b;
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgb(59 130 246 / 0.4);
+            }
+
+        .form-error {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-file {
+            display: block;
+            width: 100%;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+            .form-file::file-selector-button {
+                margin-right: 1rem;
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                border-width: 0;
+                font-size: 0.875rem;
+                font-weight: 600;
+                background-color: #eff6ff;
+                color: #2563eb;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+                .form-file::file-selector-button:hover {
+                    background-color: #dbeafe;
+                }
+
+        /* YASAKLI KELİME STİLİ */
+        .forbidden-input, .forbidden-input:focus {
+            border-color: #ef4444 !important; /* red-500 */
+            box-shadow: 0 0 0 3px rgb(239 68 68 / 40%) !important;
+        }
+    </style>
+}

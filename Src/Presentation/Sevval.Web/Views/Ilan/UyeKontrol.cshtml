@@ -1,0 +1,129 @@
+﻿@model TumIlanlarDTO
+@{
+    Layout = null; // Layout kullanılmıyor
+    var filter = ViewBag.Filter as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üye Kontrol Paneli</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <h1 class="text-center my-4 text-primary">Üye Kontrol Paneli</h1>
+
+    <div class="container uye-kontrol-panel bg-white shadow p-4 rounded">
+        <div class="d-flex justify-content-center mb-4">
+            <label class="form-check-label me-3">
+                <input type="radio" class="form-check-input" name="userType" value="All"
+                @(filter == "All" ? "checked" : "") onchange="filterUsers(this.value)">
+                Tüm Kullanıcılar
+            </label>
+            <label class="form-check-label me-3">
+                <input type="radio" class="form-check-input" name="userType" value="Bireysel"
+                @(filter == "Bireysel" ? "checked" : "") onchange="filterUsers(this.value)">
+                Bireysel
+            </label>
+            <label class="form-check-label">
+                <input type="radio" class="form-check-input" name="userType" value="Kurumsal"
+                @(filter == "Kurumsal" ? "checked" : "") onchange="filterUsers(this.value)">
+                Kurumsal
+            </label>
+        </div>
+
+        <table class="table table-striped table-bordered">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>E-Posta</th>
+                    <th>Kullanıcı Tipi</th>
+                    <th>Firma Adı</th>
+                    <th>Firma Durumu</th>
+                    <th>İlan Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    var ilanCount = Model._Ilanlar.Count(i => i.Email == user.Email);
+                    if (filter == "All" ||
+                    (filter == "Bireysel" && user.UserTypes == "BİREYSEL GİRİŞ") ||
+                    (filter == "Kurumsal" && user.UserTypes == "KURUMSAL GIRIŞ"))
+                    {
+                        <tr>
+                            <td>@user.FirstName @user.LastName</td>
+                            <td>@user.Email</td>
+                            <td>@user.UserTypes</td>
+                            <td>@(user.UserTypes == "KURUMSAL GIRIŞ" ? user.CompanyName : "-")</td>
+                            <td>
+                                @if (user.UserTypes == "KURUMSAL GIRIŞ")
+                                {
+                                    @if (user.IsConsultant)
+                                    {
+                                        <span>Danışman (@user.CompanyName)</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Firma Sahibi</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>@ilanCount</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function filterUsers(filter) {
+            const url = `@Url.Action("UyeKontrol", "Ilan")?filter=${filter}`;
+            window.location.href = url;
+        }
+    </script>
+
+    <style>
+        .uye-kontrol-panel {
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+
+        .table th {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .form-check-label {
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-check-input {
+            margin-right: 8px;
+        }
+
+        h1 {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+    </style>
+
+</body>
+</html>

@@ -1,0 +1,1530 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+
+    var currentUser = await UserManager.GetUserAsync(User);
+    bool canEdit = currentUser != null && currentUser.Email == "sftumen41@gmail.com";
+    var aboutUsContents = ViewBag.AboutUsContents as Dictionary<string, string>;
+}
+
+
+<link rel="stylesheet" href="~/css/about.css">
+<link rel="icon" type="image/png" href="~/images/favlogo.png">
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+
+
+<style>
+    .editable-line {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+        .editable-line .edit-icon {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #007bff;
+            display: none;
+        }
+
+        .editable-line:hover .edit-icon {
+            display: @(canEdit ? "block" : "none");
+        }
+
+        .editable-line .edit-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: none;
+            resize: vertical;
+        }
+
+        .editable-line .save-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .editable-line .text-content {
+            flex-grow: 1;
+            word-wrap: break-word;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+    .content-editor-container {
+        margin: 20px 0;
+    }
+
+    /* Sosyal Medya Kartları Stilleri */
+    .social-media-card {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e8eef6;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow: 0 10px 30px rgba(11,42,87,.08);
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .social-media-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 42px rgba(11,42,87,.16);
+        border-color: #dbe6f7;
+    }
+
+    .social-media-card .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 22px 0 22px;
+        text-decoration: none;
+    }
+
+    .social-media-card .social-icon {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 10px rgba(11,42,87,.18));
+        transition: transform .25s ease;
+    }
+
+    .social-media-card:hover .social-icon { transform: scale(1.06); }
+
+    .social-media-card .text {
+        padding: 18px 22px 22px 22px;
+        background: transparent;
+    }
+
+    .social-media-card .social-title {
+        color: #0b2a57;
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        line-height: 1.25;
+        letter-spacing: .2px;
+    }
+
+    .social-media-card .social-description {
+        color: #5b6b7e;
+        font-size: 14.5px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .social-edit-controls {
+        background: #f6f8fc;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #e6ecf5;
+        margin-top: 10px;
+    }
+
+    /* Sağ üst kalem ikonu */
+    .edit-pencil-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(11,42,87,.06);
+        border: 1px solid rgba(11,42,87,.15);
+        color: #0b2a57;
+        box-shadow: 0 8px 18px rgba(11,42,87,.12);
+        cursor: pointer;
+        opacity: 0;
+        transition: background .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .social-media-card:hover .edit-pencil-btn { opacity: 1; }
+    .edit-pencil-btn:hover { background: rgba(11,42,87,.12); box-shadow: 0 10px 24px rgba(11,42,87,.18); }
+
+    .save-social-btn:hover {
+        background: #218838 !important;
+    }
+
+    .cancel-social-btn:hover {
+        background: #545b62 !important;
+    }
+
+    .editor-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #ddd;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .editor-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .editor-controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-edit, .btn-save, .btn-cancel {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+        background: #007bff;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background: #0056b3;
+        }
+
+    .btn-save {
+        background: #28a745;
+        color: white;
+        display: none;
+    }
+
+        .btn-save:hover {
+            background: #1e7e34;
+        }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        display: none;
+    }
+
+        .btn-cancel:hover {
+            background: #545b62;
+        }
+
+    .editor-content {
+        padding: 20px;
+        min-height: 200px;
+    }
+
+    .content-display {
+        line-height: 1.6;
+        color: #333;
+    }
+
+    #aboutUsEditor {
+        display: none;
+    }
+
+    .edit-mode-indicator {
+        background: #fff3cd;
+        color: #856404;
+        padding: 10px 20px;
+        border-bottom: 1px solid #ffeaa7;
+        font-size: 14px;
+        display: none;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px 20px;
+        border: 1px solid #c3e6cb;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px 20px;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+    }
+
+    @@media (max-width: 768px) {
+        .container {
+            width: 100% !important;
+            padding: 10px !important;
+            box-sizing: border-box;
+        }
+
+        .about-us-section {
+            margin: 10px 0 !important;
+            padding: 15px 10px !important;
+        }
+
+        .editable-line {
+            margin-bottom: 15px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+            .editable-line .text-content {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
+            }
+
+        .main-container {
+            padding: 10px !important;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .content-container {
+            width: 100% !important;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .frame {
+            width: 100% !important;
+            margin: 10px 0 !important;
+            padding: 15px !important;
+            box-sizing: border-box;
+        }
+
+        .contact-info {
+            padding: 15px !important;
+        }
+
+        iframe {
+            width: 100% !important;
+            height: 300px !important;
+        }
+
+        body {
+            overflow-x: hidden !important;
+        }
+
+        * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+    }
+
+    .post-ad-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .free-tag {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        background-color: #007bff;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 4px;
+        transform: rotate(-10deg);
+        z-index: 1;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .post-ad {
+        display: inline-block;
+        background-color: #ffffff;
+        color: #007bff;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        border: 1px solid #007bff;
+        transition: 0.3s ease;
+    }
+
+        .post-ad:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    .coming-soon-tag {
+        position: absolute;
+        top: 20px;
+        left: 55px;
+        background-color: #007bff;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 4px;
+        transform: none;
+        z-index: 1;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+
+
+    .sol-bolum, .sag-bolum {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .sag-bolum {
+        border-left: 2px solid #fff;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-size: 28px;
+        color: #fff;
+        font-weight: bold;
+    }
+
+</style>
+<style>
+    .reklam-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .reklam-popup-content {
+        position: relative;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 80vw;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+        .reklam-popup-content img {
+            width: 50%;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+    .reklam-close {
+        position: absolute;
+        top: 20px;
+        right: 318px;
+        font-size: 30px;
+        cursor: pointer;
+        background-color: red;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        color: white;
+        text-align: center;
+    }
+     #social-media-container{
+             display: grid;
+     grid-template-columns: 2fr 2fr;
+     }
+
+     /* İletişim Bilgileri Stilleri */
+     .contact-info-card {
+         position: relative;
+         border-radius: 16px;
+         overflow: hidden;
+         border: 1px solid #e8eef6;
+         background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+         box-shadow: 0 10px 30px rgba(11,42,87,.08);
+         transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+         margin-bottom: 20px;
+     }
+
+     .contact-info-card:hover {
+         transform: translateY(-4px);
+         box-shadow: 0 16px 42px rgba(11,42,87,.16);
+         border-color: #dbe6f7;
+     }
+
+     .contact-info-card .contact-content {
+         padding: 20px 22px;
+         background: transparent;
+     }
+
+     .contact-info-card .contact-label {
+         color: #0b2a57;
+         font-size: 16px;
+         font-weight: 700;
+         margin-bottom: 8px;
+         line-height: 1.3;
+         letter-spacing: .2px;
+     }
+
+     .contact-info-card .contact-value {
+         color: #5b6b7e;
+         font-size: 15px;
+         line-height: 1.6;
+         margin: 0;
+     }
+
+     .contact-info-card .contact-value a {
+         color: #007bff;
+         text-decoration: none;
+         transition: color .2s ease;
+     }
+
+     .contact-info-card .contact-value a:hover {
+         color: #0056b3;
+         text-decoration: underline;
+     }
+
+     .contact-edit-controls {
+         background: #f6f8fc;
+         padding: 14px;
+         border-radius: 12px;
+         border: 1px solid #e6ecf5;
+         margin-top: 10px;
+         display: none;
+     }
+
+     .contact-edit-controls input {
+         width: 100%;
+         padding: 10px 12px;
+         border: 1px solid #ddd;
+         border-radius: 8px;
+         font-size: 14px;
+         margin-bottom: 10px;
+         transition: border-color .2s ease;
+     }
+
+     .contact-edit-controls input:focus {
+         outline: none;
+         border-color: #007bff;
+         box-shadow: 0 0 0 3px rgba(0,123,255,.1);
+     }
+
+     .contact-edit-controls .btn-group {
+         display: flex;
+         gap: 10px;
+     }
+
+     .contact-save-btn, .contact-cancel-btn {
+         padding: 8px 16px;
+         border: none;
+         border-radius: 8px;
+         cursor: pointer;
+         font-size: 14px;
+         font-weight: 500;
+         transition: all .2s ease;
+         flex: 1;
+     }
+
+     .contact-save-btn {
+         background: #28a745;
+         color: white;
+     }
+
+     .contact-save-btn:hover {
+         background: #218838;
+     }
+
+     .contact-cancel-btn {
+         background: #6c757d;
+         color: white;
+     }
+
+     .contact-cancel-btn:hover {
+         background: #545b62;
+     }
+
+     /* Sağ üst kalem ikonu */
+     .contact-edit-pencil-btn {
+         position: absolute;
+         top: 10px;
+         right: 10px;
+         width: 36px;
+         height: 36px;
+         border-radius: 10px;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         background: rgba(11,42,87,.06);
+         border: 1px solid rgba(11,42,87,.15);
+         color: #0b2a57;
+         box-shadow: 0 8px 18px rgba(11,42,87,.12);
+         cursor: pointer;
+         opacity: 0;
+         transition: background .2s ease, box-shadow .2s ease, opacity .2s ease;
+     }
+
+     .contact-info-card:hover .contact-edit-pencil-btn { opacity: 1; }
+     .contact-edit-pencil-btn:hover { background: rgba(11,42,87,.12); box-shadow: 0 10px 24px rgba(11,42,87,.18); }
+
+     #contact-info-container {
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         gap: 20px;
+     }
+     .footer-container .footer-section{
+            display: none !important;
+         }
+
+     @@media (max-width: 768px) {
+         #contact-info-container {
+             grid-template-columns: 1fr;
+         }
+         .about-us-section .container .content{
+            padding: 0 !important;
+         }
+         .footer-container{
+            gap: 0 !important;
+         }
+         
+    }
+</style>
+
+<section id="about-us" class="about-us-section">
+    <div class="container">
+        <div class="content">
+            <h2 class="section-title">BİZ KİMİZ?</h2>
+
+            <div id="successMessage" class="success-message"></div>
+            <div id="errorMessage" class="error-message"></div>
+
+            <div class="content-editor-container">
+                @{
+                    var style = canEdit ? "block" : "none";
+                }
+                <div class="editor-header" id="editorHeader" style="display:@style">
+                    @if (canEdit)
+                    {
+                        <div class="editor-controls">
+                            <button id="editBtn" class="btn-edit" onclick="enterEditMode()">Düzenle</button>
+                            <button id="saveBtn" class="btn-save" onclick="saveContent()">Kaydet</button>
+                            <button id="cancelBtn" class="btn-cancel" onclick="cancelEdit()">İptal</button>
+                        </div>
+                    }
+                </div>
+                <div id="editModeIndicator" class="edit-mode-indicator">
+                    <i class="fas fa-edit"></i> Düzenleme modundasınız. Değişikliklerinizi kaydetmeyi unutmayın.
+                </div>
+                <div class="editor-content">
+                    <div id="contentDisplay" class="content-display">
+                        @if (aboutUsContents != null && aboutUsContents.ContainsKey("main-content"))
+                        {
+                            @Html.Raw(aboutUsContents["main-content"])
+                        }
+                        else
+                        {
+                            <p>Henüz içerik eklenmemiş. Düzenle butonuna tıklayarak içerik ekleyebilirsiniz.</p>
+                        }
+                    </div>
+                    <div id="about-total-visitors" style="margin-top: 20px;">
+                        <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,#1e88e5,#2196f3);color:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 8px 30px rgba(0,0,0,.15);">
+                            <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);backdrop-filter:blur(2px);"><i class="fas fa-users" style="font-size:18px;"></i></span>
+                            <div style="display:flex;flex-direction:column;line-height:1.2;">
+                                <span style="opacity:.9;font-size:12px;">Toplam Ziyaretçi</span>
+                                <strong style="font-size:20px;" id="total-visitors-about">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="aboutUsEditor"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<p class=MsoNormal align=right style='text-align:right;line-height:normal'>
+    <b style='mso-bidi-font-weight:normal'><i style='mso-bidi-font-style:normal'><o:p></o:p></i></b>
+</p>
+
+
+<div class="main-container">
+    <div class="content-container">
+        <div class="map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1511.048268474477!2d29.7863549834906!3d40.759901423207836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cb393deb57eecd%3A0xec639eadcf6a4e02!2s%C5%9Eevval%20Emlak!5e0!3m2!1str!2str!4v1728855772127!5m2!1str!2str" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+        <div class="contact-info">
+            <h2>İletişim Bilgileri</h2>
+             <div id="contact-info-container">
+                 <!-- İletişim bilgileri buraya dinamik olarak yüklenecek -->
+             </div>
+        </div>
+    </div>
+    <h1>Sosyal Medya Hesaplarımız</h1>
+    <div id="social-media-container">
+        <!-- Sosyal medya kartları buraya dinamik olarak yüklenecek -->
+        </div>
+    </div>
+
+<script>
+    // Razor'dan JS'e düzenleme izni bilgisi
+    const canEdit = @(canEdit.ToString().ToLower());
+    // Sosyal medya verilerini API'den çek ve yükle
+    async function loadSocialMedia() {
+        try {
+            // Önce orijinal API'den verileri çek
+            const apiResponse = await fetch('/api/proxy/social-media');
+            let apiData = null;
+            
+            if (apiResponse.ok) {
+                const apiText = await apiResponse.text();
+                if (apiText && apiText.trim() !== '') {
+                    try {
+                        apiData = JSON.parse(apiText);
+                    } catch (e) {
+                        console.warn('API JSON parse hatası:', e);
+                    }
+                }
+            }
+            
+            // Sonra override'ları çek
+            const overridesResponse = await fetch('/api/social-media/overrides', { credentials: 'include' });
+            let overrides = {};
+            
+            if (overridesResponse.ok) {
+                const overridesData = await overridesResponse.json();
+                if (overridesData.success && overridesData.data) {
+                    overrides = overridesData.data.overrides || {};
+                }
+            }
+            
+            // API verilerini override'larla birleştir
+            if (apiData && apiData.isSuccessfull && apiData.data) {
+                const mergedData = { ...apiData.data };
+                
+                // Override'ları uygula
+                Object.keys(overrides).forEach(platform => {
+                    if (mergedData[platform]) {
+                        const platformOverrides = overrides[platform];
+                        mergedData[platform] = {
+                            ...mergedData[platform],
+                            title: platformOverrides.title || mergedData[platform].title,
+                            description: platformOverrides.description || mergedData[platform].description,
+                            url: platformOverrides.url || mergedData[platform].url,
+                            imagePath: platformOverrides.imagePath || mergedData[platform].imagePath
+                        };
+                    }
+                });
+                
+                renderSocialMediaCards(mergedData);
+            } else {
+                console.warn('API verisi alınamadı, fallback kullanılıyor');
+                loadFallbackSocialMedia();
+            }
+        } catch (error) {
+            console.error('Sosyal medya verileri yüklenirken hata:', error);
+            loadFallbackSocialMedia();
+        }
+    }
+
+    // Fallback sosyal medya verileri (API çalışmazsa)
+    function loadFallbackSocialMedia() {
+        const fallbackData = {
+            facebook: {
+                name: "Facebook",
+                url: "https://www.facebook.com/profile.php?id=61576226942639",
+                imagePath: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
+                title: "Facebook Sayfamızı Ziyaret Edin",
+                description: "En yeni duyurularımız ve etkinliklerimiz için Facebook'ta bizi takip edin ve topluluğumuzun bir parçası olun!"
+            },
+            instagram: {
+                name: "Instagram",
+                url: "https://www.instagram.com/sevvalcom?igsh=ZThycHI4eXp1dHlw",
+                imagePath: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png",
+                title: "Instagram Hesabımızı Keşfedin",
+                description: "En güzel anları ve özel içerikleri kaçırmayın! Instagram'da bizi takip edin ve topluluğumuza katılın!"
+            },
+            youtube: {
+                name: "YouTube",
+                url: "https://www.kisa.link/wmZoa",
+                imagePath: "https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png",
+                title: "YouTube Kanalımızı Takip Edin",
+                description: "Kaçırmak istemeyeceğiniz özel içerikler için hemen YouTube kanalımıza abone olun ve en yeni videoları ilk siz izleyin!"
+            },
+            google: {
+                name: "Google İşletme",
+                url: "https://www.google.com/search?q=%C5%9Eevval+Emlak",
+                imagePath: "https://sevval.com/sablon/img/google.webp",
+                title: "Google İşletme Profilimizi Ziyaret Edin",
+                description: "İşletmemiz hakkında daha fazla bilgi almak için Google İşletme Profilimize göz atın ve müşteri yorumlarımızı inceleyin!"
+            },
+            tikTok: {
+                name: "TikTok",
+                url: "https://www.kisa.link/KWiFP",
+                imagePath: "https://sevval.com/sablon/img/tiktok.webp",
+                title: "TikTok Hesabımızı Takip Edin",
+                description: "En eğlenceli ve yaratıcı içerikler için TikTok'ta bizi takip edin ve eğlencenin bir parçası olun!"
+            }
+        };
+        
+        console.log('Fallback sosyal medya verileri yükleniyor...');
+        renderSocialMediaCards(fallbackData);
+    }
+
+    function renderSocialMediaCards(socialMediaData) {
+        const container = document.getElementById('social-media-container');
+        if (!container) return;
+
+        // API'den gelen veri formatına göre platform isimlerini ayarla
+        const platforms = ['facebook', 'instagram', 'youtube', 'google', 'tikTok'];
+        
+        container.innerHTML = platforms.map(platform => {
+            // Önce küçük harfle dene, sonra büyük harfle
+            let platformData = socialMediaData[platform] || socialMediaData[platform.charAt(0).toUpperCase() + platform.slice(1)];
+            
+            if (!platformData) {
+                console.warn(`Platform verisi bulunamadı: ${platform}`);
+                return '';
+            }
+
+            return `
+                <div class="frame social-media-card" data-platform="${platform}">
+                    <a href="${platformData.url}" target="_blank" class="social-link">
+                        <img src="${platformData.imagePath}" alt="${platformData.name}" class="social-icon">
+        </a>
+        <div class="text">
+                        <h2 class="social-title" data-field="title">${platformData.title}</h2>
+                        <p class="social-description" data-field="description">${platformData.description}</p>
+                        <div class="social-edit-controls" style="display: none;">
+                            <input type="text" class="edit-input" data-field="title" value="${platformData.title}" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <textarea class="edit-textarea" data-field="description" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; min-height: 60px;">${platformData.description}</textarea>
+                            <input type="url" class="edit-input" data-field="url" value="${platformData.url}" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <input type="url" class="edit-input" data-field="imagePath" value="${platformData.imagePath}" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <div style="display: flex; gap: 10px;">
+                                <button class="save-social-btn" data-platform="${platform}" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Kaydet</button>
+                                <button class="cancel-social-btn" data-platform="${platform}" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">İptal</button>
+        </div>
+    </div>
+                        ${canEdit ? `<button class="edit-pencil-btn" data-platform="${platform}" aria-label="Düzenle"><i class="fas fa-pen"></i></button>` : ''}
+        </div>
+    </div>
+            `;
+        }).join('');
+
+        // Event listener'ları ekle
+        addSocialMediaEventListeners();
+    }
+
+    function addSocialMediaEventListeners() {
+        // Düzenle kalem ikonları
+        document.querySelectorAll('.edit-pencil-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                const platform = this.dataset.platform;
+                const card = document.querySelector(`[data-platform="${platform}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.social-edit-controls');
+                const displayContent = card.querySelector('.text > h2, .text > p');
+                
+                editControls.style.display = 'block';
+                displayContent.style.display = 'none';
+                this.style.display = 'none';
+            });
+        });
+
+        // İptal butonları
+        document.querySelectorAll('.cancel-social-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                const platform = this.dataset.platform;
+                const card = document.querySelector(`[data-platform="${platform}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.social-edit-controls');
+                const displayContent = card.querySelector('.text > h2, .text > p');
+                const editBtn = card.querySelector('.edit-pencil-btn');
+                
+                editControls.style.display = 'none';
+                displayContent.style.display = 'block';
+                editBtn.style.display = 'block';
+            });
+        });
+
+        // Kaydet butonları
+        document.querySelectorAll('.save-social-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                const platform = this.dataset.platform;
+                const card = document.querySelector(`[data-platform="${platform}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.social-edit-controls');
+                
+                const titleInput = editControls.querySelector('[data-field="title"]');
+                const descriptionInput = editControls.querySelector('[data-field="description"]');
+                const urlInput = editControls.querySelector('[data-field="url"]');
+                const imagePathInput = editControls.querySelector('[data-field="imagePath"]');
+                
+                // Güncellenmiş verileri göster
+                const titleElement = card.querySelector('.social-title');
+                const descriptionElement = card.querySelector('.social-description');
+                const linkElement = card.querySelector('.social-link');
+                const iconElement = card.querySelector('.social-icon');
+                
+                titleElement.textContent = titleInput.value;
+                descriptionElement.textContent = descriptionInput.value;
+                linkElement.href = urlInput.value;
+                iconElement.src = imagePathInput.value;
+                
+                // Düzenleme modundan çık
+                editControls.style.display = 'none';
+                titleElement.style.display = 'block';
+                descriptionElement.style.display = 'block';
+                card.querySelector('.edit-pencil-btn').style.display = 'block';
+                
+                // API'ye kaydetme işlemi
+                saveSocialMediaUpdate(platform, {
+                    title: titleInput.value,
+                    description: descriptionInput.value,
+                    url: urlInput.value,
+                    imagePath: imagePathInput.value
+                });
+            });
+        });
+    }
+
+    // Sosyal medya güncellemelerini API'ye kaydet
+    async function saveSocialMediaUpdate(platform, data) {
+        try {
+            const response = await fetch('/api/social-media/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    platform: platform,
+                    title: data.title,
+                    description: data.description,
+                    url: data.url,
+                    imagePath: data.imagePath
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                showNotification(`${platform} başarıyla güncellendi!`, 'success');
+                // Sayfayı yeniden yükle ki güncel veriler görünsün
+                setTimeout(() => {
+                    loadSocialMedia();
+                }, 1000);
+            } else {
+                showNotification(`Güncelleme hatası: ${result.message}`, 'error');
+            }
+        } catch (error) {
+            console.error('Sosyal medya güncelleme hatası:', error);
+            showNotification('Güncelleme sırasında bir hata oluştu!', 'error');
+        }
+    }
+
+    // Bildirim gösterme fonksiyonu
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            transition: all 0.3s ease;
+            ${type === 'success' ? 'background: #28a745;' : type === 'error' ? 'background: #dc3545;' : 'background: #007bff;'}
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+     // İletişim bilgilerini API'den çek ve yükle
+    async function loadContactInfo() {
+         try {
+             // Önce orijinal API'den verileri çek
+            const apiResponse = await fetch('/api/proxy/contact-info');
+             let apiData = null;
+             
+             if (apiResponse.ok) {
+                 const apiText = await apiResponse.text();
+                 if (apiText && apiText.trim() !== '') {
+                     try {
+                         apiData = JSON.parse(apiText);
+                     } catch (e) {
+                         console.warn('Contact API JSON parse hatası:', e);
+                     }
+                 }
+             }
+             
+             // Sonra override'ları çek
+            const overridesResponse = await fetch('/api/contact-info/overrides', { credentials: 'include' });
+             let overrides = {};
+             
+             if (overridesResponse.ok) {
+                 const overridesData = await overridesResponse.json();
+                 if (overridesData.success && overridesData.data) {
+                     overrides = overridesData.data.overrides || {};
+                 }
+             }
+             
+             // API verilerini override'larla birleştir
+             if (apiData && apiData.isSuccessfull && apiData.data) {
+                 const mergedData = { ...apiData.data };
+                 
+                 // Override'ları uygula
+                 Object.keys(overrides).forEach(field => {
+                     if (mergedData[field] !== undefined) {
+                         mergedData[field] = overrides[field] || mergedData[field];
+                     }
+                 });
+                 
+                 renderContactInfo(mergedData);
+             } else {
+                 console.warn('Contact API verisi alınamadı, fallback kullanılıyor');
+                 loadFallbackContactInfo();
+             }
+         } catch (error) {
+             console.error('İletişim bilgileri yüklenirken hata:', error);
+             loadFallbackContactInfo();
+         }
+     }
+
+     // Fallback iletişim bilgileri (API çalışmazsa)
+     function loadFallbackContactInfo() {
+         const fallbackData = {
+             address: "Güney Mh, Saatçi Sk, No:9/A Kocaeli/Körfez",
+             phone: "0212 955 55 41",
+             email: "sevvaltalep@gmail.com",
+             whatsAppNumber: "905070775666"
+         };
+         
+         console.log('Fallback iletişim bilgileri yükleniyor...');
+         renderContactInfo(fallbackData);
+     }
+
+     function renderContactInfo(contactData) {
+         const container = document.getElementById('contact-info-container');
+         if (!container) return;
+
+        const contactFields = [
+            { key: 'address', label: 'Adres', value: contactData.address || 'Belirtilmemiş' },
+            { key: 'phone', label: 'Telefon', value: contactData.phone || 'Belirtilmemiş', isLink: true, linkType: 'tel' },
+            { key: 'email', label: 'E-posta', value: contactData.email || 'Belirtilmemiş', isLink: true, linkType: 'mailto' },
+        ];
+
+        // Yalnızca admin (canEdit) ise WhatsApp alanını göster
+        try {
+            if (typeof canEdit !== 'undefined' && canEdit) {
+                contactFields.push({ key: 'whatsAppNumber', label: 'WhatsApp', value: contactData.whatsAppNumber || '', isLink: true, linkType: 'whatsapp' });
+                contactFields.push({ key: 'etbisUrl', label: 'ETBIS Link', value: contactData.etbisUrl || '', isLink: true, linkType: 'external' });
+                contactFields.push({ key: 'etbisImageData', label: 'ETBIS Görsel (data URL)', value: contactData.etbisImageData || '', isLink: false });
+            }
+        } catch {}
+
+         container.innerHTML = contactFields.map(field => {
+            const linkHref = field.isLink ? 
+                (field.linkType === 'tel' ? (() => { const raw = (field.value || '').replace(/\s/g,''); const cleaned = raw.replace(/^0+/, ''); return `tel:+90${cleaned}`; })() :
+                 field.linkType === 'mailto' ? `mailto:${field.value}` :
+                 field.linkType === 'whatsapp' ? `https://wa.me/${field.value}` :
+                 field.linkType === 'external' ? `${field.value}` : '#') : '#';
+             
+             return `
+                 <div class="contact-info-card" data-field="${field.key}">
+                     <div class="contact-content">
+                         <div class="contact-label">${field.label}</div>
+                         <div class="contact-value">
+                             ${field.isLink ? `<a href="${linkHref}" target="_blank">${field.value}</a>` : field.value}
+        </div>
+                         <div class="contact-edit-controls">
+                             <input type="text" value="${field.value}" placeholder="${field.label} giriniz">
+                             <div class="btn-group">
+                                 <button class="contact-save-btn" data-field="${field.key}">Kaydet</button>
+                                 <button class="contact-cancel-btn" data-field="${field.key}">İptal</button>
+    </div>
+        </div>
+                         ${canEdit ? `<button class="contact-edit-pencil-btn" data-field="${field.key}" aria-label="Düzenle"><i class="fas fa-pen"></i></button>` : ''}
+    </div>
+</div>
+             `;
+         }).join('');
+
+         // Event listener'ları ekle
+         addContactInfoEventListeners();
+     }
+
+     function addContactInfoEventListeners() {
+         // Düzenle kalem ikonları
+        document.querySelectorAll('.contact-edit-pencil-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                 const field = this.dataset.field;
+                 const card = document.querySelector(`[data-field="${field}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.contact-edit-controls');
+                const displayContent = card.querySelector('.contact-value');
+                 
+                 editControls.style.display = 'block';
+                 displayContent.style.display = 'none';
+                 this.style.display = 'none';
+             });
+         });
+
+         // İptal butonları
+        document.querySelectorAll('.contact-cancel-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                 const field = this.dataset.field;
+                 const card = document.querySelector(`[data-field="${field}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.contact-edit-controls');
+                const displayContent = card.querySelector('.contact-value');
+                const editBtn = card.querySelector('.contact-edit-pencil-btn');
+                 
+                 editControls.style.display = 'none';
+                 displayContent.style.display = 'block';
+                 editBtn.style.display = 'block';
+             });
+         });
+
+         // Kaydet butonları
+        document.querySelectorAll('.contact-save-btn').forEach(btn => {
+            if (!btn || !btn.addEventListener) return;
+            btn.addEventListener('click', function() {
+                 const field = this.dataset.field;
+                 const card = document.querySelector(`[data-field="${field}"]`);
+                if (!card) return;
+                const editControls = card.querySelector('.contact-edit-controls');
+                const input = editControls.querySelector('input');
+                const displayContent = card.querySelector('.contact-value');
+                 
+                 const newValue = input.value.trim();
+                 
+                 // Güncellenmiş veriyi göster
+                const fieldConfig = [
+                    { key: 'address', label: 'Adres', isLink: false },
+                    { key: 'phone', label: 'Telefon', isLink: true, linkType: 'tel' },
+                    { key: 'email', label: 'E-posta', isLink: true, linkType: 'mailto' },
+                    { key: 'whatsAppNumber', label: 'WhatsApp', isLink: true, linkType: 'whatsapp' },
+                    { key: 'etbisUrl', label: 'ETBIS Link', isLink: true, linkType: 'external' },
+                    { key: 'etbisImageData', label: 'ETBIS Görsel (data URL)', isLink: false },
+                ].find(f => f.key === field);
+                 
+                 if (fieldConfig) {
+                    const linkHref = fieldConfig.isLink ? 
+                        (fieldConfig.linkType === 'tel' ? (() => { const raw = newValue.replace(/\s/g,''); const cleaned = raw.replace(/^0+/, ''); return `tel:+90${cleaned}`; })() :
+                          fieldConfig.linkType === 'mailto' ? `mailto:${newValue}` :
+                          fieldConfig.linkType === 'whatsapp' ? `https://wa.me/${newValue}` :
+                          fieldConfig.linkType === 'external' ? `${newValue}` : '#') : '#';
+                     
+                     displayContent.innerHTML = fieldConfig.isLink ? 
+                         `<a href="${linkHref}" target="_blank">${newValue}</a>` : newValue;
+                 }
+                 
+                 // Düzenleme modundan çık
+                 editControls.style.display = 'none';
+                 displayContent.style.display = 'block';
+                 card.querySelector('.contact-edit-pencil-btn').style.display = 'block';
+                 
+                 // API'ye kaydetme işlemi
+                 saveContactInfoUpdate(field, newValue);
+             });
+         });
+     }
+
+     // İletişim bilgisi güncellemelerini API'ye kaydet
+     async function saveContactInfoUpdate(field, value) {
+         try {
+            const response = await fetch('/api/contact-info/update', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                credentials: 'include',
+                 body: JSON.stringify({
+                     field: field,
+                     value: value
+                 })
+             });
+             
+             const result = await response.json();
+             if (result.success) {
+                 showNotification(`${field} başarıyla güncellendi!`, 'success');
+                 // Sayfayı yeniden yükle ki güncel veriler görünsün
+                 setTimeout(() => {
+                     loadContactInfo();
+                 }, 1000);
+             } else {
+                 showNotification(`Güncelleme hatası: ${result.message}`, 'error');
+             }
+         } catch (error) {
+             console.error('İletişim bilgisi güncelleme hatası:', error);
+             showNotification('Güncelleme sırasında bir hata oluştu!', 'error');
+         }
+     }
+
+     // Sayfa yüklendiğinde verileri yükle
+     document.addEventListener('DOMContentLoaded', function() {
+         loadSocialMedia();
+         loadContactInfo();
+     });
+
+    let popupTimeout;
+    let closeTimeout;
+    function showReklamPopup() {
+        const reklamPopup = document.getElementById('reklamPopup');
+        if (!reklamPopup) return;
+
+        const popupData = JSON.parse(localStorage.getItem('popupData')) || { count: 0, lastTime: 0 };
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const twoHours = 2 * 60 * 60 * 1000;
+        if (now - popupData.lastTime >= oneDay) {
+            popupData.count = 0;
+        }
+        if (popupData.count < 3 && now - popupData.lastTime >= twoHours) {
+            reklamPopup.style.display = 'flex';
+            popupData.count += 1;
+            popupData.lastTime = now;
+            localStorage.setItem('popupData', JSON.stringify(popupData));
+        }
+    }
+    function closeReklamPopup() {
+        const reklamPopup = document.getElementById('reklamPopup');
+        if (!reklamPopup) return;
+        reklamPopup.style.display = 'none';
+        closeTimeout = setTimeout(() => {
+            showReklamPopup();
+        }, 2 * 60 * 60 * 1000);
+    }
+    window.onload = function () {
+        const randomTime = Math.floor(Math.random() * (30000 - 15000 + 1)) + 15000;
+        popupTimeout = setTimeout(() => {
+            showReklamPopup();
+        }, randomTime);
+
+        const reklamPopup = document.getElementById('reklamPopup');
+        if (reklamPopup) {
+            reklamPopup.addEventListener('click', function (event) {
+                if (event.target === this) {
+                    closeReklamPopup();
+                }
+            });
+        }
+    };
+
+
+
+    let ckEditorInstance = null;
+    let originalContent = '';
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const editableLines = document.querySelectorAll('.editable-line');
+        editableLines.forEach(line => {
+            const textContent = line.querySelector('.text-content');
+            const editIcon = line.querySelector('.edit-icon');
+            const editInput = line.querySelector('.edit-input');
+            const saveButton = line.querySelector('.save-button');
+
+            if (editIcon && editInput && saveButton) {
+                editIcon.addEventListener('click', function () {
+                    textContent.style.display = 'none';
+                    editIcon.style.display = 'none';
+                    editInput.style.display = 'block';
+                    saveButton.style.display = 'block';
+                    editInput.value = textContent.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+                    editInput.focus();
+                });
+
+                saveButton.addEventListener('click', async function () {
+                    const key = line.dataset.key;
+                    const newContent = editInput.value.replace(/\n/g, '<br/>');
+
+                    try {
+                        const response = await fetch('@Url.Action("UpdateAboutUsContent", "Home")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': getCookie('__RequestVerificationToken')
+                            },
+                            body: JSON.stringify({ Key: key, Content: newContent })
+                        });
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.success) {
+                                textContent.innerHTML = newContent;
+                                textContent.style.display = 'block';
+                                editInput.style.display = 'none';
+                                saveButton.style.display = 'none';
+                                editIcon.style.display = '@(canEdit ? "block" : "none")';
+                                showMessage("İçerik başarıyla güncellendi!", "success");
+                            } else {
+                                showMessage("Hata: " + result.message, "error");
+                            }
+                        } else {
+                            showMessage("Sunucu hatası: " + response.statusText, "error");
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showMessage("Kaydetme sırasında bir hata oluştu.", "error");
+                    }
+                });
+            }
+        });
+    });
+
+    function enterEditMode() {
+        const contentDisplay = document.getElementById('contentDisplay');
+        const editorDiv = document.getElementById('aboutUsEditor');
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const editModeIndicator = document.getElementById('editModeIndicator');
+
+        originalContent = contentDisplay.innerHTML;
+
+        contentDisplay.style.display = 'none';
+        editorDiv.style.display = 'block';
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'inline-block';
+        editModeIndicator.style.display = 'block';
+
+        ClassicEditor
+            .create(editorDiv, {
+                language: 'tr',
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                        'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                        'alignment', '|',
+                        'numberedList', 'bulletedList', '|',
+                        'outdent', 'indent', '|',
+                        'link', 'blockQuote', 'insertTable', '|',
+                        'undo', 'redo', '|',
+                        'sourceEditing'
+                    ]
+                },
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                    ]
+                },
+                fontSize: {
+                    options: [
+                        9, 11, 13, 'default', 17, 19, 21
+                    ]
+                },
+                table: {
+                    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+                }
+            })
+            .then(editor => {
+                ckEditorInstance = editor;
+                editor.setData(originalContent);
+
+                editor.editing.view.focus();
+            })
+            .catch(error => {
+                console.error('CKEditor initialization error:', error);
+                showMessage('Editor başlatılamadı: ' + error.message, 'error');
+            });
+    }
+
+    async function saveContent() {
+        if (!ckEditorInstance) {
+            showMessage('Editor bulunamadı!', 'error');
+            return;
+        }
+
+        const newContent = ckEditorInstance.getData();
+
+        try {
+            const response = await fetch('@Url.Action("UpdateAboutUsContent", "Home")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': getCookie('__RequestVerificationToken')
+                },
+                body: JSON.stringify({ Key: 'main-content', Content: newContent })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Update display content
+                    document.getElementById('contentDisplay').innerHTML = newContent;
+                    exitEditMode();
+                    showMessage('İçerik başarıyla güncellendi!', 'success');
+                } else {
+                    showMessage('Hata: ' + result.message, 'error');
+                }
+            } else {
+                showMessage('Sunucu hatası: ' + response.statusText, 'error');
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            showMessage('Kaydetme sırasında bir hata oluştu.', 'error');
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('contentDisplay').innerHTML = originalContent;
+        exitEditMode();
+        showMessage('Değişiklikler iptal edildi.', 'success');
+    }
+
+    function exitEditMode() {
+        const contentDisplay = document.getElementById('contentDisplay');
+        const editorDiv = document.getElementById('aboutUsEditor');
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const editModeIndicator = document.getElementById('editModeIndicator');
+
+        if (ckEditorInstance) {
+            ckEditorInstance.destroy()
+                .then(() => {
+                    ckEditorInstance = null;
+                })
+                .catch(error => console.error('CKEditor destroy error:', error));
+        }
+
+        contentDisplay.style.display = 'block';
+        editorDiv.style.display = 'none';
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        editModeIndicator.style.display = 'none';
+    }
+
+    function showMessage(message, type) {
+        const messageDiv = type === 'success' ?
+            document.getElementById('successMessage') :
+            document.getElementById('errorMessage');
+
+        const otherMessageDiv = type === 'success' ?
+            document.getElementById('errorMessage') :
+            document.getElementById('successMessage');
+        otherMessageDiv.style.display = 'none';
+
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+</script>
+<div class="floating-icon">
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sftumen41@gmail.com&su=Talep" title="Talep Gönder" target="_blank">
+        <img src="~/images/Talep.png" alt="Talep Gönder">
+    </a>
+</div>
+<a id="whatsapp-link-8" href="#" target="_blank" class="whatsapp-float">
+    <img src="~/sablon/img/724destek.png" alt="WhatsApp" class="whatsapp-image">
+</a>
+<script>
+    (async function(){
+        try {
+            const isMobile8 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const message8 = "Merhaba,%20Şevval%20Emlak%20Sitenizden%20Size%20Ulaşıyorum";
+
+            // API'den kontakt bilgilerini al ve override'larla birleştir
+            let data = null;
+            try {
+                const apiResp = await fetch(`${window.API_BASE}/contact-info`);
+                if (apiResp.ok) {
+                    const apiJson = await apiResp.json();
+                    data = (apiJson && apiJson.isSuccessfull) ? { ...apiJson.data } : null;
+                }
+            } catch {}
+
+            try {
+                const ov = await fetch('/api/contact-info/overrides', { credentials: 'include' });
+                if (ov.ok) {
+                    const ovJson = await ov.json();
+                    const overrides = (ovJson && ovJson.success && ovJson.data) ? (ovJson.data.overrides || {}) : {};
+                    if (!data) data = {};
+                    Object.keys(overrides).forEach(k => { data[k] = overrides[k] || data[k]; });
+                }
+            } catch {}
+
+            const whatsappNumber8 = (data && data.whatsAppNumber) ? String(data.whatsAppNumber) : "";
+            const waClean = whatsappNumber8.replace(/\D+/g, '');
+            if (waClean) {
+                const encodedMsg = encodeURIComponent("Merhaba, Şevval Emlak Sitenizden Size Ulaşıyorum");
+                const whatsappLink8 = isMobile8
+                    ? `https://wa.me/${waClean}?text=${encodedMsg}`
+                    : `https://web.whatsapp.com/send?phone=${waClean}&text=${encodedMsg}`;
+                document.getElementById("whatsapp-link-8").href = whatsappLink8;
+            }
+        } catch {}
+    })();
+</script>
+<style>
+    .whatsapp-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1001;
+    }
+
+    .whatsapp-image {
+        width: 90px;
+        height: auto;
+        transition: transform 0.3s;
+    }
+    
+
+        .whatsapp-image:hover {
+            transform: scale(1.1);
+        }
+       
+        
+</style>
+

@@ -1,0 +1,88 @@
+﻿@model Sevval.Web.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = $"{Model.User.FirstName} {Model.User.LastName}'in Kanalı";
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+}
+
+<div class="w-full min-h-screen bg-blue-50/50 font-sans">
+    <main class="flex-1 p-6 sm:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Kullanıcı Başlığı -->
+            <header class="flex flex-col sm:flex-row items-center gap-6 mb-8 bg-white p-6 rounded-2xl shadow-md border border-blue-100">
+                <img src="@(Model.User.ProfilePicturePath ?? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.User.FirstName)}+{Uri.EscapeDataString(Model.User.LastName)}&background=1E3A8A&color=fff&size=128&bold=true")"
+                     class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover flex-shrink-0 border-4 border-blue-200 shadow-lg"
+                     alt="@(Model.User.FirstName) profili" />
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-900">
+                        @(Model.User.FirstName) @(Model.User.LastName)
+                    </h1>
+                    <p class="text-lg text-gray-600 mt-2">
+                        @Model.TotalVideos video
+                    </p>
+                </div>
+            </header>
+
+            <!-- Video Listesi -->
+            @if (Model.Videos.Any())
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+                    @foreach (var video in Model.Videos)
+                    {
+                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-300 overflow-hidden border border-blue-100/50">
+                            <!-- Video Thumbnail -->
+                            <div class="relative w-full">
+                                <div class="aspect-w-16 aspect-h-9 bg-blue-100">
+                                    @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                    {
+                                        <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
+                                    }
+                                    else if (video.IsYouTube)
+                                    {
+                                        <img src="@($"https://img.youtube.com/vi/{video.VideoYolu}/hqdefault.jpg")" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                    }
+                                    else
+                                    {
+                                        <video preload="metadata" muted class="w-full h-full object-cover">
+                                            <source src="@Url.Content(video.VideoYolu)#t=1" type="video/mp4">
+                                        </video>
+                                    }
+                                </div>
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                                    <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
+                                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Video Bilgileri -->
+                            <div class="p-4">
+                                <h3 class="font-bold text-base text-blue-900 group-hover:text-blue-600 transition-colors line-clamp-2" title="@video.VideoAdi">
+                                    @video.VideoAdi
+                                </h3>
+                                <div class="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                                    <span>@video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
+                                    <span>•</span>
+                                    <span>@video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <!-- Video Bulunamadı Durumu -->
+                <div class="text-center py-24 bg-white rounded-lg shadow-sm border border-blue-100">
+                    <div class="flex justify-center items-center mx-auto w-24 h-24 bg-blue-100 rounded-full mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-blue-800">Henüz Video Yok</h2>
+                    <p class="text-blue-700/80 mt-2">Bu kullanıcı henüz hiç video yüklememiş.</p>
+                </div>
+            }
+        </div>
+    </main>
+</div>

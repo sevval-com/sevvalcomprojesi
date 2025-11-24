@@ -1,0 +1,157 @@
+.visitor-counts-navbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: -10px;
+    transform: scale(.95);
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.35);
+    padding: 6px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+    .visitor-counts-navbar span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px; /* Icon ve sayı arası boşluk */
+        line-height: 1;
+    }
+
+    .visitor-counts-navbar .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        height: auto;
+        font-size: 16px; /* göz ikonu boyutu */
+        line-height: 1;
+        color: #01e11b; /* göz rengi */
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        text-shadow: 0 0 6px rgba(1,225,27,.25);
+    }
+    .visitor-counts-navbar {
+        display: flex;
+        gap: 15px;
+        align-items: start;
+        font-size: 14px;
+        flex-direction: column;
+        margin-left: 0;
+    }
+
+        .visitor-counts-navbar span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .visitor-counts-navbar .icon {
+            font-size: 16px;
+             
+        }
+        .post-ad-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .free-tag {
+            position: absolute;
+            top: -10px;
+            left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: rotate(-10deg); /* Hafif eğik bir görünüm */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+
+        .post-ad {
+            display: inline-block;
+            background-color: #ffffff; /* Beyaz arka plan */
+            color: #007bff; /* Mavi yazı rengi */
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 1px solid #007bff; /* Mavi çerçeve */
+            transition: 0.3s ease;
+        }
+
+            .post-ad:hover {
+                background-color: #007bff; /* Hoverda mavi arka plan */
+                color: white; /* Hoverda beyaz metin */
+            }
+
+        .coming-soon-tag {
+            position: absolute;
+            top: 20px;
+            left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+        .naav-linkss {
+            margin-top: 0px;
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+            .naav-linkss a {
+                color: white;
+                text-decoration: none;
+                font-size: 18px !important;
+                font-weight: bold;
+                position: relative;
+                padding: 5px 0;
+                transition: color 0.3s, transform 0.3s;
+            }
+        
+                .naav-linkss a:hover {
+                    color: #5fff00;
+                    transform: scale(1.1);
+                }
+    /* Mobil düzenleme - 768px altında */
+    @media (max-width: 768px) {
+        .visitor-counts-navbar {
+            flex-direction: column;
+            gap: 2px;
+            font-size: 12px;
+        }
+
+            .visitor-counts-navbar .icon {
+                font-size: 12px;
+            }
+
+            .visitor-counts-navbar span {
+                font-size: 12px !important;
+            }
+            .logo img{
+                width: 70px !important;
+            }
+            .visitor-counts-navbar span{
+                display: flex !important;
+            }
+            .naav-linkss a{
+                font-size: 12px !important;
+            }
+    }
+

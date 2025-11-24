@@ -1,0 +1,614 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: #333;
+    overflow-y: auto;
+}
+
+.form-container {
+    width: 80%; /* Form container genişliği küçültüldü */
+    max-width: 900px; /* Maksimum genişlik küçültüldü */
+    padding: 30px; /* Padding küçültüldü */
+    border-radius: 15px; /* Border radius küçültüldü */
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: saturate(140%) blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 86, 179, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 25px; /* Margin küçültüldü */
+}
+
+.header-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px; /* Border radius küçültüldü */
+    box-shadow: 0 12px 30px rgba(0, 123, 255, 0.25);
+}
+
+.step-container {
+    display: flex;
+    justify-content: space-between; /* adımları eşit aralıklı ortala */
+    align-items: center;
+    position: relative;
+    margin-bottom: 32px; /* Daha kompakt */
+    padding: 0 56px; /* dış daire yarıçapı kadar iç boşluk: track uçları daire merkezleriyle hizalı */
+}
+.submit-btn{
+    margin-left: 0 !important;
+}
+#residential-info .Land-next-button{
+    margin-left: .75rem !important
+}
+
+/* Yeni stepbar altyapısı */
+.progress-track { display: none !important; }
+.progress-fill { display: none !important; }
+
+/* Eski container tabanlı çizgiyi kapat */
+.step-container::before,
+.step-container::after { display: none !important; }
+
+/* Container tabanlı genişlikler artık kullanılmıyor */
+
+.step {
+    text-align: center;
+    flex: 1;
+    font-size: 1rem; /* Font boyutu küçültüldü */
+    font-weight: bold;
+    color: #0056b3;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Segment bazlı çizgi: her step kendi sol/sağ yarım hattını çizer */
+.step::before,
+.step::after {
+    content: '';
+    position: absolute;
+    top: 28px; /* step-number merkezine hizalı */
+    height: 8px;
+    background: rgba(0,123,255,0.18);
+    border-radius: 6px;
+    z-index: 0;
+}
+.step::after{
+    display: none;
+}
+.step::before { left: -50%; right: 50%; }
+.step::after  { left: 50%; right: -50%; }
+.step:first-child::before { display: none; }
+.step:last-child::after   { display: none; }
+
+/* İlerleme: tamamlanan adımların hatları mavi, aktif adımın sol yarısı mavi */
+.step.completed::before,
+.step.completed::after { background: #43a047 !important; }
+.step.active::before { background: linear-gradient(90deg, #007bff, #1e88e5); }
+
+    .step span {
+        display: block;
+        margin-top: 10px;
+        color: #0056b3;
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+    .step.completed span{
+        color: #43a047 !important;
+    }
+
+.step-number {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: #1e88e5;
+    font-size: 1.35rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #007bff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.step:hover {
+    transform: scale(1.05); /* Ölçek küçültüldü */
+    color: #ffffff;
+}
+
+    .step:hover .step-number {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+
+.step.active {
+    color: #ffffff;
+}
+
+    .step.active .step-number {
+        background-color: #1e88e5;
+        color: #ffffff;
+    }
+
+@media screen and (max-width: 1193px) {
+    .step{
+        padding: 6px;
+    }
+    .step-container{
+        padding: 0;
+    }
+    .step::before, .step::after{
+        top: 24px;
+    }
+}
+@media screen and (max-width: 768px) {
+    .step{
+        padding: 0 !important;
+    }
+    .step-container{
+        padding: 0 !important;
+    }
+    .step::before, .step::after{
+        top: 18px;
+    }
+}
+/* Önceki denemeden kalan kaldırma kurallarını temizledik */
+
+.category-label {
+    font-size: 1.8rem; /* Font boyutu küçültüldü */
+    font-weight: 600; /* Ağırlık küçültüldü */
+    margin-bottom: 30px; /* Margin küçültüldü */
+    color: #0056b3;
+    text-align: center;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Gap küçültüldü */
+    margin-bottom: 30px; /* Margin küçültüldü */
+    flex-wrap: wrap;
+}
+
+.category-option {
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid #e0e7ff;
+    border-radius: 15px;
+    padding: 22px;
+    width: 130px;
+    height: 150px;
+    background: #f9f9ff;
+    transition: transform 0.25s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15);
+    margin-right: 22px;
+    margin-bottom: 10px;
+}
+
+    .category-option i {
+        font-size: 3rem;
+        color: #007bff;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .category-option p {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: bold;
+        color: #0056b3;
+    }
+
+    .category-option:hover {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: #fff;
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(0, 123, 255, 0.35);
+    }
+
+        .category-option:hover i {
+            color: #fff;
+            transform: scale(1.1); /* Ölçek küçültüldü */
+        }
+
+        .category-option:hover p {
+            color: #fff;
+        }
+
+    .category-option.selected {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        color: #fff;
+        border: 2px solid rgba(255,255,255,0.35);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 18px 35px rgba(21, 101, 192, 0.45);
+    }
+
+        .category-option.selected i,
+        .category-option.selected p {
+            color: #fff;
+        }
+
+#rent-sale-options {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px; /* Margin küçültüldü */
+}
+
+    #rent-sale-options .category-option {
+        margin: 0 10px; /* Margin küçültüldü */
+    }
+
+.hidden {
+    display: none;
+}
+
+.sale-rent-label {
+    font-size: 1.4rem; /* Font boyutu küçültüldü */
+    font-weight: 500; /* Ağırlık küçültüldü */
+    margin-bottom: 25px; /* Margin küçültüldü */
+    color: #0056b3;
+    text-align: center;
+}
+
+.sale-rent-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Gap küçültüldü */
+}
+
+.sale-rent-option {
+    padding: 10px 20px; /* Padding küçültüldü */
+    font-size: 1.1rem; /* Font boyutu küçültüldü */
+    background: #f9f9ff;
+    border: 2px solid #e0e7ff;
+    border-radius: 10px; /* Border radius küçültüldü */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .sale-rent-option:hover {
+        background-color: #0056b3;
+        color: white;
+        transform: scale(1.03); /* Ölçek küçültüldü */
+    }
+
+.status-label {
+    font-size: 1.8rem; /* Font boyutu küçültüldü */
+    font-weight: 600; /* Ağırlık küçültüldü */
+    margin-bottom: 30px; /* Margin küçültüldü */
+    color: #0056b3;
+    text-align: center;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Gap küçültüldü */
+    margin-bottom: 30px; /* Margin küçültüldü */
+    flex-wrap: wrap;
+}
+
+.status-option {
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid #e0e7ff;
+    border-radius: 15px; /* Border radius küçültüldü */
+    padding: 22px;
+    width: 130px;
+    height: 150px;
+    background: #f9f9ff;
+    transition: transform 0.25s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15); /* Gölge küçültüldü */
+}
+
+    .status-option i {
+        font-size: 3rem;
+        color: #007bff;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .status-option p {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: bold;
+        color: #0056b3;
+    }
+
+    .status-option:hover {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: #fff;
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(0, 123, 255, 0.35);
+    }
+
+        .status-option:hover i {
+            color: #fff;
+            transform: scale(1.1); /* Ölçek küçültüldü */
+        }
+
+        .status-option:hover p {
+            color: #fff;
+        }
+
+    .status-option.selected {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        color: #fff;
+        border: 2px solid rgba(255,255,255,0.35);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 18px 35px rgba(21, 101, 192, 0.45);
+    }
+
+        .status-option.selected i,
+        .status-option.selected p {
+            color: #fff;
+        }
+
+.next-button,
+.home-button,
+.submit-button,
+.submit-btn,
+.Land-next-button,
+.Land-home-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 28px rgba(0, 123, 255, 0.35);
+    text-align: center;
+    margin-top: 12px; /* butonlar arası boşluğu azalt */
+    min-width: 180px;
+    /* align-items: center; */
+    position: relative;
+     
+}
+
+.next-button,
+.submit-button,
+.submit-btn {
+    margin-left: 10px; /* Margin küçültüldü */
+}
+
+.Land-next-button {
+    margin-right: 10px; /* Margin küçültüldü */
+}
+
+    .next-button:hover,
+    .home-button:hover,
+    .submit-button:hover,
+    .submit-btn:hover,
+    .Land-next-button:hover,
+    .Land-home-button:hover {
+        background: linear-gradient(135deg, #2196f3 0%, #1e88e5 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 18px 36px rgba(0, 91, 187, 0.45);
+    }
+
+/* Submit (Gönder) butonunu ana buton stiliyle hizala */
+.submit-btn {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 9999px !important; /* tam pill */
+    box-shadow: 0 12px 28px rgba(0, 123, 255, 0.35) !important;
+    padding: 12px 25px !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    min-width: 180px !important;
+}
+
+.property-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px; /* Gap küçültüldü */
+    margin-top: 25px; /* Margin küçültüldü */
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .info-group label {
+        font-weight: bold;
+        margin-bottom: 6px; /* Margin küçültüldü */
+    }
+
+#residential-info,
+#land-info {
+    display: none;
+}
+
+    #residential-info.active,
+    #land-info.active {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px; /* Gap küçültüldü */
+    }
+
+/* Form elementleri */
+form label {
+    font-weight: bold;
+    margin-bottom: 8px; /* Margin küçültüldü */
+    display: block;
+}
+
+form input,
+form textarea, form select {
+    width: 100%;
+    padding: 10px; /* Padding küçültüldü */
+    margin-bottom: 12px; /* Margin küçültüldü */
+    border: 1px solid #ddd;
+    border-radius: 6px; /* Border radius küçültüldü */
+    box-sizing: border-box;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #1e88e5;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+form button {
+    padding: 12px 25px; /* Padding küçültüldü */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px; /* Border radius küçültüldü */
+    cursor: pointer;
+    font-size: 0.9rem; /* Font boyutu küçültüldü */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    form button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px); /* Hareket küçültüldü */
+    }
+
+/* Animasyon */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95); /* Ölçek küçültüldü */
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Mobil Duyarlılık */
+@media screen and (max-width: 768px) {
+    body{
+        background: rgba(255, 255, 255, 0.9);
+    }
+    .form-container {
+        width: 90%; /* Genişlik küçültüldü */
+        padding: 20px; /* Padding küçültüldü */
+        backdrop-filter: none;
+        border: none;
+        box-shadow: none
+    }
+
+    .step-container {
+        flex-wrap: wrap;
+        justify-content: space-around;
+        gap: 10px; /* Gap küçültüldü */
+    }
+
+    .category-icons, .status-icons {
+        gap: 10px; /* Gap küçültüldü */
+    }
+
+    .category-option, .status-option {
+        width: 100px; /* Boyut küçültüldü */
+        height: 100px; /* Boyut küçültüldü */
+        padding: 18px; /* Padding küçültüldü */
+    }
+
+        .category-option i, .status-option i {
+            font-size: 2.2rem; /* Font boyutu küçültüldü */
+        }
+
+        .category-option p, .status-option p {
+            font-size: 0.9rem; /* Font boyutu küçültüldü */
+        }
+
+    .sale-rent-options {
+        gap: 8px; /* Gap küçültüldü */
+    }
+
+    .sale-rent-option {
+        font-size: 0.9rem; /* Font boyutu küçültüldü */
+        padding: 8px 16px; /* Padding küçültüldü */
+    }
+    .category-option{
+        margin-right: .5rem;
+        margin-bottom: .5rem;
+    }
+    .form-container {
+        width: 100%;
+        padding: 15px;
+        height: 100%;
+        margin: 0;
+        border-radius: 0;
+        border: none;
+    }
+    .next-button, .submit-button{
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .form-container {
+        width: 100%;
+        padding: 15px; /* Padding küçültüldü */
+    }
+
+    .step-container {
+        gap: 0px;
+        padding: 0 5%;
+    }
+
+    .step span {
+        color: #666;
+        font-size: 8px !important;
+    }
+
+    .category-icons, .status-icons {
+        gap: 8px; /* Gap küçültüldü */
+    }
+
+
+        .category-option i, .status-option i {
+            font-size: 1.8rem; /* Font boyutu küçültüldü */
+        }
+
+        .category-option p, .status-option p {
+            font-size: 0.8rem; /* Font boyutu küçültüldü */
+        }
+
+    .sale-rent-options {
+        gap: 6px; /* Gap küçültüldü */
+    }
+
+    .sale-rent-option {
+        font-size: 0.8rem; /* Font boyutu küçültüldü */
+        padding: 6px 12px; /* Padding küçültüldü */
+    }
+}

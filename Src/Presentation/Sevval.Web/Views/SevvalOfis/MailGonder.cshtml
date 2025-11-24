@@ -1,0 +1,248 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Mail Gönder";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 2rem rgba(0,0,0,0.05);
+        }
+
+            .sidebar .nav-link {
+                color: #343a40;
+                font-size: 0.95rem;
+                padding: 0.85rem 1.5rem;
+                transition: all 0.2s ease;
+                border-left: 4px solid transparent;
+                border-radius: 0;
+                margin-bottom: 2px;
+            }
+
+                .sidebar .nav-link:hover {
+                    color: #0d6efd;
+                    background-color: #e7f1ff;
+                }
+
+                .sidebar .nav-link.active {
+                    color: #0d6efd;
+                    background-color: #e7f1ff;
+                    border-left-color: #0d6efd;
+                    font-weight: 500;
+                }
+
+                .sidebar .nav-link i {
+                    width: 25px;
+                    text-align: center;
+                    color: #0d6efd;
+                }
+
+            .sidebar .site-home-link {
+                background-color: #0d6efd;
+                color: white;
+                font-weight: bold;
+                border-radius: .25rem;
+            }
+
+                .sidebar .site-home-link:hover {
+                    background-color: #0b5ed7;
+                }
+
+        .content {
+            flex-grow: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .sidebar-wrapper {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .offcanvas .nav-link {
+            color: #343a40;
+        }
+
+            .offcanvas .nav-link.active {
+                font-weight: bold;
+                color: #0d6efd;
+            }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar-wrapper d-none d-lg-block" id="sidebar">
+            <nav class="sidebar p-3 h-100 d-flex flex-column">
+                <div class="text-center py-3">
+                    <img src="~/images/favlogo.png" alt="Şevval Ofis Logo" class="img-fluid mb-3" style="max-width: 100px;">
+                    <h4 class="fw-bold text-primary">Şevval Ofis</h4>
+                </div>
+                <hr>
+                <ul class="nav flex-column mb-auto">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SehirlereGoreEmlakcilar", "SevvalOfis")"><i class="bi bi-building me-2"></i> Şehirlere Göre Emlakçılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("BireyselKullanicilar", "SevvalOfis")"><i class="bi bi-person-fill me-2"></i> Bireysel Kullanıcılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanYonetim")"><i class="bi bi-clipboard2-data-fill me-2"></i> İlan Yönetimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanTakip")"><i class="bi bi-search me-2"></i> Bireysel İlan Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("TumIlanlar", "SevvalOfis")"><i class="bi bi-list-ul me-2"></i> Tüm İlanlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-diagram-3-fill me-2"></i> Kardeş Firma Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
+                </ul>
+                <div class="mt-auto">
+                    <a class="nav-link site-home-link text-center" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content p-4">
+            <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="bi bi-list"></i></button>
+            <h1 class="display-5 fw-bold mb-4">Toplu Mail Gönder</h1>
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-info">@ViewBag.Message</div>
+                    }
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Şehre Göre Filtrele:</label>
+                            <select id="citySelect" class="form-select" onchange="selectUsersByCity()">
+                                <option value="">-- Tüm Şehirler --</option>
+                                @foreach (var city in Model.AvailableCities)
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Alıcılar:</label>
+                            <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="modal" data-bs-target="#userSelectModal">
+                                <i class="bi bi-people-fill me-2"></i> Alıcıları Seç
+                            </button>
+                            <input type="hidden" id="selectedUsersInput" name="aliciEmails">
+                            <div id="selectedUsersText" class="mt-2 text-muted small"></div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="konu" name="konu" placeholder="Konu" required>
+                            <label for="konu">Konu</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="mesaj" name="mesaj" placeholder="Mesajınız" rows="8" style="height: 200px;" required></textarea>
+                            <label for="mesaj">Mesaj</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-lg"><i class="bi bi-send-fill me-2"></i> Gönder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals and Offcanvas -->
+    <div class="modal fade" id="userSelectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Alıcıları Seç</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelection()">
+                        <label for="selectAll" class="form-check-label"><strong>Tümünü Seç</strong></label>
+                    </div>
+                    <hr>
+                    <div id="userList">
+                        @foreach (var user in Model.Users)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input user-checkbox" type="checkbox" value="@user.Email" id="user_@user.Id" data-city="@user.City" @(user.Email == Model.SelectedUserEmail ? "checked" : "")>
+                                <label class="form-check-label" for="user_@user.Id">@user.Email (@user.City)</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="applySelection()" data-bs-dismiss="modal">Seçimi Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-primary fw-bold">Şevval Ofis</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="h-100 d-flex flex-column">
+                <ul class="nav flex-column mb-auto">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SehirlereGoreEmlakcilar", "SevvalOfis")"><i class="bi bi-building me-2"></i> Şehirlere Göre Emlakçılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("BireyselKullanicilar", "SevvalOfis")"><i class="bi bi-person-fill me-2"></i> Bireysel Kullanıcılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanYonetim")"><i class="bi bi-clipboard2-data-fill me-2"></i> İlan Yönetimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanTakip")"><i class="bi bi-search me-2"></i> Bireysel İlan Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
+                </ul>
+                <div class="p-3 mt-auto">
+                    <a class="nav-link site-home-link text-center" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSelection() {
+            document.querySelectorAll('.user-checkbox').forEach(c => c.checked = document.getElementById('selectAll').checked);
+        }
+
+        function applySelection() {
+            const selected = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(c => c.value);
+            document.getElementById('selectedUsersInput').value = selected.join(',');
+            document.getElementById('selectedUsersText').textContent = selected.length ? `${selected.length} alıcı seçildi.` : "Hiçbir alıcı seçilmedi.";
+        }
+
+        function selectUsersByCity() {
+            const city = document.getElementById('citySelect').value;
+            document.querySelectorAll('.user-checkbox').forEach(c => c.checked = city ? c.dataset.city === city : false);
+            applySelection();
+        }
+    </script>
+</body>
+</html>
+

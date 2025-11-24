@@ -1,0 +1,91 @@
+﻿@model Sevval.Domain.Entities.IlanModel
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!-- Stil Dosyası Bağlantısı -->
+<link rel="stylesheet" href="~/css/ilandet.css" />
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgu_ri7xBqCBNn5WRgTcR2ADbvq0f1hK0&libraries=places"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <a class="navbar-brand" href="/">
+        <img src="~/sablon/img/loogo.png" class="d-inline-block align-top" alt="Logo">
+        <span>Şevval Emlak</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto"></ul>
+        <span class="navbar-text">
+            @if (User.Identity.IsAuthenticated)
+            {
+                @User.Identity.Name
+            }
+        </span>
+    </div>
+</nav>
+
+<!-- Kategori Seçimi Penceresi -->
+<div class="breadcrumb-container mt-5 pt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/KategoriSecim"><i class="fas fa-home"></i> Kategori Seçimi</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Durum Seçimi
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Alt Kategori Seçimi
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<!-- İlan Verme Çerçevesi -->
+<div class="container ilan-container mt-3">
+    <form asp-action="IlanDetay" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <!-- Yuvarlak Aşama Çizgileri -->
+        <div class="step-container">
+            <div class="step">
+                <div class="step-circle active">1</div>
+                <div class="step-description">Katagori Seçimi</div>
+            </div>
+            <div class="step">
+                <div class="step-circle active">2</div>
+                <div class="step-description">İlan Detayları</div>
+            </div>
+            <div class="step">
+                <div class="step-circle inactive">3</div>
+                <div class="step-description">Önizleme</div>
+            </div>
+            <div class="step">
+                <div class="step-circle inactive">4</div>
+                <div class="step-description">Tebrikler</div>
+            </div>
+        </div>
+
+        <!-- Diğer İlan Detayları -->
+        <!-- Form alanları buraya gelir -->
+    </form>
+</div>
+
+<!-- Stil için CSS -->
+<style>
+    .breadcrumb-container {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .breadcrumb-item a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+</style>

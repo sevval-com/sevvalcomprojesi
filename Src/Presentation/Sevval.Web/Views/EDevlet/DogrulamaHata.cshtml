@@ -1,0 +1,29 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "E-Devlet Hatalı";
+    Layout = null; // Layout kullanılmıyor
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Doğrulama Hatası</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @Model
+                    </div>
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "EDevlet")" class="btn btn-primary">
+                            Tekrar Dene
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,11 @@
+﻿using Sevval.Application.Features.Common;
+using Sevval.Application.Features.RecentlyVisitedAnnouncement.Commands.AddRecentlyVisitedAnnouncement;
+using Sevval.Application.Features.RecentlyVisitedAnnouncement.Queries.GetRecentlyVisitedAnnouncement;
+
+namespace sevvalemlak.csproj.ClientServices.RecentlyVisitedAnnouncement;
+
+public interface IRecentlyVisitedAnnouncementClientService
+{
+    Task<ApiResponse<AddRecentlyVisitedAnnouncementCommandResponse>> AddRecentlyVisitedAnnouncementAsync(AddRecentlyVisitedAnnouncementCommandRequest request, CancellationToken cancellationToken);
+    Task<ApiResponse<List<GetRecentlyVisitedAnnouncementQueryResponse>>> GetRecentlyVisitedAnnouncementAsync(GetRecentlyVisitedAnnouncementQueryRequest request, CancellationToken cancellationToken);
+}

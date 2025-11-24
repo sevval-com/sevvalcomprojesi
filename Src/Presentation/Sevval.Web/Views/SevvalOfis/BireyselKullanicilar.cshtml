@@ -1,0 +1,354 @@
+﻿@model sevvalemlak.Models.BireyselKullaniciViewModel
+
+@{
+    ViewData["Title"] = "Şevval Ofis";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bireysel Kullanıcılar</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Referans sütununun genişliğini kısıtlayacak stil */
+        .referans-col {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* Ana Sayfaya Dön butonu için stil */
+        .anasayfa-don-button {
+            margin-left: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+            .anasayfa-don-button:hover {
+                background-color: #0056b3;
+            }
+
+        /* Excel İndir butonu için stil */
+        .excel-indir-button {
+            margin-left: 10px; /* Ana Sayfaya Dön butonundan biraz uzaklaştır */
+            background-color: #28a745; /* Yeşil renk */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+            .excel-indir-button:hover {
+                background-color: #218838; /* Daha koyu yeşil */
+            }
+
+        /* Tablo Stilleri */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+            .table-responsive::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            .table-responsive::-webkit-scrollbar-track {
+                background: #f1f3f5;
+                border-radius: 10px;
+            }
+
+            .table-responsive::-webkit-scrollbar-thumb {
+                background-color: #a6a6a6;
+                border-radius: 10px;
+                border: 2px solid #f1f3f5;
+            }
+
+                .table-responsive::-webkit-scrollbar-thumb:hover {
+                    background-color: #737373;
+                }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                color: #343a40;
+                padding: 12px;
+                text-align: left;
+                border-bottom: 2px solid #dee2e6;
+                font-weight: 500;
+                white-space: nowrap; /* Başlıkların kaymasını önler */
+            }
+
+            .table tbody td {
+                padding: 12px;
+                border-bottom: 1px solid #dee2e6;
+                text-align: left;
+                vertical-align: middle;
+                white-space: nowrap; /* Satırların kaymasını engeller */
+            }
+
+            .table tbody tr:hover {
+                background-color: #f5f5f5;
+            }
+
+            .table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+
+        .btn-secondary {
+            background-color: #e2e3e4;
+            border-color: #e2e3e4;
+            color: #383d41;
+        }
+
+            .btn-secondary:hover {
+                background-color: #d3d4d5;
+                border-color: #d3d4d5;
+            }
+
+        .form-select, .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 8px;
+            font-size: 1rem;
+            height: auto; /* Yüksekliği otomatik ayarlar */
+        }
+
+            .form-select:focus, .form-control:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                outline: none;
+            }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .referans-form {
+            display: flex;
+            align-items: center; /* Dikeyde hizalar */
+            gap: 8px; /* Seçim kutusu ve buton arasına boşluk ekler */
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <h2 class="mb-3">Bireysel Kullanıcı Listesi</h2>
+
+        <div class="mb-3">
+            <strong>Gösterilen Kullanıcı Sayısı:</strong> @Model.ToplamKullaniciSayisi
+            <strong class="ms-3">Toplam İlan Sayısı:</strong> @Model.ToplamIlanSayisi
+        </div>
+
+        <form method="get" class="row mb-3">
+            <div class="col-md-4">
+                <label for="referansFilter" class="form-label">Referansa Göre Filtrele:</label>
+                <select name="referansFilter" id="referansFilter" class="form-select">
+                    <option value="">Tümü</option>
+                    @foreach (var r in Model.DistinctReferansValues)
+                    {
+                        <option value="@r" selected="@(r == Model.FilterReferans)">@r</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="registrationFrom" class="form-label">Kayıt Tarihinden:</label>
+                <input type="date" name="registrationFrom" id="registrationFrom" class="form-control"
+                       value="@(Model.FilterRegistrationFrom?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-4">
+                <label for="registrationTo" class="form-label">Kayıt Tarihine Kadar:</label>
+                <input type="date" name="registrationTo" id="registrationTo" class="form-control"
+                       value="@(Model.FilterRegistrationTo?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-12 mt-2">
+                <button type="submit" class="btn btn-primary">Filtrele</button>
+                <a href="@Url.Action("BireyselKullanicilar")" class="btn btn-secondary">Temizle</a>
+                <a href="@Url.Action("Index", "Home")" class="anasayfa-don-button">Ana Sayfaya Dön</a>
+                <a href="@Url.Action("ExportBireyselKullanicilarToExcel", "SevvalOfis", new { referansFilter = Model.FilterReferans, registrationFrom = Model.FilterRegistrationFrom, registrationTo = Model.FilterRegistrationTo })" class="excel-indir-button">Excel İndir</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Ad Soyad</th>
+                        <th scope="col">Mail Adresi</th>
+                        <th scope="col">Telefon</th>
+                        <th scope="col">Üyelik Tarihi</th>
+                        <th scope="col">İlan Sayısı</th>
+                        <th scope="col">Referans Ata</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users?.Any() == true)
+                    {
+                        var rowNumber = Model.Users.Count();
+                        var users = Model.Users.Reverse();
+
+                        foreach (var user in users)
+                        {
+                            <tr>
+                                <th scope="row">@rowNumber</th>
+                                <td>@user.FirstName @user.LastName</td>
+                                <td>@user.Email</td>
+                                <td>@user.PhoneNumber</td>
+                                <td>@user.RegistrationDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>
+                                    @if (Model.UserIlanSayilari.ContainsKey(user.Id))
+                                    {
+                                        <a href="#"
+                                           class="ilan-count text-decoration-none"
+                                           data-email="@user.Email">
+                                            @Model.UserIlanSayilari[user.Id]
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="#"
+                                           class="ilan-count text-decoration-none"
+                                           data-email="@user.Email">
+                                            0
+                                        </a>
+                                    }
+                                </td>
+                                <td class="referans-col">
+                                    @if (!string.IsNullOrEmpty(user.Referans))
+                                    {
+                                        @user.Referans
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="ReferansSec" class="referans-form">
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <select name="invitationId" class="form-select">
+                                                <option value="">Seçiniz</option>
+                                                <option value="-1">TANER TÜMEN</option> @* Yeni Seçenek *@
+                                                @foreach (var invitation in Model.ConsultantInvitations)
+                                                {
+                                                    <option value="@invitation.Id">
+                                                        @invitation.FirstName @invitation.LastName (@invitation.Email)
+                                                    </option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Ata</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                            rowNumber--;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">Kayıtlı kullanıcı bulunamadı</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- İLAN LİSTE MODAL’I -->
+    <div class="modal fade" id="ilanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-2 shadow-sm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">İlan Başlıkları</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center mb-0">Yükleniyor…</p>
+                </div>
+                <div class="modal-footer">
+                   
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                        Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          // 1) endpoint’leri değişkene alıyoruz
+          const getIlansUrl = '@Url.Action("GetUserIlans", "SevvalOfis")';
+          const viewUrlBase = '@Url.Action("ilansayfasi", "Ilan")';
+
+          let currentIlans = [];
+
+          document.querySelectorAll('.ilan-count').forEach(el => {
+            el.addEventListener('click', async e => {
+              e.preventDefault();
+              const email = el.dataset.email;
+
+              // 2) doğru URL’le fetch, camelCase alanlar
+              const resp = await fetch(`${getIlansUrl}?email=${encodeURIComponent(email)}`);
+              const ilans = await resp.json();
+              currentIlans = ilans;
+
+              // 3) title ve id ile liste oluşturma
+              const body = document.querySelector('#ilanModal .modal-body');
+              if (ilans.length > 0) {
+                const items = ilans.map(i =>
+                  `<li class="list-group-item">
+                     <a href="${viewUrlBase}?id=${i.id}" target="_blank">${i.title}</a>
+                   </li>`
+                ).join('');
+                body.innerHTML = `<ul class="list-group mb-0">${items}</ul>`;
+              } else {
+                body.innerHTML = '<p class="text-center">Bu kullanıcıya ait ilan bulunamadı.</p>';
+              }
+
+              new bootstrap.Modal(document.getElementById('ilanModal')).show();
+            });
+          });
+
+          document.getElementById('openAllBtn').addEventListener('click', () => {
+            currentIlans.forEach(i =>
+              window.open(`${viewUrlBase}?id=${i.id}`, '_blank')
+            );
+          });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

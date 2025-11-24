@@ -1,0 +1,739 @@
+﻿@model sevvalemlak.Models.EstateRegisterInfoModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    Layout = null;
+}
+
+<!-- Göz İkonu için Font Awesome Link -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+<link href="~/css/social-login.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/emlakçı.css" />
+
+<style>
+    .eye-toggle {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #666;
+        font-size: 18px;
+        user-select: none;
+    }
+
+    .text-danger {
+        color: red;
+    }
+
+    .back-to-home {
+        background-color: #007bff; /* Canlı kırmızı */
+        padding: 5px 20px; /* Butonun iç boşluğunu büyütme */
+        text-align: center;
+        border-radius: 60px; /* Daha yuvarlak köşeler */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Daha belirgin gölge */
+        transition: all 0.3s ease-in-out; /* Geçiş efekti */
+        font-family: 'Arial', sans-serif; /* Modern font */
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+        .back-to-home a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px; /* Font boyutunu artırdık */
+            font-weight: 600;
+            letter-spacing: 1px; /* Harf aralığını açtık */
+            display: inline-block;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .back-to-home:hover {
+            background-color: #007bff; /* Hoverda rengin açılması */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Hoverda gölgenin güçlenmesi */
+            transform: translateY(-8px); /* Yüksekliğe animasyon */
+        }
+
+        .back-to-home a:hover {
+            color: #fffff; /* Hoverda metin rengini altın yap */
+            transform: scale(1.1); /* Hoverda metni büyütme */
+        }
+
+        .back-to-home a:active {
+            transform: scale(1); /* Butona tıklandığında boyutunu eski haline getirme */
+        }
+</style>
+<style>
+    /* Zorunlu alan yıldızlarını etiketle aynı satıra yerleştir */
+    .form-group label { display: inline-flex; align-items: center; gap: 4px; }
+    .required-star { color: #dc3545; display: inline; }
+    .terms-row {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .terms-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .terms-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 16px; /* Yazı boyutu */
+        font-family: 'Arial', sans-serif;
+        color: #333; /* Yazı rengi */
+    }
+
+        .terms-label input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #007bff; /* Çerçeve rengi */
+            border-radius: 4px; /* Hafif yuvarlak köşeler */
+            margin-right: 10px; /* Kutucuk ile yazı arasındaki boşluk */
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }
+
+            .terms-label input[type="checkbox"]:checked {
+                background-color: #007bff; /* Seçildiğinde mavi arka plan */
+                border-color: #0056b3; /* Daha koyu çerçeve */
+            }
+
+                .terms-label input[type="checkbox"]:checked::before {
+                    content: '✔'; /* İşaret simgesi */
+                    color: white;
+                    font-weight: bold;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+
+    .checkmark {
+        margin-right: 10px;
+    }
+
+    #terms-error {
+        font-size: 14px; /* Uyarı yazısı boyutu */
+        margin-top: 5px;
+    }
+    .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+            .footer p {
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .footer a {
+                color: #007bff;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .footer a:hover {
+                    color: #0056b3;
+                    text-decoration: underline;
+                }
+</style>
+<style>
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .preview-container img {
+            max-width: 100px; /* Resmin genişliği 100px ile sınırlı */
+            max-height: 100px; /* Resmin yüksekliği 100px ile sınırlı */
+            object-fit: cover; /* Resmin alanı kaplamasını sağlar */
+            border: 1px solid #ccc; /* Hafif bir sınır ekler */
+            padding: 5px; /* Resmin etrafında biraz boşluk bırakır */
+        }
+
+        .preview-container video {
+            max-width: 100px;
+            max-height: 100px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+</style>
+
+
+<div class="register-container">
+<h2 class="title">Sevval.com</h2>
+<h2 class="title">Üye Ol</h2>
+<p class="text-muted" style="text-align:center; font-size: 0.95rem;">
+    <span class="required-star">*</span> ile işaretli alanların doldurulması zorunludur.
+</p>
+    <form asp-action="EstateRegister" method="post" autocomplete="off" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
+            <legend style="font-size:1.05rem; font-weight:600;">Üyelik Bilgileri</legend>
+            <!-- User Type Selection -->
+            <div class="form-group">
+                <label for="UserTypes">Kullanıcı Tipi Seçiniz <span class="required-star">*</span></label>
+                <select id="UserTypes" asp-for="UserTypes" class="form-control" required>
+                    <option value="Kurumsal">KURUMSAL GİRİŞ</option>
+                    <option value="Banka">BANKA GİRİŞ</option>
+                    <option value="İnşaat">İNŞAAT GİRİŞ</option>
+                    <option value="Vakıf">VAKIF GİRİŞ</option>
+                </select>
+                <span asp-validation-for="UserTypes" class="text-danger"></span>
+            </div>
+
+            <!-- Ad Soyad Alanları -->
+            <div class="form-group">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <label for="FirstName">Adı <span class="required-star">*</span></label>
+                        <input type="text" id="firstName" asp-for="FirstName" class="form-control" placeholder="Adınızı girin" required>
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="LastName">Soyadı <span class="required-star">*</span></label>
+                        <input type="text" id="lastName" asp-for="LastName" class="form-control" placeholder="Soyadınızı girin" required>
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mail ve Telefon Alanları -->
+            <div class="form-group">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <label for="Email">E-posta <span class="required-star">*</span></label>
+                        <input type="email" id="email" asp-for="Email" class="form-control" placeholder="E-posta adresinizi girin" required>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <span id="email-format-error" class="text-danger" style="display:none;">Lütfen geçerli bir e-posta adresi giriniz.</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="PhoneNumber">Telefon <span class="required-star">*</span></label>
+                        <input type="tel" id="phone" asp-for="PhoneNumber" class="form-control"
+                               placeholder="Telefon numaranızı girin"
+                               maxlength="14" inputmode="numeric" pattern="\d*"
+                               oninput="formatPhoneNumber(this)" required>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Şifre Alanları -->
+            <div class="form-group">
+                <div class="password-fields" style="display: flex; gap: 20px;">
+                    <div class="password-field" style="flex: 1;">
+                        <label for="password">Şifre <span class="required-star">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="password" asp-for="Password" class="form-control" placeholder="Şifrenizi girin" required>
+                            <span class="eye-toggle" id="togglePassword" data-target="password">
+                                <i class="fa fa-eye" id="eyeIcon"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="password-field" style="flex: 1;">
+                        <label for="confirmPassword">Şifre Yinele <span class="required-star">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="confirmPassword" asp-for="ConfirmPassword" class="form-control" placeholder="Şifrenizi tekrar girin" required>
+                            <span class="eye-toggle" id="toggleConfirmPassword" data-target="confirmPassword">
+                                <i class="fa fa-eye" id="confirmEyeIcon"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        <span id="confirm-error" class="text-danger" style="display:none;">Şifreler eşleşmiyor.</span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
+            <legend style="font-size:1.05rem; font-weight:600;">Firma Bilgileri</legend>
+            <!-- Şirket İsmi -->
+            <div class="form-group">
+                <label for="CompanyName">Şirketinizin İsmi <span class="required-star">*</span></label>
+                <input type="text" id="CompanyName" asp-for="CompanyName" class="form-control" placeholder="Şirket isminizi girin" required />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
+            <legend style="font-size:1.05rem; font-weight:600;">Belgeler</legend>
+            <div class="form-group">
+                <label for="Level5Certificate">Lütfen Seviye 5 Belgesini Yükleyin <span class="required-star">*</span></label>
+                <input id="Level5Certificate" type="file" asp-for="Level5Certificate" class="form-control-file" accept="image/*,application/pdf" onchange="previewFile(this, 'preview1')" required />
+                <div id="preview1" class="preview-container"></div>
+                <span asp-validation-for="Level5Certificate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="TaxPlate">Lütfen Vergi Levhanızı Yükleyin <span class="required-star">*</span></label>
+                <input id="TaxPlate" type="file" asp-for="TaxPlate" class="form-control-file" accept="image/*,application/pdf" onchange="previewFile(this, 'preview2')" required />
+                <div id="preview2" class="preview-container"></div>
+                <span asp-validation-for="TaxPlate" class="text-danger"></span>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
+            <legend style="font-size:1.05rem; font-weight:600;">Adres Bilgileri</legend>
+            <!-- İl ve İlçe Seçimi -->
+            <div class="form-group">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <label for="City">İl Seçiniz <span class="required-star">*</span></label>
+                        <select id="sehir" asp-for="City" class="form-control" required>
+                            <option value="">İl Seçiniz</option>
+                        </select>
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="District">İlçe Seçiniz <span class="required-star">*</span></label>
+                        <select id="semt" asp-for="District" class="form-control" required>
+                            <option value="">İlçe Seçiniz</option>
+                        </select>
+                        <span asp-validation-for="District" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Açık Adres -->
+            <div class="form-group">
+                <label for="Address">Açık Adres Giriniz <span class="required-star">*</span></label>
+                <textarea asp-for="Address" id="companyAddress" class="form-control" placeholder="Açık adresinizi girin" rows="4" required style="resize: none; font-family: Arial;"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </fieldset>
+        
+
+        <!-- Profil Resmi Yükleme Alanı -->
+        <div class="form-group">
+            <label>Lütfen Profil Resminizi Yükleyin (Opsiyonel):</label>
+            <input type="file" asp-for="ProfilePicture" class="form-control-file" accept="image/*" onchange="validateImage(this, 'preview3', 'error3')" />
+            <div id="preview3" class="preview-container"></div>
+            <!-- Hata mesajı alanı -->
+            <div id="error3" style="color: red; font-size: 14px; display: none;"></div>
+            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+
+        </div>
+
+
+        <!-- Referans -->
+        <div class="form-group">
+            <br />
+            <label for="Reference">Referansınız Varsa Belirtin</label>
+            <textarea asp-for="Reference" id="reference" class="form-control" placeholder="Bize Nasıl Ulaştığınızı Yazın. Örn. Danışmanlar Vasıtasıyla, Örn. Tv Reklamlarıyla..." rows="4" style="resize: none; font-family: Arial;"></textarea>
+            <small style="color: red;">*Zorunlu Değil</small>
+            <span asp-validation-for="Reference" class="text-danger"></span>
+
+        </div>
+
+        <!-- Sözleşme Onayı -->
+        <div class="form-row terms-row">
+            <div class="form-group terms-group">
+                <label for="terms-checkbox" class="terms-label">
+                    <input type="checkbox" id="terms-checkbox" name="termscheckbox" />
+                    <span class="checkmark"></span>
+                    <span onclick="openTermsModal()" style="color: blue; cursor: pointer; text-decoration: underline;">
+                        Kurumsal Hesap Sözleşmesi
+                    </span>
+                    'ni okudum ve onaylıyorum <span class="required-star">*</span>
+                </label>
+                <span id="terms-error" class="text-danger" style="display:none;">Bu alanın işaretlenmesi zorunludur.</span>
+
+            </div>
+        </div>
+
+        <div class="form-row row">
+            <div class="form-group col-12">
+                <button id="submitBtn" type="submit" style="width: 100%;" class="btn btn-primary mt-3" disabled>Üye Ol</button>
+            </div>
+        </div>
+       
+        <div class="footer">
+                    <p>Hesabınız yok mu? <a href="/Account/Register">Kayıt Olun</a></p>
+                    <p><a asp-controller="Account" asp-action="SendNewCode" style="padding: 20px 0;">Şifremi Unuttum?</a></p>
+                    <button class="btn btn-primary"><a href="/" style="color: white; text-decoration: none;">Ana Sayfa</a></button>
+                </div>
+    </form>
+
+
+</div>
+
+<!-- Modal -->
+<div id="termsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeTermsModal()">&times;</span>
+        <h1 style="text-align: center; font-size: 24px; margin-bottom: 20px;">Kurumsal Hesap Sözleşmesi</h1>
+        <p>
+            <strong>1. Giriş</strong><br>
+            Bu Kurumsal Hesap Sözleşmesi ("Sözleşme"), platformumuz üzerinden kurumsal hesap oluşturacak
+            kullanıcılar ("Kullanıcı") ile platformumuz arasında yasal bir anlaşma niteliği taşır.
+            Kullanıcı, platforma üye olmakla bu sözleşme şartlarını kabul etmiş sayılır.
+        </p>
+        <p>
+            <strong>2. Tanımlar</strong><br>
+            <em>Kurumsal Hesap:</em> Kuruluşlara özel olarak sunulan, platformun gelişmiş özelliklerini kullanmaya olanak sağlayan kullanıcı hesabıdır.<br>
+            <em>Platform:</em> Şirketimize ait dijital hizmetleri sağlayan web sitesi ve mobil uygulamaları ifade eder.
+        </p>
+        <p>
+            <strong>3. Kullanım Koşulları</strong><br>
+            Kullanıcılar, kurumsal hesap oluştururken sağladıkları tüm bilgilerin eksiksiz, doğru ve güncel olduğunu taahhüt eder. Yanlış veya yanıltıcı bilgi verilmesi durumunda, platformumuzun hesabı askıya alma veya sonlandırma hakkı saklıdır.
+        </p>
+        <p>
+            <strong>4. Ücretlendirme ve Ödeme</strong><br>
+            Kurumsal hesapların kullanımı, belirli bir ücret karşılığında sunulabilir. Ücretlendirme politikaları platform üzerinde belirtilir ve gerektiğinde değiştirilebilir. Ödeme işlemleri, güvenli ödeme altyapıları aracılığıyla gerçekleştirilir.
+        </p>
+        <p>
+            <strong>5. Gizlilik ve Güvenlik</strong><br>
+            Kullanıcı bilgilerinin korunması, yürürlükteki Kişisel Verilerin Korunması Kanunu (KVKK) ve diğer ilgili düzenlemelere uygun şekilde sağlanır. Hesap güvenliği kullanıcının sorumluluğundadır; kullanıcı, şifrelerini üçüncü kişilerle paylaşmamalıdır.
+        </p>
+        <p>
+            <strong>6. Sorumluluk Reddi</strong><br>
+            Platformumuzda sunulan hizmetlerde oluşabilecek kesintilerden dolayı herhangi bir tazminat talebinde bulunulamaz. Kullanıcı, platformu yalnızca yasal amaçlarla kullanmayı kabul eder.
+        </p>
+        <p>
+            <strong>7. Sözleşme Değişiklikleri</strong><br>
+            Şirketimiz, bu sözleşmeyi önceden bildirimde bulunmaksızın değiştirme hakkını saklı tutar. Güncellenen sözleşme, platformda yayınlandığı tarihten itibaren geçerli olur.
+        </p>
+        <p>
+            <strong>8. Fesih</strong><br>
+            Kullanıcı, istediği zaman kurumsal hesabını kapatabilir. Platformumuz, bu sözleşme hükümlerine aykırı davranışlar tespit edilmesi halinde kullanıcı hesabını feshedebilir.
+        </p>
+        <p>
+            <strong>9. Uyuşmazlıkların Çözümü</strong><br>
+            Bu sözleşme Türk Hukuku'na tabi olup, taraflar arasında doğacak uyuşmazlıkların çözümünde İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.
+        </p>
+        <p>
+            <strong>10. İletişim</strong><br>
+            Her türlü soru, öneri veya şikayetleriniz için bizimle iletişime geçebilirsiniz. İletişim bilgilerimiz platformumuzun "İletişim" sayfasında bulunmaktadır.
+        </p>
+        <button onclick="closeTermsModal()" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Kapat
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        function checkUserExists(field) {
+            var email = $("#email").val().trim();
+            var phone = $("#phone").val().trim();
+
+            $.ajax({
+                url: '@Url.Action("CheckUserExists", "Account")', // Doğru controller adını yaz
+                type: "POST",
+                data: { email: email, phone: phone },
+                success: function (response) {
+                    // Önce eski hata mesajlarını temizle
+                    $(".email-error").remove();
+                    $(".phone-error").remove();
+
+                    if (field === "email" && response.emailExists) {
+                        $("#email").val(""); // Email inputunu temizle
+                        $("#email").after('<span class="text-danger email-error">Bu e-posta zaten kayıtlı.</span>');
+                    }
+
+                    if (field === "phone" && response.phoneExists) {
+                        $("#phone").val(""); // Telefon inputunu temizle
+                        $("#phone").after('<span class="text-danger phone-error">Bu telefon numarası zaten kayıtlı.</span>');
+                    }
+                }
+            });
+        }
+
+        $("#email").blur(function () {
+            checkUserExists("email");
+        });
+
+        $("#phone").blur(function () {
+            checkUserExists("phone");
+        });
+
+        // Canlı doğrulama ve buton kontrolü
+        function isValidEmail(value) {
+            var at = value.indexOf(String.fromCharCode(64));
+            var dot = value.lastIndexOf('.');
+            return at > 0 && dot > at + 1 && dot < value.length - 1;
+        }
+
+        function checkPasswordsMatch() {
+            var p1 = $('#password').val();
+            var p2 = $('#confirmPassword').val();
+            if (p1 && p2 && p1 !== p2) {
+                $('#confirm-error').show();
+                $('#confirmPassword').addClass('is-invalid');
+                return false;
+            }
+            $('#confirm-error').hide();
+            $('#confirmPassword').removeClass('is-invalid');
+            return true;
+        }
+
+        function validateForm() {
+            var firstName = $('#firstName').val()?.trim();
+            var lastName = $('#lastName').val()?.trim();
+            var emailVal = $('#email').val().trim();
+            var emailOk = emailVal.length > 0 && isValidEmail(emailVal) && $('.email-error').length === 0;
+            if (emailVal.length === 0 || isValidEmail(emailVal)) {
+                $('#email-format-error').hide();
+                $('#email').removeClass('is-invalid');
+            } else {
+                $('#email-format-error').show();
+                $('#email').addClass('is-invalid');
+            }
+
+            var phoneDigits = $('#phone').val().replace(/\D/g, '');
+            var phoneOk = phoneDigits.length === 11 && $('.phone-error').length === 0;
+
+            var passFilled = $('#password').val().length > 0;
+            var pass2Filled = $('#confirmPassword').val().length > 0;
+            var passMatch = checkPasswordsMatch();
+            var companyOk = $('#CompanyName').val()?.trim();
+            var cityOk = $('#sehir').val()?.trim();
+            var districtOk = $('#semt').val()?.trim();
+            var addressOk = $('#companyAddress').val()?.trim();
+            var termsChecked = $('#terms-checkbox').is(':checked');
+
+            var allOk = firstName && lastName && emailOk && phoneOk && passFilled && pass2Filled && passMatch && companyOk && cityOk && districtOk && addressOk && termsChecked;
+            $('#submitBtn').prop('disabled', !allOk);
+        }
+
+        $('#firstName, #lastName, #email, #phone, #password, #confirmPassword, #CompanyName, #sehir, #semt, #companyAddress').on('input blur change', function () {
+            validateForm();
+        });
+        $('#terms-checkbox').on('change', function () {
+            if (!$(this).is(':checked')) {
+                $('#terms-error').show();
+            } else {
+                $('#terms-error').hide();
+            }
+            validateForm();
+        });
+
+        // İlk yüklemede kontrol
+        validateForm();
+    });
+</script>
+<!-- JavaScript -->
+<script>
+    // Şifreyi göster/gizle işlevi
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        var passwordField = document.getElementById('password');
+        var eyeIcon = document.getElementById('eyeIcon');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    });
+
+    // Şifreyi yenileyi göster/gizle işlevi
+    document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+        var confirmPasswordField = document.getElementById('confirmPassword');
+        var confirmEyeIcon = document.getElementById('confirmEyeIcon');
+        if (confirmPasswordField.type === 'password') {
+            confirmPasswordField.type = 'text';
+            confirmEyeIcon.classList.remove('fa-eye');
+            confirmEyeIcon.classList.add('fa-eye-slash');
+        } else {
+            confirmPasswordField.type = 'password';
+            confirmEyeIcon.classList.remove('fa-eye-slash');
+            confirmEyeIcon.classList.add('fa-eye');
+        }
+    });
+</script>
+<script>
+    function validateImage(input, previewId, errorId) {
+        const file = input.files[0];
+        const errorElement = document.getElementById(errorId);
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    // Fotoğrafın genişlik ve yüksekliğini kontrol et
+                    if (img.width !== img.height) {
+                        // Hata mesajını göster ve dosya yüklemeyi sıfırla
+                        errorElement.style.display = 'block';
+                        errorElement.textContent = "Yüklenen resmin boyutları uyumsuz. Lütfen genişlik ve yüksekliği eşit olan, kare bir resim yükleyin.";
+                        input.value = ""; // Dosya alanını sıfırla
+                        document.getElementById(previewId).innerHTML = ""; // Önizlemeyi temizle
+                    } else {
+                        // Fotoğraf kare olduğunda önizlemeyi göster ve hata mesajını gizle
+                        document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" alt="Preview" class="img-fluid" />`;
+                        errorElement.style.display = 'none';
+                    }
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+<script>
+    function validateTerms() {
+        var termsCheckbox = document.getElementById('terms-checkbox');
+        var termsError = document.getElementById('terms-error');
+        if (!termsCheckbox.checked) {
+            termsError.style.display = 'block';
+            return false;
+        }
+        termsError.style.display = 'none';
+        return true;
+    }
+</script>
+
+<script>
+    function previewFile(input, previewId) {
+        const previewContainer = document.getElementById(previewId);
+        previewContainer.innerHTML = ''; // Önceki önizlemeleri temizle
+
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const fileType = file.type;
+                let element;
+
+                // Eğer yüklenen dosya bir resimse
+                if (fileType.startsWith('image/')) {
+                    element = document.createElement('img');
+                    element.src = e.target.result;
+                }
+                // Eğer yüklenen dosya bir video dosyasıysa
+                else if (fileType.startsWith('video/')) {
+                    element = document.createElement('video');
+                    element.src = e.target.result;
+                    element.controls = true;
+                }
+                // Eğer yüklenen dosya PDF ise
+                else if (fileType === 'application/pdf') {
+                    element = document.createElement('p');
+                    element.textContent = 'PDF dosyası yüklendi';
+                }
+
+                previewContainer.appendChild(element);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    }
+
+
+
+</script>
+
+<script>
+    // Modal açma fonksiyonu
+    function openTermsModal() {
+        document.getElementById('termsModal').style.display = 'block';
+    }
+
+    // Modal kapama fonksiyonu
+    function closeTermsModal() {
+        document.getElementById('termsModal').style.display = 'none';
+    }
+
+    // Modal dışına tıklama ile kapatma
+    window.onclick = function (event) {
+        const modal = document.getElementById('termsModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+</script>
+<!-- JS: Telefon Formatlama -->
+<script>
+    function formatPhoneNumber(input) {
+        let cleaned = ('' + input.value).replace(/\D/g, ''); // Sayısal olmayan karakterleri kaldır
+        if (cleaned.length > 11) cleaned = cleaned.slice(0, 11); // Maksimum 11 rakam sınırı
+
+        // Format: XXXX XXX XX XX
+        let formatted = cleaned.match(/^(\d{4})(\d{3})?(\d{2})?(\d{2})?$/);
+        if (formatted) {
+            input.value = [formatted[1], formatted[2], formatted[3], formatted[4]]
+                .filter(Boolean)
+                .join(' ');
+        }
+    }
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+            // Şehirleri doldur
+            data.forEach(function (city) {
+                $('#sehir').append(new Option(city.Il, city.Il));
+            });
+
+            // İlçe ve mahalle seçeneklerini güncelle
+            $('#sehir').change(function () {
+                var selectedCity = $(this).val();
+                var selectedCityData = data.find(c => c.Il === selectedCity);
+
+                // İlçe menüsünü temizle
+                $('#semt').empty().append('<option value="">İlçe Seçiniz</option>');
+
+                if (selectedCityData) {
+                    selectedCityData.Ilce.forEach(function (district) {
+                        $('#semt').append(new Option(district.Ilce, district.Ilce));
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<!-- JS: Dosya Önizleme -->
+<script>
+    function previewFile(input, previewId) {
+        const previewContainer = document.getElementById(previewId);
+        previewContainer.innerHTML = ""; // Önceki önizlemeyi temizler
+
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                if (file.type.startsWith("image/")) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    previewContainer.appendChild(img);
+                } else if (file.type === "application/pdf") {
+                    const embed = document.createElement("embed");
+                    embed.src = e.target.result;
+                    embed.type = "application/pdf";
+                    previewContainer.appendChild(embed);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

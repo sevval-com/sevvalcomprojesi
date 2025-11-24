@@ -1,0 +1,126 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+
+@{
+    ViewBag.Title = "EİDS Onaylı Kullanıcılar";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewBag.Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Content/eidsüye.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <!-- Başlık ve Ana Sayfaya Dön Butonu -->
+        <div class="header d-flex justify-content-between align-items-center">
+            <h2 class="display-4">@ViewBag.Title</h2>
+            <a href="~/Home/Index" class="btn btn-primary home-btn">Ana Sayfaya Dön</a>
+        </div>
+
+        <!-- Tablo Bölümü -->
+        <div class="table-responsive mt-4">
+            <table class="table table-hover align-middle custom-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Kullanıcı Id</th>
+                        <th>Ad</th>
+                        <th>Soyad</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Doğrulama Kodu</th>
+                        <th>Doğrulama Tarihi</th>
+                        <th>Son Kullanma Tarihi</th>
+                        <th>IP Adresi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.UserVerifications)
+                    {
+                        <!-- Kullanıcı satırı: Collapse tetikleyici -->
+                        <tr data-bs-toggle="collapse" data-bs-target="#ilan-@user.Id" aria-expanded="false" style="cursor:pointer;">
+                            <td>@user.Id</td>
+                            <td>@user.UserId</td>
+                            <td>@user.FirstName</td>
+                            <td>@user.LastName</td>
+                            <td>@user.Email</td>
+                            <td>@user.PhoneNumber</td>
+                            <td><span class="badge bg-secondary">@user.VerificationCode</span></td>
+                            <td>@user.VerificationDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <!-- Doğrulama Tarihi temel alınarak 1 ay sonrasını hesaplıyoruz -->
+                                <span class="countdown" data-expiry="@user.VerificationDate.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+                            </td>
+                            <td><code>@user.IPAddress</code></td>
+                        </tr>
+
+                        <!-- Genişleyen ilan detayları satırı -->
+                        <tr class="collapse" id="ilan-@user.Id">
+                            <td colspan="10">
+                                <div class="p-2">
+                                    <h5>EİDS Onaylı İlanlar</h5>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Başlık</th>
+                                                <th>Fiyat</th>
+                                                <th>Giriş Tarihi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var ilan in Model._Ilanlar
+                                           .Where(i => i.Email == user.Email && (i.KonutDurumu == "Kiralık" || i.KonutDurumu == "Devren Kiralık")))
+                                            {
+                                                <tr onclick="window.location.href='@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })';" style="cursor:pointer;">
+                                                    <td>@ilan.Title</td>
+                                                    <td>@ilan.Price</td>
+                                                    <td>@ilan.GirisTarihi.ToString("dd/MM/yyyy")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Geri Sayım Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const countdownElements = document.querySelectorAll('.countdown');
+            countdownElements.forEach(el => {
+                const expiryTimeStr = el.getAttribute('data-expiry');
+                const expiryDate = new Date(expiryTimeStr);
+                function updateCountdown() {
+                    const now = new Date();
+                    const timeLeft = expiryDate - now;
+                    if (timeLeft <= 0) {
+                        el.innerHTML = "Süre doldu";
+                        clearInterval(interval);
+                        return;
+                    }
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    el.innerHTML = days + " gün " + hours + " saat " + minutes + " dakika " + seconds + " saniye";
+                }
+                updateCountdown();
+                const interval = setInterval(updateCountdown, 1000);
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

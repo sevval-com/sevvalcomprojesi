@@ -1,0 +1,231 @@
+﻿/* Genel stil */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+.profile-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    background: #0077ff url('/ImageFiles/manzara.png') no-repeat center center;
+    background-size: cover;
+    border-bottom: 3px solid #ddd;
+    height: 250px; /* İstediğiniz piksel değeri */
+}
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 700px;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    .profile-container:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+.profile-picture {
+    flex-shrink: 0;
+    margin-right: 25px;
+}
+
+.profile-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details {
+    flex-grow: 1;
+    color: #333;
+}
+
+    .profile-details h2 {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #003d5b;
+    }
+
+    .profile-details p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+/* Ana Sayfaya Dön Butonu */
+.back-to-home-btn button {
+    padding: 8px 20px; /* Daha küçük padding */
+    background-color: #005bb5;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 14px; /* Daha küçük font */
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 91, 181, 0.3);
+    z-index: 1000;
+    white-space: nowrap; /* Satır atmasını engeller */
+}
+
+    .back-to-home-btn button:hover {
+        background-color: #0073e6;
+        box-shadow: 0 8px 20px rgba(0, 115, 230, 0.4);
+    }
+
+/* Sayfanın ortasında yuvarlatılmış arama çubuğu */
+.centered-search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Sayfa boyutunu kapsayacak şekilde ortalar */
+    margin-bottom: 50px;
+    margin-top: 30px;
+}
+
+#newSearchBar {
+    width: 50%; /* Arama çubuğunun genişliği */
+    padding: 10px 20px; /* İç boşluk */
+    font-size: 16px; /* Yazı boyutu */
+    border-radius: 25px; /* Yuvarlatılmış köşeler */
+    border: 2px solid #ccc; /* Kenarlık rengi */
+    outline: none; /* Odaklanma kenarlığını kaldırır */
+    transition: all 0.3s ease; /* Animasyon efekti */
+}
+
+#newSearchBar:focus {
+    border-color: #007bff; /* Arama çubuğuna tıklanınca kenarlık rengi */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Kenarlık etrafında hafif gölge */
+}
+
+
+/* İlanlar Başlık */
+.ilanlar-section h3 {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #004f7c;
+    margin-bottom: 50px;
+}
+
+/* İlanlar Kartları */
+.ilan-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.ilan-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+    .ilan-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+.ilan-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.ilan-info {
+    padding: 20px;
+    text-align: left;
+}
+
+    .ilan-info h4 {
+        font-size: 22px;
+        font-weight: bold;
+        color: #004f7c;
+        margin-bottom: 15px;
+    }
+
+    .ilan-info p {
+        font-size: 16px;
+        color: #666;
+        margin: 5px 0;
+    }
+
+.ilan-price {
+    font-size: 18px;
+    color: #d9534f;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+
+
+.katagoriler {
+    display: flex;
+    flex-wrap: nowrap; /* Kategorilerin aynı satırda görünmesini sağlar */
+    justify-content: space-between;
+    gap: 5px; /* Kategoriler arasındaki mesafeyi daha da kısaltıyoruz */
+    padding: 20px;
+    overflow-x: auto; /* Eğer çok fazla kategori varsa yatay kaydırma ekler */
+}
+
+.kategori {
+    width: 15%; /* Kategorilerin daha da küçük olmasını sağlar */
+    text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .kategori:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+.kategori-resim {
+    width: 100%;
+    padding-top: 100%; /* 1:1 aspect ratio for square images */
+    position: relative;
+}
+
+    .kategori-resim img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image covers the whole container */
+    }
+
+.kategori p {
+    margin: 5px 0; /* Kategori metinlerinin arasındaki boşluğu küçülttük */
+    font-size: 12px; /* Yazı boyutunu daha da küçülttük */
+    color: #333;
+}
+
+    .kategori p:first-of-type {
+        font-weight: bold;
+        font-size: 14px; /* Başlıkları daha küçük hale getirdik */
+    }

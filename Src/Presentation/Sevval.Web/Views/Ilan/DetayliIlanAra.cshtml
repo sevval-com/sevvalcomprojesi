@@ -1,0 +1,551 @@
+﻿@model List<IlanHizliAraResponseDTO>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HizliAra</title>
+    <link rel="stylesheet" href="~/css/arama.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .search-results-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: #0078d7;
+            margin-bottom: 30px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .result-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+            .result-item:hover {
+                transform: scale(1.03);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+        .result-image {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+            .result-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .result-price {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 120, 215, 0.85);
+            color: #fff;
+            padding: 5px 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .result-details {
+            padding: 15px;
+            text-align: left;
+        }
+
+            .result-details h3 {
+                font-size: 18px;
+                color: #003d66;
+                margin: 0 0 10px;
+                font-weight: 600;
+            }
+
+        .result-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .no-results {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+        }
+
+        .katagoriler {
+            display: flex;
+            flex-wrap: nowrap; /* Kategorilerin aynı satırda görünmesini sağlar */
+            justify-content: space-between;
+            gap: 5px; /* Kategoriler arasındaki mesafeyi daha da kısaltıyoruz */
+            padding: 20px;
+            overflow-x: auto; /* Eğer çok fazla kategori varsa yatay kaydırma ekler */
+        }
+
+        .kategori {
+            width: 15%; /* Kategorilerin daha da küçük olmasını sağlar */
+            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .kategori:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+        .kategori-resim {
+            width: 100%;
+            padding-top: 100%; /* 1:1 aspect ratio for square images */
+            position: relative;
+        }
+
+            .kategori-resim img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Ensures the image covers the whole container */
+            }
+
+        .kategori p {
+            margin: 5px 0; /* Kategori metinlerinin arasındaki boşluğu küçülttük */
+            font-size: 12px; /* Yazı boyutunu daha da küçülttük */
+            color: #333;
+        }
+
+            .kategori p:first-of-type {
+                font-weight: bold;
+                font-size: 14px; /* Başlıkları daha küçük hale getirdik */
+            }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbaar">
+        <div class="navbaar-container">
+            <div class="logo">
+                <a href="/">
+                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+                <span>Şevval Emlak</span>
+            </div>
+            <div class="haamburger" id="hamburger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <ul class="naav-linkss" id="nav-links">
+                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <li>
+                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                    </li>
+                }
+
+                <li><a href="@Url.Action("KardesFirmalar", "Home")">Kardeş Firmalar</a></li>
+                <li class="dropdoawn">
+                    <a href="#">Hakkımızda</a>
+                    <ul class="dropdoawn-content">
+                        <li><a href="@Url.Action("About", "Home")">Biz Kimiz</a></li>
+                        <li><a href="@Url.Action("Channels", "Home")">Diğer Kanallarımız</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
+                </li>
+
+               
+
+            </ul>
+            <div class="auth-buttoons">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var currentUser = await UserManager.GetUserAsync(User);
+
+                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                    if (currentUser != null)
+                    {
+                        <div class="dropdoawn">
+                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a> <!-- İsim ve Soyisim -->
+                            <ul class="dropdoawn-content">
+                                <li><a href="@Url.Action("KategoriSecim", "Ilan")">İlan Ver</a></li>
+                                <li>
+                                    <form asp-action="Logout" asp-controller="Account" method="post">
+                                        <button type="submit" style="background: none; border: none; color: inherit; cursor: pointer;">Çıkış Yap</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                    }
+                }
+                else
+                {
+                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
+                }
+
+
+                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
+                <div class="post-ad-container">
+                    <span class="free-tag">Ücretsiz</span>
+                   
+                    <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                   
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <style>
+        .post-ad-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .free-tag {
+            position: absolute;
+            top: -10px;
+            left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: rotate(-10deg); /* Hafif eğik bir görünüm */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+
+        .post-ad {
+            display: inline-block;
+            background-color: #ffffff; /* Beyaz arka plan */
+            color: #007bff; /* Mavi yazı rengi */
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 1px solid #007bff; /* Mavi çerçeve */
+            transition: 0.3s ease;
+        }
+
+            .post-ad:hover {
+                background-color: #007bff; /* Hoverda mavi arka plan */
+                color: white; /* Hoverda beyaz metin */
+            }
+
+        .coming-soon-tag {
+            position: absolute;
+            top: 20px;
+            left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
+            background-color: #007bff; /* Mavi arka plan */
+            color: white; /* Beyaz metin rengi */
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
+            z-index: 1;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+        }
+
+    </style>
+    <!-- Pop-up Penceresi -->
+    <div id="popup-giris" class="pencere">
+        <div class="pencere-icerik">
+            <button class="kapat-buton" id="pencere-kapat">&times;</button> <!-- Kapat Butonu -->
+            <div class="sol-bolum">
+                <h2>Bireysel</h2>
+                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+            <div class="sag-bolum">
+                <h2>Kurumsal</h2>
+                <a href="@Url.Action("Login","Account" )" class="baglanti">Giriş Yap</a>
+                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Pop-up penceresi stili */
+        .pencere {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+
+        /* Pop-up içeriği stili */
+        .pencere-icerik {
+            background: linear-gradient(90deg, #1e88e5, #2196f3); /* Mavi tonları */
+            width: 460px;
+            height: 490px;
+            display: flex;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: gorunmeEfekti 0.3s ease;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            margin: auto;
+        }
+
+        /* Sol ve sağ bölümler */
+        .sol-bolum, .sag-bolum {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Sağ bölümdeki ayırıcı */
+        .sag-bolum {
+            border-left: 2px solid #fff;
+        }
+
+        /* Başlık stilleri */
+        h4 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Bağlantı buton stilleri */
+        .baglanti {
+            margin: 15px 0;
+            padding: 15px 25px;
+            background: #fff;
+            color: #1e88e5;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            width: 80%;
+        }
+
+            .baglanti:hover {
+                background: #f1f1f1;
+                transform: translateY(-2px);
+            }
+
+            .baglanti:focus {
+                outline: none;
+            }
+
+        /* Kapat butonu */
+        .kapat-buton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 30px;
+            color: #fff;
+            background: none;
+            border: 2px solid #fff;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .kapat-buton:hover {
+                color: #d32f2f;
+                border-color: #d32f2f;
+            }
+
+    </style>
+
+    <script>
+        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+        document.getElementById('giris-buton').addEventListener('click', function (event) {
+            event.preventDefault();
+            document.getElementById('popup-giris').style.display = 'flex';
+        });
+
+        // Pop-up penceresinin dışında bir yere tıklandığında kapat
+        document.getElementById('popup-giris').addEventListener('click', function (event) {
+            if (event.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Kapatma butonuna tıklandığında pop-up penceresini kapat
+        document.getElementById('pencere-kapat').addEventListener('click', function () {
+            document.getElementById('popup-giris').style.display = 'none';
+        });
+
+    </script>
+
+
+
+    <div class="search-results-container">
+        <h2>Arama Sonuçları</h2>
+
+        @if (Model.Count > 0)
+        {
+            <div class="results-grid">
+                @foreach (var ilan in Model)
+                {
+                    <div class="result-item" onclick="window.location.href='@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })'">
+                        <div class="result-image">
+                            <img src="@ilan.IlanVitrinImageUrl" alt="@ilan.IlanBasligi" />
+                            <span class="result-price">@ilan.IlanFiyati.ToString("N0") TL</span>
+                        </div>
+                        <div class="result-details">
+                            <h3>@ilan.IlanBasligi</h3>
+                            <storng><p class="result-description"> M²:@ilan.Area / Ada: @ilan.AdaNo / Parsel: @ilan.ParselNo</p></storng>
+                            <p class="result-description"> @ilan.sehir / @ilan.semt / @ilan.mahalleKoy </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="no-results">Aradığınız kriterlere uygun bir ilan bulunamadı.</p>
+        }
+    </div>
+
+    <div class="katagoriler">
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/konutilanlari.png" alt="Konut İlanları">
+            </div>
+            <p>Konut İlanları</p>
+            <p>0 İlan</p>
+        </div>
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/isyeriilanlari2.png" alt="İş Yeri İlanları">
+            </div>
+            <p>İş Yeri İlanları</p>
+            <p>0 İlan</p>
+        </div>
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/turistiktesisilanlari.png" alt="Turistik Tesis İlanları">
+            </div>
+            <p>Turistik Tesis İlanları</p>
+            <p>0 İlan</p>
+        </div>
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/arsailanlari.png" alt="Arsa İlanları">
+            </div>
+            <p>Arsa İlanları</p>
+            <p>0 İlan</p>
+        </div>
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/bahceilanlari.png" alt="Bahçe İlanları">
+            </div>
+            <p>Bahçe İlanları</p>
+            <p>0 İlan</p>
+        </div>
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="~/ImageFiles/tarlailanlari.png" alt="Tarla İlanları">
+            </div>
+            <p>Tarla İlanları</p>
+            <p>0 İlan</p>
+        </div>
+    </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content footer-contact">
+                <h3 class="footer-title">İletişim Bilgileri</h3>
+                <p class="footer-info">Adres: Güney Mh, Saatçi Sk, No:9/A Kocaeli/Körfez</p>
+                <p class="footer-info">Telefon: 0507 077 56 66</p>
+                <p class="footer-info">E-posta: sevvalemlakiletisim@gmail.com</p>
+            </div>
+            <div class="footer-section">
+                <h3 class="footer-title">Bizi Takip Edin</h3>
+                <div class="social-icons">
+                    <a href="https://rb.gy/i71ckl" class="social-icon" target="_blank" rel="noopener noreferrer">
+                        <img src="~/images/youtubelogo.png" alt="Youtube">
+                    </a>
+                    <a href="https://x.gd/jmKVa" class="social-icon" target="_blank" rel="noopener noreferrer">
+                        <img src="~/images/instagramlogo.png" alt="Instagram">
+                    </a>
+                    <a href="https://x.gd/x0avc" class="social-icon" target="_blank" rel="noopener noreferrer">
+                        <img src="~/images/facebooklogo.png" alt="Facebook">
+                    </a>
+                    <a href="https://x.gd/JUJTk" class="social-icon" target="_blank" rel="noopener noreferrer">
+                        <img src="~/images/tiktoklogo.png" alt="Tiktok">
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

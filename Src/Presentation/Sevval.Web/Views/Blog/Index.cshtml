@@ -1,0 +1,345 @@
+﻿@using System.Text.RegularExpressions
+@model YourProjectName.Controllers.BlogIndexViewModel
+@{
+    // SEO dostu sekme başlığı güncellendi
+    ViewData["Title"] = "Şevval Emlak Blog - Gayrimenkul Dünyası";
+    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+    // Admin olarak görünecek ek e-posta adresleri
+    var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
+    var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO için meta açıklaması -->
+    <meta name="description" content="Şevval Emlak Blog'da gayrimenkul, emlak sektörü ve emlakçılık üzerine ilham veren yazılar. Modern tasarım ve animasyonlarla zenginleştirilmiş keyifli bir okuma deneyimi." />
+    <!-- SEO için anahtar kelimeler -->
+    <meta name="keywords" content="Şevval Blog, emlak blogu, gayrimenkul, emlakçılık, güncel, ilham, makaleler, Türkçe, yeni nesil" />
+    <!-- Yazar bilgisi -->
+    <meta name="author" content="Şevval" />
+    <!-- Sayfa başlığı -->
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- İsteğe bağlı, ikonlar için -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- blog.css dosyasını buraya bağlıyoruz -->
+    <link rel="stylesheet" href="~/css/blog.css">
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-WSQR6TXV');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSQR6TXV"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <!-- Header Bölümü -->
+    <header class="header-bg py-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
+                <!-- sevval.com'a geri dön butonu güncellendi, artık yeni sekmede açılmayacak -->
+                <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
+            </div>
+            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+            {
+                <nav>
+                    <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
+                    </a>
+                </nav>
+            }
+        </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold animated-heading mb-4">
+                Merhaba, Şevval Blog'a Hoş Geldin!
+            </h1>
+            <p class="lead animate-fade-in">
+                Emlak, emlakçılık ve gayrimenkul dünyasına dair ilham veren yazılar.
+            </p>
+            <a href="#latest-blog-posts" class="btn btn-light btn-lg mt-4 animate-fade-in" style="animation-delay: 0.3s;">
+                Yazıları Keşfet
+            </a>
+        </div>
+    </section>
+    <main class="container my-5 flex-grow-1">
+        @* Kategorileri Soldan Sağa Kaydırılabilir Bölüm - En Üste Taşındı *@
+        @if (Model.BlogsByCategory != null && Model.BlogsByCategory.Any())
+        {
+            <section class="category-navigation mb-5">
+                <h2 class="text-center mb-4 fw-bold text-primary animated-heading" style="font-size: 2.5rem;">
+                    Blog Kategorileri
+                </h2>
+                <div class="d-flex flex-nowrap overflow-auto pb-3 scrollbar-hidden">
+                    @foreach (var categoryGroup in Model.BlogsByCategory)
+                    {
+                        var categorySlug = categoryGroup.Key.Replace(" ", "-").ToLower();
+                        <button class="btn btn-outline-primary category-btn rounded-pill px-4 py-2 me-3" data-category="@categorySlug">
+                            @categoryGroup.Key
+                        </button>
+                    }
+                </div>
+            </section>
+        }
+
+        @* En Son Blog Yazıları Bölümü *@
+        <section id="latest-blog-posts" class="mb-5">
+            <h2 class="text-center mb-5 fw-bold text-primary animated-heading" style="font-size: 2.5rem;">
+                En Son Blog Yazıları
+            </h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @if (Model.AllBlogs != null && Model.AllBlogs.Any())
+                {
+                    @foreach (var item in Model.AllBlogs) @* Tüm son yazıları göster *@
+                    {
+                        <div class="col animate-fade-in">
+                            <div class="card blog-card h-100">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Title" class="card-img-top">
+                                }
+                                else
+                                {
+                                    <img src="https://placehold.co/600x250/E0E7FF/007BFF?text=G%C3%B6rsel+Yok" alt="Görsel Yok" class="card-img-top">
+                                }
+                                <div class="card-body blog-card-body">
+                                    <div>
+                                        <h5 class="card-title blog-card-title">@item.Title</h5>
+                                        <p class="card-text text-secondary mb-3">@item.ShortDescription</p>
+                                    </div>
+                                    <div>
+                                        <p class="blog-meta">
+                                            Yazar: <span class="fw-semibold">@item.Author</span> | Yayın Tarihi: <span class="fw-semibold">@item.PublishDate.ToShortDateString()</span>
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            @{
+                                                // Sunucu tarafında slug oluşturma mantığı
+                                                string serverSideTitleSlug = new Regex(@"[^a-z0-9\s-]").Replace(item.Title.ToLower()
+                                                .Replace("ç", "c")
+                                                .Replace("ğ", "g")
+                                                .Replace("ı", "i")
+                                                .Replace("ö", "o")
+                                                .Replace("ş", "s")
+                                                .Replace("ü", "u"), "");
+                                                serverSideTitleSlug = new Regex(@"\s+").Replace(serverSideTitleSlug, "-").Trim();
+                                                serverSideTitleSlug = new Regex(@"-+").Replace(serverSideTitleSlug, "-");
+                                            }
+                                            <a href="@Url.Action("DetailsBySlug", "Blog", new { titleSlug = serverSideTitleSlug })" class="btn btn-primary read-more-btn rounded-pill px-4">
+                                                Devamını Oku
+                                            </a>
+                                            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+                                            {
+                                                <div class="d-flex gap-3">
+                                                    <a href="@Url.Action("Edit", "Blog", new { id = item.Id })" class="admin-action-btn edit text-decoration-none">
+                                                        Düzenle
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", "Blog", new { id = item.Id })" class="admin-action-btn delete text-decoration-none">
+                                                        Sil
+                                                    </a>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5 no-posts-message">
+                        <p class="lead text-muted">Henüz blog yazısı bulunmamaktadır. Yakında yeni yazılar eklenecektir!</p>
+                    </div>
+                }
+            </div>
+        </section>
+
+        @* Kategorilere Göre Blog Yazıları Bölümü - JavaScript ile gizlenip gösterilecek *@
+        @if (Model.BlogsByCategory != null && Model.BlogsByCategory.Any())
+        {
+            @foreach (var categoryGroup in Model.BlogsByCategory)
+            {
+                var categorySlug = categoryGroup.Key.Replace(" ", "-").ToLower();
+                <section id="category-section-@categorySlug" class="mb-5 category-section d-none">
+                    @* d-none ile başlangıçta gizli *@
+                    <h2 class="text-center mb-5 fw-bold text-primary animated-heading" style="font-size: 2.5rem;">
+                        @categoryGroup.Key Kategorisi Yazıları
+                    </h2>
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 category-blog-list" data-category="@categorySlug">
+                        @* Kategori blogları burada JavaScript tarafından yüklenecek *@
+                    </div>
+                </section>
+            }
+        }
+        @* Eğer hiç blog yoksa gösterilecek mesaj *@
+        else if (Model.AllBlogs == null || !Model.AllBlogs.Any())
+        {
+            <div class="col-12 text-center py-5 no-posts-message">
+                <p class="lead text-muted">Henüz blog yazısı bulunmamaktadır. Yakında yeni yazılar eklenecektir!</p>
+            </div>
+        }
+    </main>
+    <!-- Footer Bölümü -->
+    <footer class="footer-bg text-center">
+        <div class="container">
+            <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
+            <p class="small mt-1">Modern ve İlham Veren Blog Deneyimi.</p>
+        </div>
+    </footer>
+    <!-- Bootstrap JS ve bağımlılıkları -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const categorySections = document.querySelectorAll('.category-section');
+            const latestBlogSection = document.getElementById('latest-blog-posts');
+
+            // Tüm kategori bölümlerini başlangıçta gizle
+            categorySections.forEach(section => {
+                section.classList.add('d-none');
+            });
+
+            let activeCategorySlug = null; // Şu anda aktif olan kategoriyi takip etmek için
+
+            // Sayfa yüklendiğinde varsayılan olarak "En Son Blog Yazıları"nı göster
+            if (latestBlogSection) {
+                latestBlogSection.classList.remove('d-none');
+            }
+
+            // JavaScript'te slug oluşturma fonksiyonu, C# Regex ile uyumlu
+            function generateSlug(title) {
+                let slug = title.toLowerCase();
+
+                // 1. Türkçe karakterleri çevir
+                slug = slug.replace(/ç/g, 'c')
+                           .replace(/ğ/g, 'g')
+                           .replace(/ı/g, 'i')
+                           .replace(/ö/g, 'o')
+                           .replace(/ş/g, 's')
+                           .replace(/ü/g, 'u');
+
+                // 2. a-z, 0-9, boşluk ve tire dışındaki tüm karakterleri kaldır (C# Regex: [^a-z0-9\s-])
+                slug = slug.replace(/[^a-z0-9\s-]/g, '');
+
+                // 3. Birden fazla boşluğu tek tireye çevir ve baştaki/sondaki boşlukları kaldır
+                slug = slug.replace(/\s+/g, '-').trim();
+
+                // 4. Birden fazla tireyi tek tireye çevir
+                slug = slug.replace(/-+/g, '-');
+
+                // 5. Baştaki ve sondaki tireleri kaldır (trim() sonrası kalmış olabilir)
+                slug = slug.replace(/^-+|-+$/g, '');
+
+                return slug;
+            }
+
+            // Kategori butonlarına tıklama olayı ekle
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const targetCategory = this.dataset.category;
+
+                    if (activeCategorySlug === targetCategory) {
+                        // Eğer aynı kategoriye tekrar tıklandıysa, gizle ve "En Son Blog Yazıları"nı göster
+                        const targetSection = document.getElementById(`category-section-${targetCategory}`);
+                        if (targetSection) {
+                            targetSection.classList.add('d-none');
+                        }
+                        if (latestBlogSection) {
+                            latestBlogSection.classList.remove('d-none'); // En son blogları göster
+                        }
+                        this.classList.remove('active');
+                        activeCategorySlug = null; // Aktif kategoriyi sıfırla
+                    } else {
+                        // Tüm kategori bölümlerini ve "En Son Blog Yazıları"nı gizle
+                        categorySections.forEach(section => {
+                            section.classList.add('d-none');
+                        });
+                        if (latestBlogSection) {
+                            latestBlogSection.classList.add('d-none');
+                        }
+
+                        // Hedef kategori bölümünü göster
+                        const targetSection = document.getElementById(`category-section-${targetCategory}`);
+                        if (targetSection) {
+                            targetSection.classList.remove('d-none');
+
+                            // Tüm blogları göster (Daha Fazlasını Göster butonu olmadan)
+                            const blogList = targetSection.querySelector(`.category-blog-list`);
+                            // Model.BlogsByCategory'yi JavaScript'e aktardığımız JSON'dan alıyoruz
+                            const allBlogsInThisCategory = @Html.Raw(Json.Serialize(Model.BlogsByCategory.ToDictionary(g => g.Key.Replace(" ", "-").ToLower(), g => g.Value)));
+                            const categoryBlogs = allBlogsInThisCategory[targetCategory];
+
+                            if (blogList && categoryBlogs) {
+                                blogList.innerHTML = ''; // Mevcut blogları temizle
+                                categoryBlogs.forEach(blog => {
+                                    const colDiv = document.createElement('div');
+                                    colDiv.classList.add('col', 'animate-fade-in');
+
+                                    // Dinamik olarak oluşturulan slug'ı kullan
+                                    const blogSlug = generateSlug(blog.title);
+                                    console.log('Generated slug for "' + blog.title + '": ' + blogSlug); // Debugging için eklenen satır
+
+                                    // URL'yi "/Blog/slug-değeri" formatında oluştur
+                                    colDiv.innerHTML = `
+                                        <div class="card blog-card h-100">
+                                            ${blog.imageUrl ? `<img src="${blog.imageUrl}" alt="${blog.title}" class="card-img-top">` : `<img src="https://placehold.co/600x250/E0E7FF/007BFF?text=G%C3%B6rsel+Yok" alt="Görsel Yok" class="card-img-top">`}
+                                            <div class="card-body blog-card-body">
+                                                <div>
+                                                    <h5 class="card-title blog-card-title">${blog.title}</h5>
+                                                    <p class="card-text text-secondary mb-3">${blog.shortDescription}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="blog-meta">
+                                                        Yazar: <span class="fw-semibold">${blog.author}</span> | Yayın Tarihi: <span class="fw-semibold">${new Date(blog.publishDate).toLocaleDateString('tr-TR')}</span>
+                                                    </p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <a href="/Blog/${blogSlug}" class="btn btn-primary read-more-btn rounded-pill px-4">
+                                                            Devamını Oku
+                                                        </a>
+                                                        @if (isAdminOrAdditionalAdmin)
+                                                        {
+                                                                <div class="d-flex gap-3">
+                                                                    <a href="/Blog/Edit?id=${blog.id}" class="admin-action-btn edit text-decoration-none">
+                                                                        Düzenle
+                                                                    </a>
+                                                                    <a href="/Blog/Delete?id=${blog.id}" class="admin-action-btn delete text-decoration-none">
+                                                                        Sil
+                                                                    </a>
+                                                                </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    blogList.appendChild(colDiv);
+                                });
+                            }
+                        }
+
+                        // Aktif butonu vurgula
+                        categoryButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        activeCategorySlug = targetCategory; // Aktif kategoriyi güncelle
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

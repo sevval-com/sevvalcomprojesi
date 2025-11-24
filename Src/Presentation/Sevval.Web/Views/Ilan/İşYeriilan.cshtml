@@ -1,0 +1,879 @@
+﻿@model Sevval.Domain.Entities.IlanModel
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!-- Stil Dosyası Bağlantısı -->
+<link rel="stylesheet" href="~/css/ilandet.css" />
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgu_ri7xBqCBNn5WRgTcR2ADbvq0f1hK0&libraries=places"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <a class="navbar-brand" href="/">
+        <img src="~/sablon/img/loogo.png" class="d-inline-block align-top" alt="Logo">
+        <span>Şevval Emlak</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto"></ul>
+        <span class="navbar-text">
+            @if (User.Identity.IsAuthenticated)
+            {
+                @User.Identity.Name
+            }
+        </span>
+    </div>
+</nav>
+
+<!-- İlan Verme Çerçevesi -->
+<div class="container ilan-container mt-5 pt-5">
+    <form asp-action="Konutilan" method="post">
+        <!-- Yuvarlak Aşama Çizgileri -->
+        <div class="step-container">
+            <div class="step">
+                <div class="step-circle active">1</div>
+                <div class="step-description">Kategori Seçimi</div>
+            </div>
+            <div class="step">
+                <div class="step-circle active">2</div>
+                <div class="step-description">İlan Detayları</div>
+            </div>
+            <div class="step">
+                <div class="step-circle inactive">3</div>
+                <div class="step-description">Önizleme</div>
+            </div>
+            <div class="step">
+                <div class="step-circle inactive">4</div>
+                <div class="step-description">Tebrikler</div>
+            </div>
+        </div>
+        <!-- Kategori Bilgisi Penceresi -->
+        <div class="category-info">
+            <p>İşyeri</p>
+        </div>
+
+        <style>
+            .category-info {
+                border: 1px solid #ccc; /* Kenar çizgisi */
+                padding: 10px; /* İçerik alanı */
+                border-radius: 5px; /* Kenar yuvarlama */
+                background-color: #f9f9f9; /* Arka plan rengi */
+                width: fit-content; /* İçerik boyutuna göre genişlik */
+                margin: 10px 0; /* Üst ve alt boşluk */
+            }
+
+                .category-info p {
+                    margin: 0; /* Paragraf üst ve alt boşluklarını sıfırla */
+                    font-size: 16px; /* Yazı boyutu */
+                    font-weight: bold; /* Kalın yazı stili */
+                }
+
+            .text-danger {
+                color: red; /* Hata mesajı rengi */
+            }
+        </style>
+
+        <!-- Diğer İlan Detayları -->
+        <div class="form-group">
+            <label for="IlanBaslik">İlan Başlığı</label>
+            <input type="text" id="Title" name="Title" class="form-control" maxlength="50" required />
+        </div>
+
+        <div class="form-group">
+            <label for="IlanAciklama">Açıklama</label>
+            <textarea id="Description" name="Description" class="form-control" rows="5" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="Fiyat">Fiyat (₺):</label>
+            <input type="text" id="Price" name="Price" class="form-control" oninput="formatPrice(this)" required />
+            <div id="fiyatHata" class="text-danger" style="display: none;">Fiyat en az 1.000₺ olmalıdır.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="Aidat">Aidat (TL):</label>
+            <input type="number" id="Aidat" name="Aidat" class="form-control" oninput="validateAidat(this)" required />
+            <div id="aidatHata" class="text-danger" style="display: none;">Aidat en fazla 5 haneli bir sayı olmalıdır.</div>
+        </div>
+
+        <script>
+            // Fiyat formatlama fonksiyonu
+            function formatPrice(input) {
+                let value = input.value.replace(/\D/g, ''); // Sadece rakamları al
+                if (value.length > 0) {
+                    value = parseInt(value).toLocaleString(); // Rakamları formatla
+                }
+                input.value = value; // Giriş kutusuna formatlanmış değeri yaz
+            }
+
+            // Aidat doğrulama fonksiyonu
+            function validateAidat(input) {
+                const aidatHata = document.getElementById('aidatHata');
+                const value = input.value;
+
+                // Sadece 5 haneli sayılar kabul edilir
+                if (value.length > 5) {
+                    aidatHata.style.display = 'block'; // Hata mesajını göster
+                    input.value = value.slice(0, 5); // Kullanıcının girdiği değeri 5 haneli ile sınırla
+                } else {
+                    aidatHata.style.display = 'none'; // Hata mesajını gizle
+                }
+            }
+        </script>
+
+        <!-- Brüt ve Net Metrekare Alanları -->
+        <div class="form-group">
+            <label for="BrutMetrekare">m² (Brüt):</label>
+            <input type="number" id="BrutMetrekare" name="BrutMetrekare" class="form-control" oninput="checkMetrekare()" required />
+        </div>
+
+        <div class="form-group">
+            <label for="NetMetrekare">m² (Net):</label>
+            <input type="number" id="NetMetrekare" name="NetMetrekare" class="form-control" oninput="checkMetrekare()" required />
+            <div id="metrekareHata" class="text-danger" style="display: none;">Net Brüt'ten Büyük Olamaz</div>
+        </div>
+
+        <div class="form-group">
+            <label for="OdaSayisi">Oda Sayısı</label>
+            <select id="OdaSayisi" name="OdaSayisi" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Stüdyo (1+0)">Stüdyo (1+0)</option>
+                <option value="1+1">1+1</option>
+                <option value="1.5+1">1.5+1</option>
+                <option value="2+0">2+0</option>
+                <option value="2+1">2+1</option>
+                <option value="2.5+1">2.5+1</option>
+                <option value="2+2">2+2</option>
+                <option value="3+0">3+0</option>
+                <option value="3+1">3+1</option>
+                <option value="3.5+1">3.5+1</option>
+                <option value="3+2">3+2</option>
+                <option value="3+3">3+3</option>
+                <option value="4+0">4+0</option>
+                <option value="4+1">4+1</option>
+                <option value="4.5+1">4.5+1</option>
+                <option value="4.5+2">4.5+2</option>
+                <option value="4+2">4+2</option>
+                <option value="4+3">4+3</option>
+                <option value="4+4">4+4</option>
+                <option value="5+1">5+1</option>
+                <option value="5.5+1">5.5+1</option>
+                <option value="5+2">5+2</option>
+                <option value="5+3">5+3</option>
+                <option value="5+4">5+4</option>
+                <option value="6+1">6+1</option>
+                <option value="6+2">6+2</option>
+                <option value="6.5+1">6.5+1</option>
+                <option value="6+3">6+3</option>
+                <option value="6+4">6+4</option>
+                <option value="7+1">7+1</option>
+                <option value="7+2">7+2</option>
+                <option value="7+3">7+3</option>
+                <option value="8+1">8+1</option>
+                <option value="8+2">8+2</option>
+                <option value="8+3">8+3</option>
+                <option value="8+4">8+4</option>
+                <option value="9+1">9+1</option>
+                <option value="9+2">9+2</option>
+                <option value="9+3">9+3</option>
+                <option value="9+4">9+4</option>
+                <option value="9+5">9+5</option>
+                <option value="9+6">9+6</option>
+                <option value="10+1">10+1</option>
+                <option value="10+2">10+2</option>
+                <option value="10 Üzeri">10 Üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="BinaYasi">Bina Yaşı</label>
+            <select id="BinaYasi" name="BinaYasi" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5-10 arası">5-10 arası</option>
+                <option value="11-15 arası">11-15 arası</option>
+                <option value="16-20 arası">16-20 arası</option>
+                <option value="21-25 arası">21-25 arası</option>
+                <option value="26-30 arası">26-30 arası</option>
+                <option value="30 ve üzeri">30 ve üzeri</option>
+                <option value="40 ve üzeri">40 ve üzeri</option>
+                <option value="50 ve üzeri">50 ve üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="KatSayisi">Kat Sayısı</label>
+            <select id="KatSayisi" name="KatSayisi" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30 ve üzeri">30 ve üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="BulunduguKat">Bulunduğu Kat</label>
+            <select id="BulunduguKat" name="BulunduguKat" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Giriş Altı Kot 4">Giriş Altı Kot 4</option>
+                <option value="Giriş Altı Kot 3">Giriş Altı Kot 3</option>
+                <option value="Giriş Altı Kot 2">Giriş Altı Kot 2</option>
+                <option value="Giriş Altı Kot 1">Giriş Altı Kot 1</option>
+                <option value="Bodrum Kat">Bodrum Kat</option>
+                <option value="Zemin Kat">Zemin Kat</option>
+                <option value="Bahçe Katı">Bahçe Katı</option>
+                <option value="Giriş Katı">Giriş Katı</option>
+                <option value="Yüksek Giriş">Yüksek Giriş</option>
+                <option value="Müstakil">Müstakil</option>
+                <option value="Villa Tipi">Villa Tipi</option>
+                <option value="Çatı Katı">Çatı Katı</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30 ve üzeri">30 ve üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Isitma">Isıtma</label>
+            <select id="Isitma" name="Isitma" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Yok">Yok</option>
+                <option value="Soba">Soba</option>
+                <option value="Doğalgaz Sobası">Doğalgaz Sobası</option>
+                <option value="Kat Kaloriferi">Kat Kaloriferi</option>
+                <option value="Merkezi">Merkezi</option>
+                <option value="Merkezi (Pay Ölçer)">Merkezi (Pay Ölçer)</option>
+                <option value="Kombi (Doğalgaz)">Kombi (Doğalgaz)</option>
+                <option value="Kombi (Elektrik)">Kombi (Elektrik)</option>
+                <option value="Yerden Isıtma">Yerden Isıtma</option>
+                <option value="Klima">Klima</option>
+                <option value="Fancoil Ünitesi">Fancoil Ünitesi</option>
+                <option value="Güneş Enerjisi">Güneş Enerjisi</option>
+                <option value="Elektrikli Radyatör">Elektrikli Radyatör</option>
+                <option value="Jeotermal">Jeotermal</option>
+                <option value="Şömine">Şömine</option>
+                <option value="VRV">VRV</option>
+                <option value="Isı Pompası">Isı Pompası</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="BanyoSayisi">Banyo Sayısı</label>
+            <select id="BanyoSayisi" name="BanyoSayisi" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Yok">Yok</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7 ve üzeri">7 ve üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Balkon">Balkon</label>
+            <select id="Balkon" name="Balkon" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Yok">Yok</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7 ve üzeri">7 ve üzeri</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Asansor">Asansör</label>
+            <select id="Asansor" name="Asansor" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Yok">Yok</option>
+                <option value="Var">Var</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Otopark">Otopark</label>
+            <select id="Otopark" name="Otopark" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Yok">Yok</option>
+                <option value="Açık Otopark">Açık Otopark</option>
+                <option value="Kapalı Otopark">Kapalı Otopark</option>
+                <option value="Açık ve Kapalı Otopark">Açık ve Kapalı Otopark</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Esyali">Eşyalı</label>
+            <select id="Esyali" name="Esyali" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Esya Degil">Eşyalı Değil</option>
+                <option value="Full Esya">Full Eşyalı</option>
+                <option value="Sadece Beyaz Esya">Sadece Beyaz Eşya</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Takas">Takasa Uygunluk</label>
+            <select id="Takas" name="Takas" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Uygun Degil">Uygun Değil</option>
+                <option value="Araba ile Takasa">Araba ile Takasa</option>
+                <option value="Arazi ile Takas">Arazi ile Takas</option>
+                <option value="Araba ve Arazi ile Takas">Araba + Arazi ile Takas</option>
+                <option value="Araba ve Arazi ile Takas">Yarısı Nakit Yarısı Araç/Arazi</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="KrediyeUygun">Krediye Uygun</label>
+            <input type="checkbox" id="KrediyeUygun" name="KrediyeUygun" class="form-check-input">
+        </div>
+
+        <!-- Kullanım Durumu -->
+        <div class="form-group">
+            <label for="KullanimDurumu">Kullanım Durumu</label>
+            <select id="KullanimDurumu" name="KullanimDurumu" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="Bos">Boş</option>
+                <option value="Kiracili">Kiracılı</option>
+                <option value="MulkSahibi">Mülk Sahibi</option>
+            </select>
+        </div>
+
+        <!-- Tapu Durumu -->
+        <div class="form-group">
+            <label for="TapuDurumu">Tapu Durumu</label>
+            <select id="TapuDurumu" name="TapuDurumu" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="KatMulkiyeti">Kat Mülkiyeti</option>
+                <option value="KatIrtifaki">Kat İrtifakı</option>
+                <option value="HisseliTapu">Hisseli Tapu</option>
+                <option value="MüstakilTapu">Müstakil Tapu</option>
+                <option value="ArsaTapusu">Arsa Tapusu</option>
+                <option value="KooperatifHisseliTapu">Kooperatif Hisseli Tapu</option>
+                <option value="YurtDisiTapusu">Yurt Dışı Tapusu</option>
+                <option value="TapuKaydiYok">Tapu Kaydı Yok</option>
+            </select>
+        </div>
+
+        <!-- Kimden -->
+        <div class="form-group">
+            <label for="Kimden">Kimden</label>
+            <select id="Kimden" name="Kimden" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="EmlakOfisinden">Emlak Ofisinden</option>
+                <option value="Sahibinden">Sahibinden</option>
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="GayrimenkulSahibi">Gayrimenkul Sahibi</label>
+            <select id="GayrimenkulSahibi" name="GayrimenkulSahibi" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="TC Vatandaşı">T.C Vatandaşı</option>
+                <option value="TC Vatandaşı Değil">T.C Vatandaşı Değil</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="TasınmazNumarasi">Taşınmaz Numarası</label>
+            <input type="text" id="TasınmazNumarasi" name="TasınmazNumarasi" class="form-control" required onkeypress="return isNumberKey(event)" maxlength="11" />
+        </div>
+
+        <div class="category-box">
+            <div class="form-group">
+                <label for="location-input">Konum Seçiniz:</label>
+                <input type="text" id="location-input" name="konum" class="form-control" placeholder="İl, İlçe, Mahalle Seçin" required>
+                <span class="error-message" id="locationInputError" style="color: red; display: none;">Lütfen bu alanı doldurunuz.</span>
+                <div id="map" style="height: 300px; width: 100%; margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="detail-info">
+            <h2>Detaylı Bilgi</h2>
+            <div class="inner-box">
+                <h3 class="toggle-header">Cephe:</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="cephe" value="Batı"> Batı</label>
+                    <label><input type="checkbox" name="cephe" value="Doğu"> Doğu</label>
+                    <label><input type="checkbox" name="cephe" value="Güney"> Güney</label>
+                    <label><input type="checkbox" name="cephe" value="Kuzey"> Kuzey</label>
+                </div>
+            </div>
+            <div class="inner-box">
+                <h3 class="toggle-header">İç Özellikler:</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="icerik" value="ADSL"> ADSL</label>
+                    <label><input type="checkbox" name="icerik" value="Ahşap Doğrama"> Ahşap Doğrama</label>
+                    <label><input type="checkbox" name="icerik" value="Akıllı Ev"> Akıllı Ev</label>
+                    <label><input type="checkbox" name="icerik" value="Alarm (Hırsız)"> Alarm (Hırsız)</label>
+                    <label><input type="checkbox" name="icerik" value="Alarm (Yangın)"> Alarm (Yangın)</label>
+                    <label><input type="checkbox" name="icerik" value="Alaturka Tuvalet"> Alaturka Tuvalet</label>
+                    <label><input type="checkbox" name="icerik" value="Alüminyum Doğrama"> Alüminyum Doğrama</label>
+                    <label><input type="checkbox" name="icerik" value="Amerikan Kapı"> Amerikan Kapı</label>
+                    <label><input type="checkbox" name="icerik" value="Amerikan Mutfak"> Amerikan Mutfak</label>
+                    <label><input type="checkbox" name="icerik" value="Ankastre Fırın"> Ankastre Fırın</label>
+                    <label><input type="checkbox" name="icerik" value="Barbekü"> Barbekü</label>
+                    <label><input type="checkbox" name="icerik" value="Beyaz Eşya"> Beyaz Eşya</label>
+                    <label><input type="checkbox" name="icerik" value="Boyalı"> Boyalı</label>
+                    <label><input type="checkbox" name="icerik" value="Bulaşık Makinesi"> Bulaşık Makinesi</label>
+                    <label><input type="checkbox" name="icerik" value="Buzdolabı"> Buzdolabı</label>
+                    <label><input type="checkbox" name="icerik" value="Çamaşır Kurutma Makinesi"> Çamaşır Kurutma Makinesi</label>
+                    <label><input type="checkbox" name="icerik" value="Çamaşır Makinesi"> Çamaşır Makinesi</label>
+                    <label><input type="checkbox" name="icerik" value="Çamaşır Odası"> Çamaşır Odası</label>
+                    <label><input type="checkbox" name="icerik" value="Çelik Kapı"> Çelik Kapı</label>
+                    <label><input type="checkbox" name="icerik" value="Duşakabin"> Duşakabin</label>
+                    <label><input type="checkbox" name="icerik" value="Duvar Kağıdı"> Duvar Kağıdı</label>
+                    <label><input type="checkbox" name="icerik" value="Ebeveyn Banyosu"> Ebeveyn Banyosu</label>
+                    <label><input type="checkbox" name="icerik" value="Fırın"> Fırın</label>
+                    <label><input type="checkbox" name="icerik" value="Fiber İnternet"> Fiber İnternet</label>
+                    <label><input type="checkbox" name="icerik" value="Giyinme Odası"> Giyinme Odası</label>
+                    <label><input type="checkbox" name="icerik" value="Gömme Dolap"> Gömme Dolap</label>
+                    <label><input type="checkbox" name="icerik" value="Görüntülü Diafon"> Görüntülü Diafon</label>
+                    <label><input type="checkbox" name="icerik" value="Hilton Banyo"> Hilton Banyo</label>
+                    <label><input type="checkbox" name="icerik" value="Intercom Sistemi"> Intercom Sistemi</label>
+                    <label><input type="checkbox" name="icerik" value="Isıcam"> Isıcam</label>
+                    <label><input type="checkbox" name="icerik" value="Jakuzi"> Jakuzi</label>
+                    <label><input type="checkbox" name="icerik" value="Kartonpiyer"> Kartonpiyer</label>
+                    <label><input type="checkbox" name="icerik" value="Kiler"> Kiler</label>
+                    <label><input type="checkbox" name="icerik" value="Klima"> Klima</label>
+                    <label><input type="checkbox" name="icerik" value="Küvet"> Küvet</label>
+                    <label><input type="checkbox" name="icerik" value="Laminat Zemin"> Laminat Zemin</label>
+                    <label><input type="checkbox" name="icerik" value="Marley"> Marley</label>
+                    <label><input type="checkbox" name="icerik" value="Mobilya"> Mobilya</label>
+                    <label><input type="checkbox" name="icerik" value="Mutfak (Ankastre)"> Mutfak (Ankastre)</label>
+                    <label><input type="checkbox" name="icerik" value="Mutfak (Laminat)"> Mutfak (Laminat)</label>
+                    <label><input type="checkbox" name="icerik" value="Mutfak Doğalgazı"> Mutfak Doğalgazı</label>
+                    <label><input type="checkbox" name="icerik" value="Panjur/Jaluzi"> Panjur/Jaluzi</label>
+                    <label><input type="checkbox" name="icerik" value="Parke Zemin"> Parke Zemin</label>
+                    <label><input type="checkbox" name="icerik" value="PVC Zemin"> PVC Zemin</label>
+                    <label><input type="checkbox" name="icerik" value="Siyah Eşya"> Siyah Eşya</label>
+                    <label><input type="checkbox" name="icerik" value="Sineklik"> Sineklik</label>
+                    <label><input type="checkbox" name="icerik" value="Sıva"> Sıva</label>
+                    <label><input type="checkbox" name="icerik" value="Spot Aydınlatma"> Spot Aydınlatma</label>
+                    <label><input type="checkbox" name="icerik" value="Şömine"> Şömine</label>
+                    <label><input type="checkbox" name="icerik" value="Tavan Arası"> Tavan Arası</label>
+                    <label><input type="checkbox" name="icerik" value="Tavan Kapatma"> Tavan Kapatma</label>
+                    <label><input type="checkbox" name="icerik" value="Uygun İhtiyaç"> Uygun İhtiyaç</label>
+                </div>
+            </div>
+
+            <div class="inner-box">
+                <h3 class="toggle-header">Dış Özellikler:</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="dis_ozellik" value="Araç Şarj İstasyonu"> Araç Şarj İstasyonu</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="24 Saat Güvenlik"> 24 Saat Güvenlik</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Apartman Görevlisi"> Apartman Görevlisi</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Buhar Odası"> Buhar Odası</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Çocuk Oyun Parkı"> Çocuk Oyun Parkı</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Hamam"> Hamam</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Hidrofor"> Hidrofor</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Isı Yalıtımı"> Isı Yalıtımı</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Jeneratör"> Jeneratör</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Kablo TV"> Kablo TV</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Kamera Sistemi"> Kamera Sistemi</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Kreş"> Kreş</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Müstakil Havuzlu"> Müstakil Havuzlu</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Sauna"> Sauna</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Ses Yalıtımı"> Ses Yalıtımı</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Siding"> Siding</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Spor Alanı"> Spor Alanı</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Su Deposu"> Su Deposu</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Tenis Kortu"> Tenis Kortu</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Uydu"> Uydu</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Yangın Merdiveni"> Yangın Merdiveni</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Yüzme Havuzu (Açık)"> Yüzme Havuzu (Açık)</label>
+                    <label><input type="checkbox" name="dis_ozellik" value="Yüzme Havuzu (Kapalı)"> Yüzme Havuzu (Kapalı)</label>
+                </div>
+            </div>
+
+            <!-- Muhit Penceresi -->
+            <div class="inner-box">
+                <h3 class="toggle-header">Muhit</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="muhit" value="Alışveriş Merkezi"> Alışveriş Merkezi</label>
+                    <label><input type="checkbox" name="muhit" value="Belediye"> Belediye</label>
+                    <label><input type="checkbox" name="muhit" value="Cami"> Cami</label>
+                    <label><input type="checkbox" name="muhit" value="Denize Sıfır"> Denize Sıfır</label>
+                    <label><input type="checkbox" name="muhit" value="Eczane"> Eczane</label>
+                    <label><input type="checkbox" name="muhit" value="Eğlence Merkezi"> Eğlence Merkezi</label>
+                    <label><input type="checkbox" name="muhit" value="Fuar"> Fuar</label>
+                    <label><input type="checkbox" name="muhit" value="Gölü Sıfır"> Gölü Sıfır</label>
+                    <label><input type="checkbox" name="muhit" value="Hastane"> Hastane</label>
+                    <label><input type="checkbox" name="muhit" value="Havra"> Havra</label>
+                    <label><input type="checkbox" name="muhit" value="İlkokul-Ortaokul"> İlkokul-Ortaokul</label>
+                    <label><input type="checkbox" name="muhit" value="İtfaiye"> İtfaiye</label>
+                    <label><input type="checkbox" name="muhit" value="Lise"> Lise</label>
+                    <label><input type="checkbox" name="muhit" value="Market"> Market</label>
+                    <label><input type="checkbox" name="muhit" value="Park"> Park</label>
+                    <label><input type="checkbox" name="muhit" value="Plaj"> Plaj</label>
+                    <label><input type="checkbox" name="muhit" value="Polis Merkezi"> Polis Merkezi</label>
+                    <label><input type="checkbox" name="muhit" value="Sağlık Ocağı"> Sağlık Ocağı</label>
+                    <label><input type="checkbox" name="muhit" value="Semt Pazarı"> Semt Pazarı</label>
+                    <label><input type="checkbox" name="muhit" value="Spor Salonu"> Spor Salonu</label>
+                    <label><input type="checkbox" name="muhit" value="Şehir Merkezi"> Şehir Merkezi</label>
+                    <label><input type="checkbox" name="muhit" value="Üniversite"> Üniversite</label>
+                </div>
+            </div>
+
+            <!-- Ulaşım Penceresi -->
+            <div class="inner-box">
+                <h3 class="toggle-header">Ulaşım</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="ulasim" value="Anayol"> Anayol</label>
+                    <label><input type="checkbox" name="ulasim" value="Avrasya Tüneli"> Avrasya Tüneli</label>
+                    <label><input type="checkbox" name="ulasim" value="Boğaz Köprüleri"> Boğaz Köprüleri</label>
+                    <label><input type="checkbox" name="ulasim" value="Cadde"> Cadde</label>
+                    <label><input type="checkbox" name="ulasim" value="Deniz Otobüsü"> Deniz Otobüsü</label>
+                    <label><input type="checkbox" name="ulasim" value="Dolmuş"> Dolmuş</label>
+                    <label><input type="checkbox" name="ulasim" value="E-5"> E-5</label>
+                    <label><input type="checkbox" name="ulasim" value="Havaalanı"> Havaalanı</label>
+                    <label><input type="checkbox" name="ulasim" value="İskele"> İskele</label>
+                    <label><input type="checkbox" name="ulasim" value="Marmaray"> Marmaray</label>
+                    <label><input type="checkbox" name="ulasim" value="Metro"> Metro</label>
+                    <label><input type="checkbox" name="ulasim" value="Metrobüs"> Metrobüs</label>
+                    <label><input type="checkbox" name="ulasim" value="Minibüs"> Minibüs</label>
+                    <label><input type="checkbox" name="ulasim" value="Otobüs Durağı"> Otobüs Durağı</label>
+                    <label><input type="checkbox" name="ulasim" value="Sahil"> Sahil</label>
+                    <label><input type="checkbox" name="ulasim" value="Teleferik"> Teleferik</label>
+                    <label><input type="checkbox" name="ulasim" value="TEM"> TEM</label>
+                    <label><input type="checkbox" name="ulasim" value="Tramvay"> Tramvay</label>
+                    <label><input type="checkbox" name="ulasim" value="Tren İstasyonu"> Tren İstasyonu</label>
+                    <label><input type="checkbox" name="ulasim" value="Troleybüs"> Troleybüs</label>
+                </div>
+            </div>
+
+            <!-- Manzara Penceresi -->
+            <div class="inner-box">
+                <h3 class="toggle-header">Manzara</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="manzara" value="Boğaz"> Boğaz</label>
+                    <label><input type="checkbox" name="manzara" value="Deniz"> Deniz</label>
+                    <label><input type="checkbox" name="manzara" value="Doğa"> Doğa</label>
+                    <label><input type="checkbox" name="manzara" value="Göl"> Göl</label>
+                    <label><input type="checkbox" name="manzara" value="Havuz"> Havuz</label>
+                    <label><input type="checkbox" name="manzara" value="Park & Yeşil Alan"> Park & Yeşil Alan</label>
+                    <label><input type="checkbox" name="manzara" value="Şehir"> Şehir</label>
+                </div>
+            </div>
+
+            <!-- Konut Tipi Penceresi -->
+            <div class="inner-box">
+                <h3 class="toggle-header">Konut Tipi</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="konut_tipi" value="Ara Kat"> Ara Kat</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Ara Kat Dubleks"> Ara Kat Dubleks</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Bahçe Dubleksi"> Bahçe Dubleksi</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Bahçe Katı"> Bahçe Katı</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Bahçeli"> Bahçeli</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Çatı Dubleksi"> Çatı Dubleksi</label>
+                    <label><input type="checkbox" name="konut_tipi" value="En Üst Kat"> En Üst Kat</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Foreleks"> Foreleks</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Garaj / Dükkan Üstü"> Garaj / Dükkan Üstü</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Giriş Katı"> Giriş Katı</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Kat Dubleksi"> Kat Dubleksi</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Loft"> Loft</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Müstakil Girişli"> Müstakil Girişli</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Ters Dubleks"> Ters Dubleks</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Tripleks"> Tripleks</label>
+                    <label><input type="checkbox" name="konut_tipi" value="Zemin Kat"> Zemin Kat</label>
+                </div>
+            </div>
+
+            <!-- Engelliye ve Yaşlıya Uygunluk Penceresi -->
+            <div class="inner-box">
+                <h3 class="toggle-header">Engelliye ve Yaşlıya Uygunluk</h3>
+                <div class="checkbox-group" style="display: none;">
+                    <label><input type="checkbox" name="engelli_yasli" value="Yok"> Yok</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Araç Park Yeri"> Araç Park Yeri</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Asansör"> Asansör</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Banyo"> Banyo</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Geniş Koridor"> Geniş Koridor</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Giriş/Rampa"> Giriş/Rampa</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Merdiven"> Merdiven</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Mutfak"> Mutfak</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Oda Kapısı"> Oda Kapısı</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Park"> Park</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Priz/Elektrik Anahtarı"> Priz/Elektrik Anahtarı</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Tutamak/Korkuluk"> Tutamak/Korkuluk</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Tuvalet"> Tuvalet</label>
+                    <label><input type="checkbox" name="engelli_yasli" value="Yüzme Havuzu"> Yüzme Havuzu</label>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const toggleHeaders = document.querySelectorAll('.toggle-header');
+
+                    toggleHeaders.forEach(header => {
+                        header.addEventListener('click', function () {
+                            const checkboxGroup = this.nextElementSibling;
+                            checkboxGroup.style.display = checkboxGroup.style.display === 'none' ? 'flex' : 'none'; // 'flex' olarak değiştir
+                        });
+                    });
+                });
+            </script>
+
+            <style>
+                .category-box {
+                    margin-bottom: 20px;
+                }
+
+                .detail-info {
+                    border: 2px solid #007bff; /* Çerçeve rengi */
+                    border-radius: 8px; /* Kenar yuvarlama */
+                    padding: 20px; /* İç boşluk */
+                    background-color: #f8f9fa; /* Arka plan rengi */
+                    text-align: left; /* Metni sola hizala */
+                }
+
+                    .detail-info h2 {
+                        margin: 0 0 15px; /* Başlık altındaki boşluk */
+                        font-size: 24px; /* Başlık boyutu */
+                    }
+
+                .inner-box {
+                    border: 1px solid #007bff; /* İç çerçeve rengi */
+                    border-radius: 5px; /* Kenar yuvarlama */
+                    padding: 15px; /* İç boşluk */
+                    margin-bottom: 10px; /* Alt boşluk */
+                    background-color: #fff; /* Arka plan rengi */
+                }
+
+                .toggle-header {
+                    cursor: pointer; /* Tıklanabilir kıl */
+                    margin: 0; /* Başlık altındaki boşluğu kaldır */
+                    font-weight: bold; /* Kalın yazı */
+                    font-size: 18px; /* Başlık boyutu */
+                    color: #007bff; /* Başlık rengi */
+                }
+
+                .checkbox-group {
+                    display: flex; /* Flex kutu modeli ile düzenle */
+                    flex-wrap: wrap; /* Taşmayı önle ve satırlara yayıl */
+                    margin-top: 10px; /* Kutucuk grubunun üst boşluğu */
+                }
+
+                label {
+                    flex: 0 0 23%; /* Her kutucuğun genişliğini %23 yap */
+                    margin-right: 2%; /* Sağdaki boşluk */
+                    margin-bottom: 10px; /* Alt boşluk */
+                }
+
+                    /* Son kutucuğun sağındaki boşluğu kaldır */
+                    label:nth-child(4n) {
+                        margin-right: 0;
+                    }
+            </style>
+
+
+
+
+
+            <!-- Fotoğraf ve Video -->
+            <div class="form-group">
+                <label for="PhotoUpload">Fotoğraf Yükleyin (Max 35):</label>
+                <input type="file" id="Photos" name="Photos" class="form-control" accept="image/*" multiple>
+            </div>
+
+            <div class="form-group">
+                <label for="VideoUpload">Video Yükleyin:</label>
+                <input type="file" id="Videos" name="Videos" class="form-control" accept="video/*">
+            </div>
+
+            <div class="form-group">
+                <label for="VideoLink">YouTube Video Linki:</label>
+                <input type="text" id="VideoLink" name="VideoLink" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="TKGMParselLink">TKGM Parsel Sorgu Linki:</label>
+                <input type="text" id="TKGMParselLink" name="TKGMParselLink" class="form-control" placeholder="TKGM parsel sorgu linkinizi girin">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet ve Devam Et</button>
+    </form>
+
+</div>
+
+<script>
+
+    function toggleTakasOptions() {
+        var takasCheckBox = document.getElementById("TakasaUygun");
+        var takasOptions = document.getElementById("takasOptions");
+
+        // Eğer "Takasa Uygun" kutucuğu işaretlendiyse seçenek kutucuğunu göster
+        if (takasCheckBox.checked) {
+            takasOptions.style.display = "block";
+        } else {
+            takasOptions.style.display = "none";
+        }
+    }
+
+    let map;
+    let marker;
+
+    function initMap() {
+        const defaultLocation = { lat: 41.0082, lng: 28.9784 }; // İstanbul, Türkiye
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 6,
+            center: defaultLocation,
+        });
+
+        marker = new google.maps.Marker({
+            position: defaultLocation,
+            map: map,
+            title: "Seçim Yapınız",
+            draggable: true,
+        });
+
+        const input = document.getElementById("location-input");
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo("bounds", map);
+
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                return;
+            }
+
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(15);
+            }
+
+            marker.setPosition(place.geometry.location);
+            input.value = place.formatted_address; // Seçilen adresi inputa yaz
+        });
+
+        // Haritaya tıklama olayı ekleyin
+        map.addListener("click", (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            const latLng = { lat, lng };
+
+            marker.setPosition(latLng);
+            map.setCenter(latLng);
+
+            // Latitude ve Longitude'u inputa yaz
+            input.value = lat + ", " + lng;
+        });
+
+        google.maps.event.addListener(marker, "dragend", (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+            input.value = lat + ", " + lng;
+        });
+    }
+
+
+    function checkMetrekare() {
+        const brutMetrekare = parseFloat(document.getElementById('BrutMetrekare').value);
+        const netMetrekare = parseFloat(document.getElementById('NetMetrekare').value);
+        const metrekareHata = document.getElementById('metrekareHata');
+
+        if (netMetrekare > brutMetrekare) {
+            metrekareHata.style.display = 'block';
+        } else {
+            metrekareHata.style.display = 'none';
+        }
+    }
+
+    function formatPrice(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (value.length > 3) {
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        input.value = value;
+    }
+
+    function validateForm() {
+        const priceInput = document.getElementById('Price');
+        const priceValue = parseInt(priceInput.value.replace(/\./g, ""), 10);
+        const fiyatHata = document.getElementById('fiyatHata');
+
+        if (priceValue < 1000) {
+            fiyatHata.style.display = 'block';
+            return false; // Formu gönderme
+        } else {
+            fiyatHata.style.display = 'none';
+        }
+
+        return true; // Formu gönder
+    }
+</script>
+
+<!-- Map'ı başlat -->
+<script>
+    google.maps.event.addDomListener(window, 'load', initMap);
+</script>

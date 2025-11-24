@@ -1,0 +1,757 @@
+﻿/* Genel Sıfırlama */
+
+.container-section {
+    width: 100%;
+    max-width: 1242px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 6px 20px;
+    background-color: rgb(255, 255, 255);
+    transition: box-shadow 0.3s;
+    margin:auto;
+}
+
+
+
+.image-container {
+    width: 100%;
+    height: 37%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 4px solid #007bff;
+    background: linear-gradient(135deg, #007bff, #00c4ff);
+    transition: background 0.3s ease;
+}
+
+  
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    transition: transform 0.3s ease, filter 0.3s ease; /* Resme hover efekti ekleniyor */
+}
+
+.content-container {
+    position: relative;
+    top: 27px;
+}
+
+
+.profile-section {
+    display: flex;
+    margin-top: -70px;
+    padding: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    /* background-color: #fff; */
+    border-radius: 15px;
+    /* box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); */
+    transition: transform 0.3s ease;
+}
+
+  
+
+.profile-picture {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Profil fotoğrafına gölge */
+    transition: transform 0.3s ease; /* Hover ile profil fotoğrafı büyüyecek */
+}
+
+    
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    top: 38px;
+    position: relative;
+    color: #333;
+    animation: fadeIn 1s ease-in-out;
+}
+
+    .user-info h3 {
+        font-size: 26px;
+        font-weight: 600;
+        margin: 0;
+        color: #007bff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        transition: color 0.3s ease;
+        margin-top: 12px;
+        margin-left: -10px;
+        white-space: nowrap;
+    }
+
+
+        .user-info h3:hover {
+            color: #0056b3; /* Hover ile başlık rengi koyulaşacak */
+        }
+
+    .user-info p {
+        font-size: 16px;
+        color: #555;
+        margin-top: 1px;
+        transition: color 0.3s ease;
+        margin-left: -8px;
+    }
+
+        .user-info p:hover {
+            color: #007bff; /* Hover ile e-posta maviye dönecek */
+        }
+
+.ilanlar-section {
+    margin-top: 20px;
+}
+
+    .ilanlar-section ul {
+        list-style-type: none;
+    }
+
+/* Ana Sayfaya Dön Butonu */
+.back-home {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.back-home-button {
+    background-color: #ffffff;
+    color: #007bff;
+    border: 3px solid #007bff;
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    position: relative;
+    margin-right: 37px;
+    top: -11px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    transition: 0.3s;
+}
+
+    /* Butona Hover Efekti */
+    .back-home-button:hover {
+        background-color: #ffffff; /* Beyaz Arka Plan */
+        color: #007bff; /* Mavi Yazı Rengi */
+        border: 2px solid #007bff; /* Mavi Kenarlık */
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3); /* Gölge Efekti */
+    }
+
+    /* Butonun Focus ve Active Durumları */
+    .back-home-button:focus,
+    .back-home-button:active {
+        outline: none; /* Dış Çerçeveyi Kaldır */
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4); /* Gölge Efekti Artırılır */
+    }
+
+/* Profil fotoğrafı altındaki ilan adedi için stil */
+.total-announcements {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Sol tarafa hizalama */
+    gap: 8px;
+}
+
+    .total-announcements p {
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+    }
+
+    .total-announcements strong {
+        color: #007bff; /* Mavi renk */
+        font-weight: 600;
+    }
+
+/* Profil fotoğrafı ve ilan adedi arasındaki boşluk */
+.profile-section {
+    display: flex;
+    margin-top: -70px;
+    padding: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    position: relative; /* Bu, ilan adedini sol altta konumlandırmaya yardımcı olacak */
+    flex-wrap: wrap; /* Yüksek çözünürlüklerde daha rahat bir düzen için */
+}
+
+/* İlan Adedi kısmını Profil Fotoğrafı ile hizalamak */
+.total-announcements {
+    position: absolute;
+    left: 23px;
+    top: 143px;
+    padding: 5px;
+    border-radius: 10px;
+    width: auto;
+    transition: transform 0.3s ease-in-out;
+}
+
+
+.city-announcements {
+    margin-top: 22px;
+    margin-left: 9px;
+    padding: 30px 20px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+   
+
+    .city-announcements::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(145deg, #007bff, #00c6ff); /* Mavi tonlarında gradient */
+        border-radius: 20px;
+        z-index: -1;
+        opacity: 0.2; /* Gradient arka planın opaklığı */
+    }
+
+    .city-announcements h4 {
+        font-size: 20px; /* Büyük başlık */
+        color: #333; /* Koyu gri başlık rengi */
+        font-weight: 700; /* Bold yazı tipi */
+        margin-bottom: 20px; /* Başlık ile içerik arasına boşluk */
+        text-align: left; /* Soldan hizalama */
+        letter-spacing: 1px; /* Başlıkta harfler arasında boşluk */
+        text-transform: capitalize; /* Her kelimenin ilk harfi büyük */
+    }
+
+    .city-announcements p {
+        font-size: 13px;
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        margin-top: -15px;
+        text-align: left;
+        padding: 0 1px;
+        margin-right: 11px;
+    }
+
+    .city-announcements span {
+        font-weight: 600;
+        color: #007bff; /* Vurgulanan metin için canlı mavi */
+    }
+
+    .city-announcements .separator {
+        margin: 10px 0;
+        height: 2px;
+        background-color: #007bff; /* Mavi renkli ayraç */
+        width: 50px; /* Kısa bir çizgi */
+        margin-left: 0; /* Çizgiyi soldan hizala */
+        margin-right: auto; /* Sağda boşluk bırak */
+    }
+
+
+/* İçerik Container'ı */
+.new-content-container {
+    width: 100%;
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    text-align: center;
+    max-width: 1238px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* İlanlar Container'ı (Grid Sistemi) */
+.ilanlar-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 86px;
+}
+
+/* İlan Kartı */
+.ilan-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column; /* Kartları dikey hizalayacağız */
+    height: 100%; /* Kartın boyutunu içerik boyutuna göre belirler */
+    position: relative;
+}
+
+    /* Hover Etkisi */
+    .ilan-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+/* İlan Görseli */
+.ilan-image {
+    position: relative;
+    width: 100%;
+    height: 250px; /* Sabit yükseklik, görselin kareye yakın olmasını sağlar */
+    background-color: #f4f4f4;
+    overflow: hidden;
+}
+
+    .ilan-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.no-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+}
+
+    .no-image i {
+        color: #007bff;
+    }
+
+/* Fiyat Sağ Üstte */
+.ilan-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2d2d2d;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* İlan Bilgileri */
+.ilan-info {
+    padding: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* İçerikleri daha düzenli yerleştirir */
+    flex-grow: 1; /* İçeriğin kartı doldurmasını sağlar */
+}
+
+    .ilan-info h4 {
+        font-size: 20px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 12px;
+    }
+
+.result-description {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.separator {
+    color: #777;
+}
+
+.text-muted {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+}
+
+/* Pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.pagination-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+    .pagination-btn:hover {
+        background-color: #0056b3;
+        transform: scale(1.1);
+    }
+
+    .pagination-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .pagination-btn.active {
+        background-color: #0056b3;
+        font-weight: bold;
+        cursor: default;
+    }
+
+/* 3 Seçenek Kutuları Konteyneri */
+.options-container {
+    display: flex; /* Kutucukları yan yana yerleştirmek için flexbox kullanıyoruz */
+    justify-content: center; /* Kutucukları ortalamak için */
+    align-items: center; /* Yükseklik açısından ortalama */
+    gap: 10px; /* Kutucuklar arasındaki mesafeyi artırdık */
+    margin-top: 30px; /* Üstten biraz boşluk */
+    width: 80%; /* Kutucukların genişliği */
+    margin-left: auto;
+    margin-right: auto; /* Ortalamak için */
+}
+
+/* Her Bir Seçenek Kutusu */
+.option-box {
+    background-color: white; /* Beyaz arka plan */
+    color: #007bff; /* Mavi yazı */
+    padding: 20px 40px; /* Kutucukların içindeki yazıya genişlik ve yükseklik */
+    font-size: 18px; /* Yazı boyutu */
+    font-weight: bold; /* Kalın yazı */
+    border-radius: 8px; /* Kutucuklar biraz yuvarlak köşeli olacak */
+    cursor: pointer; /* Fareyle üzerine gelindiğinde imleç değişir */
+    text-align: center; /* Yazıyı ortalamak için */
+    transition: all 0.3s ease; /* Hover efekti için yumuşak geçiş */
+    box-shadow: 0px 4px 6px rgba(0, 123, 255, 0.1); /* Hafif gölge efekti */
+    border: 2px solid #007bff; /* Mavi sınır ekledik */
+    margin: 0px; /* Aralarındaki boşlukları sıfırladık */
+}
+
+    /* Hover Durumu (Üzerine gelindiğinde) */
+    .option-box:hover {
+        background-color: #f1f9ff; /* Hover ile daha açık mavi bir arka plan */
+        transform: translateY(-5px); /* Hover efekti ile kutucuk yukarı doğru hareket eder */
+        box-shadow: 0px 6px 10px rgba(0, 123, 255, 0.3); /* Hover sırasında daha belirgin bir gölge */
+    }
+
+    /* Seçilen kutucuk (aktif durumda) */
+    .option-box.active {
+        background-color: #e6f1ff; /* Daha açık mavi bir arka plan */
+        color: #0056b3; /* Daha koyu mavi yazı */
+        transform: translateY(0); /* Hover efekti yok olur, düz hale gelir */
+        box-shadow: 0px 8px 16px rgba(0, 123, 255, 0.4); /* Aktif durumda daha belirgin bir gölge */
+    }
+
+        /* Aktif durumda kutucukların daha büyük görünmesi */
+        .option-box.active:hover {
+            transform: translateY(0); /* Hover'ı devre dışı bırak */
+        }
+
+
+/* Danışmanlar Konteyneri */
+.danisman-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 sütunlu grid düzeni */
+    gap: 20px; /* Kartlar arasındaki boşluk */
+    padding: 30px 20px;
+    justify-items: center;
+    margin-top: 40px;
+}
+
+/* Kartların Genel Stili */
+.user-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    width: 100%;
+    height: 283px;
+    max-width: 270px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .user-card:hover {
+        transform: translateY(-8px); /* Hover ile yukarı kayma efekti */
+        box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.15); /* Hover sırasında belirgin gölge */
+    }
+
+/* Profil Fotoğrafı Konteyneri */
+.consultant-profile-img-container {
+    margin-top: 20px;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+    margin-left: 73px;
+}
+
+/* Profil Fotoğrafı */
+.consultant-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Profil Fotoğrafı Placeholder */
+.consultant-profile-img-placeholder {
+    width: 100px;
+    height: 100px;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Fotoğraf placeholder'ı etrafında hafif gölge */
+}
+
+/* Kullanıcı Adı */
+.user-card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+    .user-card-title a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .user-card-title a:hover {
+            color: #007bff; /* Hoverda mavi renkte yazı */
+        }
+
+/* Kullanıcı Tipi */
+.user-card-text {
+    font-size: 14px;
+    color: #777;
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+    /* Danışman/Firma Sahibi Etiketi */
+    .user-card-text.card-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #007bff;
+        margin-top: 10px;
+    }
+
+        .user-card-text.card-text:before {
+            content: "• "; /* Öncesine simge ekledik */
+            color: #007bff;
+            font-size: 18px;
+            vertical-align: middle;
+        }
+
+        /* İlan Sayısı */
+        .user-card-text.card-text span {
+            font-size: 14px;
+            color: #555;
+        }
+
+/* Danışmanlar ve Firma Sahibi Başlığı */
+h4 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    /* margin-bottom: 15px; */
+    margin-top: 49px;
+}
+
+/* Ana Konteyner */
+.aboutUs-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #e6f2ff; /* Hafif mavi arka plan */
+    border-radius: 15px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease-in-out;
+}
+
+
+/* Başlık */
+.aboutUs-title {
+    text-align: center;
+    color: #0a4f84; /* Derin mavi başlık rengi */
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* İçerik */
+.aboutUs-content {
+    color: #333;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* Alt başlık */
+.aboutUs-subtitle {
+    font-size: 20px;
+    color: #0a4f84;
+    margin-top: 20px;
+    text-transform: capitalize;
+}
+
+/* Çizgi (hr) */
+.aboutUs-divider {
+    border: 1px solid #0a4f84; /* Mavi renkli çizgi */
+    margin: 30px 0;
+    opacity: 0.5;
+}
+
+/* Harita */
+.aboutUs-map {
+    height: 450px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+}
+
+/* Adres */
+.aboutUs-address {
+    margin-top: 30px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #0a4f84;
+    text-align: center;
+}
+
+/* Genel buton ve etkileşimli elementler */
+.aboutUs-button {
+    background-color: #0a4f84;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+    .aboutUs-button:hover {
+        background-color: #1e68a2;
+        transform: translateY(-5px);
+    }
+
+    .aboutUs-button:focus {
+        outline: none;
+    }
+
+
+/* Mobil uyumlu grid düzeni */
+@media (max-width: 767px) {
+    .danisman-container {
+        grid-template-columns: 1fr 1fr; /* 2 sütunlu grid düzeni */
+    }
+
+    .user-card {
+        height: auto; /* Yüksekliği dinamik yapalım */
+    }
+
+    .options-container {
+        gap: 0px;
+        width: 100%;
+        margin-top: -9px;
+    }
+
+    .option-box {
+        padding: 10px 20px; /* İç boşlukları küçült */
+        font-size: 14px; /* Yazı boyutunu küçült */
+        border-radius: 6px; /* Köşe yuvarlamalarını biraz azalt */
+        box-shadow: 0px 2px 4px rgba(0, 123, 255, 0.1); /* Daha küçük bir gölge efekti */
+    }
+
+        .option-box:hover {
+            transform: translateY(-3px); /* Hover hareketini küçült */
+            box-shadow: 0px 4px 6px rgba(0, 123, 255, 0.2); /* Hover gölgesini azalt */
+        }
+
+        .option-box.active {
+            box-shadow: 0px 4px 8px rgba(0, 123, 255, 0.3); /* Aktif gölgeyi biraz küçült */
+        }
+
+    .consultant-profile-img-container {
+        margin-left: 23px;
+    }
+
+    .back-home {
+        margin-top: -298px;
+        left: 191px;
+        position: relative;
+    }
+
+    .user-info h3 {
+        font-size: 17px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 348px;
+    }
+
+    .user-info {
+        margin-left: 19px;
+    }
+}
+
+
+
+/* Fade-in animasyonu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+

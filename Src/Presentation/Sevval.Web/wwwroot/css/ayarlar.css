@@ -1,0 +1,212 @@
+﻿.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.profile-image-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+    .profile-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.profile-image-upload {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 2px solid #f8f9fa;
+    padding: 1rem 1.5rem;
+}
+
+.form-control {
+    border: 1px solid #e9ecef;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+}
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 300;
+    width: 25%;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+}
+
+.password-toggle-btn {
+    border: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 0.75rem;
+    border-left: none;
+}
+
+    .password-toggle-btn:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .password-toggle-btn:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: calc(50% + 19px);
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #6c757d;
+    user-select: none;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.required::after {
+    content: " *";
+    color: red;
+}
+
+.input-group-text {
+    background-color: transparent;
+    cursor: pointer;
+    border-left: none;
+}
+
+.input-group .form-control:focus + .input-group-text {
+    border-color: #86b7fe;
+}
+
+.password-requirements {
+    font-size: 0.875rem;
+}
+
+
+
+@media (max-width: 768px) {
+    .profile-image-container {
+        width: 120px;
+        height: 120px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .card-header {
+        padding: 0.75rem 1rem;
+        text-align: center;
+    }
+
+    .form-control {
+        font-size: 0.85rem;
+        padding: 0.6rem;
+    }
+
+    .password-toggle-btn {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .toggle-password {
+        font-size: 1rem;
+    }
+
+    .input-group .form-control {
+        padding-right: 2rem;
+    }
+
+    .input-group-text {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .password-requirements {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-image-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .container-fluid mt-4 {
+
+    }
+
+    .btn-primary {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    .card {
+        box-shadow: none;
+    }
+
+    .card-header {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .form-control {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+
+    .input-group-text {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+    }
+
+    .password-toggle-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+
+    .password-requirements {
+        font-size: 0.7rem;
+    }
+}

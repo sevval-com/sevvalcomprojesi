@@ -1,0 +1,231 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@model Sevval.Domain.Entities.IlanModel
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!-- Stil Dosyası Bağlantısı -->
+<link rel="stylesheet" href="~/css/tebrikler.css" />
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgu_ri7xBqCBNn5WRgTcR2ADbvq0f1hK0&libraries=places"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Navbar -->
+<nav class="navbaar">
+    <div class="navbaar-container">
+        <div class="logo">
+            <a href="/">
+                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                </a>
+            <span>Sevval.com</span>
+        </div>
+        <div class="haamburger" id="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <ul class="naav-linkss" id="nav-links">
+            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                </li>
+                
+            }
+
+            <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
+            <li class="dropdoawn">
+                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
+            </li>
+
+            <li>
+                <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
+            </li>
+
+            
+
+        </ul>
+        <div class="auth-buttoons">
+            @if (User.Identity.IsAuthenticated)
+            {
+                var currentUser = await UserManager.GetUserAsync(User);
+
+                // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
+                if (currentUser != null)
+                {
+                    <div class="dropdown">
+                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                        <ul class="dropdown-content">
+                            <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
+                            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
+                            
+                            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
+                            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
+                            
+                            <li><a href="@Url.Action("Akademi", "Ilan")">Satın Al</a></li>
+                            <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
+                            @if (User.Identity.IsAuthenticated &&
+                           (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+
+                            {
+                                <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
+                            }
+                            <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
+                }
+            }
+            else
+            {
+                <a href="#" class="login" id="login-button">Giriş Yap</a>
+            }
+
+
+            <!-- İlan Ver butonu ve Ücretsiz etiketi -->
+            <div class="post-ad-container">
+                <span class="free-tag">Ücretsiz</span>
+                <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account") : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+            </div>
+        </div>
+
+    </div>
+</nav>
+<style>
+    .post-ad-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .free-tag {
+        position: absolute;
+        top: -10px;
+        left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
+        background-color: #007bff; /* Mavi arka plan */
+        color: white; /* Beyaz metin rengi */
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 4px;
+        transform: rotate(-10deg); /* Hafif eğik bir görünüm */
+        z-index: 1;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+    }
+
+    .post-ad {
+        display: inline-block;
+        background-color: #ffffff; /* Beyaz arka plan */
+        color: #007bff; /* Mavi yazı rengi */
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        border: 1px solid #007bff; /* Mavi çerçeve */
+        transition: 0.3s ease;
+    }
+
+        .post-ad:hover {
+            background-color: #007bff; /* Hoverda mavi arka plan */
+            color: white; /* Hoverda beyaz metin */
+        }
+
+    .coming-soon-tag {
+        position: absolute;
+        top: 20px;
+        left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
+        background-color: #007bff; /* Mavi arka plan */
+        color: white; /* Beyaz metin rengi */
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 4px;
+        transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
+        z-index: 1;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+    }
+
+</style>
+<!-- Pop-up Penceresi -->
+<div id="login-popup" class="popup">
+    <div class="popup-content">
+        <button class="close-button" id="close-popup">&times;</button> <!-- Kapat Butonu -->
+        <div class="left-section">
+            <h2>Bireysel</h2>
+            <a href="@Url.Action("Login", "Account")" class="button">Giriş Yap</a>
+            <a href="@Url.Action("Register", "Account")" class="button">Üye Ol</a>
+        </div>
+        <div class="right-section">
+            <h2>Kurumsal</h2>
+            <a href="@Url.Action("Login","Account")" class="button">Giriş Yap</a>
+            <a href="@Url.Action("EstateRegister", "Account")" class="button">Üye Ol</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Giriş Yap butonuna tıklandığında pop-up penceresini aç
+    document.getElementById('login-button').addEventListener('click', function (event) {
+        event.preventDefault(); // Varsayılan bağlantı davranışını engelle
+        document.getElementById('login-popup').style.display = 'flex'; // Pop-up'ı aç
+    });
+
+    // Pop-up penceresinin dışında bir yere tıklandığında kapat
+    document.getElementById('login-popup').addEventListener('click', function (event) {
+        if (event.target === this) { // Eğer dış alana tıklandıysa
+            this.style.display = 'none'; // Pop-up'ı kapat
+        }
+    });
+
+    // Kapatma butonuna tıklandığında pop-up penceresini kapat
+    document.getElementById('close-popup').addEventListener('click', function () {
+        document.getElementById('login-popup').style.display = 'none'; // Pop-up'ı kapat
+    });
+</script>
+
+
+<!-- İlan Verme Çerçevesi -->
+<div class="container ilan-container mt-5 pt-5">
+    <!-- Yuvarlak Aşama Çizgileri -->
+    <div class="step-container">
+        <div class="step">
+            <div class="step-circle active">1</div>
+            <div class="step-description">İlan Detayları</div>
+        </div>
+        <div class="step">
+            <div class="step-circle active">2</div>
+            <div class="step-description">Önizleme</div>
+        </div>
+        <div class="step">
+            <div class="step-circle active">3</div>
+            <div class="step-description">Tebrikler</div>
+        </div>
+    </div>
+    <!-- Modern Çerçeve -->
+    <div class="card border-success mb-3" style="max-width: 450px; margin: 0 auto;">
+        <div class="card-header">
+            <img src="~/sablon/img/tik.png" alt="Onay" style="width: 80px; height: 80px;" /> <!-- PNG Tik İşareti -->
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Tebrikler!</h5>
+            <p class="card-text">İlanınız Başarıyla Yayınlanmıştır</p>
+            <div class="mt-4">
+                <a class="btn btn-success text-white me-3" href="/">Ana Sayfaya Dön</a>
+                <a class="btn btn-success text-white" href="@Url.Action("ilansayfasi", "Ilan", new { id = ViewBag.Id })">İlana Git</a>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</div>

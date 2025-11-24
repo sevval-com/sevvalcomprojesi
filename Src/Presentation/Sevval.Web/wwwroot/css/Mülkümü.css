@@ -1,0 +1,107 @@
+﻿/* Mülkümü.css Dosyasına Ekleyin */
+
+/* Pop-up Arka Planı */
+.popup {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center; /* Dikey ortalama */
+    justify-content: center; /* Yatay ortalama */
+    z-index: 1000; /* Yüksek z-index ile diğer içeriklerin üstünde olsun */
+}
+
+/* Pop-up İçeriği */
+.popup-content {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%; /* Genişlik, istediğiniz gibi ayarlayın */
+    height: auto; /* Yükseklik, içeriğe göre ayarlanacak */
+    max-width: 500px; /* Maksimum genişlik */
+    max-height: 60%; /* Maksimum yükseklik, gerektiğinde ayarlayın */
+    overflow-y: auto; /* Yükseklik aşıldığında kaydırma çubuğu */
+    padding: 20px;
+    position: absolute; /* Kapak simgesinin konumlandırılması için */
+    left: 50%; /* Ekranın ortasına yerleştirmek için */
+    top: 50%; /* Ekranın ortasına yerleştirmek için */
+    transform: translate(-50%, -50%); /* Gerçek ortalama sağlamak için */
+    animation: fadeIn 0.3s; /* Fade in animasyonu */
+}
+
+/* Kapatma Butonu */
+.close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Adım Başlıkları */
+.step h2, .step h3 {
+    color: #333;
+}
+
+/* Giriş Alanları */
+input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Buton Stili */
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    button:hover {
+        background-color: #218838; /* Hover rengini değiştirme */
+    }
+
+/* WhatsApp İkonu */
+#whatsappLink img {
+    width: 50px; /* İkon boyutu */
+    transition: transform 0.3s;
+}
+
+    #whatsappLink img:hover {
+        transform: scale(1.1); /* Hover ile büyütme efekti */
+    }
+
+/* Logo Konumu */
+.floating-logo {
+    position: fixed;
+    bottom: 120px; /* Alt konum */
+    left: 32px; /* Sol konum */
+    z-index: 999; /* Diğer öğelerin üstünde kalmasını sağla */
+}
+
+    .floating-logo img {
+        width: 80px; /* Logo boyutu, istediğiniz gibi ayarlayın */
+        cursor: pointer; /* Tıklanabilir görüntü */
+    }
+
+/* Fade In Animasyonu */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px); /* Yukarı kaydırma efekti */
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

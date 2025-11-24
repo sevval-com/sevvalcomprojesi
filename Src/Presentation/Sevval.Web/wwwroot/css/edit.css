@@ -1,0 +1,96 @@
+﻿.upload-progress {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 10px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(33,150,243,0.2);
+}
+
+.progress-circle {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+    .progress-circle circle {
+        fill: none;
+        stroke-width: 4;
+        stroke-linecap: round;
+    }
+
+    .progress-circle .background {
+        stroke: #e6e6e6;
+    }
+
+    .progress-circle .progress {
+        stroke: #2196F3;
+        transition: stroke-dashoffset 0.3s;
+    }
+
+.upload-spinner {
+    position: absolute;
+    font-size: 24px;
+    color: #2196F3;
+    animation: spin 1s linear infinite;
+}
+
+.checkmark {
+    position: absolute;
+    font-size: 32px;
+    color: #2196F3;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s;
+}
+
+.pulse-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(33,150,243,0.2);
+    animation: pulse 1s ease-out;
+    opacity: 0;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.image-preview-container {
+    position: relative;
+    margin: 5px;
+    display: inline-block;
+}
+
+    .image-preview-container img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #2196F3;
+    }
+

@@ -1,0 +1,155 @@
+﻿/* Genel Stil Ayarları */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Açık gri Bootstrap arka planı */
+    color: #212529; /* Koyu metin rengi */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Bölümü (Index.cshtml ve Details.cshtml ile uyumlu) */
+.header-bg {
+    background-color: #007bff; /* Bootstrap mavisi */
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Kartı */
+.create-form-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 50px auto; /* Merkezleme ve üst/alt boşluk */
+    max-width: 800px; /* Maksimum genişlik */
+}
+
+.form-title {
+    color: #007bff; /* Mavi başlık */
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Form Grupları */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    color: #343a40;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-input,
+.form-textarea {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #495057;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .form-input:focus,
+    .form-textarea:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        outline: none;
+    }
+
+.file-input {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #e9ecef;
+    font-size: 0.95rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+    .file-input:hover {
+        background-color: #dee2e6;
+    }
+
+.validation-error {
+    color: #dc3545; /* Kırmızı hata mesajı */
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+/* Butonlar */
+.submit-btn {
+    background-color: #28a745; /* Yeşil Kaydet butonu */
+    border-color: #28a745;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px; /* Daha oval buton */
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .submit-btn:hover {
+        background-color: #218838;
+        border-color: #218838;
+        transform: translateY(-2px);
+    }
+
+.back-to-list-btn {
+    color: #007bff; /* Mavi geri dön butonu */
+    font-weight: 500;
+    transition: color 0.3s ease;
+    text-decoration: none; /* Alt çizgiyi kaldır */
+}
+
+    .back-to-list-btn:hover {
+        color: #0056b3;
+        text-decoration: underline; /* Hover'da alt çizgi */
+    }
+
+/* Footer Bölümü (Index.cshtml ile aynı stil) */
+.footer-bg {
+    background-color: #343a40; /* Koyu gri footer */
+    color: white;
+    padding: 20px 0;
+    margin-top: auto; /* Footer'ı alta sabitle */
+    text-align: center;
+}
+
+/* Animasyonlar (Tüm sayfalarla uyumlu) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

@@ -1,0 +1,73 @@
+﻿/* Paneli kapsayan div */
+.total-visitors-container {
+    position: relative; /* Konumu ayarlamak için relative yap */
+    padding: 10px; /* Kapsayıcıya hafif padding */
+}
+
+/* Aktif ziyaretçi paneli */
+.total-visitors-panel {
+    background-color: #007bff; /* Mavi arka plan */
+    color: rgba(255, 255, 255, 0.9); /* Beyaz yazı rengi */
+    padding: 20px; /* İç boşluk */
+    border-radius: 25px; /* Oval köşeler */
+    width: 450px; /* Varsayılan genişlik */
+    min-width: 250px; /* Minimum genişlik */
+    max-width: 400px; /* Maksimum genişlik */
+    margin: 25px auto; /* Ortaya hizalama */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font */
+    text-align: center; /* Metni ortala */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Gölge efekti */
+    transition: transform 0.3s, box-shadow 0.3s; /* Geçiş efekti */
+    position: absolute; /* Panelin pozisyonunu elle ayarlayabilmek için absolute yap */
+    top: 3235px; /* Üstten 50px yukarıda başlat */
+    left: 900px; /* Soldan 50px sola başlat */
+}
+
+    /* Hover etkisi */
+    .total-visitors-panel:hover {
+        transform: scale(1.05); /* Hover etkisi: hafif büyütme */
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* Hover etkisi: gölgeyi artır */
+    }
+
+    /* Başlık stili */
+    .total-visitors-panel h3 {
+        margin: 0; /* Varsayılan margin'i sıfırla */
+        font-size: 1.5em; /* Daha büyük yazı boyutu */
+        font-weight: 600; /* Daha kalın yazı */
+        color: rgba(255, 255, 255, 0.9); /* Beyaz yazı */
+    }
+
+/* Medya Sorguları ile Responsive Tasarım */
+
+/* 400px ve altındaki ekranlar için */
+@media (max-width: 400px) {
+    .total-visitors-panel {
+        top: 6160px; /* Üstten 40px */
+        left: 80px; /* Soldan 40px */
+        width: 30%; /* Genişliği %80 yap */
+        padding: 9px; /* Normal padding */
+        font-size: 0.6em; /* Yazı boyutunu biraz büyüt */
+    }
+}
+
+/* 616px ve altındaki ekranlar için */
+@media (max-width: 616px) {
+    .total-visitors-panel {
+        top: 6160px; /* Üstten 40px */
+        left: 80px; /* Soldan 40px */
+        width: 30%; /* Genişliği %80 yap */
+        padding: 9px; /* Normal padding */
+        font-size: 0.6em; /* Yazı boyutunu biraz büyüt */
+    }
+}
+
+/* 768px ve altındaki ekranlar için */
+@media (max-width: 768px) {
+    .total-visitors-panel {
+        top: 6160px; /* Üstten 40px */
+        left: 80px; /* Soldan 40px */
+        width: 30%; /* Genişliği %80 yap */
+        padding: 9px; /* Normal padding */
+        font-size: 0.6em; /* Yazı boyutunu biraz büyüt */
+    }
+}

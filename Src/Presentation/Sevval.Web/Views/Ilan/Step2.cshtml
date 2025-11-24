@@ -1,0 +1,56 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "İlan Detayı";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/kategori.css" />
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">İlan Detayı</h2>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form method="post" asp-controller="Ilan" asp-action="Step2" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="ilanBasligi">İlan Başlığı:</label>
+                        <input type="text" class="form-control" id="ilanBasligi" name="Title" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanAciklama">İlan Açıklaması:</label>
+                        <textarea class="form-control" id="ilanAciklama" name="Description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanFiyati">İlan Fiyatı:</label>
+                        <input type="number" class="form-control" id="ilanFiyati" name="Price" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanMetrekare">İlan Metrekare:</label>
+                        <input type="number" class="form-control" id="ilanMetrekare" name="Metrekare" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanAdaParsel">Ada/Parsel:</label>
+                        <input type="text" class="form-control" id="ilanAdaParsel" name="AdaParsel" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanKonumu">İlan Konumu:</label>
+                        <input type="text" class="form-control" id="ilanKonumu" name="Konum" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="ilanVideoLink">YouTube Video Linki:</label>
+                        <input type="url" class="form-control" id="ilanVideoLink" name="Video" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">İlanı Yayınla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
