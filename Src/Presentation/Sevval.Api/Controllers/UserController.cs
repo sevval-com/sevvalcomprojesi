@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sevval.Application.Features.User.Commands.ConfirmEstate;
 using Sevval.Application.Features.User.Commands.CorporateRegister;
 using Sevval.Application.Features.User.Commands.CorporateUpdate;
+using Sevval.Application.Features.User.Commands.DeleteUser;
 using Sevval.Application.Features.User.Commands.ForgottenPassword;
 using Sevval.Application.Features.User.Commands.IndividualRegister;
 using Sevval.Application.Features.User.Commands.IndividualUpdate;
@@ -150,7 +151,14 @@ public class UserController : BaseController
         return Ok(response);
     }
 
-
+    
+    //[Authorize(Roles = "admin")]
+    [HttpDelete(DeleteUserCommandRequest.Route + "/{id}")]
+    public async Task<IActionResult> DeleteUser(string id, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new DeleteUserCommandRequest { Id = id }, cancellationToken);
+        return Ok(response);
+    }
 
 
     /* // [Authorize(Roles = "admin")]
@@ -172,7 +180,7 @@ public class UserController : BaseController
 
      
      //[Authorize(Roles = "admin")]
-     [HttpDelete(DeleteUserCommandRequest.Route)]
+     [HttpDelete(DeleteUserCommandRequest.Route + "/{id}")]
      public async Task<IActionResult> DeleteUser(string id, CancellationToken cancellationToken)
      {
          var response = await _mediator.Send(new DeleteUserCommandRequest { Id = id }, cancellationToken);

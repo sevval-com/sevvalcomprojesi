@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.Dto.TumIlanlarDTO
 
@@ -601,7 +601,7 @@
         padding: 12px 20px;
         border-radius: 25px;
         color: white;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 500;
         margin-top: 15px;
         backdrop-filter: blur(10px);
@@ -765,6 +765,223 @@
 
         .modern-image-slider {
             height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .property-title h2 {
+            font-size: 16px;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .price-value {
+            font-size: 20px;
+        }
+
+        .property-details-grid {
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .contact-section {
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .contact-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .view-count {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .image-action-buttons {
+            gap: 0.3rem;
+        }
+
+        .price-value {
+            font-size: 24px;
+        }
+
+        .property-details-grid {
+            gap: 10px;
+        }
+
+        .detail-item {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .contact-section {
+            padding: 15px;
+        }
+
+        .contact-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .view-count {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .slider-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
+        }
+
+        .prev-btn {
+            left: 2px;
+        }
+
+        .next-btn {
+            right: 2px;
+        }
+    }
+            padding: 15px 12px 12px 12px;
+        }
+        
+        .offer-right-content {
+            padding: 12px;
+            padding-top: 0;
+        }
+        
+        .property-tags {
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .tag {
+            padding: 5px 10px;
+            font-size: 9px;
+        }
+        
+        .price-section {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+        }
+        
+        .price-label {
+            font-size: 11px;
+        }
+
+        .price-value {
+            font-size: 24px;
+        }
+        
+        .property-title h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .location-section {
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+
+        .property-details-grid {
+            grid-template-columns: 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .detail-item {
+            padding: 7px 9px;
+            font-size: 11px;
+        }
+
+        .contact-section {
+            padding: 12px;
+        }
+        
+        .contact-person,
+        .contact-phone,
+        .contact-company {
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .contact-buttons {
+            gap: 8px;
+        }
+        
+        .contact-btn {
+            padding: 10px 14px;
+            font-size: 12px;
+        }
+
+        .modern-image-slider {
+            height: 200px;
+            border-radius: 12px;
+        }
+        
+        .slider-slide {
+            height: 200px;
+        }
+        
+        .slider-slide img {
+            height: 200px !important;
+        }
+
+        .slider-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+
+        .prev-btn {
+            left: 8px;
+        }
+
+        .next-btn {
+            right: 8px;
+        }
+        
+        .image-action-buttons {
+            margin-top: 12px;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            font-size: 13px;
+            gap: 8px;
+        }
+        
+        .action-btn i {
+            font-size: 14px;
+        }
+        
+        .view-count {
+            padding: 10px 14px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            padding: 12px;
+            gap: 8px;
+        }
+    }
             margin-bottom: 10px;
         }
 
@@ -1042,13 +1259,67 @@
                             bool gununIlaniEklendi = false;
                             for (int i = 0; i < ViewBag.Fotograflar.Count; i++)
                             {
+                                string photoUrl = ViewBag.Fotograflar[i].Url.ToString();
+                                string originalUrl = photoUrl; // Debug için
+                                
+                                // Tam dosya yolunu web URL'ine çevir
+                                if (photoUrl.Contains("wwwroot"))
+                                {
+                                    int wwwrootIndex = photoUrl.IndexOf("wwwroot");
+                                    photoUrl = photoUrl.Substring(wwwrootIndex + 8).Replace("\\", "/");
+                                    if (!photoUrl.StartsWith("/")) photoUrl = "/" + photoUrl;
+                                }
+                                else if (photoUrl.Contains("sehirler"))
+                                {
+                                    // sehirler klasörü için özel işlem
+                                    int sehirlerIndex = photoUrl.IndexOf("sehirler");
+                                    photoUrl = "/" + photoUrl.Substring(sehirlerIndex).Replace("\\", "/");
+                                }
+                                else if (photoUrl.Contains("ImageFiles"))
+                                {
+                                    // ImageFiles klasörü için
+                                    int imageFilesIndex = photoUrl.IndexOf("ImageFiles");
+                                    photoUrl = "/" + photoUrl.Substring(imageFilesIndex).Replace("\\", "/");
+                                }
+                                else if (photoUrl.Contains("images") || photoUrl.Contains("uploads"))
+                                {
+                                    // images/uploads klasörü için
+                                    if (photoUrl.Contains("images"))
+                                    {
+                                        int imagesIndex = photoUrl.IndexOf("images");
+                                        photoUrl = "/" + photoUrl.Substring(imagesIndex).Replace("\\", "/");
+                                    }
+                                    else if (photoUrl.Contains("uploads"))
+                                    {
+                                        int uploadsIndex = photoUrl.IndexOf("uploads");
+                                        photoUrl = "/images/" + photoUrl.Substring(uploadsIndex).Replace("\\", "/");
+                                    }
+                                }
+                                
+                                // Eski uzantıları webp ile değiştir
+                                photoUrl = photoUrl.Replace(".jpg", ".webp").Replace(".jpeg", ".webp").Replace(".png", ".webp").Replace(".JPG", ".webp").Replace(".JPEG", ".webp").Replace(".PNG", ".webp");
+                                
+                                <text>
+                                <script>console.log('Original:', '@originalUrl', '-> Converted:', '@photoUrl');</script>
+                                </text>
+                                
                                 <div class="slider-slide">
-                                    <img src="@ViewBag.Fotograflar[i].Url" alt="Fotoğraf" loading="lazy" width="800" height="400">
+                                    <img src="@photoUrl" 
+                                         alt="İlan Fotoğrafı" 
+                                         loading="lazy" 
+                                         width="800" 
+                                         height="500"
+                                         onerror="this.onerror=null; this.src='~/images/no-image.webp'; this.style.objectFit='contain';">
                                 </div>
                                 @if (!gununIlaniEklendi && i == (ViewBag.Fotograflar.Count / 2))
                                 {
                                     <div class="slider-slide">
-                                        <img src="~/ImageFiles/gununilani.png" alt="Günün İlanı" loading="lazy" width="800" height="400">
+                                        <img src="~/ImageFiles/gununilani.webp" 
+                                             alt="Günün İlanı" 
+                                             loading="lazy" 
+                                             width="800" 
+                                             height="500"
+                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#FFD700;\'><i class=\'fas fa-star\' style=\'font-size:60px;margin-bottom:15px;\'></i><span style=\'font-size:24px;font-weight:600;\'>GÜNÜN İLANI</span></div>';">
                                     </div>
                                     gununIlaniEklendi = true;
                                 }
@@ -1096,7 +1367,7 @@
 
 <!-- Yüzen buton -->
 <a href="#" id="floating-offer-icon" class="floating-offer-link">
-    <img src="~/ImageFiles/GÜNÜNİLANİ.png" alt="Günün İlanı" class="floating-offer-img" loading="lazy" width="100" height="100">
+    <img src="~/ImageFiles/GÜNÜNİLANİ.webp" alt="Günün İlanı" class="floating-offer-img" loading="lazy" width="100" height="100">
 </a>
 <div class="tagline-container1" style="display: flex;">
     <h2 class="tagline">VARSA BİZDEN İYİSİ, O DA BİZDEN BİRİSİ</h2>
@@ -1591,7 +1862,7 @@
     <!-- Ücretsiz Hizmet Penceresi -->
     <div class="service-popup" id="service-popup" onclick="window.location.href='@Url.Action("MulkumuSatmakIstiyorum", "Form")'">
         <span class="label">Ücretsiz Hizmet</span>
-        <img src="~/images/satmakistiyorum.png" alt="Mülk Resmi" class="property-image" loading="lazy" width="200" height="150">
+        <img src="~/images/tl_ikon.webp" alt="Mülk Resmi" class="property-image" loading="lazy" width="200" height="150">
         <h3>MÜLKÜMÜ SATMAK İSTİYORUM</h3>
         <p>Mülk bilgilerini girin. Değerlendirip, o bölgedeki profesyonel üyelerimizden en az 20 emlakçıya&nbsp;yönlendirelim</p>
         <!-- Bilgilendirme Simgesi -->
@@ -1603,12 +1874,11 @@
     <!-- Ücretsiz Hizmet Penceresi -->
     <div class="service-popup-2" id="servicePopup" onclick="window.location.href='@Url.Action("YatirimYapmakIstiyorum", "Form")'">
         <span class="label-2">Ücretsiz Hizmet</span>
-        <img src="~/images/banabul.png" alt="Mülk Resmi" class="property-image-2" loading="lazy" width="200" height="150">
+        <img src="~/images/banabul.webp" alt="Mülk Resmi" class="property-image-2" loading="lazy" width="200" height="150">
         <h3>YATIRIM YAPMAK <br />İSTİYORUM</h3>
         <p>Aradığınız mülkün özelliklerini girin. <br />Size en uygun mülkü bulalım</p>
     </div>
-
-    <!-- ŞevvalDrone Hizmet Penceresi -->
+<!-- ŞevvalDrone Hizmet Penceresi -->
     <div class="sevvaldrone-popup" id="sevvaldrone-popup">
     <span class="label">300₺</span>
         <div class="drone-icon">
@@ -1617,7 +1887,7 @@
                  alt="Drone İkonu"
                  loading="lazy"
                  width="80" height="80"
-                 onerror="this.onerror=null;this.src='https://placehold.co/128x128/6366f1/ffffff?text=Drone';"
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/7504/7504454.png';"
                  class="w-full h-full object-contain rounded-full">
         </div>
         <h3>ŞEVVALDRONE</h3>
@@ -1773,7 +2043,7 @@
                     <div class="advisor-img-wrapper">
                         <img src="@user.ProfilePicturePath" class="advisor-img" alt="Profil Fotoğrafı"
                              loading="lazy" width="80" height="80"
-                             onerror="this.src='/images/profil.png'">
+                             onerror="this.src='/images/profil.webp'">
                     </div>
                     <div class="advisor-info">
                         @{
@@ -1793,7 +2063,7 @@
 
     <!-- WhatsApp Logo -->
     <a id="whatsapp-link-8" href="#" target="_blank" class="whatsapp-float">
-        <img src="~/sablon/img/724destek.png" alt="WhatsApp" class="whatsapp-image" loading="lazy" width="90" height="90">
+        <img src="~/sablon/img/724destek.webp" alt="WhatsApp" class="whatsapp-image" loading="lazy" width="90" height="90">
     </a>
 
 
@@ -1854,13 +2124,13 @@
     <!-- İletişim Penceresi -->
     <div class="contact-popup">
         <div class="contact-left">
-            <img src="~/images/şevvalemlak.png" alt="İletişim Resmi" class="contact-image" loading="lazy" width="300" height="200">
+            <img src="~/images/şevvalemlak.webp" alt="İletişim Resmi" class="contact-image" loading="lazy" width="300" height="200">
         </div>
         <div class="contact-right">
             <h2>Bizimle İletişime Geçin</h2>
             <p>Sizin için en iyi yatırıma yardımcı olalım! Satın almak, kiralamak veya satmak istiyorsanız, deneyimli danışmanlarımızla iletişime geçerek hemen adım atın.</p>
             <a id="whatsapp-link-7" class="whatsapp-button" target="_blank">
-                <img src="~/sablon/img/WhatsApp_icon.png" alt="WhatsApp İkonu" class="whatsapp-icon" loading="lazy" width="24" height="24">
+                <img src="~/sablon/img/WhatsApp_icon.webp" alt="WhatsApp İkonu" class="whatsapp-icon" loading="lazy" width="24" height="24">
                 7/24 WhatsApp Destek
             </a>
 
@@ -1886,7 +2156,6 @@
 @section Scripts {
 
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script src="~/js/home.js"></script>
     
     <script>
         
@@ -2091,57 +2360,61 @@
         });
 
 
-        // JSON verisini yüklemek için AJAX kullanımı
+        // Optimized: API'den dinamik il-ilçe-mahalle yükleme
         $(document).ready(function () {
-            $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
-                // Tüm kategori alanları için il seçeneği doldur
-                ['sehir', 'sehirArsa', 'sehirBahce', 'sehirTarla', 'sehirIsYeri', 'sehirTuristik'].forEach(function (id) {
-                    data.forEach(function (city) {
-                        $(`#${id}`).append(new Option(city.Il, city.Il));
+            // Tüm kategori alanları için il listesini API'den yükle
+            var citySelectors = ['sehir', 'sehirArsa', 'sehirBahce', 'sehirTarla', 'sehirIsYeri', 'sehirTuristik'];
+            
+            // İl listesini bir kez API'den çek ve tüm select'lere doldur
+            $.ajax({
+                url: '/api/provinces',
+                method: 'GET',
+                dataType: 'json',
+                success: function(provinces) {
+                    citySelectors.forEach(function(id) {
+                        var $select = $(`#${id}`);
+                        provinces.forEach(function(province) {
+                            $select.append(new Option(province, province));
+                        });
                     });
-                });
-                // İl değiştiğinde ilgili kategorinin ilçelerini doldur
-                ['sehir', 'sehirArsa', 'sehirBahce', 'sehirTarla', 'sehirIsYeri', 'sehirTuristik'].forEach(function (id) {
-                    $(`#${id}`).change(function () {
-                        var selectedCity = $(this).val();
-                        var relatedSemt = $(this).attr('id').replace('sehir', 'semt');
-                        var relatedMahalle = $(this).attr('id').replace('sehir', 'mahalle');
-                        // İlçeleri ve mahalleleri temizle
-                        $(`#${relatedSemt}`).empty().append('<option value="">İlçe Seçiniz</option>');
-                        $(`#${relatedMahalle}`).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
-                        // İlgili ili bul ve ilçeleri ekle
-                        var selectedCityData = data.find(c => c.Il === selectedCity);
-                        if (selectedCityData) {
-                            selectedCityData.Ilce.forEach(function (district) {
-                                $(`#${relatedSemt}`).append(new Option(district.Ilce, district.Ilce));
-                            });
-                        }
-                    });
-                });
-                // İlçe değiştiğinde ilgili kategorinin mahallelerini doldur
-                ['semt', 'semtArsa', 'semtBahce', 'semtTarla', 'semtIsYeri', 'semtTuristik'].forEach(function (id) {
-                    $(`#${id}`).change(function () {
-                        var relatedSehir = $(this).attr('id').replace('semt', 'sehir');
-                        var relatedMahalle = $(this).attr('id').replace('semt', 'mahalle');
-                        var selectedCity = $(`#${relatedSehir}`).val();
-                        var selectedDistrict = $(this).val();
-                        // Mahalleleri temizle
-                        $(`#${relatedMahalle}`).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
-                        // İlgili il ve ilçeyi bul ve mahalleleri ekle
-                        var selectedCityData = data.find(c => c.Il === selectedCity);
-                        if (selectedCityData) {
-                            var selectedDistrictData = selectedCityData.Ilce.find(d => d.Ilce === selectedDistrict);
-                            if (selectedDistrictData) {
-                                selectedDistrictData.Semt.forEach(function (neighborhood) {
-                                    neighborhood.Mahalle.forEach(function (mah) {
-                                        $(`#${relatedMahalle}`).append(new Option(mah.Mahalle, mah.Mahalle));
-                                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('İl listesi yüklenirken hata:', error);
+                }
+            });
+
+            // İl değiştiğinde ilgili kategorinin ilçelerini API'den yükle
+            citySelectors.forEach(function(id) {
+                $(`#${id}`).change(function() {
+                    var selectedProvince = $(this).val();
+                    var relatedSemt = $(this).attr('id').replace('sehir', 'semt');
+                    var relatedMahalle = $(this).attr('id').replace('sehir', 'mahalle');
+                    
+                    // İlçeleri ve mahalleleri temizle
+                    $(`#${relatedSemt}`).empty().append('<option value="">İlçe Seçiniz</option>');
+                    $(`#${relatedMahalle}`).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+                    
+                    if (selectedProvince) {
+                        // İlçeleri API'den yükle
+                        $.ajax({
+                            url: '/api/districts/' + encodeURIComponent(selectedProvince),
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function(districts) {
+                                districts.forEach(function(district) {
+                                    $(`#${relatedSemt}`).append(new Option(district, district));
                                 });
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('İlçe listesi yüklenirken hata:', error);
                             }
-                        }
-                    });
+                        });
+                    }
                 });
             });
+
+            // NOT: Mahalle seçimi şu an kaldırıldı - gerekirse daha sonra eklenebilir
+            // İlçe seçimi yeterli, mahalle için ayrı API endpoint gerekir
         });
     </script>
 
@@ -2889,6 +3162,53 @@
                     imageObserver.observe(img);
                 });
             }
+        });
+
+        // WEBP Dönüştürücü - Tüm resimlerin uzantısını .webp yap
+        function convertImagesToWebP() {
+            const allImages = document.querySelectorAll('img');
+            allImages.forEach(img => {
+                // İstisna: popup konteynırlarındaki görselleri dönüştürme
+                if (img.closest('.service-popup') || 
+                    img.closest('.service-popup-2') || 
+                    img.closest('.sevvaldrone-popup') ||
+                    img.classList.contains('property-image') ||
+                    img.classList.contains('property-image-2')) {
+                    return; // Bu görseli atla
+                }
+                
+                if (img.src && !img.src.includes('.webp')) {
+                    img.src = img.src.replace(/\.(jpe?g|png)$/i, '.webp');
+                }
+                if (img.dataset.src && !img.dataset.src.includes('.webp')) {
+                    img.dataset.src = img.dataset.src.replace(/\.(jpe?g|png)$/i, '.webp');
+                }
+            });
+        }
+
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', convertImagesToWebP);
+
+        // MutationObserver ile dinamik eklenen içerikleri izle
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    convertImagesToWebP();
+                }
+            });
+        });
+
+        // Body'deki değişiklikleri izle
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Sayfa tamamen yüklendiğinde bir kez daha çalıştır
+        window.addEventListener('load', function() {
+            setTimeout(convertImagesToWebP, 100);
+            setTimeout(convertImagesToWebP, 500);
+            setTimeout(convertImagesToWebP, 1000);
         });
 
     </script>

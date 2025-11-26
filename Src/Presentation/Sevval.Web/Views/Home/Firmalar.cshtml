@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.csproj.Dto.Company.CompanySearchDto
 @{
@@ -37,7 +37,7 @@
 <!-- Dış CSS dosyaları -->
 <link rel="stylesheet" href="~/css/kardesfirmalar.css">
 <link rel="stylesheet" href="~/css/anasayfa.css">
-<link rel="icon" type="image/png" href="~/images/favlogo.png">
+<link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 <!--
     YENİ MAVİ & BEYAZ ANİMASYONLU TASARIM
@@ -652,13 +652,13 @@
 
                     <!-- Profil Resmi -->
                     <div class="img-box loading" aria-hidden="true">
-                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.png" : user.ProfilePicturePath)"
+                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.webp" : user.ProfilePicturePath)"
                              alt="@user.CompanyName Profil Fotoğrafı"
                              class="user-profile-picture"
                              width="100" height="100"
                              loading="lazy"
                              onload="this.parentElement.classList.remove('loading')"
-                             onerror="this.src='/ImageFiles/kurumsalbosfoto.png'; this.parentElement.classList.remove('loading')" />
+                             onerror="this.src='/ImageFiles/kurumsalbosfoto.webp'; this.parentElement.classList.remove('loading')" />
                     </div>
 
                     <!-- Firma Adı -->
@@ -890,52 +890,70 @@
     $(document).ready(function () {
         var currentProvince = $('#CurrentProvince').val();
         var currentDistrict = $('#CurrentDistrict').val();
+        var provinceSelect = $('#provinceFilter');
+        var districtSelect = $('#districtFilter');
 
-        $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
-            var provinceSelect = $('#provinceFilter');
-
-            // 1. İl (Province) listesini doldur
-            if (provinceSelect.length) {
-                data.sort((a, b) => a.Il.localeCompare(b.Il, 'tr'));
-                data.forEach(function (city) {
-                    provinceSelect.append(new Option(city.Il, city.Il));
+        // 1. İl (Province) listesini API'den dinamik olarak yükle
+        $.ajax({
+            url: '/api/provinces',
+            method: 'GET',
+            dataType: 'json',
+            success: function(provinces) {
+                provinces.forEach(function(province) {
+                    provinceSelect.append(new Option(province, province));
                 });
                 
+                // Mevcut il değeri varsa seç ve ilçeleri yükle
                 if (currentProvince) {
                     provinceSelect.val(currentProvince);
-                    populateDistricts(currentProvince);
+                    loadDistricts(currentProvince, currentDistrict);
                 }
-            }
-
-            // 2. İl (Province) değiştiğinde ilçeleri (District) güncelle
-            provinceSelect.change(function () {
-                var selectedCity = $(this).val();
-                populateDistricts(selectedCity);
-                // İl değiştiğinde gizli ilçe değerini sıfırla
-                $('#CurrentDistrict').val(''); 
-            });
-
-            // İlçe listesini dolduran yardımcı fonksiyon
-            function populateDistricts(cityName) {
-                var districtSelect = $('#districtFilter');
-                districtSelect.empty().append('<option value="">Tüm İlçeler</option>');
-
-                if (cityName) {
-                    var selectedCityData = data.find(c => c.Il === cityName);
-                    if (selectedCityData && selectedCityData.Ilce) {
-                        selectedCityData.Ilce.sort((a, b) => a.Ilce.localeCompare(b.Ilce, 'tr'));
-                        selectedCityData.Ilce.forEach(function (district) {
-                            districtSelect.append(new Option(district.Ilce, district.Ilce));
-                        });
-                        
-                        // Sadece mevcut il ile eşleşiyorsa mevcut ilçeyi seç
-                        if (cityName === currentProvince && currentDistrict) {
-                             districtSelect.val(currentDistrict);
-                        }
-                    }
-                }
+            },
+            error: function(xhr, status, error) {
+                console.error('İl listesi yüklenirken hata:', error);
             }
         });
+
+        // 2. İl (Province) değiştiğinde ilçeleri (District) dinamik olarak yükle
+        provinceSelect.change(function () {
+            var selectedProvince = $(this).val();
+            $('#CurrentDistrict').val(''); // İl değiştiğinde ilçe seçimini sıfırla
+            
+            if (selectedProvince) {
+                loadDistricts(selectedProvince, null);
+            } else {
+                // İl seçilmemişse ilçe listesini temizle
+                districtSelect.empty().append('<option value="">Tüm İlçeler</option>');
+            }
+        });
+
+        // İlçeleri API'den yükleyen fonksiyon
+        function loadDistricts(province, selectedDistrict) {
+            districtSelect.empty().append('<option value="">Tüm İlçeler</option>');
+            districtSelect.prop('disabled', true); // Yükleme sırasında devre dışı bırak
+            
+            $.ajax({
+                url: '/api/districts/' + encodeURIComponent(province),
+                method: 'GET',
+                dataType: 'json',
+                success: function(districts) {
+                    districts.forEach(function(district) {
+                        districtSelect.append(new Option(district, district));
+                    });
+                    
+                    // Eğer mevcut bir ilçe seçimi varsa onu seç
+                    if (selectedDistrict) {
+                        districtSelect.val(selectedDistrict);
+                    }
+                    
+                    districtSelect.prop('disabled', false); // Yükleme bittikten sonra aktif et
+                },
+                error: function(xhr, status, error) {
+                    console.error('İlçe listesi yüklenirken hata:', error);
+                    districtSelect.prop('disabled', false);
+                }
+            });
+        }
     });
 </script>
 

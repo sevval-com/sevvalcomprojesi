@@ -1,4 +1,4 @@
-@model sevvalemlak.csproj.Dto.Company.CompanyDetailDto
+﻿@model sevvalemlak.csproj.Dto.Company.CompanyDetailDto
 
 <title>Üye Detayları</title>
 <link rel="stylesheet" href="~/css/firmalar.css" />
@@ -783,7 +783,7 @@
             else
             {
                 var cityName = Model.About?.City?.ToUpper();
-                var cityImagePath = $"/sehirler/{cityName}.jpeg";
+                var cityImagePath = $"/sehirler/{cityName}.webp";
                 <img src="@cityImagePath" alt="@Model.About?.City Banner Resmi" class="image"
                      onerror="this.onerror=null; this.src='https://placehold.co/1200x300/007bff/FFFFFF?text=Sevval+Emlak';">
             }
@@ -793,9 +793,9 @@
         <div class="profile-section">
             <div class="profile-picture">
                 <img src="@(string.IsNullOrEmpty(Model.About?.ProfilePicturePath) ?
-                                          "/images/common/defaultuser.png" :
+                                          "/images/common/defaultuser.webp" :
                                           Model.About?.ProfilePicturePath)"
-                     alt="Profil Fotoğrafı" class="profile-img" onerror="this.onerror=null; this.src='/images/common/defaultuser.png';">
+                     alt="Profil Fotoğrafı" class="profile-img" onerror="this.onerror=null; this.src='/images/common/defaultuser.webp';">
             </div>
 
             <div class="company-info">

@@ -2,6 +2,7 @@
 using Sevval.Application.Features.Common;
 using Sevval.Application.Features.User.Commands.ConfirmEstate;
 using Sevval.Application.Features.User.Commands.CorporateRegister;
+using Sevval.Application.Features.User.Commands.DeleteUser;
 using Sevval.Application.Features.User.Commands.ForgottenPassword;
 using Sevval.Application.Features.User.Commands.IndividualRegister;
 using Sevval.Application.Features.User.Commands.LoginWithSocialMedia;
@@ -172,6 +173,40 @@ namespace sevvalemlak.csproj.ClientServices.UserServices
                 Message = "Kayıt işlemi başarısız oldu.",
                 Data = null
             };
+        }
+
+        public async Task<ApiResponse<DeleteUserCommandResponse>> DeleteUser(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync(
+                    GeneralConstants.BaseClientUrl + DeleteUserCommandRequest.Route + "/" + userId,
+                    CancellationToken.None
+                );
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<ApiResponse<DeleteUserCommandResponse>>();
+                }
+
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    IsSuccessfull = false,
+                    Message = "Hesap silme işlemi başarısız oldu.",
+                    Data = null,
+                    Code = (int)response.StatusCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    IsSuccessfull = false,
+                    Message = $"API çağrısı sırasında hata: {ex.Message}",
+                    Data = null,
+                    Code = 500
+                };
+            }
         }
 
 

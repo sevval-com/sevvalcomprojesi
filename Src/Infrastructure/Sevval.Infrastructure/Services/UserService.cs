@@ -3,6 +3,7 @@ using GridBox.Solar.Domain.IRepositories;
 using GridBox.Solar.Domain.IUnitOfWork;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Sevval.Application.Constants;
 using Sevval.Application.Dtos.Email;
 using Sevval.Application.Dtos.Front.Auth;
@@ -28,6 +29,7 @@ using Sevval.Application.Features.User.Queries.GetUserById;
 using Sevval.Application.Interfaces.IService;
 using Sevval.Application.Utilities;
 using Sevval.Domain.Entities;
+using Sevval.Persistence.Context;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -49,6 +51,8 @@ namespace Sevval.Infrastructure.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IEMailService _emailService;
+        private readonly IEMailService _eMailService;
+        private readonly ApplicationDbContext _context;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ITokenService _tokenService;
 
@@ -64,7 +68,8 @@ namespace Sevval.Infrastructure.Services
          IReadRepository<ForgettenPassword> forgettenPasswordReadRepository,
          IHostingEnvironment hostingEnvironment, IEMailService emailService,
          IWriteRepository<UserRefreshToken> writeUserRefreshTokenRepository,
-         IReadRepository<UserRefreshToken> readUserRefreshTokenRepository, ITokenService tokenService)
+         IReadRepository<UserRefreshToken> readUserRefreshTokenRepository, ITokenService tokenService,
+         ApplicationDbContext context)
         {
             _writeRepository = writeRepository;
             _readRepository = readRepository;
@@ -79,6 +84,8 @@ namespace Sevval.Infrastructure.Services
             _hostingEnvironment = hostingEnvironment;
             imgUrl = _hostingEnvironment.WebRootPath + "\\userImages\\";
             _emailService = emailService;
+            _eMailService = emailService;
+            _context = context;
             _writeUserRefreshTokenRepository = writeUserRefreshTokenRepository;
             _readUserRefreshTokenRepository = readUserRefreshTokenRepository;
 
@@ -788,18 +795,56 @@ namespace Sevval.Infrastructure.Services
                     IsSuccessfull = false,
                     Message = "Kayıt Bulunamadı"
                 };
-            //  user.IsDeleted = true;
+
+            // Soft delete: Kullanıcıyı işaretle
+            user.IsActive = "deleted"; // IsActive ile soft delete simulation
+            
+            // Generate recovery token
+            var recoveryToken = Guid.NewGuid().ToString("N");
+            
+            // Track deletion date for 30-day recovery window
+            var deletedAccount = new Sevval.Domain.Entities.DeletedAccount
+            {
+                UserId = user.Id,
+                DeletedAt = DateTime.UtcNow,
+                DeletionReason = null,
+                RecoveryToken = recoveryToken
+            };
+            await _context.DeletedAccounts.AddAsync(deletedAccount, cancellationToken);
+            
+            // İlgili verileri cascade soft delete yap
+            await SoftDeleteUserRelatedDataAsync(user.Id, user.Email, cancellationToken);
 
             await _writeRepository.UpdateAsync(user);
 
             if (await _unitOfWork.CommitAsync(cancellationToken) > 0)
             {
+                // Email bildirimini asenkron gönder (başarısızlık işlemi engellemez)
+                try
+                {
+                    await _eMailService.SendAccountDeletionEmailAsync(new SendAccountDeletionDto
+                    {
+                        ReceiverEmail = user.Email,
+                        ReceiverName = $"{user.FirstName} {user.LastName}",
+                        DeletionDate = DateTime.UtcNow,
+                        RecoveryDeadline = DateTime.UtcNow.AddDays(30),
+                        RecoveryToken = recoveryToken,
+                        UserId = user.Id
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // Email gönderimi başarısız olsa bile hesap silme devam etmeli
+                    // Sadece log at
+                    Console.WriteLine($"Email gönderimi başarısız: {ex.Message}");
+                }
+
                 return new ApiResponse<DeleteUserCommandResponse>
                 {
                     Code = (int)HttpStatusCode.OK,
                     Data = _mapper.Map<DeleteUserCommandResponse>(user),
                     IsSuccessfull = true,
-                    Message = "Güncelleme işlemi başarılı"
+                    Message = "Hesabınız başarıyla silindi. 30 gün içinde destek ekibimize başvurarak hesabınızı kurtarabilirsiniz."
                 };
             }
 
@@ -808,9 +853,38 @@ namespace Sevval.Infrastructure.Services
                 Code = 400,
                 Data = null,
                 IsSuccessfull = false,
-                Message = string.Empty
+                Message = "Hesap silme işlemi başarısız oldu. Lütfen daha sonra tekrar deneyin."
             };
 
+        }
+
+        /// <summary>
+        /// Kullanıcıya ait ilgili verileri cascade soft delete yapar
+        /// </summary>
+        private async Task SoftDeleteUserRelatedDataAsync(string userId, string userEmail, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // IlanBilgileri - Kullanıcının ilanlarını "deleted" status yap
+                var ilanlar = await _context.IlanBilgileri
+                    .Where(x => x.Email == userEmail)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var ilan in ilanlar)
+                {
+                    ilan.Status = "deleted"; // IlanModel'de de IsDeleted yok, Status var
+                }
+
+                // NOT: Diğer entity'lerde soft delete property'si bulunmuyor
+                // Bu yüzden sadece IlanBilgileri için Status="deleted" pattern uygulanıyor
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Cascade delete hatası işlemi durdurmamalı
+                Console.WriteLine($"İlgili verilerin silinmesi sırasında hata: {ex.Message}");
+            }
         }
 
         public async Task<ApiResponse<GetUserByIdQueryResponse>> GetUser(GetUserByIdQueryRequest request)

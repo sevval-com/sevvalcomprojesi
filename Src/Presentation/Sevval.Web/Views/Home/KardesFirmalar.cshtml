@@ -1,10 +1,10 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.csproj.Dto.Company.CompanySearchDto
 
 <link rel="stylesheet" href="~/css/kardesfirmalar.css">
 <link rel="stylesheet" href="~/css/anasayfa.css">
-<link rel="icon" type="image/png" href="~/images/favlogo.png">
+<link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 <style>
     body {
@@ -12,7 +12,7 @@
         flex-direction: column;
         min-height: 100vh; /* Sayfa yüksekliğini %100 yapar */
         margin: 0; /* Varsayılan margin'i kaldırır */
-        background-image: url('~/images/arka-plan-resmi.jpg');
+        background-image: url('~/images/arka-plan-resmi.webp');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -1020,13 +1020,13 @@
                     </div>
 
                     <div class="img-box loading" aria-hidden="true">
-                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.png" : user.ProfilePicturePath)"
+                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.webp" : user.ProfilePicturePath)"
                              alt="Profil Fotoğrafı"
                              class="user-profile-picture"
                              width="80" height="80"
                              loading="lazy"
                              onload="this.parentElement.classList.remove('loading')"
-                             onerror="this.src='/ImageFiles/kurumsalbosfoto.png'; this.parentElement.classList.remove('loading')" />
+                             onerror="this.src='/ImageFiles/kurumsalbosfoto.webp'; this.parentElement.classList.remove('loading')" />
                     </div>
 
                     <p class="user-name">

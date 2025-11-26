@@ -1,6 +1,7 @@
 ﻿using Sevval.Application.Features.Common;
 using Sevval.Application.Features.User.Commands.ConfirmEstate;
 using Sevval.Application.Features.User.Commands.CorporateRegister;
+using Sevval.Application.Features.User.Commands.DeleteUser;
 using Sevval.Application.Features.User.Commands.ForgottenPassword;
 using Sevval.Application.Features.User.Commands.IndividualRegister;
 using Sevval.Application.Features.User.Commands.LoginWithSocialMedia;
@@ -18,5 +19,6 @@ namespace sevvalemlak.csproj.ClientServices.UserServices
         Task<ApiResponse<RejectEstateCommandResponse>> RejectEstate(RejectEstateCommandRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<SendNewCodeCommandResponse>> SendNewCode(SendNewCodeCommandRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<LoginWithSocialMediaCommandResponse>> SocialRegister(LoginWithSocialMediaCommandRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<DeleteUserCommandResponse>> DeleteUser(string userId);
     }
 }

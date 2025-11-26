@@ -115,6 +115,9 @@ builder.Services.AddIdentity<ApplicationUser, Role>(options =>
 
 builder.Services.AddServices(builder.Configuration);
 
+// Register background service for permanent deletion of expired accounts
+builder.Services.AddHostedService<sevvalemlak.csproj.Services.AccountCleanupService>();
+
 // Session ayarları
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

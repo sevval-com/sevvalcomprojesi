@@ -1,4 +1,4 @@
-@model IEnumerable<Sevval.Application.Features.Announcement.Queries.GetAnnouncementCountByProvince.GetAnnouncementCountByProvinceQueryResponse>
+﻿@model IEnumerable<Sevval.Application.Features.Announcement.Queries.GetAnnouncementCountByProvince.GetAnnouncementCountByProvinceQueryResponse>
 
 <div class="sehirler">
     <h2 style="color: #0d6efd">Şehirlere Göre İlanlar</h2>
@@ -7,7 +7,7 @@
         {
             <div class="sehir-kart" onclick="submitHizliAraSehir('@item.Province')" data-sehir="@item.Province">
                 <div class="sehir-resim">
-                    <img src="@item.ImagePath" alt="@item.Province" @* onerror="this.src='/icons/default-city-icon.png';" *@ />
+                    <img src="@item.ImagePath" alt="@item.Province" @* onerror="this.src='/icons/default-city-icon.webp';" *@ />
                 </div>
                 <!-- Şehir açıklamasını burada üst kısmında göstermek için 'sehir-aciklama' div'i eklendi -->
                 <div class="sehir-aciklama" id="aciklama-@item.Province">

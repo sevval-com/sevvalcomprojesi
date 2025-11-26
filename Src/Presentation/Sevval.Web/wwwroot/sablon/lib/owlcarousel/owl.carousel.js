@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Owl Carousel v2.2.1
  * Copyright 2013-2017 David Deutsch
  * Licensed under  ()
@@ -2247,7 +2247,7 @@
 		}
 
 		if (video.type === 'youtube') {
-			path = "//img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
+			path = "//img.youtube.com/vi/" + video.id + "/hqdefault.webp";
 			create(path);
 		} else if (video.type === 'vimeo') {
 			$.ajax({

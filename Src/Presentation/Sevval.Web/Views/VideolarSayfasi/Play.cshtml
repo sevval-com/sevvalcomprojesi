@@ -111,7 +111,7 @@
                     <div class="border-t border-slate-200 my-4"></div>
                     <!-- Yükleyen Bilgisi -->
                     <div class="flex items-center gap-4">
-                            <img src="@Url.Content("~/images/LOGO mavi.png")"
+                            <img src="@Url.Content("~/images/LOGO mavi.webp")"
                                  class="w-12 h-12 rounded-full object-cover flex-shrink-0"
                                  alt="Sevval.com" />
                         <div class="w-full">
@@ -708,7 +708,7 @@
             if (video.kapakFotografiYolu) {
                 return `<img src="${video.kapakFotografiYolu}" alt="${video.videoAdi}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />`;
             } else if (video.isYouTube) {
-                return `<img src="https://img.youtube.com/vi/${video.videoYolu}/hqdefault.jpg" alt="${video.videoAdi}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />`;
+                return `<img src="https://img.youtube.com/vi/${video.videoYolu}/hqdefault.webp" alt="${video.videoAdi}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />`;
             } else {
                 return `<video preload="metadata" muted class="w-full h-full object-cover"><source src="${video.videoYolu}#t=1" type="video/mp4"></video>`;
             }

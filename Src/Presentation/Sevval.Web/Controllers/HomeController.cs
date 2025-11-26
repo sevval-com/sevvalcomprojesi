@@ -47,6 +47,59 @@ public class HomeController : Controller
         return Ok(response);
     }
 
+    // İl listesini döndüren endpoint (Performans için sadece il isimleri)
+    [HttpGet("api/provinces")]
+    public async Task<IActionResult> GetProvinces()
+    {
+        try
+        {
+            var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json");
+            var jsonContent = await System.IO.File.ReadAllTextAsync(jsonPath);
+            var data = System.Text.Json.JsonSerializer.Deserialize<List<CityData>>(jsonContent);
+            
+            var provinces = data?.Select(x => x.Il).Distinct().OrderBy(x => x).ToList();
+            return Ok(provinces);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "İl listesi yüklenirken hata oluştu", message = ex.Message });
+        }
+    }
+
+    // Seçilen ile ait ilçeleri döndüren endpoint
+    [HttpGet("api/districts/{province}")]
+    public async Task<IActionResult> GetDistricts(string province)
+    {
+        try
+        {
+            var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json");
+            var jsonContent = await System.IO.File.ReadAllTextAsync(jsonPath);
+            var data = System.Text.Json.JsonSerializer.Deserialize<List<CityData>>(jsonContent);
+            
+            var cityData = data?.FirstOrDefault(x => x.Il == province);
+            var districts = cityData?.Ilce?.Select(x => x.Ilce).OrderBy(x => x).ToList() ?? new List<string>();
+            
+            return Ok(districts);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "İlçe listesi yüklenirken hata oluştu", message = ex.Message });
+        }
+    }
+
+    // JSON deserialize için model sınıfları (HomeController sınıfı dışında tanımlanmalı)
+    public class CityData
+    {
+        public string Il { get; set; }
+        public List<DistrictData> Ilce { get; set; }
+    }
+
+    public class DistrictData
+    {
+        public string Ilce { get; set; }
+        public List<string> Mahalle { get; set; }
+    }
+
 
     public async Task<IActionResult> Firmalar(CompanySearchDto model)
     {

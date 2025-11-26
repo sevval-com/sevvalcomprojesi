@@ -12,5 +12,6 @@ namespace Sevval.Application.Interfaces.IService
         Task<bool> SendPasswordResetEmailAsync(ForgotPasswordViewDto model, string code);
         Task<bool> SendRejectedMailToEstate(string email);
         Task<bool> SendVerificationEmailAsync(SendVerifyEmailDto model);
+        Task<bool> SendAccountDeletionEmailAsync(SendAccountDeletionDto model);
     }
 }

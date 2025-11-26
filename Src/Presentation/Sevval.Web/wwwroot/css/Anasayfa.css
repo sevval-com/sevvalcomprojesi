@@ -6568,11 +6568,14 @@ button {
 .gif-container {
     display: flex; /* Flexbox kullanarak ortalamak için */
     justify-content: center; /* Yatayda ortala */
-    margin: 20px 0; /* Üst ve alt boşluk */
+    margin: 20px auto; /* Üst ve alt boşluk, yatayda ortala */
+    max-width: 1200px; /* Main content genişliğinde */
+    width: 100%; /* Tam genişlik */
 }
 
 .centered-gif {
     max-width: 100%; /* Mobil uyumlu olması için genişliği ayarlayın */
+    width: 100%; /* Konteynerin tamamını kaplasın */
     height: auto; /* Orantılı yükseklik ayarlayın */
     cursor: pointer; /* İşaretçi simgesi */
 }

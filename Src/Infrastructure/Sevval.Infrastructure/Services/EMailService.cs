@@ -508,6 +508,104 @@ namespace Sevval.Infrastructure.Services
             return await SendEmailAsync(model.Email, subject, body);
         }
 
+        public async Task<bool> SendAccountDeletionEmailAsync(SendAccountDeletionDto model)
+        {
+            var subject = "Hesap Silme İşleminiz Hakkında";
+
+            // Generate recovery link with base URL from configuration
+            var baseUrl = (_configuration["BaseUrl"] ?? "https://sevval.com").TrimEnd('/');
+            var recoveryLink = $"{baseUrl}/Account/RecoverAccount?token={model.RecoveryToken}&userId={model.UserId}";
+
+            var body = $@"
+                <div style='background-color: #f4f6f9; font-family: Arial, sans-serif; padding: 0; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: auto; overflow: hidden;'>
+                    <div style='background-color: #dc3545; color: #fff; padding: 15px; text-align: center;'>
+                        <img src='https://resmim.net/cdn/2024/11/25/Ddd4F7.png' alt='Şirket Logosu' style='width: 120px; display: block; margin: 0 auto;'>
+                        <h1 style='font-size: 20px; margin: 10px 0 0;'>Şevval Emlak</h1>
+                    </div>
+                    <div style='background-color: #ffffff; padding: 20px;'>
+                        <h2 style='color: #333; text-align: center; margin-top: 0;'>Hesabınız Silindi</h2>
+                        <p style='color: #555; font-size: 14px; line-height: 1.6;'>
+                            Merhaba <strong>{model.ReceiverName}</strong>,
+                        </p>
+                        <p style='color: #555; font-size: 14px; line-height: 1.6;'>
+                            <strong>{model.DeletionDate:dd.MM.yyyy HH:mm}</strong> tarihinde hesabınızı silme talebinde bulundunuz ve işleminiz başarıyla tamamlandı.
+                        </p>
+                        
+                        <div style='background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;'>
+                            <h3 style='color: #856404; margin: 0 0 10px 0; font-size: 16px;'>
+                                <i style='font-style: normal;'>⚠️</i> Önemli Bilgiler
+                            </h3>
+                            <ul style='color: #856404; font-size: 13px; margin: 0; padding-left: 20px;'>
+                                <li>Hesabınıza ait tüm ilanlarınız devre dışı bırakıldı</li>
+                                <li>Mesaj geçmişiniz ve favori listeniz silindi</li>
+                                <li>Kişisel bilgileriniz sistemde soft delete olarak işaretlendi</li>
+                                <li>Hesabınız <strong>30 gün boyunca</strong> kurtarma için bekletilecektir</li>
+                            </ul>
+                        </div>
+
+                        <div style='background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0;'>
+                            <h3 style='color: #155724; margin: 0 0 10px 0; font-size: 16px;'>
+                                <i style='font-style: normal;'>✅</i> Fikrini Değiştirdin mi?
+                            </h3>
+                            <p style='color: #155724; font-size: 13px; margin: 0 0 15px 0;'>
+                                <strong>İyi haber!</strong> Hesabınızı <strong>{model.RecoveryDeadline:dd.MM.yyyy}</strong> tarihine kadar geri yükleyebilirsiniz.
+                            </p>
+                            <p style='color: #155724; font-size: 13px; margin: 0 0 15px 0;'>
+                                <strong>2 farklı yöntemle hesabınızı geri alabilirsiniz:</strong>
+                            </p>
+                            <ol style='color: #155724; font-size: 13px; margin: 0 0 15px 0; padding-left: 20px;'>
+                                <li><strong>Otomatik Kurtarma:</strong> Aynı giriş bilgilerinizle tekrar giriş yapın - hesabınız otomatik olarak aktif olacaktır!</li>
+                                <li><strong>Tek Tıkla Kurtarma:</strong> Aşağıdaki butona tıklayın ve hesabınız anında kurtarılsın:</li>
+                            </ol>
+                            
+                            <div style='text-align: center; margin: 20px 0;'>
+                                <a href='{recoveryLink}' style='display: inline-block; background-color: #28a745; color: #fff; text-decoration: none; padding: 15px 40px; border-radius: 5px; font-weight: bold; font-size: 16px;'>
+                                    🔓 Hesabımı Geri Yükle
+                                </a>
+                            </div>
+                            
+                            <p style='color: #155724; font-size: 11px; margin: 0; text-align: center;'>
+                                Bu link <strong>30 gün</strong> boyunca geçerlidir.
+                            </p>
+                        </div>
+
+                        <div style='background-color: #d1ecf1; border-left: 4px solid #0dcaf0; padding: 15px; margin: 20px 0;'>
+                            <h3 style='color: #0c5460; margin: 0 0 10px 0; font-size: 16px;'>
+                                <i style='font-style: normal;'>💡</i> Alternatif Yöntem
+                            </h3>
+                            <p style='color: #0c5460; font-size: 13px; margin: 0 0 10px 0;'>
+                                Link çalışmıyorsa destek ekibimize başvurabilirsiniz:
+                            </p>
+                            <p style='color: #0c5460; font-size: 13px; margin: 0;'>
+                                <strong>Destek E-posta:</strong> <a href='mailto:destek@sevval.com' style='color: #0c5460;'>destek@sevval.com</a><br>
+                                <strong>Telefon:</strong> +90 (XXX) XXX XX XX
+                            </p>
+                        </div>
+
+                        <p style='color: #555; font-size: 14px; line-height: 1.6;'>
+                            Eğer bu işlemi siz yapmadıysanız, lütfen <strong>derhal</strong> destek ekibimizle iletişime geçiniz!
+                        </p>
+
+                        <p style='color: #555; font-size: 14px; line-height: 1.6;'>
+                            Aramızda olduğunuz için teşekkür ederiz. İleride tekrar görüşmek dileğiyle...
+                        </p>
+                        <p style='color: #555; font-size: 14px; line-height: 1.6;'>
+                            Saygılarımızla,<br>
+                            <strong>Şevval Emlak Ekibi</strong>
+                        </p>
+                    </div>
+                    <div style='background-color: #f4f6f9; text-align: center; font-size: 12px; color: #999; padding: 10px 20px;'>
+                        Bu bir otomatik mesajdır, lütfen yanıtlamayın.<br>
+                        &copy; 2024 Şevval Emlak. Tüm hakları saklıdır.<br>
+                        <a href='https://sevval.com/privacy' style='color: #999; text-decoration: none;'>Gizlilik Politikası</a> | 
+                        <a href='https://sevval.com/terms' style='color: #999; text-decoration: none;'>Kullanım Şartları</a>
+                    </div>
+                </div>
+            ";
+
+            return await SendEmailAsync(model.ReceiverEmail, subject, body);
+        }
+
 
         public async Task<bool> SendEmailAsync(string to, string subject, string body)
         {

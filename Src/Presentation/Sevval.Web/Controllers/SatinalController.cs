@@ -96,7 +96,7 @@ namespace EmlakSitesi.Controllers
                 string siteName = "sevvalemlak.com.tr";
 
                 // Logo dosya yolu
-                var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.png");
+                var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.webp");
 
                 // Mail mesajı oluştur (Admin için olan)
                 var adminMail = new MailMessage();
@@ -106,7 +106,7 @@ namespace EmlakSitesi.Controllers
                 adminMail.IsBodyHtml = true;
 
                 // Logo’yu embed et (Admin mail için)
-                var inlineLogoAdmin = new LinkedResource(logoPath, MediaTypeNames.Image.Jpeg)
+                var inlineLogoAdmin = new LinkedResource(logoPath, "image/webp")
                 {
                     ContentId = "logoImage"
                 };
@@ -232,7 +232,7 @@ namespace EmlakSitesi.Controllers
                 userMail.IsBodyHtml = true;
 
                 // Logo’yu embed et (Kullanıcı mail için)
-                var inlineLogoUser = new LinkedResource(logoPath, MediaTypeNames.Image.Jpeg)
+                var inlineLogoUser = new LinkedResource(logoPath, "image/webp")
                 {
                     ContentId = "logoImage"
                 };

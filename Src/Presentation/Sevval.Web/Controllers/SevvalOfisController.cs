@@ -1,4 +1,4 @@
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1078,7 +1078,7 @@ namespace YourProjectNamespace.Controllers
             string siteName = "sevvalemlak.com.tr";
 
             // Logo dosya yolu
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.png");
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.webp");
 
             var mail = new MailMessage();
             mail.From = new MailAddress(fromAddress, siteName);
@@ -1086,7 +1086,7 @@ namespace YourProjectNamespace.Controllers
             mail.IsBodyHtml = true;
 
             // Logo’yu embed et
-            var inlineLogo = new LinkedResource(logoPath, MediaTypeNames.Image.Jpeg)
+            var inlineLogo = new LinkedResource(logoPath, "image/webp")
             {
                 ContentId = "logoImage"
             };
@@ -1645,7 +1645,7 @@ namespace YourProjectNamespace.Controllers
 <body>
     <div class='email-container'>
         <div class='header'>
-            <img src='https://i.hizliresim.com/sw39o6d.png' alt='Sevval Emlak Logo' class='logo' />
+            <img src='https://i.hizliresim.com/sw39o6d.webp' alt='Sevval Emlak Logo' class='logo' />
             <h1 style='color: #fff; margin:0; font-size: 22px;'>
                 VARSA BİZDEN İYİSİ, O DA BİZDEN BİRİSİ
             </h1>

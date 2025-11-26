@@ -1,4 +1,4 @@
-@model sevvalemlak.Models.SettingsViewModel
+﻿@model sevvalemlak.Models.SettingsViewModel
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
@@ -24,7 +24,7 @@
 
     <!-- Navbar için gerekli olan özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
-    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 </head>
 <body>
@@ -33,7 +33,7 @@
         <div class="navbaar-container">
             <div class="logo">
                 <a href="/">
-                    <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
                 </a>
                 <span>Şevval Emlak</span>
             </div>
@@ -335,6 +335,11 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link @(activeTab == "membership" ? "active" : "")" id="membership-tab" data-bs-toggle="tab" data-bs-target="#membership" type="button" role="tab" aria-controls="membership" aria-selected="false">Üyelik İşlemleri</button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link @(activeTab == "security" ? "active" : "")" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+                                    <i class="bi bi-shield-lock me-2"></i>Hesap Güvenliği
+                                </button>
+                            </li>
                         </ul>
                         <div class="tab-content p-3 border border-top-0" id="myTabContent">
                             <!-- Profil Tab -->
@@ -343,7 +348,7 @@
                                     <div class="row">
                                         <div class="col-md-3 text-center mb-4">
                                             <div class="profile-image-container mb-3">
-                                                <img src="@(string.IsNullOrEmpty(Model.ProfilePicturePath) ? "/images/default-profile.png" : Model.ProfilePicturePath)" alt="Profil Resmi" id="profilePicturePreview" />
+                                                <img src="@(string.IsNullOrEmpty(Model.ProfilePicturePath) ? "/images/default-profile.webp" : Model.ProfilePicturePath)" alt="Profil Resmi" id="profilePicturePreview" />
                                             </div>
                                             <label for="profilePictureInput" class="btn btn-outline-primary">
                                                 <i class="fas fa-upload me-2"></i>Resim Seç
@@ -438,11 +443,11 @@
                                                 <div class="col-md-12 mb-3"><input type="text" class="form-control" name="companyAddress" placeholder="Şirket Adresi" required></div>
                                                 <div class="col-md-6 mb-3">
                                                     <label class="form-label">5. Seviye Belgesi</label>
-                                                    <input type="file" class="form-control" name="level5Certificate" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                    <input type="file" class="form-control" name="level5Certificate" accept=".pdf,.webp,.webp,.webp" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label class="form-label">Vergi Levhası</label>
-                                                    <input type="file" class="form-control" name="taxDocument" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                    <input type="file" class="form-control" name="taxDocument" accept=".pdf,.webp,.webp,.webp" required>
                                                 </div>
                                                 <div class="col-12"><button type="submit" class="btn btn-primary">Kurumsal Üyelik Talebi Oluştur</button></div>
                                             </div>
@@ -462,6 +467,76 @@
                                     </div>
                                 }
                             </div>
+
+                            <!-- Hesap Güvenliği Tab -->
+                            <div class="tab-pane fade @(activeTab == "security" ? "show active" : "")" id="security" role="tabpanel" aria-labelledby="security-tab">
+                                <div class="row">
+                                    <!-- ŞİFRE DEĞİŞTİRME BÖLÜMÜ -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card border-primary h-100">
+                                            <div class="card-header bg-primary text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="bi bi-key me-2"></i>Şifre Değiştir
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="text-muted">Hesap güvenliğiniz için şifrenizi düzenli olarak değiştirmenizi öneririz.</p>
+                                                <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-primary">
+                                                    <i class="bi bi-pencil-square me-2"></i>Şifremi Değiştir
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- HESAP SİLME BÖLÜMÜ -->
+                                    <div class="col-md-12 mb-4">
+                                        <div class="card border-danger">
+                                            <div class="card-header bg-danger text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="bi bi-exclamation-triangle me-2"></i>Tehlikeli Bölge - Hesabı Sil
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="alert alert-warning">
+                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                    <strong>Dikkat!</strong> Bu işlem geri alınamaz. Hesabınızı silmeden önce aşağıdaki bilgileri dikkatlice okuyun:
+                                                </div>
+
+                                                <h6 class="text-danger mb-3">Hesap Silindiğinde:</h6>
+                                                <ul class="list-unstyled mb-4">
+                                                    <li class="mb-2">
+                                                        <i class="bi bi-x-circle text-danger me-2"></i>
+                                                        Tüm ilanlarınız devre dışı bırakılacak
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="bi bi-x-circle text-danger me-2"></i>
+                                                        Mesaj geçmişiniz silinecek
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="bi bi-x-circle text-danger me-2"></i>
+                                                        Favorileriniz ve kayıtlı aramalarınız silinecek
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="bi bi-x-circle text-danger me-2"></i>
+                                                        Yorumlarınız ve değerlendirmeleriniz anonimleştirilecek
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="bi bi-check-circle text-success me-2"></i>
+                                                        <strong>30 gün içinde</strong> destek ekibimize başvurarak hesabınızı kurtarabilirsiniz
+                                                    </li>
+                                                </ul>
+
+                                                <button type="button" class="btn btn-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteAccountModal">
+                                                    <i class="bi bi-trash me-2"></i>Hesabımı Kalıcı Olarak Sil
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -469,12 +544,167 @@
         </div>
     </main>
 
+    <!-- HESAP SİLME MODAL -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" 
+         aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Hesabı Silmeyi Onayla
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" 
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="DeleteAccount" asp-controller="Account" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <strong>Son Uyarı:</strong> Bu işlem geri alınamaz!
+                        </div>
+
+                        <p class="mb-3">
+                            Hesabınızı silmek istediğinizden emin misiniz? 
+                            Bu işlemi onaylamak için:
+                        </p>
+
+                        <ol class="mb-4">
+                            <li>Mevcut şifrenizi girin</li>
+                            <li>Onay metnini yazın: <strong>"HESABIMI SIL"</strong></li>
+                        </ol>
+
+                        <!-- Şifre -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-key me-2"></i>Şifreniz
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   name="Password" 
+                                   placeholder="Mevcut şifrenizi girin"
+                                   required>
+                            <small class="text-muted">
+                                Güvenlik için şifrenizi doğrulamanız gerekiyor
+                            </small>
+                        </div>
+
+                        <!-- Onay Metni -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-check2-square me-2"></i>Onay Metni
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="ConfirmationText" 
+                                   id="confirmationTextInput"
+                                   placeholder="HESABIMI SIL yazın"
+                                   required>
+                            <small class="text-danger">
+                                Tam olarak "HESABIMI SIL" yazmalısınız (büyük harfle)
+                            </small>
+                        </div>
+
+                        <!-- Neden -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Neden hesabınızı siliyorsunuz? (İsteğe bağlı)
+                            </label>
+                            <select class="form-select" name="DeletionReason">
+                                <option value="">Seçiniz...</option>
+                                <option value="privacy">Gizlilik endişeleri</option>
+                                <option value="not-using">Artık kullanmıyorum</option>
+                                <option value="found-alternative">Alternatif buldum</option>
+                                <option value="poor-experience">Kötü deneyim</option>
+                                <option value="too-expensive">Çok pahalı</option>
+                                <option value="technical-issues">Teknik sorunlar</option>
+                                <option value="other">Diğer</option>
+                            </select>
+                        </div>
+
+                        <!-- Geri Alma Bilgisi -->
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Bilgi:</strong> Hesabınızı 30 gün içinde 
+                            <a href="mailto:destek@sevval.com">destek@sevval.com</a> 
+                            adresine e-posta göndererek kurtarabilirsiniz.
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" 
+                                data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-2"></i>İptal
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                            <i class="bi bi-trash me-2"></i>Evet, Hesabımı Sil
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Onay metni kontrolü - Submit butonunu aktifleştir
+            $('#confirmationTextInput').on('input', function() {
+                const confirmBtn = $('#confirmDeleteBtn');
+                const inputValue = $(this).val().trim();
+                
+                if (inputValue === 'HESABIMI SIL') {
+                    confirmBtn.prop('disabled', false);
+                    confirmBtn.removeClass('btn-danger').addClass('btn-danger');
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    confirmBtn.prop('disabled', true);
+                    if (inputValue.length > 0) {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-valid is-invalid');
+                    }
+                }
+            });
+
+            // Form submit öncesi son onay
+            $('form[action*="DeleteAccount"]').on('submit', function(e) {
+                const confirmed = confirm(
+                    '⚠️ SON ONAY\n\n' +
+                    'Hesabınızı silmek istediğinizden kesinlikle emin misiniz?\n\n' +
+                    '✓ Bu işlem 30 gün içinde destek ekibi aracılığıyla geri alınabilir.\n' +
+                    '✗ Tüm ilanlarınız, mesajlarınız ve favorileriniz silinecek.\n\n' +
+                    'Devam etmek istiyor musunuz?'
+                );
+                
+                if (!confirmed) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Modal kapatıldığında formu temizle
+            $('#deleteAccountModal').on('hidden.bs.modal', function () {
+                $(this).find('form')[0].reset();
+                $('#confirmationTextInput').removeClass('is-valid is-invalid');
+                $('#confirmDeleteBtn').prop('disabled', true);
+            });
+
+            // Tab değiştiğinde URL'i güncelle
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                const targetTab = $(e.target).attr('data-bs-target');
+                if (targetTab) {
+                    const tabName = targetTab.substring(1);
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tabName);
+                    window.history.pushState({}, '', url);
+                }
+            });
+
             // Banner client-side boyut kontrolü
             const bannerInput = document.getElementById('bannerPictureInput');
             if (bannerInput) {
@@ -653,6 +883,38 @@
             padding: 8px 14px;
             border-radius: 6px;
             margin-top: 0;
+        }
+
+        /* Hesap silme güvenlik bölümü stilleri */
+        .card.border-danger {
+            border-width: 2px;
+        }
+        
+        .card.border-danger .card-header {
+            font-weight: 600;
+        }
+
+        #confirmDeleteBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-content.border-danger {
+            border-width: 3px;
+        }
+
+        /* Validasyon stilleri */
+        .is-valid {
+            border-color: #198754 !important;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        /* Tehlikeli bölge hover efekti */
+        .card.border-danger:hover {
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
         }
     </style>
 </body>

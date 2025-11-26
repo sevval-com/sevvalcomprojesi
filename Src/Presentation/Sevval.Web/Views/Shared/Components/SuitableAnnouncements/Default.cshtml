@@ -1,4 +1,4 @@
-@model List<Sevval.Application.Features.Announcement.Queries.GetSuitableAnnouncements.GetSuitableAnnouncementsQueryResponse>
+﻿@model List<Sevval.Application.Features.Announcement.Queries.GetSuitableAnnouncements.GetSuitableAnnouncementsQueryResponse>
 
 @if (Model != null && Model.Any())
 {
@@ -18,7 +18,7 @@
                             else
                             {
                                 <img src="@ilan.IlanVitrinImageUrl" alt="@ilan.IlanBasligi" loading="lazy"
-                                     onerror="this.src='/ImageFiles/kurumsalbosfoto.png'" />
+                                     onerror="this.src='/ImageFiles/kurumsalbosfoto.webp'" />
                             }
                             <span class="result-price">@ilan.IlanFiyati.ToString("N0") TL</span>
                             @{
