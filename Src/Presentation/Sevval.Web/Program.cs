@@ -204,10 +204,11 @@ app.Use(async (context, next) =>
         }
         await next();
     }
-    catch (Exception s)
+    catch (Exception ex)
     {
-
-
+        // Log authentication claim addition errors
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error adding user claims during authentication");
     }
 });
 

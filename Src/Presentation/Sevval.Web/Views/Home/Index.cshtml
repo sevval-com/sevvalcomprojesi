@@ -1296,30 +1296,24 @@
                                     }
                                 }
                                 
-                                // Eski uzantıları webp ile değiştir
-                                photoUrl = photoUrl.Replace(".jpg", ".webp").Replace(".jpeg", ".webp").Replace(".png", ".webp").Replace(".JPG", ".webp").Replace(".JPEG", ".webp").Replace(".PNG", ".webp");
-                                
-                                <text>
-                                <script>console.log('Original:', '@originalUrl', '-> Converted:', '@photoUrl');</script>
-                                </text>
+                                // GÜNÜN İLANI - Sunucudan çekilen görseller için webp dönüşümü yapma
+                                // photoUrl zaten doğru formatta geliyor (/images/uploads/xxx.png)
                                 
                                 <div class="slider-slide">
                                     <img src="@photoUrl" 
-                                         alt="İlan Fotoğrafı" 
+                                         alt="Fotoğraf" 
                                          loading="lazy" 
                                          width="800" 
-                                         height="500"
-                                         onerror="this.onerror=null; this.src='~/images/no-image.webp'; this.style.objectFit='contain';">
+                                         height="400">
                                 </div>
                                 @if (!gununIlaniEklendi && i == (ViewBag.Fotograflar.Count / 2))
                                 {
                                     <div class="slider-slide">
-                                        <img src="~/ImageFiles/gununilani.webp" 
+                                        <img src="~/ImageFiles/gununilani.png" 
                                              alt="Günün İlanı" 
                                              loading="lazy" 
                                              width="800" 
-                                             height="500"
-                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#FFD700;\'><i class=\'fas fa-star\' style=\'font-size:60px;margin-bottom:15px;\'></i><span style=\'font-size:24px;font-weight:600;\'>GÜNÜN İLANI</span></div>';">
+                                             height="400">
                                     </div>
                                     gununIlaniEklendi = true;
                                 }
@@ -3168,13 +3162,15 @@
         function convertImagesToWebP() {
             const allImages = document.querySelectorAll('img');
             allImages.forEach(img => {
-                // İstisna: popup konteynırlarındaki görselleri dönüştürme
+                // İstisna: popup konteynırlarındaki ve GÜNÜN İLANI slider'ındaki görselleri dönüştürme
                 if (img.closest('.service-popup') || 
                     img.closest('.service-popup-2') || 
                     img.closest('.sevvaldrone-popup') ||
+                    img.closest('.slider-container') ||      // Günün İlanı slider'ı
+                    img.closest('#dailyOfferContainer') ||   // Günün İlanı container'ı
                     img.classList.contains('property-image') ||
                     img.classList.contains('property-image-2')) {
-                    return; // Bu görseli atla
+                    return; // Bu görseli atla (sunucudan PNG olarak geliyorlar)
                 }
                 
                 if (img.src && !img.src.includes('.webp')) {
