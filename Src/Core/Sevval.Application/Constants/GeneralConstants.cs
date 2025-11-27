@@ -18,10 +18,10 @@
 
         //dev
         public const string BaseUrl = "http://localhost:5096"; // Frontend URL
-        public const string WwwRootPath = "C:\\Users\\Dell\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Web\\wwwroot\\";
-        public const string SendEstateConfirmationEmail = "ismail.kmkl58@gmail.com";
+        public const string WwwRootPath = "C:\\Users\\Msi\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Web\\wwwroot\\";
+        public const string SendEstateConfirmationEmail = "kaaanyildz@gmail.com";
         public const string BaseClientUrl = "http://localhost:5235"; // API URL
-        public const string ConnectionString = "Data Source=C:\\Users\\Dell\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Api\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
+        public const string ConnectionString = "Data Source=C:\\Users\\Msi\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Api\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
 
         public const string SecretKey = "SeVVAlEmlaK3300129231321943198419SEVVALEMLAK";
     }
