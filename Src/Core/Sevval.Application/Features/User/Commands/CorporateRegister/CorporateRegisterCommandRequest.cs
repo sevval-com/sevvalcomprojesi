@@ -26,11 +26,21 @@ public class CorporateRegisterCommandRequest : IRequest<ApiResponse<CorporateReg
 
     [NotMapped]
     [SwaggerIgnore]
+    [Obsolete("Use Document1Path instead")]
     public string Level5CertificatePath { get; set; }
 
     [NotMapped]
     [SwaggerIgnore]
+    [Obsolete("Use Document2Path instead")]
     public string TaxPlatePath { get; set; }
+
+    [NotMapped]
+    [SwaggerIgnore]
+    public string Document1Path { get; set; }
+
+    [NotMapped]
+    [SwaggerIgnore]
+    public string Document2Path { get; set; }
 
     public string Reference { get; set; }
 

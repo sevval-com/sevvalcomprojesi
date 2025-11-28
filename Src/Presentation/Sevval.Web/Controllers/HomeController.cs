@@ -118,8 +118,8 @@ public class HomeController : Controller
             SortBy = model.SortBy,
 
             // === İSTEĞE GÖRE EKLENEN FİLTRELER ===
-            // Sadece Kurumsal, Danışman olmayan (0) ve Aktif olan firmalar listelenecek.
-            UserTypes = "Kurumsal",
+            // Sadece Emlakçı (eski Kurumsal dahil), Danışman olmayan (0) ve Aktif olan firmalar listelenecek.
+            UserTypes = "Emlakçı",  // Not: Backend'de "Kurumsal" değeri de otomatik destekleniyor
             IsConsultant = "0",
             IsActive = "active"
             // ======================================

@@ -188,12 +188,13 @@
             <legend style="font-size:1.05rem; font-weight:600;">Üyelik Bilgileri</legend>
             <!-- User Type Selection -->
             <div class="form-group">
-                <label for="UserTypes">Kullanıcı Tipi Seçiniz <span class="required-star">*</span></label>
+                <label for="UserTypes">Kullanıcı Tipi <span class="required-star">*</span></label>
                 <select id="UserTypes" asp-for="UserTypes" class="form-control" required>
-                    <option value="Kurumsal">KURUMSAL GİRİŞ</option>
-                    <option value="Banka">BANKA GİRİŞ</option>
-                    <option value="İnşaat">İNŞAAT GİRİŞ</option>
-                    <option value="Vakıf">VAKIF GİRİŞ</option>
+                    <option value="">Seçiniz</option>
+                    <option value="Emlakçı" selected>Emlakçı</option>
+                    <option value="İnşaat">İnşaat Firması</option>
+                    <option value="Banka">Banka</option>
+                    <option value="Vakıf">Vakıf</option>
                 </select>
                 <span asp-validation-for="UserTypes" class="text-danger"></span>
             </div>
@@ -265,6 +266,7 @@
 
         <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
             <legend style="font-size:1.05rem; font-weight:600;">Firma Bilgileri</legend>
+            
             <!-- Şirket İsmi -->
             <div class="form-group">
                 <label for="CompanyName">Şirketinizin İsmi <span class="required-star">*</span></label>
@@ -275,18 +277,25 @@
 
         <fieldset style="border:1px solid #e0e0e0; padding:16px; border-radius:8px; margin-bottom:18px;">
             <legend style="font-size:1.05rem; font-weight:600;">Belgeler</legend>
+            
             <div class="form-group">
-                <label for="Level5Certificate">Lütfen Seviye 5 Belgesini Yükleyin <span class="required-star">*</span></label>
+                <label for="Level5Certificate" id="document1Label">
+                    <span id="document1Text">Lütfen belge yükleyiniz</span> <span class="required-star">*</span>
+                </label>
                 <input id="Level5Certificate" type="file" asp-for="Level5Certificate" class="form-control-file" accept="image/*,application/pdf" onchange="previewFile(this, 'preview1')" required />
                 <div id="preview1" class="preview-container"></div>
                 <span asp-validation-for="Level5Certificate" class="text-danger"></span>
+                <small class="form-text text-muted" id="document1Help">Önce kullanıcı tipi seçiniz</small>
             </div>
 
             <div class="form-group">
-                <label for="TaxPlate">Lütfen Vergi Levhanızı Yükleyin <span class="required-star">*</span></label>
+                <label for="TaxPlate" id="document2Label">
+                    Lütfen Vergi Levhanızı Yükleyin <span class="required-star">*</span>
+                </label>
                 <input id="TaxPlate" type="file" asp-for="TaxPlate" class="form-control-file" accept="image/*,application/pdf" onchange="previewFile(this, 'preview2')" required />
                 <div id="preview2" class="preview-container"></div>
                 <span asp-validation-for="TaxPlate" class="text-danger"></span>
+                <small class="form-text text-muted">Vergi levhası tüm kurumsal kullanıcılar için zorunludur</small>
             </div>
         </fieldset>
 
@@ -708,6 +717,43 @@
                     });
                 }
             });
+        });
+
+        // 🆕 UserTypes değişimi - Belge label'larını dinamik güncelle
+        $('#UserTypes').change(function () {
+            const userType = $(this).val();
+            const doc1Text = $('#document1Text');
+            const doc1Help = $('#document1Help');
+
+            // Kullanıcı tipine göre belge ismini değiştir
+            const documentLabels = {
+                'Emlakçı': {
+                    text: 'Lütfen Seviye 5 Belgesini Yükleyin',
+                    help: 'Emlak danışmanlığı için gerekli seviye 5 belgesi'
+                },
+                'İnşaat': {
+                    text: 'Lütfen Müteahhitlik Belgesini Yükleyin',
+                    help: 'İnşaat firması olarak gerekli müteahhitlik belgesi'
+                },
+                'Banka': {
+                    text: 'Lütfen İmza Sirküleri Belgesini Yükleyin',
+                    help: 'Banka kurumu için gerekli imza sirküleri belgesi'
+                },
+                'Vakıf': {
+                    text: 'Lütfen Vakıf Senedini Yükleyin',
+                    help: 'Vakıf kurumu için gerekli vakıf senedi belgesi'
+                }
+            };
+
+            if (userType && documentLabels[userType]) {
+                doc1Text.text(documentLabels[userType].text);
+                doc1Help.text(documentLabels[userType].help);
+                doc1Help.removeClass('text-warning').addClass('text-info');
+            } else {
+                doc1Text.text('Lütfen belge yükleyiniz');
+                doc1Help.text('Önce kullanıcı tipi seçiniz');
+                doc1Help.removeClass('text-info').addClass('text-warning');
+            }
         });
     });
 </script>

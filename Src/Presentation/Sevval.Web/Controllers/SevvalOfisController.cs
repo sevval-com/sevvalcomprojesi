@@ -29,14 +29,16 @@ namespace YourProjectNamespace.Controllers
         private readonly INetGsmService _netGsmService;
         private readonly IUserClientService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<SevvalOfisController> _logger;
 
-        public SevvalOfisController(IConfiguration configuration, ApplicationDbContext context, INetGsmService netGsmService, IUserClientService userService, UserManager<ApplicationUser> userManager)
+        public SevvalOfisController(IConfiguration configuration, ApplicationDbContext context, INetGsmService netGsmService, IUserClientService userService, UserManager<ApplicationUser> userManager, ILogger<SevvalOfisController> logger)
         {
             _configuration = configuration;
             _context = context;
             _netGsmService = netGsmService;
             _userService = userService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         private async Task<IActionResult> CheckUserAuthorization()
@@ -115,8 +117,8 @@ namespace YourProjectNamespace.Controllers
             // Tüm sorguları paralel olarak çalıştır
 
 
-            // "KURUMSAL GİRİŞ" ve "Bireysel" için sayıları al
-            var corporateCount = users.Where(x => x.UserTypes == "Kurumsal")?.Count() ?? 0;
+            // "Emlakçı" (ve eski "Kurumsal") ve "Bireysel" için sayıları al
+            var corporateCount = users.Where(x => x.UserTypes == "Emlakçı" || x.UserTypes == "Kurumsal")?.Count() ?? 0;
             var individualCount = users.Where(x => x.UserTypes == "Bireysel")?.Count() ?? 0;
             var bankCount = users.Where(x => x.UserTypes == "Banka")?.Count() ?? 0;
             var buildingCount = users.Where(x => x.UserTypes == "İnşaat")?.Count() ?? 0;
@@ -176,7 +178,7 @@ namespace YourProjectNamespace.Controllers
             return BadRequest(); // Hatalı yanıt
         }
 
-        public async Task<IActionResult> Uyelikler(string filter = "All", int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Uyelikler(string filter = "Emlakçı", int page = 1, int pageSize = 10)
         {
             var authorizationResult = await CheckUserAuthorization();
             if (authorizationResult != null) return authorizationResult;
@@ -185,8 +187,29 @@ namespace YourProjectNamespace.Controllers
             // Tüm kullanıcıları ve ilanları çekmek yerine, sadece ilgili olanları çekmek daha verimli olabilir
             // Bu örnekte tüm kullanıcıları ve ilanları çekmeye devam ediyoruz ancak Select ile iyileştirme yapıyoruz.
 
+            // 🆕 ConsultantInvitations'ı önceden yükle (Danışman-Firma ilişkisi için)
+            var consultantInvitations = await _context.ConsultantInvitations
+                .AsNoTracking()
+                .Where(ci => ci.Status == "Accepted")
+                .ToDictionaryAsync(ci => ci.Email, ci => ci.InvitedBy);
+
             // Tüm kullanıcıları al (filtreleme için)
             var allUsers = await _context.Users.AsNoTracking().ToListAsync();
+
+            // 🆕 Her kullanıcı için firma bilgisini belirle (Danışman ise bağlı olduğu firma)
+            foreach (var user in allUsers)
+            {
+                if (user.IsConsultant && consultantInvitations.ContainsKey(user.Email))
+                {
+                    var invitedById = consultantInvitations[user.Email];
+                    var companyOwner = allUsers.FirstOrDefault(u => u.Id == invitedById);
+                    if (companyOwner != null)
+                    {
+                        // Geçici olarak CompanyName'e firma sahibinin şirket adını yazıyoruz
+                        user.CompanyName = $"{companyOwner.CompanyName} (Danışman)";
+                    }
+                }
+            }
 
             // Sadece 'active' ilanları veritabanı seviyesinde filtrele
             var activeIlanlar = await _context.IlanBilgileri
@@ -208,6 +231,7 @@ namespace YourProjectNamespace.Controllers
             var filteredUsers = allUsers.Where(user =>
                 filter == "All" ||
                 (filter == "Bireysel" && user.UserTypes == "Bireysel") ||
+                (filter == "Emlakçı" && user.UserTypes == "Emlakçı") ||
                 (filter == "Kurumsal" && user.UserTypes == "Kurumsal") ||
                 (filter == "Vakıf" && user.UserTypes == "Vakıf") ||
                 (filter == "İnşaat" && user.UserTypes == "İnşaat") ||
@@ -243,6 +267,178 @@ namespace YourProjectNamespace.Controllers
             ViewBag.HasNextPage = page < totalPages;
             model.PageSize = pageSize;
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveUser(string userId)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+                }
+
+                user.IsActive = "active";
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    // Kullanıcıya onay maili gönder
+                    try
+                    {
+                        await SendApprovalEmail(user.Email, user.FirstName, user.LastName);
+                    }
+                    catch (Exception emailEx)
+                    {
+                        _logger.LogError(emailEx, "Onay maili gönderilemedi: {Email}", user.Email);
+                    }
+
+                    return Json(new { success = true, message = "Kullanıcı başarıyla onaylandı" });
+                }
+
+                return Json(new { success = false, message = "Kullanıcı onaylanırken hata oluştu" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ApproveUser hatası: {UserId}", userId);
+                return Json(new { success = false, message = "Bir hata oluştu" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkApprove(List<string> selectedIds)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                return Json(new { success = false, message = "Hiçbir kullanıcı seçilmedi" });
+            }
+
+            try
+            {
+                var users = await _context.Users
+                    .Where(u => selectedIds.Contains(u.Id) && u.IsActive == "passive")
+                    .ToListAsync();
+
+                if (!users.Any())
+                {
+                    return Json(new { success = false, message = "Onaylanacak bekleyen kullanıcı bulunamadı" });
+                }
+
+                int approvedCount = 0;
+                foreach (var user in users)
+                {
+                    user.IsActive = "active";
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        approvedCount++;
+                        // Email gönderimi opsiyonel
+                        try
+                        {
+                            await SendApprovalEmail(user.Email, user.FirstName, user.LastName);
+                        }
+                        catch (Exception emailEx)
+                        {
+                            _logger.LogError(emailEx, "Toplu onay maili gönderilemedi: {Email}", user.Email);
+                        }
+                    }
+                }
+
+                return Json(new { success = true, message = $"{approvedCount} kullanıcı başarıyla onaylandı" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "BulkApprove hatası");
+                return Json(new { success = false, message = "Bir hata oluştu" });
+            }
+        }
+
+        private async Task SendApprovalEmail(string toEmail, string firstName, string lastName)
+        {
+            var smtpConfig = _configuration.GetSection("EmailSettings");
+            var smtpServer = smtpConfig["SmtpServer"];
+            var smtpPort = int.Parse(smtpConfig["SmtpPort"]);
+            var smtpUser = smtpConfig["Username"];
+            var smtpPassword = smtpConfig["Password"];
+            var fromAddress = smtpConfig["FromAddress"];
+
+            var subject = "Üyeliğiniz Onaylandı - Şevval Emlak";
+            var body = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <h2 style='color: #0d6efd;'>Tebrikler {firstName} {lastName}!</h2>
+                    <p>Şevval Emlak üyeliğiniz başarıyla onaylanmıştır.</p>
+                    <p>Artık platformumuzdaki tüm özellikleri kullanabilirsiniz.</p>
+                    <p><a href='https://www.sevvalemlak.com' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Siteye Git</a></p>
+                    <br>
+                    <p>İyi günler dileriz,</p>
+                    <p><strong>Şevval Emlak Ekibi</strong></p>
+                </body>
+                </html>";
+
+            using var client = new SmtpClient(smtpServer, smtpPort)
+            {
+                Credentials = new NetworkCredential(smtpUser, smtpPassword),
+                EnableSsl = true
+            };
+
+            var mailMessage = new MailMessage(fromAddress, toEmail, subject, body)
+            {
+                IsBodyHtml = true
+            };
+
+            await client.SendMailAsync(mailMessage);
+        }
+
+        // 🆕 Üye İstatistikleri API (Modal için)
+        [HttpGet]
+        public async Task<IActionResult> GetMemberStats(string userId)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+                }
+
+                // İlan istatistiklerini hesapla
+                var userIlanlar = await _context.IlanBilgileri
+                    .AsNoTracking()
+                    .Where(i => i.Email == user.Email)
+                    .ToListAsync();
+
+                var stats = new
+                {
+                    userId = userId,
+                    fullName = $"{user.FirstName} {user.LastName}",
+                    email = user.Email,
+                    toplamIlanSayisi = userIlanlar.Count,
+                    fotografliIlanSayisi = userIlanlar.Count(i => !string.IsNullOrEmpty(i.ProfilePicture)),
+                    fotografsizIlanSayisi = userIlanlar.Count(i => string.IsNullOrEmpty(i.ProfilePicture)),
+                    videoluIlanSayisi = userIlanlar.Count(i => !string.IsNullOrEmpty(i.VideoLink)),
+                    videosuzIlanSayisi = userIlanlar.Count(i => string.IsNullOrEmpty(i.VideoLink)),
+                    sonIlanTarihi = userIlanlar.Any() ? userIlanlar.Max(i => i.GirisTarihi).ToString("dd.MM.yyyy HH:mm") : "Henüz ilan yok"
+                };
+
+                return Json(new { success = true, data = stats });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetMemberStats hatası: {UserId}", userId);
+                return Json(new { success = false, message = "İstatistikler yüklenirken hata oluştu" });
+            }
         }
 
         [HttpPost]
@@ -614,7 +810,7 @@ namespace YourProjectNamespace.Controllers
 
             var query = _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false);
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false);
 
             if (!string.IsNullOrEmpty(request.City))
             {
@@ -707,7 +903,7 @@ namespace YourProjectNamespace.Controllers
 
             var sehirler = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false)
                 .Select(u => u.City)
                 .Distinct()
                 .OrderBy(c => c)
@@ -715,7 +911,7 @@ namespace YourProjectNamespace.Controllers
 
             var ilceler = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false)
                 .Where(u => string.IsNullOrEmpty(request.City) || u.City == request.City)
                 .Select(u => u.District)
                 .Distinct()
@@ -785,7 +981,7 @@ namespace YourProjectNamespace.Controllers
 
             var districts = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false && u.City == city)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false && u.City == city)
                 .Select(u => u.District)
                 .Distinct()
                 .OrderBy(d => d)
@@ -803,7 +999,7 @@ namespace YourProjectNamespace.Controllers
         {
             var query = _context.Users
                 .AsNoTracking() // Sadece okunacağı için takip etmeyi kapat
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false);
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false);
 
             if (!string.IsNullOrEmpty(city))
             {

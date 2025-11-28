@@ -455,6 +455,54 @@ namespace Sevval.Infrastructure.Services
 
         public async Task<ApiResponse<CorporateRegisterCommandResponse>> CorporateRegister(CorporateRegisterCommandRequest request, CancellationToken cancellationToken)
         {
+            // 1. Email unique kontrolü (EN BAŞTA)
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız."
+                };
+            }
+
+            // 2. UserTypes validasyonu
+            var validUserTypes = new[] { "Emlakçı", "İnşaat", "Banka", "Vakıf", "Bireysel" };
+            if (string.IsNullOrWhiteSpace(request.UserTypes) || !validUserTypes.Contains(request.UserTypes))
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Geçersiz kullanıcı tipi. Emlakçı, İnşaat, Banka, Vakıf veya Bireysel olmalıdır."
+                };
+            }
+
+            // 3. Dosya kontrolü
+            if (request.Level5Certificate == null || request.Level5Certificate.Length == 0)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Belge dosyası zorunludur."
+                };
+            }
+
+            if (request.TaxPlate == null || request.TaxPlate.Length == 0)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Vergi Levhası zorunludur."
+                };
+            }
 
             var TaxPlate = Path.GetFileName(request.TaxPlate.FileName);
 
@@ -480,9 +528,13 @@ namespace Sevval.Infrastructure.Services
                 await request.Level5Certificate.CopyToAsync(stream);
             }
 
-            request.Level5CertificatePath = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + level5Cert;
+            // Use new flexible document fields
+            request.Document1Path = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + level5Cert;
+            request.Document2Path = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + TaxPlate;
 
-            request.TaxPlatePath = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + TaxPlate;
+            // Keep old fields for backward compatibility
+            request.Level5CertificatePath = request.Document1Path;
+            request.TaxPlatePath = request.Document2Path;
 
             if (request.ProfilePicture != null)
             {
@@ -540,19 +592,17 @@ namespace Sevval.Infrastructure.Services
                     Message = string.Join(", ", result.Errors.Select(a => a.Description).ToList())
                 };
             }
-            catch (Exception s)
+            catch (Exception ex)
             {
-
-
+                // Log the exception (eğer logger varsa kullanılabilir)
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 500,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz."
+                };
             }
-
-            return new ApiResponse<CorporateRegisterCommandResponse>
-            {
-                Code = 400,
-                Data = null,
-                IsSuccessfull = false,
-                Message = "Bir hata oluştu"
-            };
         }
 
         // Corporate Update Method
@@ -983,7 +1033,8 @@ namespace Sevval.Infrastructure.Services
             var defaultRoles = new[]
             {
             "Bireysel",
-            "Kurumsal",
+            "Emlakçı",   // 🆕 Yeni kurumsal kayıt sistemi
+            "Kurumsal",  // ⚠️ Geriye dönük uyumluluk için
             "İnşaat",
             "Vakıf",
             "Banka"

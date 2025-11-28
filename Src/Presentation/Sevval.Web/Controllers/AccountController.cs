@@ -69,13 +69,31 @@ public class AccountController : Controller
 
             if (user != null)
             {
+                // 🆕 PASSIVE ACCOUNT CHECK - Admin onayı bekleyen kullanıcılar giriş yapamaz
+                if (user.IsActive == "passive")
+                {
+                    ModelState.AddModelError(string.Empty, 
+                        "Hesabınız henüz onaylanmamış. Lütfen yönetici onayını bekleyiniz. " +
+                        "Onay sonrası e-posta ile bilgilendirileceksiniz.");
+                    _logger.LogWarning("Login engellendi: Kullanıcı ({Email}) passive durumda", model.Email);
+                    return View(model);
+                }
+                
                 // CHECK FOR DELETED ACCOUNT RECOVERY (30-day window)
                 // Handle ANY non-active account that has a DeletedAccounts record
                 if (user.IsActive != "active")
                 {
                     // Check if account was deleted (has DeletedAccounts record)
-                    var deletedAccount = await _context.DeletedAccounts
-                        .FirstOrDefaultAsync(d => d.UserId == user.Id);
+                    DeletedAccount? deletedAccount = null;
+                    try
+                    {
+                        deletedAccount = await _context.DeletedAccounts
+                            .FirstOrDefaultAsync(d => d.UserId == user.Id);
+                    }
+                    catch (Exception)
+                    {
+                        // DeletedAccounts tablosu henüz oluşturulmamış, devam et
+                    }
                     
                     if (deletedAccount != null)
                     {
@@ -375,6 +393,15 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
+            // ✅ KRİTİK GÜVENLİK: Unique email kontrolü
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız veya farklı bir e-posta kullanınız.");
+                _logger.LogWarning("Register: Email already exists - {Email}", model.Email);
+                return View(model);
+            }
+
             var response = await _userClientService.IndividualRegister(new IndividualRegisterCommandRequest
             {
                 Email = model.Email,
@@ -408,6 +435,15 @@ public class AccountController : Controller
             // ModelState hatalarını logla ve yönlendir
             _logger.LogWarning("SendEstateVerifyInfo: ModelState geçersiz. Hatalar: {Errors}", string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
             return View(model); // Hataları View'e geri gönder
+        }
+
+        // ✅ KRİTİK GÜVENLİK: Unique email kontrolü
+        var existingUser = await _userManager.FindByEmailAsync(model.Email);
+        if (existingUser != null)
+        {
+            ModelState.AddModelError("Email", "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız veya farklı bir e-posta kullanınız.");
+            _logger.LogWarning("EstateRegister: Email already exists - {Email}", model.Email);
+            return View(model);
         }
 
         var response = await _userClientService.CorporateRegister(new CorporateRegisterCommandRequest
@@ -1806,7 +1842,7 @@ public class AccountController : Controller
             // API üzerinden hesap silme işlemini tetikle
             try
             {
-                var deleteResult = await _userClientService.DeleteUser(userId);
+                var deleteResult = await _userClientService.DeleteUser(userId, model.Password, model.ConfirmationText);
 
                 if (deleteResult != null && deleteResult.IsSuccessfull)
                 {

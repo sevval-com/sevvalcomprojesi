@@ -19,6 +19,6 @@ namespace sevvalemlak.csproj.ClientServices.UserServices
         Task<ApiResponse<RejectEstateCommandResponse>> RejectEstate(RejectEstateCommandRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<SendNewCodeCommandResponse>> SendNewCode(SendNewCodeCommandRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<LoginWithSocialMediaCommandResponse>> SocialRegister(LoginWithSocialMediaCommandRequest request, CancellationToken cancellationToken);
-        Task<ApiResponse<DeleteUserCommandResponse>> DeleteUser(string userId);
+        Task<ApiResponse<DeleteUserCommandResponse>> DeleteUser(string userId, string password, string confirmationText);
     }
 }

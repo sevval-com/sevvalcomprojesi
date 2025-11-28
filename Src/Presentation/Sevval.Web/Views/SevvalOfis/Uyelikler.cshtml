@@ -130,7 +130,7 @@
 
         <!-- Main Content -->
         <div class="content p-4">
-            <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+            <button class="btn btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                 <i class="bi bi-list"></i>
             </button>
             <h1 class="display-5 fw-bold mb-4">Üyelikler</h1>
@@ -146,6 +146,18 @@
                             <input type="radio" class="btn-check" name="userType" value="Bireysel" id="bireysel" @(ViewBag.Filter == "Bireysel" ? "checked" : "") onchange="location.href='?filter=Bireysel&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="bireysel">Bireysel</label>
 
+                            <input type="radio" class="btn-check" name="userType" value="Emlakçı" id="emlakci" @(ViewBag.Filter == "Emlakçı" ? "checked" : "") onchange="location.href='?filter=Emlakçı&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="emlakci">Emlakçı</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="İnşaat" id="insaat" @(ViewBag.Filter == "İnşaat" ? "checked" : "") onchange="location.href='?filter=İnşaat&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="insaat">İnşaat</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="Banka" id="banka" @(ViewBag.Filter == "Banka" ? "checked" : "") onchange="location.href='?filter=Banka&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="banka">Banka</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="Vakıf" id="vakif" @(ViewBag.Filter == "Vakıf" ? "checked" : "") onchange="location.href='?filter=Vakıf&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="vakif">Vakıf</label>
+
                             <input type="radio" class="btn-check" name="userType" value="Kurumsal" id="kurumsal" @(ViewBag.Filter == "Kurumsal" ? "checked" : "") onchange="location.href='?filter=Kurumsal&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="kurumsal">Kurumsal</label>
 
@@ -160,7 +172,10 @@
                     <!-- Actions -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-primary" disabled onclick="confirmBulkDelete()">
+                            <button type="button" id="bulkApproveBtn" class="btn btn-success" disabled onclick="confirmBulkApprove()">
+                                <i class="bi bi-check-circle"></i> Seçilenleri Onayla
+                            </button>
+                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger ms-2" disabled onclick="confirmBulkDelete()">
                                 <i class="bi bi-trash"></i> Seçilenleri Sil
                             </button>
                             <span id="selectedCount" class="text-muted ms-2 small">0 kayıt seçildi</span>
@@ -181,6 +196,8 @@
                                         <th>Kullanıcı Adı</th>
                                         <th>E-Posta</th>
                                         <th>Tipi</th>
+                                        <th>Firma Adı</th>
+                                        <th>Durum</th>
                                         <th>Abonelik</th>
                                         <th>İşlemler</th>
                                     </tr>
@@ -191,12 +208,32 @@
                                     }
                                     @foreach (var user in Model.Users)
                                     {
-                                        <tr>
+                                        <tr id="user-row-@user.Id">
                                             <td><input type="checkbox" name="selectedIds" value="@user.Id" class="form-check-input row-checkbox" onchange="updateSelectedCount()"></td>
                                             <td>@index</td>
                                             <td>@user.FirstName @user.LastName</td>
                                             <td>@user.Email</td>
                                             <td><span class="badge bg-primary bg-opacity-10 text-primary">@user.UserTypes</span></td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(user.CompanyName))
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                                else
+                                                {
+                                                    @user.CompanyName
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (user.IsActive == "active")
+                                                {
+                                                    <span class="badge bg-success" id="status-badge-@user.Id">Onaylı</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark" id="status-badge-@user.Id">Beklemede</span>
+                                                }
+                                            </td>
                                             <td>
                                                 @if (user.IsSubscribed == "ücretli")
                                                 {
@@ -208,6 +245,16 @@
                                                 }
                                             </td>
                                             <td>
+                                                <!-- 🆕 Detay Butonu (İstatistik Modalı) -->
+                                                <button type="button" class="btn btn-info btn-sm me-1" onclick="showMemberStats('@user.Id')" title="İstatistikler">
+                                                    <i class="bi bi-graph-up"></i>
+                                                </button>
+                                                @if (user.IsActive == "passive")
+                                                {
+                                                    <button type="button" class="btn btn-success btn-sm me-1" onclick="approveUser('@user.Id')" id="approve-btn-@user.Id" title="Onayla">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                }
                                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditModal('@user.Id', '@user.FirstName', '@user.LastName', '@user.Email', '@user.UserTypes', '@user.CompanyName', '@user.IsSubscribed')">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
@@ -246,10 +293,64 @@
             const count = document.querySelectorAll('.row-checkbox:checked').length;
             document.getElementById('selectedCount').textContent = `${count} kayıt seçildi`;
             document.getElementById('bulkDeleteBtn').disabled = count === 0;
+            document.getElementById('bulkApproveBtn').disabled = count === 0;
             const selectAll = document.getElementById('selectAll');
             const total = document.querySelectorAll('.row-checkbox').length;
             selectAll.checked = count > 0 && count === total;
             selectAll.indeterminate = count > 0 && count < total;
+        }
+
+        function approveUser(userId) {
+            if (!confirm('Bu kullanıcıyı onaylamak istediğinizden emin misiniz?')) return;
+
+            $.ajax({
+                url: '@Url.Action("ApproveUser", "SevvalOfis")',
+                type: 'POST',
+                data: { userId: userId },
+                success: function(response) {
+                    if (response.success) {
+                        // Update badge
+                        const badge = $('#status-badge-' + userId);
+                        badge.removeClass('bg-warning text-dark').addClass('bg-success').text('Onaylı');
+                        
+                        // Hide approve button
+                        $('#approve-btn-' + userId).fadeOut();
+                        
+                        // Show success message
+                        alert(response.message);
+                    } else {
+                        alert('Hata: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
+        }
+
+        function confirmBulkApprove() {
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(c => c.value);
+            const count = selectedIds.length;
+            
+            if (!confirm(`${count} kullanıcıyı onaylamak istediğinizden emin misiniz?`)) return;
+
+            $.ajax({
+                url: '@Url.Action("BulkApprove", "SevvalOfis")',
+                type: 'POST',
+                data: { selectedIds: selectedIds },
+                traditional: true,
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
         }
 
         function confirmBulkDelete() {
@@ -282,6 +383,101 @@
             }
         }
         $('#editUserTypes').on('change', toggleEditCompanyFields);
+
+        // 🆕 Üye İstatistikleri Modalını Göster
+        function showMemberStats(userId) {
+            // Loading göster
+            $('#statsModalBody').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Yükleniyor...</span></div></div>');
+            new bootstrap.Modal(document.getElementById('memberStatsModal')).show();
+
+            // İstatistikleri getir
+            $.ajax({
+                url: '@Url.Action("GetMemberStats", "SevvalOfis")',
+                type: 'GET',
+                data: { userId: userId },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
+                        $('#statsModalBody').html(`
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h5 class="text-primary">${data.fullName}</h5>
+                                    <p class="text-muted mb-0">${data.email}</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-primary bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-primary mb-0">${data.toplamIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Toplam İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-success bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-success mb-0">${data.fotografliIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Fotoğraflı İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-warning bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-warning mb-0">${data.fotografsizIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Fotoğrafsız İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-info bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-info mb-0">${data.videoluIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Videolu İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="card bg-secondary bg-opacity-10 border-0">
+                                        <div class="card-body">
+                                            <p class="mb-1"><strong>Son İlan Tarihi:</strong></p>
+                                            <p class="text-muted mb-0">${data.sonIlanTarihi}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        $('#statsModalBody').html(`<div class="alert alert-danger">${response.message}</div>`);
+                    }
+                },
+                error: function() {
+                    $('#statsModalBody').html('<div class="alert alert-danger">İstatistikler yüklenirken hata oluştu.</div>');
+                }
+            });
+        }
     </script>
+
+    <!-- 🆕 Üye İstatistikleri Modalı -->
+    <div class="modal fade" id="memberStatsModal" tabindex="-1" aria-labelledby="memberStatsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberStatsModalLabel">
+                        <i class="bi bi-graph-up me-2"></i>Üye İstatistikleri
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="statsModalBody">
+                    <!-- İstatistikler buraya yüklenecek -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

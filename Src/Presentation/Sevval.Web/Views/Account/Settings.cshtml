@@ -406,7 +406,7 @@
                                                     <div class="form-text mt-2">Önerilen boyut: 1220 x 240 piksel</div>
                                                 </div>
                                             </div>
-                                            @if (Model.UserTypes == "KURUMSAL GIRIŞ")
+                                            @if (Model.UserTypes == "KURUMSAL GIRIŞ" || Model.UserTypes == "Emlakçı" || Model.UserTypes == "İnşaat" || Model.UserTypes == "Banka" || Model.UserTypes == "Vakıf")
                                             {
                                                 <div class="mb-3" style="display: none;">
                                                     <label asp-for="CompanyName" class="form-label">Firma Adı</label>
@@ -454,7 +454,7 @@
                                         </form>
                                     </div>
                                 }
-                                else if (Model.UserTypes == "KURUMSAL GIRIŞ")
+                                else if (Model.UserTypes == "KURUMSAL GIRIŞ" || Model.UserTypes == "Emlakçı" || Model.UserTypes == "İnşaat" || Model.UserTypes == "Banka" || Model.UserTypes == "Vakıf")
                                 {
                                     <div id="membershipChangeForm">
                                         <div class="alert alert-info">Kurumsal üyelikten bireysel üyeliğe geçiş yapmak istediğinizi onaylayın.</div>
