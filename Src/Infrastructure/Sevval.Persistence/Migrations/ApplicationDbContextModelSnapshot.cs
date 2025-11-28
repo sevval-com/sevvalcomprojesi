@@ -696,6 +696,10 @@ namespace Sevval.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RecoveryToken")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -704,6 +708,8 @@ namespace Sevval.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DeletedAt");
+
+                    b.HasIndex("RecoveryToken");
 
                     b.HasIndex("UserId");
 

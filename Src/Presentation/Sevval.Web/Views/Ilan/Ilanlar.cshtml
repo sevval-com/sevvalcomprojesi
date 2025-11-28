@@ -14,9 +14,6 @@
     Layout = null; // Layout kullanılmıyor
 }
 
-
-
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -37,7 +34,7 @@
 </head>
 <body>
 
-    <!-- Navbar - Bu kısım isteğiniz üzerine değiştirilmemiştir -->
+    <!-- Navbar -->
     <nav class="navbaar">
         <div class="navbaar-container">
             <div class="logo">
@@ -58,7 +55,7 @@
                     <a href="@Url.Action("About", "Home")">Hakkımızda</a>
                 </li>
                 <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
-                
+
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
                     <li>
@@ -80,7 +77,7 @@
                                 <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
                                 <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                                 <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                                
+
                                 <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
                                 <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
                                 @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
@@ -297,6 +294,14 @@
                 object-fit: cover;
             }
 
+        /* Ada/Parsel Badges */
+        .badge-info-light {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #bbdefb;
+            font-weight: 500;
+        }
+
         /* Mobile Specific Styles */
         @@media (max-width: 767.98px) {
             .ilan-kart .row {
@@ -359,11 +364,11 @@
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action active" aria-current="true">İlanlar</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
-                                
+
                                 <a href="@Url.Action("Settings", "Account")" class="list-group-item list-group-item-action">Ayarlar</a>
                                 <a href="@Url.Action("Index", "Satinal")" class="list-group-item list-group-item-action">Satın Al</a>
-                                
-                              
+
+
                                 @if (User.Identity.IsAuthenticated && (new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" }).Contains(User.Identity.Name, StringComparer.OrdinalIgnoreCase))
                                 {
                                     <a href="@Url.Action("Index", "SevvalOfis")" class="list-group-item list-group-item-action">Şevval Ofis</a>
@@ -467,17 +472,47 @@
                                     <div class="card-body d-flex flex-column">
                                         <div class="flex-grow-1">
                                             <h5 class="card-title text-primary fw-bold mb-1">@ilan.Title</h5>
-                                            <p class="card-text text-muted small mb-2">@ilan.sehir / @ilan.semt / @ilan.mahalleKoy</p>
 
-                                            <div id="price-container-@ilan.Id" class="mb-2">
-                                                <span class="text-danger fs-5 fw-bold" id="price-text-@ilan.Id">@ilan.Price.ToString("N0") TL</span>
-                                                <input type="number" id="price-input-@ilan.Id" class="form-control d-none w-50" value="@ilan.Price" />
-                                                <i class="fa fa-edit ms-2 edit-price" data-id="@ilan.Id" style="color: #007bff; cursor: pointer;"></i>
-                                                <i class="fa fa-check ms-2 d-none save-price" data-id="@ilan.Id" style="color: #28a745; cursor: pointer;"></i>
-                                                <i class="fa fa-times ms-2 d-none cancel-price" data-id="@ilan.Id" style="color: #dc3545; cursor: pointer;"></i>
+                                            <!-- Konum Bilgisi -->
+                                            <p class="card-text text-muted small mb-2 text-truncate">
+                                                <i class="bi bi-geo-alt-fill me-1"></i>@ilan.sehir / @ilan.semt / @ilan.mahalleKoy
+                                            </p>
+
+                                            <!-- YENİ EKLENEN KISIM: ADA VE PARSEL BİLGİLERİ -->
+                                            @if (!string.IsNullOrEmpty(ilan.AdaNo) || !string.IsNullOrEmpty(ilan.ParselNo))
+                                            {
+                                                <div class="mb-2 d-flex flex-wrap gap-2">
+                                                    @if (!string.IsNullOrEmpty(ilan.AdaNo))
+                                                    {
+                                                        <span class="badge badge-info-light">
+                                                            <i class="bi bi-grid-3x3 me-1"></i>Ada: @ilan.AdaNo
+                                                        </span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(ilan.ParselNo))
+                                                    {
+                                                        <span class="badge badge-info-light">
+                                                            <i class="bi bi-geo me-1"></i>Parsel: @ilan.ParselNo
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
+                                            <!-- ADA PARSEL SONU -->
+                                            <!-- Fiyat Bölümü -->
+                                            <div id="price-container-@ilan.Id" class="mb-2 d-flex align-items-center">
+                                                <span class="text-danger fs-5 fw-bold me-2" id="price-text-@ilan.Id">@ilan.Price.ToString("N0") TL</span>
+                                                <input type="number" id="price-input-@ilan.Id" class="form-control d-none w-50 me-2" value="@ilan.Price" />
+
+                                                <div class="action-icons">
+                                                    <i class="fa fa-edit edit-price fs-5" data-id="@ilan.Id" style="color: #007bff; cursor: pointer;" title="Fiyatı Düzenle"></i>
+                                                    <i class="fa fa-check d-none save-price fs-5 me-2" data-id="@ilan.Id" style="color: #28a745; cursor: pointer;" title="Kaydet"></i>
+                                                    <i class="fa fa-times d-none cancel-price fs-5" data-id="@ilan.Id" style="color: #dc3545; cursor: pointer;" title="İptal"></i>
+                                                </div>
                                             </div>
 
-                                            <p class="small text-muted mb-2">İlan No: @ilan.Id | Giriş: @ilan.GirisTarihi.ToString("dd.MM.yyyy HH:mm")</p>
+                                            <p class="small text-muted mb-2">
+                                                <strong>İlan No:</strong> @ilan.Id <span class="mx-1">|</span>
+                                                <strong>Giriş:</strong> @ilan.GirisTarihi.ToString("dd.MM.yyyy HH:mm")
+                                            </p>
 
                                             @if (!string.IsNullOrEmpty(ilan.PatronunNotu))
                                             {
@@ -875,5 +910,3 @@
     </script>
 </body>
 </html>
-"
-
