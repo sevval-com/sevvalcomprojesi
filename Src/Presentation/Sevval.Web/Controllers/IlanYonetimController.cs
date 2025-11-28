@@ -5,6 +5,10 @@ using Sevval.Domain.Entities;
 using Sevval.Persistence.Context;
 using sevvalemlak.Dto;
 using System.Security.Claims;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace sevvalemlak.Controllers
 {
@@ -19,6 +23,7 @@ namespace sevvalemlak.Controllers
             _userManager = userManager;
         }
 
+        // Yetki kontrolü (Orijinal koddan korundu)
         private async Task<IActionResult> CheckUserAuthorization()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -55,35 +60,29 @@ namespace sevvalemlak.Controllers
 
                 return new ContentResult
                 {
-                    ContentType = "text/html; charset=utf-8", // Karakter kodlaması eklendi
+                    ContentType = "text/html; charset=utf-8",
                     StatusCode = 403,
-                    Content = @"
-                        <!DOCTYPE html>
-                        <html lang='tr'>
-                            <head>
-                                <meta charset='UTF-8'>
-                                <title>Yetkisiz Erişim</title>
-                                <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css' rel='stylesheet'>
-                            </head>
-                            <body class='d-flex align-items-center justify-content-center vh-100 bg-light'>
-                                <div class='text-center'>
-                                    <h1 class='display-1 fw-bold text-primary'>403</h1>
-                                    <p class='fs-3'> <span class='text-danger'>Erişim Reddedildi!</span></p>
-                                    <p class='lead'>
-                                        Bu sayfayı görüntüleme yetkiniz yok.
-                                    </p>
-                                    <a href='/' class='btn btn-primary'>Ana Sayfaya Dön</a>
-                                </div>
-                            </body>
-                        </html>"
+                    Content = @"<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Yetkisiz Erişim</title><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css' rel='stylesheet'></head><body class='d-flex align-items-center justify-content-center vh-100 bg-light'><div class='text-center'><h1 class='display-1 fw-bold text-primary'>403</h1><p class='fs-3'> <span class='text-danger'>Erişim Reddedildi!</span></p><p class='lead'>Bu sayfayı görüntüleme yetkiniz yok.</p><a href='/' class='btn btn-primary'>Ana Sayfaya Dön</a></div></body></html>"
                 };
             }
 
             return null;
         }
 
-
-        public async Task<IActionResult> Index(string ilanNo, string firmaId, string danismanEmail, string sehir, string ilce, string ilanSahibiArama, int page = 1)
+        public async Task<IActionResult> Index(
+            string ilanNo,
+            string firmaId,
+            string danismanEmail,
+            string sehir,
+            string ilce,
+            string mahalle, // Yeni
+            string ilanSahibiArama,
+            string baslikArama, // Yeni
+            decimal? minFiyat, // Yeni
+            decimal? maxFiyat, // Yeni
+            double? minMetrekare, // Yeni
+            double? maxMetrekare, // Yeni
+            int page = 1)
         {
             var authorizationResult = await CheckUserAuthorization();
             if (authorizationResult != null) return authorizationResult;
@@ -91,47 +90,93 @@ namespace sevvalemlak.Controllers
             int pageSize = 20;
             var query = _context.IlanBilgileri.AsNoTracking();
 
-            // Filtreleme
+            // --- FİLTRELEME İŞLEMLERİ ---
+
+            // 1. İlan No
             if (!string.IsNullOrEmpty(ilanNo) && int.TryParse(ilanNo, out int id))
             {
                 query = query.Where(i => i.Id == id);
             }
+
+            // 2. Başlık Arama (SQLite Case-Insensitive Çözümü)
+            // SQLite'da ToLower() kullanarak karşılaştırma yapıyoruz.
+            if (!string.IsNullOrEmpty(baslikArama))
+            {
+                string aranan = baslikArama.ToLower();
+                query = query.Where(i => i.Title.ToLower().Contains(aranan));
+            }
+
+            // 3. Konum Filtreleri
             if (!string.IsNullOrEmpty(sehir))
             {
-                query = query.Where(i => i.sehir.Contains(sehir));
+                query = query.Where(i => i.sehir == sehir);
             }
             if (!string.IsNullOrEmpty(ilce))
             {
-                query = query.Where(i => i.semt.Contains(ilce));
+                query = query.Where(i => i.semt == ilce);
             }
+            if (!string.IsNullOrEmpty(mahalle))
+            {
+                query = query.Where(i => i.mahalleKoy == mahalle);
+            }
+
+            // 4. Fiyat Aralığı
+            if (minFiyat.HasValue)
+            {
+                query = query.Where(i => i.Price >= minFiyat.Value);
+            }
+            if (maxFiyat.HasValue)
+            {
+                query = query.Where(i => i.Price <= maxFiyat.Value);
+            }
+
+            // 5. Metrekare Aralığı
+            if (minMetrekare.HasValue)
+            {
+                query = query.Where(i => i.Area >= minMetrekare.Value);
+            }
+            if (maxMetrekare.HasValue)
+            {
+                query = query.Where(i => i.Area <= maxMetrekare.Value);
+            }
+
+            // 6. Danışman Filtresi
             if (!string.IsNullOrEmpty(danismanEmail))
             {
                 query = query.Where(i => i.Email == danismanEmail);
             }
 
-            // Firma ve İlan Sahibi için daha karmaşık filtreleme
+            // 7. Firma ve İlan Sahibi Arama (Orijinal Mantık + Case Insensitive)
             if (!string.IsNullOrEmpty(firmaId) || !string.IsNullOrEmpty(ilanSahibiArama))
             {
                 var userQuery = _context.Users.AsNoTracking();
 
                 if (!string.IsNullOrEmpty(ilanSahibiArama))
                 {
-                    userQuery = userQuery.Where(u => (u.FirstName + " " + u.LastName).Contains(ilanSahibiArama) || u.CompanyName.Contains(ilanSahibiArama));
+                    string arananSahip = ilanSahibiArama.ToLower();
+                    // İsim Soyisim veya Şirket Adı içinde arama
+                    userQuery = userQuery.Where(u =>
+                        (u.FirstName + " " + u.LastName).ToLower().Contains(arananSahip) ||
+                        u.CompanyName.ToLower().Contains(arananSahip));
                 }
 
                 if (!string.IsNullOrEmpty(firmaId))
                 {
+                    // Seçilen firma ID'si kendisi olabilir veya bu firma tarafından davet edilmiş bir danışman olabilir
                     userQuery = userQuery.Where(u => u.Id == firmaId || _context.ConsultantInvitations.Any(ci => ci.Email == u.Email && ci.InvitedBy == firmaId));
                 }
 
+                // Filtrelenen kullanıcıların e-postalarını alıp ilanları buna göre filtreliyoruz
                 var filteredUserEmails = await userQuery.Select(u => u.Email).ToListAsync();
                 query = query.Where(i => filteredUserEmails.Contains(i.Email));
             }
 
 
+            // --- VERİ ÇEKME VE SAYFALAMA ---
             var totalCount = await query.CountAsync();
             var ilanlarRaw = await query.OrderByDescending(i => i.Id).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            // İlişkili verileri (Fotoğraf, Kullanıcı, Firma Bilgisi) toplu çekme
             var ilanIds = ilanlarRaw.Select(i => i.Id).ToList();
             var ilanEmails = ilanlarRaw.Select(i => i.Email).Distinct().ToList();
 
@@ -145,6 +190,7 @@ namespace sevvalemlak.Controllers
                 .Where(u => ilanEmails.Contains(u.Email))
                 .ToDictionaryAsync(u => u.Email);
 
+            // Danışmanların bağlı olduğu firmaları bulma
             var danismanFirmaMap = await _context.ConsultantInvitations.AsNoTracking()
                 .Where(ci => ilanEmails.Contains(ci.Email))
                 .Join(_context.Users.AsNoTracking(), ci => ci.InvitedBy, owner => owner.Id, (ci, owner) => new { ci.Email, owner.CompanyName })
@@ -158,6 +204,7 @@ namespace sevvalemlak.Controllers
                 string firmaAdi = null;
                 if (sahip != null)
                 {
+                    // Eğer kullanıcı danışmansa, davet eden firmanın adını al, değilse kendi şirket adını kullan
                     firmaAdi = sahip.IsConsultant ? danismanFirmaMap.GetValueOrDefault(sahip.Email) : sahip.CompanyName;
                 }
 
@@ -165,7 +212,7 @@ namespace sevvalemlak.Controllers
                 {
                     Ilan = ilan,
                     IlanSahibi = sahip,
-                    FirmaAdi = firmaAdi ?? "Bilinmiyor",
+                    FirmaAdi = firmaAdi ?? "Bireysel / Bilinmiyor",
                     VitrinFotografi = fotograflar.GetValueOrDefault(ilan.Id)
                 });
             }
@@ -175,20 +222,31 @@ namespace sevvalemlak.Controllers
                 Ilanlar = ilanlarList,
                 Firmalar = await _context.Users.AsNoTracking().Where(u => !u.IsConsultant).ToListAsync(),
                 Danismanlar = await _context.Users.AsNoTracking().ToListAsync(),
+
+                // Form verilerini view'a geri taşıyoruz
                 IlanNo = ilanNo,
                 FirmaId = firmaId,
                 DanismanEmail = danismanEmail,
                 Sehir = sehir,
                 Ilce = ilce,
+                Mahalle = mahalle,
                 IlanSahibiArama = ilanSahibiArama,
+                BaslikArama = baslikArama,
+                MinFiyat = minFiyat,
+                MaxFiyat = maxFiyat,
+                MinMetrekare = minMetrekare,
+                MaxMetrekare = maxMetrekare,
+
                 CurrentPage = page,
                 PageSize = pageSize,
                 TotalCount = totalCount,
-                TotalPages = (int)System.Math.Ceiling(totalCount / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
             };
 
             return View(model);
         }
+
+        // --- YARDIMCI METOTLAR (Orijinal koddan korundu) ---
 
         [HttpGet]
         public async Task<IActionResult> GetFirmalar()
@@ -237,18 +295,13 @@ namespace sevvalemlak.Controllers
             ilan.LastActionDate = System.DateTime.Now;
 
             await _context.SaveChangesAsync();
-
             return Json(new { success = true, message = "İlan başarıyla atandı." });
         }
 
         [HttpPost]
         public async Task<IActionResult> Sil(int ilanId)
         {
-            if (ilanId <= 0)
-            {
-                return Json(new { success = false, message = "Geçersiz İlan ID." });
-            }
-
+            if (ilanId <= 0) return Json(new { success = false, message = "Geçersiz İlan ID." });
             try
             {
                 var ilan = await _context.IlanBilgileri.FirstOrDefaultAsync(i => i.Id == ilanId);
@@ -260,7 +313,7 @@ namespace sevvalemlak.Controllers
                 }
                 return Json(new { success = false, message = "Silinecek ilan bulunamadı." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "İlan silinirken bir hata oluştu." });
             }
@@ -269,11 +322,7 @@ namespace sevvalemlak.Controllers
         [HttpPost]
         public async Task<IActionResult> TopluSil([FromForm] List<int> ilanIds)
         {
-            if (ilanIds == null || !ilanIds.Any())
-            {
-                return Json(new { success = false, message = "Silinecek ilan seçilmedi." });
-            }
-
+            if (ilanIds == null || !ilanIds.Any()) return Json(new { success = false, message = "Silinecek ilan seçilmedi." });
             try
             {
                 var ilanlar = await _context.IlanBilgileri.Where(i => ilanIds.Contains(i.Id)).ToListAsync();
@@ -281,19 +330,16 @@ namespace sevvalemlak.Controllers
                 {
                     var photos = await _context.Photos.Where(p => ilanIds.Contains(p.IlanId)).ToListAsync();
                     var videos = await _context.Videos.Where(v => ilanIds.Contains(v.IlanId)).ToListAsync();
-
                     if (photos.Any()) _context.Photos.RemoveRange(photos);
                     if (videos.Any()) _context.Videos.RemoveRange(videos);
-
                     _context.IlanBilgileri.RemoveRange(ilanlar);
                     await _context.SaveChangesAsync();
                     return Json(new { success = true, message = $"{ilanlar.Count} adet ilan başarıyla silindi." });
                 }
                 return Json(new { success = false, message = "Silinecek ilan bulunamadı." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Hata loglanabilir
                 return Json(new { success = false, message = "İlanlar silinirken bir hata oluştu." });
             }
         }
@@ -301,21 +347,12 @@ namespace sevvalemlak.Controllers
         [HttpPost]
         public async Task<IActionResult> TopluAta([FromForm] List<int> ilanIds, [FromForm] string danismanEmail)
         {
-            if (ilanIds == null || !ilanIds.Any() || string.IsNullOrEmpty(danismanEmail))
-            {
-                return Json(new { success = false, message = "Gerekli bilgiler eksik: İlan ID'leri veya danışman email'i belirtilmemiş." });
-            }
-
+            if (ilanIds == null || !ilanIds.Any() || string.IsNullOrEmpty(danismanEmail)) return Json(new { success = false, message = "Gerekli bilgiler eksik." });
             try
             {
                 var danisman = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == danismanEmail);
-                if (danisman == null)
-                {
-                    return Json(new { success = false, message = "Danışman bulunamadı." });
-                }
-
+                if (danisman == null) return Json(new { success = false, message = "Danışman bulunamadı." });
                 var ilanlar = await _context.IlanBilgileri.Where(i => ilanIds.Contains(i.Id)).ToListAsync();
-
                 foreach (var ilan in ilanlar)
                 {
                     ilan.Email = danisman.Email;
@@ -324,18 +361,14 @@ namespace sevvalemlak.Controllers
                     ilan.PhoneNumber = danisman.PhoneNumber;
                     ilan.LastActionDate = DateTime.Now;
                 }
-
                 _context.IlanBilgileri.UpdateRange(ilanlar);
                 await _context.SaveChangesAsync();
-
                 return Json(new { success = true, message = $"{ilanlar.Count} adet ilan başarıyla '{danisman.FirstName} {danisman.LastName}' adlı danışmana atandı." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Hata loglanabilir
                 return Json(new { success = false, message = "İlanlar atanırken bir hata oluştu." });
             }
         }
     }
 }
-
