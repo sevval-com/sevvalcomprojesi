@@ -594,7 +594,8 @@ namespace Sevval.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                // Log the exception (eğer logger varsa kullanılabilir)
+                // TODO: Add proper logging here (ILogger<UserService>)
+                // Console.WriteLine($"Corporate registration error: {ex.Message}");
                 return new ApiResponse<CorporateRegisterCommandResponse>
                 {
                     Code = 500,

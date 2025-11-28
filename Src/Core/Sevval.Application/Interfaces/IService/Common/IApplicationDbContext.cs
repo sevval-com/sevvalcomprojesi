@@ -14,7 +14,8 @@ public interface IApplicationDbContext
     DbSet<Country> Countries { get; }
     DbSet<District> Districts { get; }
     DbSet<ForgettenPassword> ForgettenPasswords { get;  }
-    public DbSet<ApplicationUser> Users { get;  }
+    DbSet<ApplicationUser> Users { get;  }
+    DbSet<IlanModel> IlanBilgileri { get; }
    
 
     #endregion
