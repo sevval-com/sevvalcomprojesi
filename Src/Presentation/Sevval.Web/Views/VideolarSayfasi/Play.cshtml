@@ -75,7 +75,7 @@
                 <div class="bg-white rounded-2xl shadow-md p-5">
                     <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-tight clamp-2 break-anywhere">@Model.Video.VideoAdi</h1>
                     <!-- Açıklama: Başlığın hemen altında -->
-                    <div id="description-box" class="text-slate-600 text-sm mt-2 prose prose-sm max-w-none relative max-h-14 overflow-hidden transition-all duration-300">
+                    <div id="description-box" class="text-slate-600 text-sm mt-2 prose prose-sm max-w-none relative max-h-24 overflow-hidden transition-all duration-300">
                         @FormatDescription(Model.Video.VideoAciklamasi)
                     </div>
                     <button id="description-toggler" class="text-blue-600 font-semibold text-sm mt-1 hover:underline">daha fazla</button>
@@ -352,11 +352,11 @@
             const descToggler = document.getElementById('description-toggler');
             if(descBox && descToggler && descBox.scrollHeight > descBox.clientHeight) {
                 descToggler.addEventListener('click', () => {
-                    if(descBox.classList.contains('max-h-14')) {
-                        descBox.classList.remove('max-h-14');
+                    if(descBox.classList.contains('max-h-24')) {
+                        descBox.classList.remove('max-h-24');
                         descToggler.textContent = 'daha az';
                     } else {
-                        descBox.classList.add('max-h-14');
+                        descBox.classList.add('max-h-24');
                         descToggler.textContent = 'daha fazla';
                     }
                 });
