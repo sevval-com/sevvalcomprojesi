@@ -1359,11 +1359,13 @@ public class IlanController : Controller
             return RedirectToRoutePermanent("IlanDetaySeo", new { id = id, slug = expectedSlug });
         }
 
-        // Görüntülenme sayısı kontrolü
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-        var sessionKey = $"{ipAddress}_{id}_{DateTime.Today:yyyy-MM-dd}";
+        // Görüntülenme sayısı kontrolü - IP bazlı cookie ile 24 saatte bir sayım
+        string userIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        userIpAddress = userIpAddress.Replace(":", "_").Replace(".", "_");
+        var ipAddressKey = $"IP_{userIpAddress}_{id}";
 
-       // if (!string.IsNullOrEmpty(ipAddress) && HttpContext.Session.GetString(sessionKey) == null)
+        // Cookie kontrolü - 24 saat içinde aynı IP tekrar sayılmaz
+        if (HttpContext.Request.Cookies[ipAddressKey] == null)
         {
             var ilanToUpdate = await _context.IlanBilgileri.FindAsync(id);
             if (ilanToUpdate != null)
@@ -1372,38 +1374,20 @@ public class IlanController : Controller
                 ilanToUpdate.GoruntulenmeTarihi = DateTime.Now;
                 _context.IlanBilgileri.Update(ilanToUpdate);
                 await _context.SaveChangesAsync();
+
+                // İlan sayısını view'daki modele de yansıt
+                ilanData.Ilan.GoruntulenmeSayisi = ilanToUpdate.GoruntulenmeSayisi;
             }
 
-            // Detay sayfasında gösterilecek toplam görüntülenmeyi (ilan + günün ilanı) hesapla
-            try
+            // 24 saat süreyle cookie ekle (aynı kullanıcı 24 saat sonra tekrar sayılacak)
+            CookieOptions cookieOptions = new CookieOptions
             {
-                var today = DateTime.Today;
-                // Önce bugüne ait featured kayıt var mı?
-                var featured = await _context.GununIlanlari
-                    .AsNoTracking()
-                    .Where(g => g.Id == id && g.YayinlanmaTarihi.Date == today)
-                    .OrderByDescending(g => g.YayinlanmaTarihi)
-                    .FirstOrDefaultAsync();
-
-                // Yoksa bu ilana ait en son featured kaydına düş
-                if (featured == null)
-                {
-                    featured = await _context.GununIlanlari
-                        .AsNoTracking()
-                        .Where(g => g.Id == id)
-                        .OrderByDescending(g => g.YayinlanmaTarihi)
-                        .FirstOrDefaultAsync();
-                }
-
-                if (featured != null)
-                {
-                    var baseViews = ilanData.Ilan.GoruntulenmeSayisi;
-                    ilanData.Ilan.GoruntulenmeSayisi = (baseViews) + (featured.GoruntulenmeSayisi);
-                }
-            }
-            catch { }
-
-           // HttpContext.Session.SetString(sessionKey, "visited");
+                Expires = DateTime.Now.AddDays(1),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax
+            };
+            Response.Cookies.Append(ipAddressKey, "1", cookieOptions);
         }
 
         var otherIlanlar = await _context.IlanBilgileri.AsNoTracking()

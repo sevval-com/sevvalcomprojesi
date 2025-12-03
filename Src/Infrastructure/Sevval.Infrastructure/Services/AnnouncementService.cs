@@ -304,7 +304,8 @@ public class AnnouncementService : IAnnouncementService
         response.ParselNo = selectedAnnouncement.ParselNo;
         response.NetMetrekare = selectedAnnouncement.NetMetrekare;
 
-        // If this ilan is featured today, add daily featured extra view count
+        // Web ile tutarlılık için: Sadece GununIlanlari tablosundan görüntülenme sayısı
+        // Web'de GetDailyOfferViewCount() aynı mantığı kullanıyor (tek kaynak: GununIlanlari)
         try
         {
             var today2 = DateTime.Today;
@@ -312,11 +313,19 @@ public class AnnouncementService : IAnnouncementService
                 .Where(g => g.YayinlanmaTarihi.Date == today2 && g.Id == selectedAnnouncement.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            // Eğer bugün için featured kayıt yoksa, en son featured kaydına düş
+            if (featuredCounter == null)
+            {
+                featuredCounter = await _readGununIlanRepository.Queryable()
+                    .Where(g => g.Id == selectedAnnouncement.Id)
+                    .OrderByDescending(g => g.YayinlanmaTarihi)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            // Sadece GununIlanlari tablosundaki sayıyı kullan (web ile aynı)
             if (featuredCounter != null)
             {
-                var baseViews = selectedAnnouncement.GoruntulenmeSayisi;
-                var extraViews = featuredCounter.GoruntulenmeSayisi;
-                response.GoruntulenmeSayisi = (baseViews) + (extraViews);
+                response.GoruntulenmeSayisi = featuredCounter.GoruntulenmeSayisi;
             }
         }
         catch { }

@@ -9,6 +9,20 @@ public class ApplicationUser : IdentityUser
 {
     public int UserOrder { get; set; }
 
+    /// <summary>
+    /// Formatlanmış Firma No döndürür (K-0001, B-0001 formatında)
+    /// </summary>
+    [NotMapped]
+    public string FormattedFirmaNo
+    {
+        get
+        {
+            if (UserOrder == 0) return "Atanmadı";
+            var prefix = UserTypes == "Bireysel" ? "B" : "K";
+            return $"{prefix}-{UserOrder:D4}";
+        }
+    }
+
     [Required]
     public string FirstName { get; set; } = string.Empty;
 

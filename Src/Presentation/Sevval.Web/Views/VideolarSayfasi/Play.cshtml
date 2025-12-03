@@ -33,10 +33,10 @@
     }
 </style>
 <div class="bg-slate-100 font-sans">
-    <div class="container mx-auto max-w-screen-2xl px-4 lg:px-8 py-8">
-    <div class="w-full lg:w-[68%] mb-2">
-                <nav class="text-sm text-slate-600" aria-label="Breadcrumb">
-                    <ol class="flex flex-wrap items-center gap-2">
+    <div class="container mx-auto max-w-screen-2xl px-2 sm:px-4 lg:px-8 py-2 sm:py-4 lg:py-8">
+    <div class="w-full lg:w-[68%] mb-2 px-2 sm:px-0">
+                <nav class="text-xs sm:text-sm text-slate-600" aria-label="Breadcrumb">
+                    <ol class="flex flex-wrap items-center gap-1 sm:gap-2">
                         <li>
                             <a href="@Url.Action("Index","Home")" class="hover:text-blue-600">Ana sayfa</a>
                         </li>
@@ -53,47 +53,56 @@
                     </ol>
                 </nav>
             </div>
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row gap-3 lg:gap-6">
             <!-- Breadcrumb -->
             
             <!-- Ana İçerik Alanı -->
             <div class="w-full lg:w-[68%]">
-                <!-- Video Oynatıcı -->
-                <div class="aspect-w-16 bg-black rounded-2xl shadow-lg mb-4">
-                    @if (Model.Video.IsYouTube)
-                    {
-                        <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="@Model.Video.VideoYolu"></div>
-                    }
-                    else
-                    {
-                        <video id="player" playsinline webkit-playsinline x5-playsinline controls class="w-full h-full object-cover" poster="@Url.Content(Model.Video.KapakFotografiYolu ?? string.Empty)" preload="metadata">
-                            <source src="@Url.Content(Model.Video.VideoYolu)" type="video/mp4">
-                        </video>
-                    }
+                <!-- Video Oynatıcı - YouTube Tarzı 16:9 Çerçeve -->
+                <div class="relative w-full rounded-none sm:rounded-2xl shadow-lg mb-2 sm:mb-4 overflow-hidden">
+                    <!-- Video container -->
+                    <div class="relative w-full bg-black" style="aspect-ratio: 16/9;">
+                        @if (Model.Video.IsYouTube)
+                        {
+                            <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="@Model.Video.VideoYolu" class="w-full h-full"></div>
+                        }
+                        else
+                        {
+                            <video id="player" playsinline webkit-playsinline x5-playsinline controls 
+                                   style="width: 100%; height: 100%; object-fit: contain;"
+                                   poster="@Url.Content(Model.Video.KapakFotografiYolu ?? string.Empty)" 
+                                   preload="metadata">
+                                <source src="@Url.Content(Model.Video.VideoYolu)" type="video/mp4">
+                            </video>
+                        }
+                        
+                        <!-- Progress bar - Video container içinde, en altta -->
+                        <div id="mobile-progress-container" class="md:hidden" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;"></div>
+                    </div>
                 </div>
                 <!-- Başlık ve Aksiyonlar -->
-                <div class="bg-white rounded-2xl shadow-md p-5">
-                    <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-tight clamp-2 break-anywhere">@Model.Video.VideoAdi</h1>
+                <div class="bg-white rounded-none sm:rounded-2xl shadow-md p-3 sm:p-5">
+                    <h1 class="text-base sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-tight clamp-2 break-anywhere">@Model.Video.VideoAdi</h1>
                     <!-- Açıklama: Başlığın hemen altında -->
-                    <div id="description-box" class="text-slate-600 text-sm mt-2 prose prose-sm max-w-none relative max-h-24 overflow-hidden transition-all duration-300">
+                    <div id="description-box" class="text-slate-600 text-xs sm:text-sm mt-2 prose prose-sm max-w-none relative max-h-24 overflow-hidden transition-all duration-300">
                         @FormatDescription(Model.Video.VideoAciklamasi)
                     </div>
-                    <button id="description-toggler" class="text-blue-600 font-semibold text-sm mt-1 hover:underline">daha fazla</button>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3">
-                        <div class="text-slate-500 text-sm mb-3 sm:mb-0">
+                    <button id="description-toggler" class="text-blue-600 font-semibold text-xs sm:text-sm mt-1 hover:underline">daha fazla</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-2 sm:gap-0">
+                        <div class="text-slate-500 text-xs sm:text-sm">
                             <span>@Model.Video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
-                            <span class="mx-2 font-bold text-slate-300">•</span>
+                            <span class="mx-1 sm:mx-2 font-bold text-slate-300">•</span>
                             <span>@Model.Video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
                         </div>
-                            <div class="flex items-center gap-2">
-                                <div class="flex items-center bg-slate-100 rounded-full">
-                                <button id="likeButton" data-videoid="@Model.Video.Id" class="flex w-full items-center gap-1.5 px-4 py-1 rounded-l-full group transition text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == true ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
-                                        <i class="fas fa-thumbs-up text-base"></i>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <div class="flex items-center bg-slate-100 rounded-full flex-1 sm:flex-none">
+                                <button id="likeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-l-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == true ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                        <i class="fas fa-thumbs-up text-sm sm:text-base"></i>
                                         <span id="likeCount" class="font-semibold text-xs">@Model.Video.BegeniSayisi</span>
                                     </button>
-                                    <div class="border-l border-slate-300 h-5"></div>
-                                <button id="dislikeButton" data-videoid="@Model.Video.Id" class="flex w-full items-center gap-1.5 px-4 py-1 rounded-r-full group transition text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == false ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
-                                        <i class="fas fa-thumbs-down text-base"></i>
+                                    <div class="border-l border-slate-300 h-4 sm:h-5"></div>
+                                <button id="dislikeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-r-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == false ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                        <i class="fas fa-thumbs-down text-sm sm:text-base"></i>
                                         <span id="dislikeCount" class="font-semibold text-xs">@Model.Video.DislikeSayisi</span>
                                     </button>
                                 </div>
@@ -108,19 +117,19 @@
                                 }
                             </div>
                     </div>
-                    <div class="border-t border-slate-200 my-4"></div>
+                    <div class="border-t border-slate-200 my-3 sm:my-4"></div>
                     <!-- Yükleyen Bilgisi -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 sm:gap-4">
                             <img src="@Url.Content("~/images/LOGO mavi.webp")"
-                                 class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                                 class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
                                  alt="Sevval.com" />
                         <div class="w-full">
-                            <p class="font-bold text-slate-800 text-base">Sevval.com</p>
+                            <p class="font-bold text-slate-800 text-sm sm:text-base">Sevval.com</p>
                         </div>
                     </div>
                 </div>
                 <!-- Yorumlar Bölümü -->
-                <div class="bg-white rounded-2xl shadow-md p-5 mt-6">
+                <div class="bg-white rounded-none sm:rounded-2xl shadow-md p-3 sm:p-5 mt-3 sm:mt-6">
                     <h2 class="text-lg font-bold text-slate-800 mb-4">@Model.Yorumlar.Sum(y => 1 + y.Yanitlar.Count()) Yorum</h2>
                     @if (User.Identity.IsAuthenticated)
                     {
@@ -217,18 +226,441 @@
 </div>
 @section Scripts {
     <style>
-        /* Mobilde Plyr menü ve tooltiplerinin kesilmesini önle */
-        .plyr { position: relative; z-index: 1; }
+        /* Plyr base styling */
+        .plyr { 
+            position: relative; 
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Oynatma butonu ve kontroller - hareket etmesin! */
+        .plyr__control,
+        .plyr__control--overlaid {
+            transform: none !important;
+            transition: opacity 0.2s ease, background-color 0.2s ease !important;
+        }
+        
+        /* Hover efektinde sadece opacity değişsin, pozisyon değişmesin */
+        .plyr__control:hover,
+        .plyr__control--overlaid:hover {
+            transform: none !important;
+            opacity: 0.9;
+        }
+        
+        /* Büyük oynatma butonu - sabit pozisyon */
+        .plyr__control--overlaid {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .plyr__control--overlaid:hover {
+            transform: translate(-50%, -50%) !important;
+        }
+        
+        /* Overlaid button içindeki SVG */
+        .plyr__control--overlaid svg {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            display: block !important;
+        }
+        
+        /* Kontroller ve menüler */
         .plyr__controls, .plyr__menu__container, .plyr__tooltip, .plyr__control--overlaid {
             z-index: 10010 !important;
         }
+        
+        /* Kontroller container - flex wrap için */
+        .plyr__controls {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+        }
+        
         /* Menü konteyneri taşmasın */
         .plyr__menu__container { overflow: visible !important; }
-        /* Aspect container ve iç sarmalayıcılar taşmayı gösterebilsin */
+        
+        /* Aspect container ve iç sarmalayıcılar */
         .aspect-w-16, .plyr__video-wrapper, .plyr__video-embed { overflow: visible !important; }
-        /* iOS adres çubuğu ile çakışmayı azaltmak için küçük marj */
-        @@media (max-width: 768px){
+        
+        /* Plyr video wrapper - contain kullan */
+        .plyr__video-wrapper,
+        .plyr__video-wrapper video {
+            object-fit: contain !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* Video element */
+        video#player {
+            object-fit: contain !important;
+            background-color: #000;
+        }
+        
+        /* Kontroller flex container yap */
+        .plyr__controls {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+        }
+        
+        /* Desktop - Normal progress bar (satır içinde) */
+        @@media (min-width: 769px) {
+            .plyr__progress {
+                flex: 1 !important;
+                order: 0 !important;
+                margin: 0 8px !important;
+            }
+            
+            .plyr__progress input[type="range"] {
+                height: 4px !important;
+            }
+            
+            .plyr__progress__buffer {
+                height: 4px !important;
+            }
+        }
+        
+        /* Tam ekranda progress bar - HER ZAMAN GÖRÜNÜR */
+        .plyr--fullscreen #mobile-progress-container,
+        .plyr--fullscreen-active #mobile-progress-container,
+        .plyr:-webkit-full-screen #mobile-progress-container,
+        .plyr:-moz-full-screen #mobile-progress-container,
+        .plyr:fullscreen #mobile-progress-container {
+            position: fixed !important;
+            bottom: 80px !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100vw !important;
+            z-index: 9999 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Tam ekranda progress bar içindeki progress */
+        .plyr--fullscreen #mobile-progress-container .plyr__progress,
+        .plyr--fullscreen-active #mobile-progress-container .plyr__progress {
+            display: block !important;
+            visibility: visible !important;
+            width: 100% !important;
+        }
+        
+        /* Mobilde YouTube tarzı progress bar - Video içinde, alt */
+        @@media (max-width: 768px) {
+            /* Mobile progress container - video içinde absolute pozisyonda */
+            #mobile-progress-container {
+                position: absolute !important;
+                bottom: 34px !important; /* Kontrollere çok yakın */
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                padding: 2px 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                z-index: 20 !important;
+            }
+            
+            /* Tam ekranda daha yüksek z-index */
+            .plyr--fullscreen #mobile-progress-container {
+                z-index: 99999 !important;
+                bottom: 60px !important;
+            }
+            
+            /* Progress bar mobile container içinde - TAM GENİŞLİK */
+            #mobile-progress-container .plyr__progress {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important; /* Padding kaldır - tam genişlik olsun */
+                box-sizing: border-box !important;
+            }
+            
+            /* Kontrollerdeki progress bar'ı gizle */
+            .plyr__controls .plyr__progress {
+                display: none !important;
+            }
+            
+            /* Progress bar - TAM genişlik, sadece track ve thumb */
+            .plyr__progress input[type="range"] {
+                width: 100% !important;
+                height: 12px !important; /* Touch area için yükseklik */
+                box-sizing: border-box !important;
+                -webkit-appearance: none !important;
+                background: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                cursor: pointer !important;
+            }
+            
+            /* Progress track (gri zemin) - çok daha belirgin */
+            .plyr__progress input[type="range"]::-webkit-slider-runnable-track {
+                width: 100% !important;
+                height: 4px !important;
+                background: rgba(255, 255, 255, 0.5) !important; /* Yarı saydam - çok belirgin */
+                border-radius: 2px !important;
+            }
+            
+            .plyr__progress input[type="range"]::-moz-range-track {
+                width: 100% !important;
+                height: 4px !important;
+                background: rgba(255, 255, 255, 0.5) !important; /* Yarı saydam - çok belirgin */
+                border-radius: 2px !important;
+            }
+            
+            /* Played ve Buffer çizgilerini gizle */
+            .plyr__progress__played,
+            .plyr__progress__buffer {
+                display: none !important;
+            }
+            
+            /* Range input thumb - ortalanmış kırmızı nokta */
+            .plyr__progress input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none !important;
+                width: 12px !important;
+                height: 12px !important;
+                border-radius: 50% !important;
+                background: #ff0000 !important;
+                cursor: pointer !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+                border: 2px solid #fff !important;
+                opacity: 1 !important;
+                margin-top: -4px !important; /* Track'e göre ortalama */
+            }
+            
+            .plyr__progress input[type="range"]::-moz-range-thumb {
+                width: 12px !important;
+                height: 12px !important;
+                border-radius: 50% !important;
+                background: #ff0000 !important;
+                cursor: pointer !important;
+                border: 2px solid #fff !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+                opacity: 1 !important;
+            }
+            
+            /* Diğer kontroller progress bar'ın ALTINDA */
+            .plyr__controls > *:not(.plyr__progress) {
+                order: 1;
+            }
+            
+            /* Time display - oynatma butonunun yanına */
+            .plyr__time {
+                font-size: 12px !important;
+                order: 0 !important; /* Play butonundan hemen sonra */
+                margin-left: 8px !important;
+                color: #fff !important;
+                font-weight: 500 !important;
+            }
+            
+            /* Play butonu */
+            .plyr__controls button[data-plyr="play"] {
+                order: -1 !important; /* En başta */
+            }
+            
+            /* Kontroller flex layout */
+            .plyr__controls {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+            }
+        }
+        
+        /* Desktop'ta normal boyut ve düzen */
+        @@media (min-width: 769px) {
+            /* Mobile container'ı gizle */
+            #mobile-progress-container {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            /* Progress bar MUTLAKA göster ve normal pozisyonda */
+            .plyr__controls .plyr__progress {
+                display: flex !important;
+                visibility: visible !important;
+                margin: 0 0 8px 0 !important;
+                width: 100% !important;
+                order: -1 !important;
+                flex: 0 0 100% !important;
+                padding: 0 !important;
+            }
+            
+            /* Progress input normal yükseklik */
+            .plyr__progress input[type="range"] {
+                height: 5px !important;
+            }
+            
+            /* Time display normal pozisyonda */
+            .plyr__time {
+                order: unset !important;
+                margin-left: 0 !important;
+                font-size: 14px !important;
+            }
+            
+            /* Play butonu normal */
+            .plyr__controls button[data-plyr="play"] {
+                order: unset !important;
+            }
+            
+            /* Kontroller normal */
+            .plyr__controls {
+                flex-wrap: wrap !important;
+            }
+            
+            .plyr__progress input[type="range"]::-webkit-slider-thumb {
+                width: 13px !important;
+                height: 13px !important;
+                margin-top: -4px !important;
+            }
+            
+            .plyr__progress input[type="range"]::-moz-range-thumb {
+                width: 13px !important;
+                height: 13px !important;
+            }
+            
+            /* Track normal yükseklik */
+            .plyr__progress input[type="range"]::-webkit-slider-runnable-track {
+                height: 5px !important;
+            }
+            
+            .plyr__progress input[type="range"]::-moz-range-track {
+                height: 5px !important;
+            }
+        }
+        
+        /* Responsive kontrol boyutları */
+        @@media (max-width: 480px) {
+            /* Çok küçük ekranlar - mobil */
+            .plyr__control--overlaid {
+                width: 60px !important;
+                height: 60px !important;
+                padding: 0 !important;
+            }
+            
+            .plyr__control--overlaid svg {
+                width: 40px !important;
+                height: 40px !important;
+            }
+            
+            .plyr__controls {
+                padding: 6px !important;
+                font-size: 12px !important;
+            }
+            
+            .plyr__control {
+                padding: 4px 6px !important;
+                min-width: 32px !important;
+                height: 32px !important;
+            }
+            
+            .plyr__control svg {
+                width: 16px !important;
+                height: 16px !important;
+            }
+            
             .plyr__menu__container { margin-bottom: 8px; }
+            
+            .comment-buttons button {
+                padding: 0 8px !important;
+                max-width: 120px !important;
+            }
+        }
+        
+        @@media (min-width: 481px) and (max-width: 640px) {
+            /* Küçük mobil */
+            .plyr__control--overlaid {
+                width: 70px !important;
+                height: 70px !important;
+                padding: 0 !important;
+            }
+            
+            .plyr__control--overlaid svg {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            
+            .plyr__controls {
+                padding: 8px !important;
+                font-size: 13px !important;
+            }
+            
+            .plyr__control {
+                padding: 5px 7px !important;
+                min-width: 36px !important;
+                height: 36px !important;
+            }
+            
+            .plyr__control svg {
+                width: 18px !important;
+                height: 18px !important;
+            }
+        }
+        
+        @@media (min-width: 641px) and (max-width: 768px) {
+            /* Tablet */
+            .plyr__control--overlaid {
+                width: 80px !important;
+                height: 80px !important;
+                padding: 0 !important;
+            }
+            
+            .plyr__control--overlaid svg {
+                width: 56px !important;
+                height: 56px !important;
+            }
+            
+            .plyr__controls {
+                padding: 10px !important;
+            }
+            
+            .plyr__control {
+                padding: 6px 8px !important;
+                min-width: 40px !important;
+                height: 40px !important;
+            }
+            
+            .plyr__control svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+            
+            .plyr__menu__container { margin-bottom: 8px; }
+        }
+        
+        @@media (min-width: 769px) {
+            /* Desktop */
+            .plyr__control--overlaid {
+                width: 90px !important;
+                height: 90px !important;
+                padding: 0 !important;
+            }
+            
+            .plyr__control--overlaid svg {
+                width: 64px !important;
+                height: 64px !important;
+            }
+            
+            .plyr__controls {
+                padding: 12px !important;
+            }
+            
+            .plyr__control {
+                padding: 8px 10px !important;
+                min-width: 44px !important;
+                height: 44px !important;
+            }
+            
+            .plyr__control svg {
+                width: 22px !important;
+                height: 22px !important;
+            }
         }
     </style>
     <script>
@@ -240,6 +672,7 @@
                 clickToPlay: true,
                 muted: false,
                 autoplay: false,
+                hideControls: true, // Kontrolleri otomatik gizle
                 youtube: {
                     rel: 0,
                     modestbranding: 1,
@@ -326,10 +759,178 @@
             };
             player.on('enterfullscreen', () => {
                 tryLockLandscape();
+                
+                // Tam ekranda mobile progress container'ı Plyr container'a taşı
+                setTimeout(() => {
+                    const mobileContainer = document.getElementById('mobile-progress-container');
+                    const plyrContainer = document.querySelector('.plyr');
+                    
+                    if (mobileContainer && plyrContainer && window.innerWidth <= 768) {
+                        plyrContainer.appendChild(mobileContainer);
+                        mobileContainer.style.position = 'fixed';
+                        mobileContainer.style.bottom = '80px';
+                        mobileContainer.style.left = '0';
+                        mobileContainer.style.right = '0';
+                        mobileContainer.style.width = '100%';
+                        mobileContainer.style.zIndex = '9999';
+                        mobileContainer.style.display = 'block';
+                        mobileContainer.style.visibility = 'visible';
+                        
+                        console.log('Fullscreen: Progress bar taşındı');
+                    }
+                }, 200);
             });
+            
             player.on('exitfullscreen', () => {
                 tryUnlock();
+                
+                // Tam ekrandan çıkınca mobile progress container'ı geri taşı
+                setTimeout(() => {
+                    const mobileContainer = document.getElementById('mobile-progress-container');
+                    const videoContainer = document.querySelector('.aspect-w-16');
+                    
+                    if (mobileContainer && videoContainer && window.innerWidth <= 768) {
+                        videoContainer.appendChild(mobileContainer);
+                        mobileContainer.style.position = 'absolute';
+                        mobileContainer.style.bottom = '34px';
+                        mobileContainer.style.zIndex = '20';
+                        
+                        console.log('Exit fullscreen: Progress bar geri taşındı');
+                    }
+                }, 200);
             });
+            
+            // MOBİLDE PROGRESS BAR'I YUKARIYA TAŞI VE OTO-GİZLE
+            let hideProgressTimeout;
+            
+            function moveProgressBarOnMobile() {
+                const progressBar = document.querySelector('.plyr__progress');
+                const mobileContainer = document.getElementById('mobile-progress-container');
+                const controls = document.querySelector('.plyr__controls');
+                
+                if (!progressBar) return;
+                
+                if (window.innerWidth <= 768) {
+                    // MOBİL: Progress bar'ı mobile container'a taşı
+                    if (mobileContainer && !mobileContainer.contains(progressBar)) {
+                        mobileContainer.style.display = 'block';
+                        mobileContainer.appendChild(progressBar);
+                        progressBar.style.display = 'block';
+                        progressBar.style.visibility = 'visible';
+                    }
+                } else {
+                    // MASAÜSTÜ: Progress bar'ı kontrollere geri taşı
+                    if (mobileContainer) {
+                        mobileContainer.style.display = 'none';
+                        mobileContainer.style.visibility = 'hidden';
+                    }
+                    
+                    if (controls && !controls.contains(progressBar)) {
+                        // Progress bar'ı kontrollerin en başına ekle
+                        controls.insertBefore(progressBar, controls.firstChild);
+                        progressBar.style.display = 'flex';
+                        progressBar.style.visibility = 'visible';
+                        progressBar.style.width = '100%';
+                        progressBar.style.order = '-1';
+                    }
+                }
+            }
+            
+            // Progress bar'ı Plyr kontrollerine senkronize et
+            function syncProgressBarWithControls() {
+                if (window.innerWidth > 768) return; // Sadece mobilde çalış
+                
+                const mobileContainer = document.getElementById('mobile-progress-container');
+                const plyrContainer = document.querySelector('.plyr');
+                
+                if (mobileContainer && plyrContainer) {
+                    // Plyr container'ının 'plyr--hide-controls' class'ını kontrol et
+                    const controlsHidden = plyrContainer.classList.contains('plyr--hide-controls');
+                    
+                    // Progress bar'ı kontrollere göre ayarla
+                    if (controlsHidden && !player.paused) {
+                        mobileContainer.style.opacity = '0';
+                    } else {
+                        mobileContainer.style.opacity = '1';
+                    }
+                    mobileContainer.style.transition = 'opacity 0.3s ease';
+                }
+            }
+            
+            // Sayfa yüklendiğinde ve pencere boyutu değiştiğinde çalıştır
+            player.on('ready', () => {
+                setTimeout(() => {
+                    moveProgressBarOnMobile();
+                    
+                    // Plyr container'ındaki değişiklikleri izle
+                    const plyrContainer = document.querySelector('.plyr');
+                    if (plyrContainer && window.innerWidth <= 768) {
+                        // MutationObserver ile .plyr container'daki class değişikliklerini izle
+                        const observer = new MutationObserver(syncProgressBarWithControls);
+                        observer.observe(plyrContainer, { 
+                            attributes: true, 
+                            attributeFilter: ['class'] 
+                        });
+                        
+                        // İlk durumu ayarla
+                        syncProgressBarWithControls();
+                    }
+                }, 100);
+            });
+            
+            // Plyr olaylarında progress bar'ı senkronize et
+            player.on('controlsshown', () => {
+                setTimeout(syncProgressBarWithControls, 0);
+            });
+            player.on('controlshidden', () => {
+                setTimeout(syncProgressBarWithControls, 0);
+            });
+            player.on('play', () => {
+                setTimeout(syncProgressBarWithControls, 100);
+            });
+            player.on('pause', syncProgressBarWithControls);
+            player.on('seeking', syncProgressBarWithControls);
+            player.on('seeked', syncProgressBarWithControls);
+            
+            // Fullscreen olaylarında progress bar'ı güncelle
+            player.on('enterfullscreen', () => {
+                setTimeout(() => {
+                    moveProgressBarOnMobile();
+                    syncProgressBarWithControls();
+                }, 100);
+            });
+            
+            player.on('exitfullscreen', () => {
+                setTimeout(() => {
+                    moveProgressBarOnMobile();
+                    syncProgressBarWithControls();
+                }, 100);
+            });
+            
+            // Mouse/touch hareketinde progress bar'ı göster
+            const videoContainer = document.querySelector('.aspect-w-16');
+            if (videoContainer) {
+                videoContainer.addEventListener('mousemove', syncProgressBarWithControls);
+                videoContainer.addEventListener('touchstart', syncProgressBarWithControls);
+            }
+            
+            // Resize olayında progress bar'ı doğru yere taşı
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    moveProgressBarOnMobile();
+                    
+                    // Masaüstüne geçildiğinde observer'ı temizle
+                    if (window.innerWidth > 768) {
+                        const mobileContainer = document.getElementById('mobile-progress-container');
+                        if (mobileContainer) {
+                            mobileContainer.style.opacity = '1'; // Masaüstünde opacity sıfırlanmasın
+                        }
+                    }
+                }, 250); // Debounce - çok fazla tetiklenmesini önle
+            });
+            
             // Fullscreen tooltip: state'e göre tek bir tooltip göster
             (function(){
                 const fsBtn = document.querySelector('.plyr__controls [data-plyr="fullscreen"]');

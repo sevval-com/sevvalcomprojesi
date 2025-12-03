@@ -178,7 +178,7 @@ namespace YourProjectNamespace.Controllers
             return BadRequest(); // Hatalı yanıt
         }
 
-        public async Task<IActionResult> Uyelikler(string filter = "Emlakçı", int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Uyelikler(string filter = "All", int page = 1, int pageSize = 50)
         {
             var authorizationResult = await CheckUserAuthorization();
             if (authorizationResult != null) return authorizationResult;
@@ -227,18 +227,40 @@ namespace YourProjectNamespace.Controllers
                 })
                 .ToListAsync();
 
-            // Filtreleme uygula
+            // Onay bekleyen kullanıcı sayısını hesapla - Case-insensitive karşılaştırma
+            var pendingCount = allUsers.Count(u => 
+                !string.IsNullOrWhiteSpace(u.IsActive) && 
+                u.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase));
+            
+            // Debug için tüm IsActive değerlerini ve sayılarını logla
+            var isActiveStats = allUsers
+                .GroupBy(u => u.IsActive ?? "(null)")
+                .Select(g => new { Value = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+            
+            _logger.LogInformation("IsActive değerleri ve dağılımı: {Stats}", 
+                string.Join(", ", isActiveStats.Select(s => $"'{s.Value}': {s.Count}")));
+            _logger.LogInformation("Onay bekleyen (passive) kullanıcı sayısı: {Count}", pendingCount);
+            
+            ViewBag.PendingCount = pendingCount;
+
+            // Filtreleme uygula - Case-insensitive karşılaştırma
             var filteredUsers = allUsers.Where(user =>
                 filter == "All" ||
-                (filter == "Bireysel" && user.UserTypes == "Bireysel") ||
-                (filter == "Emlakçı" && user.UserTypes == "Emlakçı") ||
-                (filter == "Kurumsal" && user.UserTypes == "Kurumsal") ||
-                (filter == "Vakıf" && user.UserTypes == "Vakıf") ||
-                (filter == "İnşaat" && user.UserTypes == "İnşaat") ||
-                (filter == "Banka" && user.UserTypes == "Banka") ||
-                (filter == "ücretsiz" && user.IsSubscribed == "ücretsiz") ||
-                (filter == "ücretli" && user.IsSubscribed == "ücretli")
+                (filter == "OnayBekleyen" && !string.IsNullOrWhiteSpace(user.IsActive) && user.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Bireysel" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Bireysel", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Emlakçı" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Emlakçı", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Kurumsal" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Kurumsal", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Vakıf" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Vakıf", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "İnşaat" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("İnşaat", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Banka" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Banka", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "ücretsiz" && !string.IsNullOrWhiteSpace(user.IsSubscribed) && user.IsSubscribed.Trim().Equals("ücretsiz", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "ücretli" && !string.IsNullOrWhiteSpace(user.IsSubscribed) && user.IsSubscribed.Trim().Equals("ücretli", StringComparison.OrdinalIgnoreCase))
             ).ToList();
+            
+            // Debug için filtrelenmiş kullanıcı sayısını logla
+            _logger.LogInformation("Filtre: {Filter}, Bulunan kullanıcı sayısı: {Count}", filter, filteredUsers.Count);
 
             // Toplam kayıt sayısı
             var totalRecords = filteredUsers.Count;
@@ -323,8 +345,11 @@ namespace YourProjectNamespace.Controllers
 
             try
             {
+                // Case-insensitive karşılaştırma için ToLower() kullan
                 var users = await _context.Users
-                    .Where(u => selectedIds.Contains(u.Id) && u.IsActive == "passive")
+                    .Where(u => selectedIds.Contains(u.Id) && 
+                                u.IsActive != null && 
+                                u.IsActive.ToLower().Trim() == "passive")
                     .ToListAsync();
 
                 if (!users.Any())
@@ -2213,6 +2238,128 @@ namespace YourProjectNamespace.Controllers
             await _context.SaveChangesAsync();
 
             return await createAndReturnView(displayMessage, isSuccess);
+        }
+
+        /// <summary>
+        /// 🔧 ÇAKIŞMA DÜZELT: Çakışan UserOrder numaralarını düzeltir
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> FixDuplicateUserOrders()
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                // Tüm kullanıcıları kayıt tarihine göre al
+                var allUsers = await _context.Users
+                    .OrderBy(u => u.RegistrationDate)
+                    .ToListAsync();
+
+                // Tip bazlı kullanıcıları grupla
+                var bireyselUsers = allUsers.Where(u => u.UserTypes == "Bireysel").ToList();
+                var kurumsalUsers = allUsers.Where(u => u.UserTypes != "Bireysel").ToList();
+
+                int fixedCount = 0;
+
+                // Bireysel kullanıcıları yeniden numaralandır
+                int bireyselCounter = 1;
+                foreach (var user in bireyselUsers)
+                {
+                    user.UserOrder = bireyselCounter++;
+                    fixedCount++;
+                }
+
+                // Kurumsal kullanıcıları yeniden numaralandır
+                int kurumsalCounter = 1;
+                foreach (var user in kurumsalUsers)
+                {
+                    user.UserOrder = kurumsalCounter++;
+                    fixedCount++;
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("FixDuplicateUserOrders: {Count} kullanıcı yeniden numaralandırıldı", fixedCount);
+
+                return Json(new 
+                { 
+                    success = true, 
+                    message = $"✅ {fixedCount} kullanıcı yeniden numaralandırıldı. Bireysel: {bireyselCounter - 1}, Kurumsal: {kurumsalCounter - 1}" 
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "FixDuplicateUserOrders: Hata oluştu");
+                return Json(new { success = false, message = "Hata: " + ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// ⚠️ TEK SEFERLIK: Mevcut kullanıcılara UserOrder atar (Migration sonrası çalıştır)
+        /// ✅ ARTIK GÜVENLİ: Çakışma olmaz, mevcut en yüksek numaradan devam eder
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> AssignFirmaNumbers()
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                // Tüm kullanıcıları al (kayıt tarihine göre sırala)
+                var allUsers = await _context.Users
+                    .OrderBy(u => u.RegistrationDate)
+                    .ToListAsync();
+
+                // ✅ Mevcut en yüksek numaraları bul (çakışmayı önle)
+                var maxBireyselOrder = await _context.Users
+                    .Where(u => u.UserTypes == "Bireysel" && u.UserOrder > 0)
+                    .MaxAsync(u => (int?)u.UserOrder) ?? 0;
+
+                var maxKurumsalOrder = await _context.Users
+                    .Where(u => u.UserTypes != "Bireysel" && u.UserOrder > 0)
+                    .MaxAsync(u => (int?)u.UserOrder) ?? 0;
+
+                // Tip bazlı sayaçlar (mevcut en yüksekten devam et)
+                var kurumsalCounter = maxKurumsalOrder + 1;
+                var bireyselCounter = maxBireyselOrder + 1;
+
+                int updated = 0;
+
+                foreach (var user in allUsers)
+                {
+                    // Zaten numarası varsa atla
+                    if (user.UserOrder > 0) continue;
+
+                    // Tip bazlı numara ata
+                    if (user.UserTypes == "Bireysel")
+                    {
+                        user.UserOrder = bireyselCounter++;
+                    }
+                    else
+                    {
+                        user.UserOrder = kurumsalCounter++;
+                    }
+
+                    updated++;
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("AssignFirmaNumbers: {Count} kullanıcıya firma numarası atandı", updated);
+
+                return Json(new 
+                { 
+                    success = true, 
+                    message = $"{updated} kullanıcıya firma numarası atandı. Kurumsal: {kurumsalCounter - 1}, Bireysel: {bireyselCounter - 1}" 
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AssignFirmaNumbers: Hata oluştu");
+                return Json(new { success = false, message = "Hata: " + ex.Message });
+            }
         }
     }
 }

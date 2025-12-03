@@ -166,23 +166,48 @@
 
                             <input type="radio" class="btn-check" name="userType" value="ücretli" id="ucretli" @(ViewBag.Filter == "ücretli" ? "checked" : "") onchange="location.href='?filter=ücretli&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="ucretli">Ücretli</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="OnayBekleyen" id="onayBekleyen" @(ViewBag.Filter == "OnayBekleyen" ? "checked" : "") onchange="location.href='?filter=OnayBekleyen&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-warning" for="onayBekleyen">
+                                <i class="bi bi-clock-history me-1"></i> Onay Bekleyenler
+                                @if(ViewBag.PendingCount > 0)
+                                {
+                                    <span class="badge bg-warning text-dark">@ViewBag.PendingCount</span>
+                                }
+                            </label>
                         </div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
                             <button type="button" id="bulkApproveBtn" class="btn btn-success" disabled onclick="confirmBulkApprove()">
                                 <i class="bi bi-check-circle"></i> Seçilenleri Onayla
                             </button>
-                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger ms-2" disabled onclick="confirmBulkDelete()">
+                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger" disabled onclick="confirmBulkDelete()">
                                 <i class="bi bi-trash"></i> Seçilenleri Sil
                             </button>
-                            <span id="selectedCount" class="text-muted ms-2 small">0 kayıt seçildi</span>
+                            <button type="button" id="assignFirmaNoBtn" class="btn btn-warning" onclick="assignFirmaNumbers()" title="Mevcut kullanıcılara firma numarası ata (tek seferlik)">
+                                <i class="bi bi-hash"></i> Firma No Ata
+                            </button>
+                            <button type="button" id="fixDuplicateBtn" class="btn btn-danger" onclick="fixDuplicateUserOrders()" title="Çakışan kullanıcı numaralarını düzelt">
+                                <i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt
+                            </button>
+                            <span id="selectedCount" class="text-muted small">0 kayıt seçildi</span>
                         </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                            <i class="bi bi-plus-circle me-1"></i> Yeni Kullanıcı Ekle
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="small text-muted mb-0">Sayfa başına:</label>
+                            <select class="form-select form-select-sm" style="width: auto;" onchange="location.href='?filter=@ViewBag.Filter&page=1&pageSize=' + this.value">
+                                <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                                <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+                                <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                                <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+                                <option value="999999" selected="@(ViewBag.PageSize == 999999)">Tümü</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="bi bi-plus-circle me-1"></i> Yeni Kullanıcı Ekle
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Table -->
@@ -197,6 +222,7 @@
                                         <th>E-Posta</th>
                                         <th>Tipi</th>
                                         <th>Firma Adı</th>
+                                        <th>Firma No</th>
                                         <th>Durum</th>
                                         <th>Abonelik</th>
                                         <th>İşlemler</th>
@@ -225,13 +251,28 @@
                                                 }
                                             </td>
                                             <td>
-                                                @if (user.IsActive == "active")
+                                                <span class="badge bg-info text-dark">@user.FormattedFirmaNo</span>
+                                            </td>
+                                            <td>
+                                                @if (user.IsActive != null && user.IsActive.Trim().Equals("active", StringComparison.OrdinalIgnoreCase))
                                                 {
                                                     <span class="badge bg-success" id="status-badge-@user.Id">Onaylı</span>
                                                 }
-                                                else
+                                                else if (user.IsActive != null && user.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase))
                                                 {
                                                     <span class="badge bg-warning text-dark" id="status-badge-@user.Id">Beklemede</span>
+                                                }
+                                                else if (user.IsActive != null && (user.IsActive.Trim().Equals("inactive", StringComparison.OrdinalIgnoreCase) || user.IsActive.Trim().Equals("Inactive", StringComparison.OrdinalIgnoreCase)))
+                                                {
+                                                    <span class="badge bg-secondary" id="status-badge-@user.Id">Pasif</span>
+                                                }
+                                                else if (user.IsActive != null && user.IsActive.Trim().Equals("deleted", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-danger" id="status-badge-@user.Id">Silinmiş</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" id="status-badge-@user.Id">Belirsiz</span>
                                                 }
                                             </td>
                                             <td>
@@ -266,6 +307,42 @@
                             </table>
                         </div>
                     </form>
+
+                    <!-- Pagination ve Bilgi -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                        <div class="text-muted small">
+                            Toplam <strong>@ViewBag.TotalRecords</strong> kayıt - 
+                            Sayfa <strong>@ViewBag.CurrentPage</strong> / <strong>@ViewBag.TotalPages</strong>
+                        </div>
+                        
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <nav aria-label="Sayfa navigasyonu">
+                                <ul class="pagination pagination-sm mb-0">
+                                    @if (ViewBag.HasPreviousPage)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@(ViewBag.CurrentPage - 1)&pageSize=@ViewBag.PageSize">Önceki</a>
+                                        </li>
+                                    }
+                                    
+                                    @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@i&pageSize=@ViewBag.PageSize">@i</a>
+                                        </li>
+                                    }
+                                    
+                                    @if (ViewBag.HasNextPage)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@(ViewBag.CurrentPage + 1)&pageSize=@ViewBag.PageSize">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -303,26 +380,53 @@
         function approveUser(userId) {
             if (!confirm('Bu kullanıcıyı onaylamak istediğinizden emin misiniz?')) return;
 
+            // Buton devre dışı bırak
+            const btn = $('#approve-btn-' + userId);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Onaylanıyor...');
+
             $.ajax({
                 url: '@Url.Action("ApproveUser", "SevvalOfis")',
                 type: 'POST',
                 data: { userId: userId },
                 success: function(response) {
                     if (response.success) {
-                        // Update badge
+                        // Update badge with animation
                         const badge = $('#status-badge-' + userId);
-                        badge.removeClass('bg-warning text-dark').addClass('bg-success').text('Onaylı');
+                        badge.fadeOut(200, function() {
+                            $(this).removeClass('bg-warning text-dark').addClass('bg-success')
+                                .html('<i class="bi bi-check-circle me-1"></i>Onaylı')
+                                .fadeIn(200);
+                        });
                         
-                        // Hide approve button
-                        $('#approve-btn-' + userId).fadeOut();
+                        // Hide approve button with animation
+                        btn.fadeOut(400, function() {
+                            $(this).remove();
+                        });
                         
-                        // Show success message
-                        alert(response.message);
+                        // Modern toast notification (Bootstrap 5)
+                        const toastHtml = `
+                            <div class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" style="z-index: 9999;">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        <i class="bi bi-check-circle-fill me-2"></i>${response.message}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                                </div>
+                            </div>
+                        `;
+                        $('body').append(toastHtml);
+                        const toast = new bootstrap.Toast($('.toast').last()[0]);
+                        toast.show();
+                        
+                        // Toast otomatik silinsin
+                        setTimeout(() => { $('.toast').last().remove(); }, 5000);
                     } else {
+                        btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i>');
                         alert('Hata: ' + response.message);
                     }
                 },
                 error: function() {
+                    btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i>');
                     alert('Bir hata oluştu. Lütfen tekrar deneyin.');
                 }
             });
@@ -455,6 +559,62 @@
                 },
                 error: function() {
                     $('#statsModalBody').html('<div class="alert alert-danger">İstatistikler yüklenirken hata oluştu.</div>');
+                }
+            });
+        }
+
+        // Mevcut kullanıcılara firma numarası ata (TEK SEFERLIK)
+        function assignFirmaNumbers() {
+            if (!confirm('⚠️ BU İŞLEM TEK SEFERLIK YAPILMALIDIR!\n\nMevcut tüm kullanıcılara kayıt tarihine göre sıralı firma numarası atanacak.\n\nDevam etmek istediğinize emin misiniz?')) {
+                return;
+            }
+
+            const btn = $('#assignFirmaNoBtn');
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>İşleniyor...');
+
+            $.ajax({
+                url: '@Url.Action("AssignFirmaNumbers", "SevvalOfis")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ ' + response.message);
+                        location.reload(); // Sayfayı yenile
+                    } else {
+                        alert('❌ Hata: ' + response.message);
+                        btn.prop('disabled', false).html('<i class="bi bi-hash"></i> Firma No Ata');
+                    }
+                },
+                error: function() {
+                    alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                    btn.prop('disabled', false).html('<i class="bi bi-hash"></i> Firma No Ata');
+                }
+            });
+        }
+
+        // Çakışan kullanıcı numaralarını düzelt
+        function fixDuplicateUserOrders() {
+            if (!confirm('⚠️ ÇAKIŞAN NUMARALARI DÜZELT\n\nTüm kullanıcılar kayıt tarihine göre yeniden numaralandırılacak.\nÇakışan numaralar temizlenecek.\n\nDevam etmek istediğinize emin misiniz?')) {
+                return;
+            }
+
+            const btn = $('#fixDuplicateBtn');
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Düzeltiliyor...');
+
+            $.ajax({
+                url: '@Url.Action("FixDuplicateUserOrders", "SevvalOfis")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ ' + response.message);
+                        location.reload(); // Sayfayı yenile
+                    } else {
+                        alert('❌ Hata: ' + response.message);
+                        btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt');
+                    }
+                },
+                error: function() {
+                    alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                    btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt');
                 }
             });
         }

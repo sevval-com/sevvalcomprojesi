@@ -2,6 +2,9 @@
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.csproj.Dto.Company.CompanySearchDto
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Firmalar";
+    
     // Sayfalama ve filtre verilerini değişkenlere alalım
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
@@ -45,6 +48,53 @@
     ve daha fazla animasyon (başlıkta shimmer, kartta glow) eklendi.
 -->
 <style>
+    /* === DROPDOWN MENÜ - HOVER İLE AÇILSIN === */
+    .dropdown {
+        position: relative !important;
+    }
+
+    .dropdown-content {
+        position: absolute !important;
+        top: 100% !important;
+        background-color: white !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+        z-index: 10000 !important;
+        min-width: 180px !important;
+        opacity: 0 !important;
+        transform: translateY(20px) !important;
+        transition: opacity 0.3s ease, transform 0.3s ease !important;
+        pointer-events: none !important;
+        display: block !important;
+        list-style: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .dropdown:hover .dropdown-content {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+
+    .dropdown-content li {
+        padding: 10px 15px !important;
+        transition: background-color 0.3s, color 0.3s !important;
+    }
+
+    .dropdown-content li a {
+        color: #009cfb !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        font-size: 16px !important;
+        display: block !important;
+    }
+
+    .dropdown-content li a:hover {
+        background-color: rgba(0, 156, 251, 0.1) !important;
+        color: #0056b3 !important;
+    }
+
     /* === KÖK DEĞİŞKENLER (YENİ TEMA - MAVİ/BEYAZ) === */
     :root {
         --brand-primary: #3B82F6; /* Tailwind Blue 500 */
@@ -690,9 +740,13 @@
                     </p>
                     
                     <!-- Diğer Bilgiler -->
+                    @{
+                        var prefix = user.UserTypes == "Bireysel" ? "B" : "K";
+                        var firmaNo = user.UserOrder > 0 ? $"{prefix}-{user.UserOrder:D4}" : "Atanmadı";
+                    }
                     <p class="user-registration-date">
                         Üyelik Tarihi: @user.RegistrationDate?.ToString("dd.MM.yyyy")<br />
-                        Firma No: @user.UserOrder?.ToString("D4")
+                        Firma No: @firmaNo
                     </p>
                 </li>
             }

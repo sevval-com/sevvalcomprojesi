@@ -207,7 +207,7 @@ namespace Sevval.Infrastructure.Services
             user.UserTypes = "Bireysel";
             user.IsSubscribed = "ücretsiz";
             user.IsActive = "active";
-            user.UserOrder = 1;
+            user.UserOrder = await GetNextUserOrder("Bireysel"); // ✅ Otomatik numara ata
             user.RegistrationDate = DateTime.Now;
 
             if (request.ProfilePicture != null && request.ProfilePicture.Length > 0)
@@ -557,6 +557,9 @@ namespace Sevval.Infrastructure.Services
 
             user.RegistrationDate = DateTime.Now;
 
+            // ✅ Otomatik Firma No Ata (Tip bazlı)
+            user.UserOrder = await GetNextUserOrder(request.UserTypes);
+
             try
             {
                 var result = await _userManager.CreateAsync(user, request.Password);
@@ -847,6 +850,36 @@ namespace Sevval.Infrastructure.Services
                     Message = "Kayıt Bulunamadı"
                 };
 
+            // Onay metni kontrolü (mobil ekip isteği)
+            if (request.ConfirmationText != "HESABIMI SIL")
+            {
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Onay metni yanlış. Tam olarak 'HESABIMI SIL' yazmalısınız."
+                };
+            }
+
+            // Şifre kontrolü (mobil ekip isteği)
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<ApplicationUser>();
+                var verificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+                
+                if (verificationResult == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Failed)
+                {
+                    return new ApiResponse<DeleteUserCommandResponse>
+                    {
+                        Code = (int)HttpStatusCode.BadRequest,
+                        Data = null,
+                        IsSuccessfull = false,
+                        Message = "Şifre hatalı."
+                    };
+                }
+            }
+
             // Soft delete: Kullanıcıyı işaretle
             user.IsActive = "deleted"; // IsActive ile soft delete simulation
             
@@ -854,11 +887,14 @@ namespace Sevval.Infrastructure.Services
             var recoveryToken = Guid.NewGuid().ToString("N");
             
             // Track deletion date for 30-day recovery window
+            var deletionDate = DateTime.UtcNow;
+            var recoveryDeadline = deletionDate.AddDays(30);
+            
             var deletedAccount = new Sevval.Domain.Entities.DeletedAccount
             {
                 UserId = user.Id,
-                DeletedAt = DateTime.UtcNow,
-                DeletionReason = null,
+                DeletedAt = deletionDate,
+                DeletionReason = request.DeletionReason,
                 RecoveryToken = recoveryToken
             };
             await _context.DeletedAccounts.AddAsync(deletedAccount, cancellationToken);
@@ -893,7 +929,13 @@ namespace Sevval.Infrastructure.Services
                 return new ApiResponse<DeleteUserCommandResponse>
                 {
                     Code = (int)HttpStatusCode.OK,
-                    Data = _mapper.Map<DeleteUserCommandResponse>(user),
+                    Data = new DeleteUserCommandResponse
+                    {
+                        UserId = user.Id,
+                        DeletedAt = deletionDate,
+                        RecoveryDeadline = recoveryDeadline,
+                        RecoveryToken = recoveryToken
+                    },
                     IsSuccessfull = true,
                     Message = "Hesabınız başarıyla silindi. 30 gün içinde destek ekibimize başvurarak hesabınızı kurtarabilirsiniz."
                 };
@@ -1697,7 +1739,20 @@ namespace Sevval.Infrastructure.Services
             }
         }
 
+        /// <summary>
+        /// Verilen kullanıcı tipine göre bir sonraki UserOrder numarasını hesaplar
+        /// </summary>
+        private async Task<int> GetNextUserOrder(string userType)
+        {
+            // Aynı tip için son kullanıcıyı bul
+            var lastUser = await _context.Users
+                .Where(u => u.UserTypes == userType && u.UserOrder > 0)
+                .OrderByDescending(u => u.UserOrder)
+                .FirstOrDefaultAsync();
 
+            // Son numara + 1 döndür, yoksa 1'den başla
+            return (lastUser?.UserOrder ?? 0) + 1;
+        }
 
     }
 
