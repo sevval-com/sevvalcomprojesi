@@ -187,11 +187,8 @@
                             <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger" disabled onclick="confirmBulkDelete()">
                                 <i class="bi bi-trash"></i> Seçilenleri Sil
                             </button>
-                            <button type="button" id="assignFirmaNoBtn" class="btn btn-warning" onclick="assignFirmaNumbers()" title="Mevcut kullanıcılara firma numarası ata (tek seferlik)">
-                                <i class="bi bi-hash"></i> Firma No Ata
-                            </button>
-                            <button type="button" id="fixDuplicateBtn" class="btn btn-danger" onclick="fixDuplicateUserOrders()" title="Çakışan kullanıcı numaralarını düzelt">
-                                <i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt
+                            <button type="button" id="createNumbersBtn" class="btn btn-primary" onclick="createNumbersByRegistrationDate()" title="Şevval Emlak K-0001 olacak, diğerleri kayıt tarihine göre numaralandırılacak">
+                                <i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur
                             </button>
                             <span id="selectedCount" class="text-muted small">0 kayıt seçildi</span>
                         </div>
@@ -563,58 +560,30 @@
             });
         }
 
-        // Mevcut kullanıcılara firma numarası ata (TEK SEFERLIK)
-        function assignFirmaNumbers() {
-            if (!confirm('⚠️ BU İŞLEM TEK SEFERLIK YAPILMALIDIR!\n\nMevcut tüm kullanıcılara kayıt tarihine göre sıralı firma numarası atanacak.\n\nDevam etmek istediğinize emin misiniz?')) {
+        // Numaraları kayıt tarihine göre oluştur (Şevval Emlak her zaman K-0001)
+        function createNumbersByRegistrationDate() {
+            if (!confirm('⚠️ NUMARALARI KAYIT TARİHİNE GÖRE OLUŞTUR\n\n🏆 ŞEVVAL EMLAK → K-0001 (Sabit)\n📅 Kurumsal kullanıcılar → K-0002, K-0003... (Kayıt tarihine göre)\n📅 Bireysel kullanıcılar → B-0001, B-0002... (Kayıt tarihine göre)\n\nDevam etmek istediğinize emin misiniz?')) {
                 return;
             }
 
-            const btn = $('#assignFirmaNoBtn');
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>İşleniyor...');
+            const btn = $('#createNumbersBtn');
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Oluşturuluyor...');
 
             $.ajax({
-                url: '@Url.Action("AssignFirmaNumbers", "SevvalOfis")',
+                url: '@Url.Action("CreateNumbersByRegistrationDate", "SevvalOfis")',
                 type: 'POST',
                 success: function(response) {
                     if (response.success) {
                         alert('✅ ' + response.message);
-                        location.reload(); // Sayfayı yenile
+                        location.reload();
                     } else {
                         alert('❌ Hata: ' + response.message);
-                        btn.prop('disabled', false).html('<i class="bi bi-hash"></i> Firma No Ata');
+                        btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur');
                     }
                 },
                 error: function() {
                     alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
-                    btn.prop('disabled', false).html('<i class="bi bi-hash"></i> Firma No Ata');
-                }
-            });
-        }
-
-        // Çakışan kullanıcı numaralarını düzelt
-        function fixDuplicateUserOrders() {
-            if (!confirm('⚠️ ÇAKIŞAN NUMARALARI DÜZELT\n\nTüm kullanıcılar kayıt tarihine göre yeniden numaralandırılacak.\nÇakışan numaralar temizlenecek.\n\nDevam etmek istediğinize emin misiniz?')) {
-                return;
-            }
-
-            const btn = $('#fixDuplicateBtn');
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Düzeltiliyor...');
-
-            $.ajax({
-                url: '@Url.Action("FixDuplicateUserOrders", "SevvalOfis")',
-                type: 'POST',
-                success: function(response) {
-                    if (response.success) {
-                        alert('✅ ' + response.message);
-                        location.reload(); // Sayfayı yenile
-                    } else {
-                        alert('❌ Hata: ' + response.message);
-                        btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt');
-                    }
-                },
-                error: function() {
-                    alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
-                    btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Çakışan Numaraları Düzelt');
+                    btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur');
                 }
             });
         }

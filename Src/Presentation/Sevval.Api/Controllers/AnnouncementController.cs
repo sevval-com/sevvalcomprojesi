@@ -57,7 +57,15 @@ namespace Sevval.Api.Controllers
         }
 
         [HttpGet(GetTodaysAnnouncementsQueryRequest.Route)]
-        [SwaggerOperation(Summary = "Günün ilanını getirir", Description = "Bugün eklenen en son ilanı ve toplam günlük ilan sayısını döndürür. Status parametresi opsiyoneldir.")]
+        [SwaggerOperation(
+            Summary = "Günün ilanını getirir", 
+            Description = @"Bugün eklenen en son ilanı ve toplam günlük ilan sayısını döndürür. 
+            
+            📊 ÖZELLIKLER:
+            • Status parametresi opsiyoneldir (default: 'active')
+            • DeviceId parametresi opsiyoneldir - gönderilirse aynı cihaz 24 saat içinde tekrar sayılmaz
+            • Her çağrıda görüntülenme sayacı otomatik artırılır (benzersiz cihazlar için)
+            • Hem GununIlanlari hem de IlanBilgileri tablosundaki sayaçlar güncellenir")]
         public async Task<IActionResult> GetTodaysAnnouncements([FromQuery] GetTodaysAnnouncementsQueryRequest request, CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(request, cancellationToken);

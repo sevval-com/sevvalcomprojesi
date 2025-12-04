@@ -21,6 +21,9 @@ namespace Sevval.Infrastructure.Services;
 
 public class AnnouncementService : IAnnouncementService
 {
+    // 🆕 Basit in-memory cache (Production'da Redis kullanın!)
+    private static readonly Dictionary<string, DateTime> _viewCache = new Dictionary<string, DateTime>();
+    
     private readonly IReadRepository<IlanModel> _readRepository;
     private readonly IReadRepository<PhotoModel> _photoRepository;
     private readonly IReadRepository<VideoModel> _videoRepository;
@@ -29,6 +32,7 @@ public class AnnouncementService : IAnnouncementService
     private readonly IReadRepository<YorumModel> _readCommentRepository;
     private readonly IReadRepository<GununIlanModel> _readGununIlanRepository;
     private readonly IWriteRepository<IlanModel> _writeRepository;
+    private readonly IWriteRepository<GununIlanModel> _writeGununIlanRepository;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -43,6 +47,7 @@ public class AnnouncementService : IAnnouncementService
         IReadRepository<YorumModel> readCommentRepository,
         IReadRepository<GununIlanModel> readGununIlanRepository,
         IWriteRepository<IlanModel> writeRepository,
+        IWriteRepository<GununIlanModel> writeGununIlanRepository,
         IUnitOfWork unitOfWork)
     {
         _readRepository = readRepository;
@@ -54,6 +59,7 @@ public class AnnouncementService : IAnnouncementService
         _readCommentRepository = readCommentRepository;
         _readGununIlanRepository = readGununIlanRepository;
         _writeRepository = writeRepository;
+        _writeGununIlanRepository = writeGununIlanRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -322,9 +328,53 @@ public class AnnouncementService : IAnnouncementService
                     .FirstOrDefaultAsync(cancellationToken);
             }
 
-            // Sadece GununIlanlari tablosundaki sayıyı kullan (web ile aynı)
+            // 🆕 Görüntülenme sayacını artır (deviceId varsa benzersizlik kontrolü yap)
             if (featuredCounter != null)
             {
+                bool shouldIncrement = true;
+                
+                // DeviceId varsa cache kontrolü (24 saat - Web ile aynı mantık)
+                if (!string.IsNullOrEmpty(request.DeviceId))
+                {
+                    var cacheKey = $"daily_offer_view_{request.DeviceId}_{selectedAnnouncement.Id}";
+                    
+                    // Cache'de varsa ve 24 saat geçmemişse artırma
+                    if (_viewCache.TryGetValue(cacheKey, out DateTime lastView))
+                    {
+                        if ((DateTime.Now - lastView).TotalHours < 24)
+                        {
+                            shouldIncrement = false;
+                        }
+                        else
+                        {
+                            // 24 saat geçmiş, yeniden say
+                            _viewCache[cacheKey] = DateTime.Now;
+                        }
+                    }
+                    else
+                    {
+                        _viewCache[cacheKey] = DateTime.Now;
+                    }
+                }
+                
+                if (shouldIncrement)
+                {
+                    // GununIlanlari sayacını artır
+                    featuredCounter.GoruntulenmeSayisi += 1;
+                    await _writeGununIlanRepository.UpdateAsync(featuredCounter);
+                    
+                    // IlanBilgileri toplam sayacını da artır
+                    var announcementEntity = await _readRepository.GetAsync(x => x.Id == selectedAnnouncement.Id, EnableTracking: false);
+                    if (announcementEntity != null)
+                    {
+                        announcementEntity.GoruntulenmeSayisi += 1;
+                        announcementEntity.GoruntulenmeTarihi = DateTime.Now;
+                        await _writeRepository.UpdateAsync(announcementEntity);
+                    }
+                    
+                    await _unitOfWork.CommitAsync(cancellationToken);
+                }
+                
                 response.GoruntulenmeSayisi = featuredCounter.GoruntulenmeSayisi;
             }
         }

@@ -1742,16 +1742,45 @@ namespace Sevval.Infrastructure.Services
         /// <summary>
         /// Verilen kullanıcı tipine göre bir sonraki UserOrder numarasını hesaplar
         /// </summary>
+        /// <summary>
+        /// Yeni kullanıcıya tip bazlı sıradaki numarayı atar
+        /// 🏆 KURUMSAL: ŞEVVAL EMLAK (sftumen41@gmail.com) → K-0001 (sabit)
+        /// 🏢 Diğer kurumsallar → Kayıt tarihine göre K-0002, K-0003...
+        /// 👤 Bireysel → Kayıt tarihine göre B-0001, B-0002...
+        /// </summary>
         private async Task<int> GetNextUserOrder(string userType)
         {
-            // Aynı tip için son kullanıcıyı bul
-            var lastUser = await _context.Users
-                .Where(u => u.UserTypes == userType && u.UserOrder > 0)
-                .OrderByDescending(u => u.UserOrder)
-                .FirstOrDefaultAsync();
+            // 🏆 ÖZEL DURUM: ŞEVVAL EMLAK her zaman K-0001
+            if (userType != "Bireysel")
+            {
+                // Kurumsal kullanıcılar için ŞEVVAL EMLAK kontrolü
+                var sevvalExists = await _context.Users
+                    .AnyAsync(u => u.Email != null && u.Email.ToLower() == "sftumen41@gmail.com" && u.UserTypes != "Bireysel");
 
-            // Son numara + 1 döndür, yoksa 1'den başla
-            return (lastUser?.UserOrder ?? 0) + 1;
+                if (!sevvalExists)
+                {
+                    // ŞEVVAL EMLAK henüz kayıt olmamış, K-0001'i ayır
+                    return 1;
+                }
+
+                // ŞEVVAL EMLAK zaten var, diğer kurumsallar için son numarayı al
+                var lastKurumsal = await _context.Users
+                    .Where(u => u.UserTypes != "Bireysel" && u.UserOrder > 0)
+                    .OrderByDescending(u => u.UserOrder)
+                    .FirstOrDefaultAsync();
+
+                return (lastKurumsal?.UserOrder ?? 1) + 1;
+            }
+            else
+            {
+                // 👤 Bireysel kullanıcılar için ayrı sayaç
+                var lastBireysel = await _context.Users
+                    .Where(u => u.UserTypes == "Bireysel" && u.UserOrder > 0)
+                    .OrderByDescending(u => u.UserOrder)
+                    .FirstOrDefaultAsync();
+
+                return (lastBireysel?.UserOrder ?? 0) + 1;
+            }
         }
 
     }

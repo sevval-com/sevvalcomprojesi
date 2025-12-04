@@ -2241,125 +2241,109 @@ namespace YourProjectNamespace.Controllers
         }
 
         /// <summary>
-        /// 🔧 ÇAKIŞMA DÜZELT: Çakışan UserOrder numaralarını düzeltir
+        /// 🆕 Numaraları kayıt tarihine göre oluştur
+        /// ŞEVVAL EMLAK her zaman K-0001
+        /// Kurumsal ve Bireysel ayrı numaralandırma
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> FixDuplicateUserOrders()
+        public async Task<IActionResult> CreateNumbersByRegistrationDate()
         {
             var authorizationResult = await CheckUserAuthorization();
             if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
 
             try
             {
-                // Tüm kullanıcıları kayıt tarihine göre al
-                var allUsers = await _context.Users
+                // Tüm kullanıcıları al
+                var allUsers = await _context.Users.ToListAsync();
+                
+                // 🏆 ŞEVVAL EMLAK'ı bul (sftumen41@gmail.com)
+                var sevvalUser = allUsers.FirstOrDefault(u => 
+                    u.Email != null && u.Email.Equals("sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase));
+
+                int totalProcessed = 0;
+
+                // 📋 BİREYSEL KULLANICILAR - Kayıt tarihine göre B-0001, B-0002...
+                var bireyselUsers = allUsers
+                    .Where(u => u.UserTypes == "Bireysel")
                     .OrderBy(u => u.RegistrationDate)
-                    .ToListAsync();
-
-                // Tip bazlı kullanıcıları grupla
-                var bireyselUsers = allUsers.Where(u => u.UserTypes == "Bireysel").ToList();
-                var kurumsalUsers = allUsers.Where(u => u.UserTypes != "Bireysel").ToList();
-
-                int fixedCount = 0;
-
-                // Bireysel kullanıcıları yeniden numaralandır
+                    .ToList();
+                
                 int bireyselCounter = 1;
                 foreach (var user in bireyselUsers)
                 {
                     user.UserOrder = bireyselCounter++;
-                    fixedCount++;
+                    _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                    totalProcessed++;
                 }
 
-                // Kurumsal kullanıcıları yeniden numaralandır
-                int kurumsalCounter = 1;
-                foreach (var user in kurumsalUsers)
-                {
-                    user.UserOrder = kurumsalCounter++;
-                    fixedCount++;
-                }
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("FixDuplicateUserOrders: {Count} kullanıcı yeniden numaralandırıldı", fixedCount);
-
-                return Json(new 
-                { 
-                    success = true, 
-                    message = $"✅ {fixedCount} kullanıcı yeniden numaralandırıldı. Bireysel: {bireyselCounter - 1}, Kurumsal: {kurumsalCounter - 1}" 
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "FixDuplicateUserOrders: Hata oluştu");
-                return Json(new { success = false, message = "Hata: " + ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// ⚠️ TEK SEFERLIK: Mevcut kullanıcılara UserOrder atar (Migration sonrası çalıştır)
-        /// ✅ ARTIK GÜVENLİ: Çakışma olmaz, mevcut en yüksek numaradan devam eder
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> AssignFirmaNumbers()
-        {
-            var authorizationResult = await CheckUserAuthorization();
-            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
-
-            try
-            {
-                // Tüm kullanıcıları al (kayıt tarihine göre sırala)
-                var allUsers = await _context.Users
+                // 🏢 KURUMSAL KULLANICILAR - Kayıt tarihine göre sırala
+                var kurumsalUsers = allUsers
+                    .Where(u => u.UserTypes != "Bireysel")
                     .OrderBy(u => u.RegistrationDate)
-                    .ToListAsync();
+                    .ToList();
 
-                // ✅ Mevcut en yüksek numaraları bul (çakışmayı önle)
-                var maxBireyselOrder = await _context.Users
-                    .Where(u => u.UserTypes == "Bireysel" && u.UserOrder > 0)
-                    .MaxAsync(u => (int?)u.UserOrder) ?? 0;
-
-                var maxKurumsalOrder = await _context.Users
-                    .Where(u => u.UserTypes != "Bireysel" && u.UserOrder > 0)
-                    .MaxAsync(u => (int?)u.UserOrder) ?? 0;
-
-                // Tip bazlı sayaçlar (mevcut en yüksekten devam et)
-                var kurumsalCounter = maxKurumsalOrder + 1;
-                var bireyselCounter = maxBireyselOrder + 1;
-
-                int updated = 0;
-
-                foreach (var user in allUsers)
+                // 🔥 ÖNCE ŞEVVAL EMLAK'I İŞLE
+                if (sevvalUser != null && kurumsalUsers.Contains(sevvalUser))
                 {
-                    // Zaten numarası varsa atla
-                    if (user.UserOrder > 0) continue;
-
-                    // Tip bazlı numara ata
-                    if (user.UserTypes == "Bireysel")
+                    // 1. ŞEVVAL EMLAK → K-0001
+                    sevvalUser.UserOrder = 1;
+                    _context.Users.Update(sevvalUser); // Açıkça güncelleme olarak işaretle
+                    totalProcessed++;
+                    _logger.LogInformation("✅ ŞEVVAL EMLAK (ID: {Id}) → K-0001 atandı (Kayıt: {Date})", 
+                        sevvalUser.Id, sevvalUser.RegistrationDate.ToString("dd.MM.yyyy HH:mm"));
+                    
+                    // 2. DİĞER KURUMSAL KULLANICILAR - ŞEVVAL EMLAK HARİÇ
+                    int kurumsalCounter = 2;
+                    foreach (var user in kurumsalUsers.Where(u => u.Id != sevvalUser.Id))
                     {
-                        user.UserOrder = bireyselCounter++;
+                        user.UserOrder = kurumsalCounter;
+                        _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                        _logger.LogInformation("   → {Email} → K-{Number:D4} (Kayıt: {Date})", 
+                            user.Email, kurumsalCounter, user.RegistrationDate.ToString("dd.MM.yyyy HH:mm"));
+                        kurumsalCounter++;
+                        totalProcessed++;
                     }
-                    else
+                }
+                else
+                {
+                    // ŞEVVAL EMLAK YOKSA veya Bireysel ise - Normal sıralama
+                    _logger.LogWarning("⚠️ ŞEVVAL EMLAK (sftumen41@gmail.com) kurumsal kullanıcı olarak bulunamadı!");
+                    
+                    int kurumsalCounter = 1;
+                    foreach (var user in kurumsalUsers)
                     {
                         user.UserOrder = kurumsalCounter++;
+                        _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                        totalProcessed++;
                     }
-
-                    updated++;
                 }
 
-                await _context.SaveChangesAsync();
+                // 💾 Değişiklikleri veritabanına kaydet
+                var savedCount = await _context.SaveChangesAsync();
+                _logger.LogInformation("💾 Database'e {SavedCount} değişiklik kaydedildi", savedCount);
 
-                _logger.LogInformation("AssignFirmaNumbers: {Count} kullanıcıya firma numarası atandı", updated);
+                _logger.LogInformation("✅ CreateNumbersByRegistrationDate: {Count} kullanıcı numaralandırıldı", totalProcessed);
+
+                // Mesaj oluştur
+                var kurumsalCount = kurumsalUsers.Count;
+                var bireyselCount = bireyselUsers.Count;
+                
+                var message = sevvalUser != null && kurumsalUsers.Contains(sevvalUser)
+                    ? $"✅ Numaralandırma tamamlandı!\n\n🏆 ŞEVVAL EMLAK → K-0001\n📊 Kurumsal: {kurumsalCount} kullanıcı (K-0001 - K-{kurumsalCount:D4})\n📊 Bireysel: {bireyselCount} kullanıcı (B-0001 - B-{bireyselCount:D4})\n\n🔄 Toplam: {totalProcessed} kullanıcı"
+                    : $"✅ Numaralandırma tamamlandı!\n\n📊 Kurumsal: {kurumsalCount} kullanıcı\n📊 Bireysel: {bireyselCount} kullanıcı\n\n🔄 Toplam: {totalProcessed} kullanıcı";
 
                 return Json(new 
                 { 
                     success = true, 
-                    message = $"{updated} kullanıcıya firma numarası atandı. Kurumsal: {kurumsalCounter - 1}, Bireysel: {bireyselCounter - 1}" 
+                    message = message
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "AssignFirmaNumbers: Hata oluştu");
+                _logger.LogError(ex, "CreateNumbersByRegistrationDate: Hata oluştu");
                 return Json(new { success = false, message = "Hata: " + ex.Message });
             }
         }
+
     }
 }

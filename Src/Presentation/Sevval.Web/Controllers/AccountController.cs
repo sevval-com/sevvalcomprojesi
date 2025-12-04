@@ -1052,12 +1052,14 @@ public class AccountController : Controller
 
             var invitationToken = await GenerateInvitationToken(model.Email);
 
-            // En yüksek UserOrder değerini al ve bir artır (AsNoTracking ile performans)
-            var maxUserOrder = await _userManager.Users
+            // ✅ Kurumsal kullanıcılar için tip bazlı sıra numarası al
+            // ŞEVVAL EMLAK K-0001, diğerleri sırayla
+            var maxKurumsalOrder = await _userManager.Users
                 .AsNoTracking()
+                .Where(u => u.UserTypes != "Bireysel")
                 .OrderByDescending(u => u.UserOrder)
                 .FirstOrDefaultAsync();
-            int newUserOrder = maxUserOrder?.UserOrder + 1 ?? 1;
+            int newUserOrder = (maxKurumsalOrder?.UserOrder ?? 0) + 1;
 
             var consultant = new ConsultantInvitation
             {
@@ -1168,12 +1170,14 @@ public class AccountController : Controller
             var user = await _userManager.FindByEmailAsync(invitation.Email);
             if (user == null)
             {
-                // UserOrder değerini artırmak için en yüksek UserOrder'ı alıyoruz (AsNoTracking ile performans)
-                var maxUserOrder = await _userManager.Users
+                // ✅ Kurumsal danışman için tip bazlı sıra numarası al
+                // ŞEVVAL EMLAK K-0001, diğer kurumsallar sırayla
+                var maxKurumsalOrder = await _userManager.Users
                     .AsNoTracking()
+                    .Where(u => u.UserTypes != "Bireysel")
                     .OrderByDescending(u => u.UserOrder)
                     .FirstOrDefaultAsync();
-                int newUserOrder = maxUserOrder?.UserOrder + 1 ?? 1;
+                int newUserOrder = (maxKurumsalOrder?.UserOrder ?? 0) + 1;
 
                 user = new ApplicationUser
                 {
