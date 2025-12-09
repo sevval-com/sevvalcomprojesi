@@ -544,6 +544,9 @@ namespace Sevval.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("UserFullName")
                         .HasColumnType("TEXT");
 

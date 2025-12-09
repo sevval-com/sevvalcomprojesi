@@ -789,10 +789,10 @@ img {
 }
 
 .service-popup h3 {
-    margin: 10px 0; /* Başlık için üstten ve alttan boşluk */
-    font-size: 22px; /* Başlık yazı boyutu */
-    font-weight: bold; /* Başlık kalın yazı */
-    text-align: center; /* Başlığı ortalamak için */
+    margin: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .service-popup p {
@@ -846,7 +846,7 @@ img {
 
 .service-popup-2 h3 {
     margin: 10px 0;
-    font-size: 22px;
+    font-size: 17px !important;
     font-weight: bold;
     text-align: center;
 }
