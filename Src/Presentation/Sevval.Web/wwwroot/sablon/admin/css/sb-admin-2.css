@@ -1,4 +1,4 @@
-/*!
+ï»¿/*!
  * Start Bootstrap - SB Admin 2 v4.1.3 (https://startbootstrap.com/theme/sb-admin-2)
  * Copyright 2013-2021 Start Bootstrap
  * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-sb-admin-2/blob/master/LICENSE)
@@ -10861,14 +10861,14 @@ a:focus {
 }
 
 .bg-login-image {
-    background-image: url('~/images/üye ol sað.jpg');
-    background-position: center right; /* Resmi saða yasla */
-    background-size: cover; /* Resmi kapsama alanýný kapla */
-    height: 100%; /* Yüksekliði tam ayarla */
+    background-image: url('~/images/ï¿½ye ol saï¿½.webp');
+    background-position: center right; /* Resmi saï¿½a yasla */
+    background-size: cover; /* Resmi kapsama alanï¿½nï¿½ kapla */
+    height: 100%; /* Yï¿½ksekliï¿½i tam ayarla */
 }
 
 .bg-register-image {
-    padding-right: 1px; /* Sað boþluk */
+    padding-right: 1px; /* Saï¿½ boï¿½luk */
 }
 
 .bg-password-image {

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -69,11 +69,76 @@ public class AccountController : Controller
 
             if (user != null)
             {
-
+                // 🆕 PASSIVE ACCOUNT CHECK - Admin onayı bekleyen kullanıcılar giriş yapamaz
+                if (user.IsActive == "passive")
+                {
+                    ModelState.AddModelError(string.Empty, 
+                        "Hesabınız henüz onaylanmamış. Lütfen yönetici onayını bekleyiniz. " +
+                        "Onay sonrası e-posta ile bilgilendirileceksiniz.");
+                    _logger.LogWarning("Login engellendi: Kullanıcı ({Email}) passive durumda", model.Email);
+                    return View(model);
+                }
+                
+                // CHECK FOR DELETED ACCOUNT RECOVERY (30-day window)
+                // Handle ANY non-active account that has a DeletedAccounts record
                 if (user.IsActive != "active")
                 {
-                    ModelState.AddModelError(string.Empty, "Hesabınız aktif edilmemiş. Lütfen daha sonra tekrar deneyin.");
-                    return View(model);
+                    // Check if account was deleted (has DeletedAccounts record)
+                    DeletedAccount? deletedAccount = null;
+                    try
+                    {
+                        deletedAccount = await _context.DeletedAccounts
+                            .FirstOrDefaultAsync(d => d.UserId == user.Id);
+                    }
+                    catch (Exception)
+                    {
+                        // DeletedAccounts tablosu henüz oluşturulmamış, devam et
+                    }
+                    
+                    if (deletedAccount != null)
+                    {
+                        // Account was deleted - check if within recovery window
+                        var daysSinceDeletion = (DateTime.UtcNow - deletedAccount.DeletedAt).TotalDays;
+                        
+                        if (daysSinceDeletion <= 30)
+                        {
+                            // RESTORE ACCOUNT - within recovery window
+                            user.IsActive = "active";
+                            await _userManager.UpdateAsync(user);
+                            
+                            // Restore user's IlanBilgileri
+                            var userAds = await _context.IlanBilgileri
+                                .Where(i => i.Email == user.Email && i.Status == "deleted")
+                                .ToListAsync();
+                            
+                            foreach (var ad in userAds)
+                            {
+                                ad.Status = "active";
+                            }
+                            
+                            // Remove from DeletedAccounts table
+                            _context.DeletedAccounts.Remove(deletedAccount);
+                            await _context.SaveChangesAsync();
+                            
+                            // Sign in user and show success message
+                            await _signInManager.SignInAsync(user, isPersistent: true);
+                            TempData["SuccessMessage"] = "Hoş geldiniz! Hesabınız başarıyla kurtarıldı ve tekrar aktif edildi.";
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            // Beyond 30 days - account cannot be recovered
+                            ModelState.AddModelError(string.Empty, 
+                                "Hesabınız 30 günlük kurtarma süresini aştığı için kalıcı olarak silinmiştir. Yeni bir hesap oluşturabilirsiniz.");
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        // Not deleted, just inactive - show original error
+                        ModelState.AddModelError(string.Empty, "Hesabınız aktif edilmemiş. Lütfen daha sonra tekrar deneyin.");
+                        return View(model);
+                    }
                 }
 
                 if (user.EmailConfirmed == false)
@@ -328,6 +393,15 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
+            // ✅ KRİTİK GÜVENLİK: Unique email kontrolü
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız veya farklı bir e-posta kullanınız.");
+                _logger.LogWarning("Register: Email already exists - {Email}", model.Email);
+                return View(model);
+            }
+
             var response = await _userClientService.IndividualRegister(new IndividualRegisterCommandRequest
             {
                 Email = model.Email,
@@ -361,6 +435,15 @@ public class AccountController : Controller
             // ModelState hatalarını logla ve yönlendir
             _logger.LogWarning("SendEstateVerifyInfo: ModelState geçersiz. Hatalar: {Errors}", string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
             return View(model); // Hataları View'e geri gönder
+        }
+
+        // ✅ KRİTİK GÜVENLİK: Unique email kontrolü
+        var existingUser = await _userManager.FindByEmailAsync(model.Email);
+        if (existingUser != null)
+        {
+            ModelState.AddModelError("Email", "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız veya farklı bir e-posta kullanınız.");
+            _logger.LogWarning("EstateRegister: Email already exists - {Email}", model.Email);
+            return View(model);
         }
 
         var response = await _userClientService.CorporateRegister(new CorporateRegisterCommandRequest
@@ -555,7 +638,7 @@ public class AccountController : Controller
                 }
 
                 // Eski profil resmini sil
-                if (!string.IsNullOrEmpty(user.ProfilePicturePath) && user.ProfilePicturePath != "/ImageFiles/boşprofifoto.png")
+                if (!string.IsNullOrEmpty(user.ProfilePicturePath) && user.ProfilePicturePath != "/ImageFiles/boşprofifoto.webp")
                 {
                     var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.ProfilePicturePath.TrimStart('/'));
                     if (System.IO.File.Exists(oldFilePath))
@@ -969,12 +1052,14 @@ public class AccountController : Controller
 
             var invitationToken = await GenerateInvitationToken(model.Email);
 
-            // En yüksek UserOrder değerini al ve bir artır (AsNoTracking ile performans)
-            var maxUserOrder = await _userManager.Users
+            // ✅ Kurumsal kullanıcılar için tip bazlı sıra numarası al
+            // ŞEVVAL EMLAK K-0001, diğerleri sırayla
+            var maxKurumsalOrder = await _userManager.Users
                 .AsNoTracking()
+                .Where(u => u.UserTypes != "Bireysel")
                 .OrderByDescending(u => u.UserOrder)
                 .FirstOrDefaultAsync();
-            int newUserOrder = maxUserOrder?.UserOrder + 1 ?? 1;
+            int newUserOrder = (maxKurumsalOrder?.UserOrder ?? 0) + 1;
 
             var consultant = new ConsultantInvitation
             {
@@ -988,7 +1073,7 @@ public class AccountController : Controller
                 ExpiryDate = DateTime.UtcNow.AddDays(7),
                 Status = "Pending",
                 UserOrder = newUserOrder,
-                ProfilePicturePath = string.IsNullOrEmpty(model.ProfilePicturePath) ? "/ImageFiles/boşprofifoto.png" : model.ProfilePicturePath
+                ProfilePicturePath = string.IsNullOrEmpty(model.ProfilePicturePath) ? "/ImageFiles/boşprofifoto.webp" : model.ProfilePicturePath
             };
 
             _context.ConsultantInvitations.Add(consultant);
@@ -1085,12 +1170,14 @@ public class AccountController : Controller
             var user = await _userManager.FindByEmailAsync(invitation.Email);
             if (user == null)
             {
-                // UserOrder değerini artırmak için en yüksek UserOrder'ı alıyoruz (AsNoTracking ile performans)
-                var maxUserOrder = await _userManager.Users
+                // ✅ Kurumsal danışman için tip bazlı sıra numarası al
+                // ŞEVVAL EMLAK K-0001, diğer kurumsallar sırayla
+                var maxKurumsalOrder = await _userManager.Users
                     .AsNoTracking()
+                    .Where(u => u.UserTypes != "Bireysel")
                     .OrderByDescending(u => u.UserOrder)
                     .FirstOrDefaultAsync();
-                int newUserOrder = maxUserOrder?.UserOrder + 1 ?? 1;
+                int newUserOrder = (maxKurumsalOrder?.UserOrder ?? 0) + 1;
 
                 user = new ApplicationUser
                 {
@@ -1105,7 +1192,7 @@ public class AccountController : Controller
                     RegistrationDate = DateTime.UtcNow,
                     IsActive = "active",
                     UserOrder = newUserOrder,
-                    ProfilePicturePath = "/ImageFiles/boşprofifoto.png",
+                    ProfilePicturePath = "/ImageFiles/boşprofifoto.webp",
                     CompanyName = invitation.CompanyName // Şirket adını davetiyeden al
                 };
 
@@ -1123,7 +1210,7 @@ public class AccountController : Controller
                 // Mevcut kullanıcıyı danışman olarak güncelle
                 user.UserTypes = "KURUMSAL GIRIŞ";
                 user.IsConsultant = true;
-                user.ProfilePicturePath = "/ImageFiles/boşprofifoto.png";
+                user.ProfilePicturePath = "/ImageFiles/boşprofifoto.webp";
                 user.CompanyName = invitation.CompanyName; // Şirket adını davetiyeden al
                 var updateResult = await _userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
@@ -1285,7 +1372,7 @@ public class AccountController : Controller
                     });
                 }
 
-                var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+                var allowedExtensions = new[] { ".pdf", ".webp", ".webp", ".webp" };
                 var level5Ext = Path.GetExtension(level5Certificate.FileName).ToLowerInvariant();
                 var taxExt = Path.GetExtension(taxDocument.FileName).ToLowerInvariant();
 
@@ -1707,6 +1794,215 @@ public class AccountController : Controller
             .Replace("Ç", "c");
 
         return normalized;
+    }
+
+    #endregion
+
+    #region Hesap Silme
+
+    /// <summary>
+    /// Kullanıcı hesap silme action - POST
+    /// </summary>
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAccount(DeleteAccountViewModel model)
+    {
+        try
+        {
+            // Model validasyonu
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Lütfen tüm alanları doğru şekilde doldurunuz.";
+                return RedirectToAction("Settings", new { tab = "security" });
+            }
+
+            // Onay metni kontrolü (case-sensitive)
+            if (model.ConfirmationText != "HESABIMI SIL")
+            {
+                TempData["ErrorMessage"] = "Onay metni yanlış. Tam olarak 'HESABIMI SIL' yazmalısınız (büyük harfle).";
+                return RedirectToAction("Settings", new { tab = "security" });
+            }
+
+            // Mevcut kullanıcıyı al
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Kullanıcı bulunamadı.";
+                return RedirectToAction("Login");
+            }
+
+            // Şifre doğrulama
+            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!passwordValid)
+            {
+                TempData["ErrorMessage"] = "Şifreniz yanlış. Lütfen tekrar deneyin.";
+                _logger.LogWarning("Hesap silme başarısız: Yanlış şifre. UserId: {UserId}", userId);
+                return RedirectToAction("Settings", new { tab = "security" });
+            }
+
+            // API üzerinden hesap silme işlemini tetikle
+            try
+            {
+                var deleteResult = await _userClientService.DeleteUser(userId, model.Password, model.ConfirmationText);
+
+                if (deleteResult != null && deleteResult.IsSuccessfull)
+                {
+                    // Kullanıcıyı logout et
+                    await _signInManager.SignOutAsync();
+                    HttpContext.Session.Clear();
+
+                    _logger.LogInformation("Hesap başarıyla silindi. UserId: {UserId}, Email: {Email}", 
+                        userId, user.Email);
+
+                    TempData["SuccessMessage"] = "Hesabınız başarıyla silindi. 30 gün içinde destek@sevval.com adresine e-posta göndererek hesabınızı kurtarabilirsiniz.";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = deleteResult?.Message ?? "Hesap silme işlemi başarısız oldu. Lütfen daha sonra tekrar deneyin.";
+                    _logger.LogError("Hesap silme API hatası. UserId: {UserId}, Message: {Message}", 
+                        userId, deleteResult?.Message);
+                    return RedirectToAction("Settings", new { tab = "security" });
+                }
+            }
+            catch (Exception apiEx)
+            {
+                _logger.LogError(apiEx, "Hesap silme API çağrısı sırasında hata. UserId: {UserId}", userId);
+                TempData["ErrorMessage"] = "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+                return RedirectToAction("Settings", new { tab = "security" });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Hesap silme işlemi sırasında beklenmeyen hata");
+            TempData["ErrorMessage"] = "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
+            return RedirectToAction("Settings", new { tab = "security" });
+        }
+    }
+
+    /// <summary>
+    /// Hesap silme onay modal için veri döndürür (AJAX)
+    /// </summary>
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetDeleteAccountConfirmInfo()
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+            }
+
+            // Kullanıcının ilan sayısını al (sadece aktif ilanlar)
+            var adsCount = await _context.IlanBilgileri
+                .Where(x => x.Email == user.Email && x.Status != "deleted")
+                .CountAsync();
+
+            // Kullanıcının okunmamış mesaj sayısını al (Message entity'de ReceiverEmail var)
+            var unreadMessagesCount = await _context.Messages
+                .Where(x => x.ReceiverEmail == user.Email && !x.IsRead)
+                .CountAsync();
+
+            var confirmModel = new DeleteAccountConfirmViewModel
+            {
+                Email = user.Email,
+                FullName = $"{user.FirstName} {user.LastName}",
+                TotalAdsCount = adsCount,
+                UnreadMessagesCount = unreadMessagesCount,
+                RecoveryPeriodDays = 30
+            };
+
+            return Json(new { success = true, data = confirmModel });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Hesap silme onay bilgileri alınırken hata");
+            return Json(new { success = false, message = "Bir hata oluştu" });
+        }
+    }
+
+    #endregion
+
+    #region Hesap Kurtarma
+
+    /// <summary>
+    /// Email linkinden hesap kurtarma - GET
+    /// Token bazlı hesap aktivasyonu
+    /// </summary>
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> RecoverAccount(string token, string userId)
+    {
+        try
+        {
+            // Parametreleri validate et
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userId))
+            {
+                TempData["ErrorMessage"] = "Geçersiz kurtarma linki. Lütfen email'inizdeki linki kontrol edin.";
+                return RedirectToAction("Login");
+            }
+
+            // DeletedAccounts kaydını bul
+            var deletedAccount = await _context.DeletedAccounts
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.UserId == userId && d.RecoveryToken == token);
+
+            if (deletedAccount == null)
+            {
+                TempData["ErrorMessage"] = "Kurtarma linki geçersiz veya süresi dolmuş. Lütfen giriş yaparak hesabınızı kurtarmayı deneyin.";
+                return RedirectToAction("Login");
+            }
+
+            // 30 gün kontrolü
+            var daysSinceDeletion = (DateTime.UtcNow - deletedAccount.DeletedAt).TotalDays;
+            if (daysSinceDeletion > 30)
+            {
+                TempData["ErrorMessage"] = "Hesabınız 30 günlük kurtarma süresini aştığı için kalıcı olarak silinmiştir.";
+                return RedirectToAction("Login");
+            }
+
+            var user = deletedAccount.User;
+            
+            // RESTORE ACCOUNT
+            user.IsActive = "active";
+            await _userManager.UpdateAsync(user);
+
+            // Restore user's IlanBilgileri
+            var userAds = await _context.IlanBilgileri
+                .Where(i => i.Email == user.Email && i.Status == "deleted")
+                .ToListAsync();
+
+            foreach (var ad in userAds)
+            {
+                ad.Status = "active";
+            }
+
+            // Remove from DeletedAccounts table
+            _context.DeletedAccounts.Remove(deletedAccount);
+            await _context.SaveChangesAsync();
+
+            // Auto sign in user
+            await _signInManager.SignInAsync(user, isPersistent: true);
+
+            TempData["SuccessMessage"] = $"🎉 Harika! Hesabınız başarıyla kurtarıldı. Tekrar aramızda olduğunuz için mutluyuz, {user.FirstName}!";
+            
+            _logger.LogInformation($"Account recovered via email link: {user.Email} (ID: {user.Id})");
+            
+            return RedirectToAction("Index", "Home");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Hesap kurtarma sırasında hata");
+            TempData["ErrorMessage"] = "Hesap kurtarma sırasında bir hata oluştu. Lütfen giriş yaparak tekrar deneyin.";
+            return RedirectToAction("Login");
+        }
     }
 
     #endregion

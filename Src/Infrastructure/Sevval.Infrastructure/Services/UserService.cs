@@ -3,6 +3,7 @@ using GridBox.Solar.Domain.IRepositories;
 using GridBox.Solar.Domain.IUnitOfWork;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Sevval.Application.Constants;
 using Sevval.Application.Dtos.Email;
 using Sevval.Application.Dtos.Front.Auth;
@@ -28,6 +29,7 @@ using Sevval.Application.Features.User.Queries.GetUserById;
 using Sevval.Application.Interfaces.IService;
 using Sevval.Application.Utilities;
 using Sevval.Domain.Entities;
+using Sevval.Persistence.Context;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -49,6 +51,8 @@ namespace Sevval.Infrastructure.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IEMailService _emailService;
+        private readonly IEMailService _eMailService;
+        private readonly ApplicationDbContext _context;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ITokenService _tokenService;
 
@@ -64,7 +68,8 @@ namespace Sevval.Infrastructure.Services
          IReadRepository<ForgettenPassword> forgettenPasswordReadRepository,
          IHostingEnvironment hostingEnvironment, IEMailService emailService,
          IWriteRepository<UserRefreshToken> writeUserRefreshTokenRepository,
-         IReadRepository<UserRefreshToken> readUserRefreshTokenRepository, ITokenService tokenService)
+         IReadRepository<UserRefreshToken> readUserRefreshTokenRepository, ITokenService tokenService,
+         ApplicationDbContext context)
         {
             _writeRepository = writeRepository;
             _readRepository = readRepository;
@@ -79,6 +84,8 @@ namespace Sevval.Infrastructure.Services
             _hostingEnvironment = hostingEnvironment;
             imgUrl = _hostingEnvironment.WebRootPath + "\\userImages\\";
             _emailService = emailService;
+            _eMailService = emailService;
+            _context = context;
             _writeUserRefreshTokenRepository = writeUserRefreshTokenRepository;
             _readUserRefreshTokenRepository = readUserRefreshTokenRepository;
 
@@ -200,7 +207,7 @@ namespace Sevval.Infrastructure.Services
             user.UserTypes = "Bireysel";
             user.IsSubscribed = "ücretsiz";
             user.IsActive = "active";
-            user.UserOrder = 1;
+            user.UserOrder = await GetNextUserOrder("Bireysel"); // ✅ Otomatik numara ata
             user.RegistrationDate = DateTime.Now;
 
             if (request.ProfilePicture != null && request.ProfilePicture.Length > 0)
@@ -448,6 +455,54 @@ namespace Sevval.Infrastructure.Services
 
         public async Task<ApiResponse<CorporateRegisterCommandResponse>> CorporateRegister(CorporateRegisterCommandRequest request, CancellationToken cancellationToken)
         {
+            // 1. Email unique kontrolü (EN BAŞTA)
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Bu e-posta adresi sistemde zaten kayıtlı. Lütfen giriş yapınız."
+                };
+            }
+
+            // 2. UserTypes validasyonu
+            var validUserTypes = new[] { "Emlakçı", "İnşaat", "Banka", "Vakıf", "Bireysel" };
+            if (string.IsNullOrWhiteSpace(request.UserTypes) || !validUserTypes.Contains(request.UserTypes))
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Geçersiz kullanıcı tipi. Emlakçı, İnşaat, Banka, Vakıf veya Bireysel olmalıdır."
+                };
+            }
+
+            // 3. Dosya kontrolü
+            if (request.Level5Certificate == null || request.Level5Certificate.Length == 0)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Belge dosyası zorunludur."
+                };
+            }
+
+            if (request.TaxPlate == null || request.TaxPlate.Length == 0)
+            {
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 400,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Vergi Levhası zorunludur."
+                };
+            }
 
             var TaxPlate = Path.GetFileName(request.TaxPlate.FileName);
 
@@ -473,9 +528,13 @@ namespace Sevval.Infrastructure.Services
                 await request.Level5Certificate.CopyToAsync(stream);
             }
 
-            request.Level5CertificatePath = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + level5Cert;
+            // Use new flexible document fields
+            request.Document1Path = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + level5Cert;
+            request.Document2Path = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + TaxPlate;
 
-            request.TaxPlatePath = GeneralConstants.BaseUrl + "/uploads/estate_docs/" + TaxPlate;
+            // Keep old fields for backward compatibility
+            request.Level5CertificatePath = request.Document1Path;
+            request.TaxPlatePath = request.Document2Path;
 
             if (request.ProfilePicture != null)
             {
@@ -497,6 +556,9 @@ namespace Sevval.Infrastructure.Services
             user.IsActive = "passive";
 
             user.RegistrationDate = DateTime.Now;
+
+            // ✅ Otomatik Firma No Ata (Tip bazlı)
+            user.UserOrder = await GetNextUserOrder(request.UserTypes);
 
             try
             {
@@ -533,19 +595,18 @@ namespace Sevval.Infrastructure.Services
                     Message = string.Join(", ", result.Errors.Select(a => a.Description).ToList())
                 };
             }
-            catch (Exception s)
+            catch (Exception ex)
             {
-
-
+                // TODO: Add proper logging here (ILogger<UserService>)
+                // Console.WriteLine($"Corporate registration error: {ex.Message}");
+                return new ApiResponse<CorporateRegisterCommandResponse>
+                {
+                    Code = 500,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz."
+                };
             }
-
-            return new ApiResponse<CorporateRegisterCommandResponse>
-            {
-                Code = 400,
-                Data = null,
-                IsSuccessfull = false,
-                Message = "Bir hata oluştu"
-            };
         }
 
         // Corporate Update Method
@@ -788,18 +849,95 @@ namespace Sevval.Infrastructure.Services
                     IsSuccessfull = false,
                     Message = "Kayıt Bulunamadı"
                 };
-            //  user.IsDeleted = true;
+
+            // Onay metni kontrolü (mobil ekip isteği)
+            if (request.ConfirmationText != "HESABIMI SIL")
+            {
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Data = null,
+                    IsSuccessfull = false,
+                    Message = "Onay metni yanlış. Tam olarak 'HESABIMI SIL' yazmalısınız."
+                };
+            }
+
+            // Şifre kontrolü (mobil ekip isteği)
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<ApplicationUser>();
+                var verificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+                
+                if (verificationResult == Microsoft.AspNetCore.Identity.PasswordVerificationResult.Failed)
+                {
+                    return new ApiResponse<DeleteUserCommandResponse>
+                    {
+                        Code = (int)HttpStatusCode.BadRequest,
+                        Data = null,
+                        IsSuccessfull = false,
+                        Message = "Şifre hatalı."
+                    };
+                }
+            }
+
+            // Soft delete: Kullanıcıyı işaretle
+            user.IsActive = "deleted"; // IsActive ile soft delete simulation
+            
+            // Generate recovery token
+            var recoveryToken = Guid.NewGuid().ToString("N");
+            
+            // Track deletion date for 30-day recovery window
+            var deletionDate = DateTime.UtcNow;
+            var recoveryDeadline = deletionDate.AddDays(30);
+            
+            var deletedAccount = new Sevval.Domain.Entities.DeletedAccount
+            {
+                UserId = user.Id,
+                DeletedAt = deletionDate,
+                DeletionReason = request.DeletionReason,
+                RecoveryToken = recoveryToken
+            };
+            await _context.DeletedAccounts.AddAsync(deletedAccount, cancellationToken);
+            
+            // İlgili verileri cascade soft delete yap
+            await SoftDeleteUserRelatedDataAsync(user.Id, user.Email, cancellationToken);
 
             await _writeRepository.UpdateAsync(user);
 
             if (await _unitOfWork.CommitAsync(cancellationToken) > 0)
             {
+                // Email bildirimini asenkron gönder (başarısızlık işlemi engellemez)
+                try
+                {
+                    await _eMailService.SendAccountDeletionEmailAsync(new SendAccountDeletionDto
+                    {
+                        ReceiverEmail = user.Email,
+                        ReceiverName = $"{user.FirstName} {user.LastName}",
+                        DeletionDate = DateTime.UtcNow,
+                        RecoveryDeadline = DateTime.UtcNow.AddDays(30),
+                        RecoveryToken = recoveryToken,
+                        UserId = user.Id
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // Email gönderimi başarısız olsa bile hesap silme devam etmeli
+                    // Sadece log at
+                    Console.WriteLine($"Email gönderimi başarısız: {ex.Message}");
+                }
+
                 return new ApiResponse<DeleteUserCommandResponse>
                 {
                     Code = (int)HttpStatusCode.OK,
-                    Data = _mapper.Map<DeleteUserCommandResponse>(user),
+                    Data = new DeleteUserCommandResponse
+                    {
+                        UserId = user.Id,
+                        DeletedAt = deletionDate,
+                        RecoveryDeadline = recoveryDeadline,
+                        RecoveryToken = recoveryToken
+                    },
                     IsSuccessfull = true,
-                    Message = "Güncelleme işlemi başarılı"
+                    Message = "Hesabınız başarıyla silindi. 30 gün içinde destek ekibimize başvurarak hesabınızı kurtarabilirsiniz."
                 };
             }
 
@@ -808,9 +946,38 @@ namespace Sevval.Infrastructure.Services
                 Code = 400,
                 Data = null,
                 IsSuccessfull = false,
-                Message = string.Empty
+                Message = "Hesap silme işlemi başarısız oldu. Lütfen daha sonra tekrar deneyin."
             };
 
+        }
+
+        /// <summary>
+        /// Kullanıcıya ait ilgili verileri cascade soft delete yapar
+        /// </summary>
+        private async Task SoftDeleteUserRelatedDataAsync(string userId, string userEmail, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // IlanBilgileri - Kullanıcının ilanlarını "deleted" status yap
+                var ilanlar = await _context.IlanBilgileri
+                    .Where(x => x.Email == userEmail)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var ilan in ilanlar)
+                {
+                    ilan.Status = "deleted"; // IlanModel'de de IsDeleted yok, Status var
+                }
+
+                // NOT: Diğer entity'lerde soft delete property'si bulunmuyor
+                // Bu yüzden sadece IlanBilgileri için Status="deleted" pattern uygulanıyor
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Cascade delete hatası işlemi durdurmamalı
+                Console.WriteLine($"İlgili verilerin silinmesi sırasında hata: {ex.Message}");
+            }
         }
 
         public async Task<ApiResponse<GetUserByIdQueryResponse>> GetUser(GetUserByIdQueryRequest request)
@@ -909,7 +1076,8 @@ namespace Sevval.Infrastructure.Services
             var defaultRoles = new[]
             {
             "Bireysel",
-            "Kurumsal",
+            "Emlakçı",   // 🆕 Yeni kurumsal kayıt sistemi
+            "Kurumsal",  // ⚠️ Geriye dönük uyumluluk için
             "İnşaat",
             "Vakıf",
             "Banka"
@@ -1571,7 +1739,49 @@ namespace Sevval.Infrastructure.Services
             }
         }
 
+        /// <summary>
+        /// Verilen kullanıcı tipine göre bir sonraki UserOrder numarasını hesaplar
+        /// </summary>
+        /// <summary>
+        /// Yeni kullanıcıya tip bazlı sıradaki numarayı atar
+        /// 🏆 KURUMSAL: ŞEVVAL EMLAK (sftumen41@gmail.com) → K-0001 (sabit)
+        /// 🏢 Diğer kurumsallar → Kayıt tarihine göre K-0002, K-0003...
+        /// 👤 Bireysel → Kayıt tarihine göre B-0001, B-0002...
+        /// </summary>
+        private async Task<int> GetNextUserOrder(string userType)
+        {
+            // 🏆 ÖZEL DURUM: ŞEVVAL EMLAK her zaman K-0001
+            if (userType != "Bireysel")
+            {
+                // Kurumsal kullanıcılar için ŞEVVAL EMLAK kontrolü
+                var sevvalExists = await _context.Users
+                    .AnyAsync(u => u.Email != null && u.Email.ToLower() == "sftumen41@gmail.com" && u.UserTypes != "Bireysel");
 
+                if (!sevvalExists)
+                {
+                    // ŞEVVAL EMLAK henüz kayıt olmamış, K-0001'i ayır
+                    return 1;
+                }
+
+                // ŞEVVAL EMLAK zaten var, diğer kurumsallar için son numarayı al
+                var lastKurumsal = await _context.Users
+                    .Where(u => u.UserTypes != "Bireysel" && u.UserOrder > 0)
+                    .OrderByDescending(u => u.UserOrder)
+                    .FirstOrDefaultAsync();
+
+                return (lastKurumsal?.UserOrder ?? 1) + 1;
+            }
+            else
+            {
+                // 👤 Bireysel kullanıcılar için ayrı sayaç
+                var lastBireysel = await _context.Users
+                    .Where(u => u.UserTypes == "Bireysel" && u.UserOrder > 0)
+                    .OrderByDescending(u => u.UserOrder)
+                    .FirstOrDefaultAsync();
+
+                return (lastBireysel?.UserOrder ?? 0) + 1;
+            }
+        }
 
     }
 

@@ -1,9 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sevval.Application.Features.Common;
 using Sevval.Application.Features.User.Commands.ConfirmEstate;
 using Sevval.Application.Features.User.Commands.CorporateRegister;
 using Sevval.Application.Features.User.Commands.CorporateUpdate;
+using Sevval.Application.Features.User.Commands.DeleteUser;
 using Sevval.Application.Features.User.Commands.ForgottenPassword;
 using Sevval.Application.Features.User.Commands.IndividualRegister;
 using Sevval.Application.Features.User.Commands.IndividualUpdate;
@@ -150,7 +152,14 @@ public class UserController : BaseController
         return Ok(response);
     }
 
-
+    
+    //[Authorize(Roles = "admin")]
+    [HttpDelete(DeleteUserCommandRequest.Route + "/{id}")]
+    public async Task<IActionResult> DeleteUser(string id, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new DeleteUserCommandRequest { Id = id }, cancellationToken);
+        return Ok(response);
+    }
 
 
     /* // [Authorize(Roles = "admin")]
@@ -172,7 +181,7 @@ public class UserController : BaseController
 
      
      //[Authorize(Roles = "admin")]
-     [HttpDelete(DeleteUserCommandRequest.Route)]
+     [HttpDelete(DeleteUserCommandRequest.Route + "/{id}")]
      public async Task<IActionResult> DeleteUser(string id, CancellationToken cancellationToken)
      {
          var response = await _mediator.Send(new DeleteUserCommandRequest { Id = id }, cancellationToken);
@@ -207,6 +216,59 @@ public class UserController : BaseController
         await _userService.Logout();
 
         return Ok("Logged out successfully");
+    }
+
+    /// <summary>
+    /// Kullanıcı hesabını siler (Soft Delete - 30 gün kurtarma süresi)
+    /// </summary>
+    /// <remarks>
+    /// Kullanıcı hesabını soft delete yapar. Hesap 30 gün boyunca kurtarılabilir.
+    /// 
+    /// **KVKK/GDPR Uyumlu:** 
+    /// - Kullanıcı verileri "deleted" olarak işaretlenir
+    /// - İlanlar "deleted" status alır
+    /// - 30 gün içinde recovery token ile kurtarma yapılabilir
+    /// - Kullanıcıya email ile bilgilendirme gönderilir
+    /// 
+    /// **Request Body Örneği:**
+    /// ```json
+    /// {
+    ///   "id": "550e8400-e29b-41d4-a716-446655440000",
+    ///   "password": "kullanici_sifresi",
+    ///   "confirmationText": "HESABIMI SIL"
+    /// }
+    /// ```
+    /// 
+    /// **Response Örneği (Başarılı):**
+    /// ```json
+    /// {
+    ///   "isSuccessfull": true,
+    ///   "code": 200,
+    ///   "message": "Hesabınız başarıyla silindi. 30 gün içinde destek ekibimize başvurarak hesabınızı kurtarabilirsiniz.",
+    ///   "data": {
+    ///     "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///     "deletedAt": "2025-12-02T10:30:00Z",
+    ///     "recoveryDeadline": "2026-01-02T10:30:00Z"
+    ///   }
+    /// }
+    /// ```
+    /// </remarks>
+    [HttpPost(DeleteUserCommandRequest.Route)]
+    [Authorize]
+    [SwaggerOperation(
+        Summary = "Hesap silme (Soft Delete)",
+        Description = "Kullanıcı hesabını soft delete yapar. 30 gün içinde kurtarılabilir. KVKK/GDPR uyumlu."
+    )]
+    [SwaggerResponse(200, "Hesap başarıyla silindi", typeof(ApiResponse<DeleteUserCommandResponse>))]
+    [SwaggerResponse(400, "Şifre yanlış veya onay metni hatalı")]
+    [SwaggerResponse(401, "Yetkisiz erişim - Token gerekli")]
+    [SwaggerResponse(404, "Kullanıcı bulunamadı")]
+    public async Task<IActionResult> DeleteAccount(
+        [FromBody] DeleteUserCommandRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        return Ok(response);
     }
 
 

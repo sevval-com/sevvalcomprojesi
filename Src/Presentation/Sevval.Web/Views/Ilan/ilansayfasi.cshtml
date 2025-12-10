@@ -111,7 +111,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
     @if (isNotActive)
     {
         <style>
@@ -167,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="navbaar-container">
             <div class="logo">
                <a href="/">
-                  <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                  <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
                 </a>
                 <span>Sevval.com</span>
             </div>
@@ -486,7 +486,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="emirhanPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanEmirhanPopup()">×</span>
-                    <img src="~/ImageFiles/emir.jpg" alt="Emirhan Acar Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/emir.webp" alt="Emirhan Acar Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -515,7 +515,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="ilkayPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanIlkayPopup()">×</span>
-                    <img src="~/ImageFiles/ilkay.jpg" alt="İlkay Koyun Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/ilkay.webp" alt="İlkay Koyun Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -543,7 +543,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="burakPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanBurakPopup()">×</span>
-                    <img src="~/ImageFiles/burak.jpg" alt="Burak TÜMEN Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/burak.webp" alt="Burak TÜMEN Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -572,7 +572,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="fahriPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanFahriPopup()">×</span>
-                    <img src="~/ImageFiles/fahri.jpg" alt="Fahri TÜMEN Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/fahri.webp" alt="Fahri TÜMEN Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -601,7 +601,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="korayPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanKorayPopup()">×</span>
-                    <img src="~/ImageFiles/serkan.jpg" alt="Serkan SÖZ Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/serkan.webp" alt="Serkan SÖZ Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -629,7 +629,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div id="erenPopup" class="danisman-popup" style="display: none;">
                 <div class="danisman-popup-content">
                     <span class="danisman-popup-close" onclick="closeDanismanErenPopup()">×</span>
-                    <img src="~/ImageFiles/eren.jpg" alt="Eren ACAR Fotoğraf" class="danisman-popup-image">
+                    <img src="~/ImageFiles/eren.webp" alt="Eren ACAR Fotoğraf" class="danisman-popup-image">
                 </div>
             </div>
 
@@ -748,7 +748,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="gallery-section" id="photo-gallery" style="display: block;">
                             <div class="photo-gallery-container">
                                 <div class="photo-window" id="photoWindow">
-                                    <img src="@("https://www.sevval.com/" + (Model?._Fotograflar?.FirstOrDefault()?.Url ?? "default.jpg"))"
+                                    <img src="@("https://www.sevval.com/" + (Model?._Fotograflar?.FirstOrDefault()?.Url ?? "default.webp"))"
                                          alt="Fotoğraf"
                                          class="gallery-image" />
                                 </div>
@@ -1408,20 +1408,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <img src="@("https://www.sevval.com/" + Model.User.ProfilePicturePath)"
                  alt="Profil Fotoğrafı"
                  class="profile-picture"
-                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.png';" />
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.webp';" />
         }
         else if (!string.IsNullOrEmpty(Model.CompanyOwnerProfilePicturePath))
         {
             <img src="@("https://www.sevval.com/" + Model.CompanyOwnerProfilePicturePath)"
                  alt="Şirket Sahibi Profil Fotoğrafı"
                  class="profile-picture"
-                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.png';" />
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.webp';" />
         }
         else
         {
             <!-- Eğer hiç fotoğraf yolu yoksa, varsayılan ikonu göster -->
             <!-- Varsayılan ikon yerine doğrudan varsayılan bir resim gösteriyoruz -->
-            <img src="https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
+            <img src="https://cdn-icons-png.flaticon.com/128/3177/3177440.webp"
                  alt="Varsayılan Profil Fotoğrafı"
                  class="profile-picture" />
         }
@@ -1443,12 +1443,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <!-- WhatsApp Iconu -->
                 <a href="javascript:void(0)" class="whatsapp-icon" target="_blank"
                    onclick="sendWhatsAppMessage('@Model.User.PhoneNumber')">
-                    <img src="https://img.icons8.com/fluency/48/000000/whatsapp.png" alt="WhatsApp" width="32" />
+                    <img src="https://img.icons8.com/fluency/48/000000/whatsapp.webp" alt="WhatsApp" width="32" />
                 </a>
 
                 <!-- Arama Iconu -->
                 <a href="tel:@Model.User.PhoneNumber" class="call-icon" onclick="updatePhoneCallCount(@Model._Ilanlar[0].Id)">
-                    <img src="https://img.icons8.com/fluency/48/000000/phone.png" alt="Call" width="32" />
+                    <img src="https://img.icons8.com/fluency/48/000000/phone.webp" alt="Call" width="32" />
                 </a>
 
                 <script>
@@ -1501,7 +1501,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <a href="#" class="ilan-mesaj-ikonu"
                    data-email="@Model.User.Email"
                    data-adsoyad="@Model.User.FirstName @Model.User.LastName">
-                    <img src="https://img.icons8.com/fluency/48/000000/sms.png" alt="Message" width="32" />
+                    <img src="https://img.icons8.com/fluency/48/000000/sms.webp" alt="Message" width="32" />
                 </a>
             </div>
         </div>
@@ -1692,14 +1692,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="company-logo">
                 <img src="@Url.Content(Model.CompanyOwnerProfilePicturePath)"
                      alt="Firma Sahibi Profili"
-                     onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/14385/14385352.png';" />
+                     onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/14385/14385352.webp';" />
             </div>
         }
         else
         {
             <!-- Eğer CompanyOwnerProfilePicturePath boşsa, varsayılan bir resim göster -->
             <div class="company-logo">
-                <img src="https://cdn-icons-png.flaticon.com/128/14385/14385352.png"
+                <img src="https://cdn-icons-png.flaticon.com/128/14385/14385352.webp"
                      alt="Varsayılan Firma Profili" />
             </div>
         }
@@ -2157,7 +2157,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- WhatsApp Logo -->
     <a id="whatsapp-link-8" href="#" target="_blank" class="whatsapp-float">
-        <img src="~/sablon/img/724destek.png" alt="WhatsApp" class="whatsapp-image">
+        <img src="~/sablon/img/724destek.webp" alt="WhatsApp" class="whatsapp-image">
     </a>
 
     <script>
@@ -2243,22 +2243,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <h2 class="footer-title">Bizi Takip Edin</h2>
                 <div class="social-icons">
                     <a href="https://www.kisa.link/wmZoa" class="social-icon" target="_blank">
-                        <img src="~/images/youtubelogo.png" alt="Youtube">
+                        <img src="~/images/youtubelogo.webp" alt="Youtube">
                     </a>
                     <a href="https://www.instagram.com/sevvalcom?igsh=ZThycHI4eXp1dHlw" class="social-icon" target="_blank">
-                        <img src="~/images/instagramlogo.png" alt="Instagram">
+                        <img src="~/images/instagramlogo.webp" alt="Instagram">
                     </a>
                     <a href="https://www.facebook.com/profile.php?id=61576226942639" class="social-icon" target="_blank">
-                        <img src="~/images/facebooklogo.png" alt="Facebook">
+                        <img src="~/images/facebooklogo.webp" alt="Facebook">
                     </a>
                     <a href="https://www.kisa.link/KWiFP" class="social-icon" target="_blank">
-                        <img src="~/images/tiktoklogo.png" alt="TikTok">
+                        <img src="~/images/tiktoklogo.webp" alt="TikTok">
                     </a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
+            <p>&copy; 2025 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
         </div>
     </footer>
 

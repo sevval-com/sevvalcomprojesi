@@ -10,12 +10,6 @@
     <None Remove="Migrations\videos\uploads\0c65d185-61a4-433f-9ded-8ba1e599f833_72.000 TL - AFYONKARAHİSAR SANDIKLI ÇAMBEYLİ KÖYÜNDE 157M² TARLAMIZ SATILIK.mp4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Migrations\videos\uploads\0c65d185-61a4-433f-9ded-8ba1e599f833_72.000 TL - AFYONKARAHİSAR SANDIKLI ÇAMBEYLİ KÖYÜNDE 157M² TARLAMIZ SATILIK.mp4">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Configuration\" />

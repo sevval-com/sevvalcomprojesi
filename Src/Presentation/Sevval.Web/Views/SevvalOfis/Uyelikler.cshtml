@@ -1,4 +1,4 @@
-@model TumIlanlarDTO
+﻿@model TumIlanlarDTO
 @using Sevval.Domain.Entities
 
 @{
@@ -103,7 +103,7 @@
         <div class="sidebar-wrapper d-none d-lg-block" id="sidebar">
             <nav class="sidebar p-3 h-100 d-flex flex-column">
                 <div class="text-center py-3">
-                    <img src="~/images/favlogo.png" alt="Şevval Ofis Logo" class="img-fluid mb-3" style="max-width: 100px;">
+                    <img src="~/images/favlogo.webp" alt="Şevval Ofis Logo" class="img-fluid mb-3" style="max-width: 100px;">
                     <h4 class="fw-bold text-primary">Şevval Ofis</h4>
                 </div>
                 <hr>
@@ -130,7 +130,7 @@
 
         <!-- Main Content -->
         <div class="content p-4">
-            <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+            <button class="btn btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                 <i class="bi bi-list"></i>
             </button>
             <h1 class="display-5 fw-bold mb-4">Üyelikler</h1>
@@ -146,6 +146,18 @@
                             <input type="radio" class="btn-check" name="userType" value="Bireysel" id="bireysel" @(ViewBag.Filter == "Bireysel" ? "checked" : "") onchange="location.href='?filter=Bireysel&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="bireysel">Bireysel</label>
 
+                            <input type="radio" class="btn-check" name="userType" value="Emlakçı" id="emlakci" @(ViewBag.Filter == "Emlakçı" ? "checked" : "") onchange="location.href='?filter=Emlakçı&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="emlakci">Emlakçı</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="İnşaat" id="insaat" @(ViewBag.Filter == "İnşaat" ? "checked" : "") onchange="location.href='?filter=İnşaat&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="insaat">İnşaat</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="Banka" id="banka" @(ViewBag.Filter == "Banka" ? "checked" : "") onchange="location.href='?filter=Banka&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="banka">Banka</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="Vakıf" id="vakif" @(ViewBag.Filter == "Vakıf" ? "checked" : "") onchange="location.href='?filter=Vakıf&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-primary" for="vakif">Vakıf</label>
+
                             <input type="radio" class="btn-check" name="userType" value="Kurumsal" id="kurumsal" @(ViewBag.Filter == "Kurumsal" ? "checked" : "") onchange="location.href='?filter=Kurumsal&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="kurumsal">Kurumsal</label>
 
@@ -154,20 +166,45 @@
 
                             <input type="radio" class="btn-check" name="userType" value="ücretli" id="ucretli" @(ViewBag.Filter == "ücretli" ? "checked" : "") onchange="location.href='?filter=ücretli&page=1&pageSize=@ViewBag.PageSize'">
                             <label class="btn btn-outline-primary" for="ucretli">Ücretli</label>
+
+                            <input type="radio" class="btn-check" name="userType" value="OnayBekleyen" id="onayBekleyen" @(ViewBag.Filter == "OnayBekleyen" ? "checked" : "") onchange="location.href='?filter=OnayBekleyen&page=1&pageSize=@ViewBag.PageSize'">
+                            <label class="btn btn-outline-warning" for="onayBekleyen">
+                                <i class="bi bi-clock-history me-1"></i> Onay Bekleyenler
+                                @if(ViewBag.PendingCount > 0)
+                                {
+                                    <span class="badge bg-warning text-dark">@ViewBag.PendingCount</span>
+                                }
+                            </label>
                         </div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-primary" disabled onclick="confirmBulkDelete()">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <button type="button" id="bulkApproveBtn" class="btn btn-success" disabled onclick="confirmBulkApprove()">
+                                <i class="bi bi-check-circle"></i> Seçilenleri Onayla
+                            </button>
+                            <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger" disabled onclick="confirmBulkDelete()">
                                 <i class="bi bi-trash"></i> Seçilenleri Sil
                             </button>
-                            <span id="selectedCount" class="text-muted ms-2 small">0 kayıt seçildi</span>
+                            <button type="button" id="createNumbersBtn" class="btn btn-primary" onclick="createNumbersByRegistrationDate()" title="Şevval Emlak K-0001 olacak, diğerleri kayıt tarihine göre numaralandırılacak">
+                                <i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur
+                            </button>
+                            <span id="selectedCount" class="text-muted small">0 kayıt seçildi</span>
                         </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                            <i class="bi bi-plus-circle me-1"></i> Yeni Kullanıcı Ekle
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="small text-muted mb-0">Sayfa başına:</label>
+                            <select class="form-select form-select-sm" style="width: auto;" onchange="location.href='?filter=@ViewBag.Filter&page=1&pageSize=' + this.value">
+                                <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                                <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+                                <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                                <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+                                <option value="999999" selected="@(ViewBag.PageSize == 999999)">Tümü</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="bi bi-plus-circle me-1"></i> Yeni Kullanıcı Ekle
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Table -->
@@ -181,6 +218,9 @@
                                         <th>Kullanıcı Adı</th>
                                         <th>E-Posta</th>
                                         <th>Tipi</th>
+                                        <th>Firma Adı</th>
+                                        <th>Firma No</th>
+                                        <th>Durum</th>
                                         <th>Abonelik</th>
                                         <th>İşlemler</th>
                                     </tr>
@@ -191,12 +231,47 @@
                                     }
                                     @foreach (var user in Model.Users)
                                     {
-                                        <tr>
+                                        <tr id="user-row-@user.Id">
                                             <td><input type="checkbox" name="selectedIds" value="@user.Id" class="form-check-input row-checkbox" onchange="updateSelectedCount()"></td>
                                             <td>@index</td>
                                             <td>@user.FirstName @user.LastName</td>
                                             <td>@user.Email</td>
                                             <td><span class="badge bg-primary bg-opacity-10 text-primary">@user.UserTypes</span></td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(user.CompanyName))
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                                else
+                                                {
+                                                    @user.CompanyName
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info text-dark">@user.FormattedFirmaNo</span>
+                                            </td>
+                                            <td>
+                                                @if (user.IsActive != null && user.IsActive.Trim().Equals("active", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-success" id="status-badge-@user.Id">Onaylı</span>
+                                                }
+                                                else if (user.IsActive != null && user.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-warning text-dark" id="status-badge-@user.Id">Beklemede</span>
+                                                }
+                                                else if (user.IsActive != null && (user.IsActive.Trim().Equals("inactive", StringComparison.OrdinalIgnoreCase) || user.IsActive.Trim().Equals("Inactive", StringComparison.OrdinalIgnoreCase)))
+                                                {
+                                                    <span class="badge bg-secondary" id="status-badge-@user.Id">Pasif</span>
+                                                }
+                                                else if (user.IsActive != null && user.IsActive.Trim().Equals("deleted", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <span class="badge bg-danger" id="status-badge-@user.Id">Silinmiş</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" id="status-badge-@user.Id">Belirsiz</span>
+                                                }
+                                            </td>
                                             <td>
                                                 @if (user.IsSubscribed == "ücretli")
                                                 {
@@ -208,6 +283,16 @@
                                                 }
                                             </td>
                                             <td>
+                                                <!-- 🆕 Detay Butonu (İstatistik Modalı) -->
+                                                <button type="button" class="btn btn-info btn-sm me-1" onclick="showMemberStats('@user.Id')" title="İstatistikler">
+                                                    <i class="bi bi-graph-up"></i>
+                                                </button>
+                                                @if (user.IsActive == "passive")
+                                                {
+                                                    <button type="button" class="btn btn-success btn-sm me-1" onclick="approveUser('@user.Id')" id="approve-btn-@user.Id" title="Onayla">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                }
                                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEditModal('@user.Id', '@user.FirstName', '@user.LastName', '@user.Email', '@user.UserTypes', '@user.CompanyName', '@user.IsSubscribed')">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
@@ -219,6 +304,42 @@
                             </table>
                         </div>
                     </form>
+
+                    <!-- Pagination ve Bilgi -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                        <div class="text-muted small">
+                            Toplam <strong>@ViewBag.TotalRecords</strong> kayıt - 
+                            Sayfa <strong>@ViewBag.CurrentPage</strong> / <strong>@ViewBag.TotalPages</strong>
+                        </div>
+                        
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <nav aria-label="Sayfa navigasyonu">
+                                <ul class="pagination pagination-sm mb-0">
+                                    @if (ViewBag.HasPreviousPage)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@(ViewBag.CurrentPage - 1)&pageSize=@ViewBag.PageSize">Önceki</a>
+                                        </li>
+                                    }
+                                    
+                                    @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@i&pageSize=@ViewBag.PageSize">@i</a>
+                                        </li>
+                                    }
+                                    
+                                    @if (ViewBag.HasNextPage)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?filter=@ViewBag.Filter&page=@(ViewBag.CurrentPage + 1)&pageSize=@ViewBag.PageSize">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,10 +367,91 @@
             const count = document.querySelectorAll('.row-checkbox:checked').length;
             document.getElementById('selectedCount').textContent = `${count} kayıt seçildi`;
             document.getElementById('bulkDeleteBtn').disabled = count === 0;
+            document.getElementById('bulkApproveBtn').disabled = count === 0;
             const selectAll = document.getElementById('selectAll');
             const total = document.querySelectorAll('.row-checkbox').length;
             selectAll.checked = count > 0 && count === total;
             selectAll.indeterminate = count > 0 && count < total;
+        }
+
+        function approveUser(userId) {
+            if (!confirm('Bu kullanıcıyı onaylamak istediğinizden emin misiniz?')) return;
+
+            // Buton devre dışı bırak
+            const btn = $('#approve-btn-' + userId);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Onaylanıyor...');
+
+            $.ajax({
+                url: '@Url.Action("ApproveUser", "SevvalOfis")',
+                type: 'POST',
+                data: { userId: userId },
+                success: function(response) {
+                    if (response.success) {
+                        // Update badge with animation
+                        const badge = $('#status-badge-' + userId);
+                        badge.fadeOut(200, function() {
+                            $(this).removeClass('bg-warning text-dark').addClass('bg-success')
+                                .html('<i class="bi bi-check-circle me-1"></i>Onaylı')
+                                .fadeIn(200);
+                        });
+                        
+                        // Hide approve button with animation
+                        btn.fadeOut(400, function() {
+                            $(this).remove();
+                        });
+                        
+                        // Modern toast notification (Bootstrap 5)
+                        const toastHtml = `
+                            <div class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" style="z-index: 9999;">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        <i class="bi bi-check-circle-fill me-2"></i>${response.message}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                                </div>
+                            </div>
+                        `;
+                        $('body').append(toastHtml);
+                        const toast = new bootstrap.Toast($('.toast').last()[0]);
+                        toast.show();
+                        
+                        // Toast otomatik silinsin
+                        setTimeout(() => { $('.toast').last().remove(); }, 5000);
+                    } else {
+                        btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i>');
+                        alert('Hata: ' + response.message);
+                    }
+                },
+                error: function() {
+                    btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i>');
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
+        }
+
+        function confirmBulkApprove() {
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(c => c.value);
+            const count = selectedIds.length;
+            
+            if (!confirm(`${count} kullanıcıyı onaylamak istediğinizden emin misiniz?`)) return;
+
+            $.ajax({
+                url: '@Url.Action("BulkApprove", "SevvalOfis")',
+                type: 'POST',
+                data: { selectedIds: selectedIds },
+                traditional: true,
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
         }
 
         function confirmBulkDelete() {
@@ -282,6 +484,129 @@
             }
         }
         $('#editUserTypes').on('change', toggleEditCompanyFields);
+
+        // 🆕 Üye İstatistikleri Modalını Göster
+        function showMemberStats(userId) {
+            // Loading göster
+            $('#statsModalBody').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Yükleniyor...</span></div></div>');
+            new bootstrap.Modal(document.getElementById('memberStatsModal')).show();
+
+            // İstatistikleri getir
+            $.ajax({
+                url: '@Url.Action("GetMemberStats", "SevvalOfis")',
+                type: 'GET',
+                data: { userId: userId },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
+                        $('#statsModalBody').html(`
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h5 class="text-primary">${data.fullName}</h5>
+                                    <p class="text-muted mb-0">${data.email}</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-primary bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-primary mb-0">${data.toplamIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Toplam İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-success bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-success mb-0">${data.fotografliIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Fotoğraflı İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-warning bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-warning mb-0">${data.fotografsizIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Fotoğrafsız İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-info bg-opacity-10 border-0">
+                                        <div class="card-body text-center">
+                                            <h3 class="text-info mb-0">${data.videoluIlanSayisi}</h3>
+                                            <p class="text-muted mb-0">Videolu İlan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="card bg-secondary bg-opacity-10 border-0">
+                                        <div class="card-body">
+                                            <p class="mb-1"><strong>Son İlan Tarihi:</strong></p>
+                                            <p class="text-muted mb-0">${data.sonIlanTarihi}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        $('#statsModalBody').html(`<div class="alert alert-danger">${response.message}</div>`);
+                    }
+                },
+                error: function() {
+                    $('#statsModalBody').html('<div class="alert alert-danger">İstatistikler yüklenirken hata oluştu.</div>');
+                }
+            });
+        }
+
+        // Numaraları kayıt tarihine göre oluştur (Şevval Emlak her zaman K-0001)
+        function createNumbersByRegistrationDate() {
+            if (!confirm('⚠️ NUMARALARI KAYIT TARİHİNE GÖRE OLUŞTUR\n\n🏆 ŞEVVAL EMLAK → K-0001 (Sabit)\n📅 Kurumsal kullanıcılar → K-0002, K-0003... (Kayıt tarihine göre)\n📅 Bireysel kullanıcılar → B-0001, B-0002... (Kayıt tarihine göre)\n\nDevam etmek istediğinize emin misiniz?')) {
+                return;
+            }
+
+            const btn = $('#createNumbersBtn');
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Oluşturuluyor...');
+
+            $.ajax({
+                url: '@Url.Action("CreateNumbersByRegistrationDate", "SevvalOfis")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ ' + response.message);
+                        location.reload();
+                    } else {
+                        alert('❌ Hata: ' + response.message);
+                        btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur');
+                    }
+                },
+                error: function() {
+                    alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                    btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat"></i> Numaraları Kayıt Tarihine Göre Oluştur');
+                }
+            });
+        }
     </script>
+
+    <!-- 🆕 Üye İstatistikleri Modalı -->
+    <div class="modal fade" id="memberStatsModal" tabindex="-1" aria-labelledby="memberStatsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberStatsModalLabel">
+                        <i class="bi bi-graph-up me-2"></i>Üye İstatistikleri
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="statsModalBody">
+                    <!-- İstatistikler buraya yüklenecek -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

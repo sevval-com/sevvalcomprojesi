@@ -1,4 +1,4 @@
-@model Sevval.Domain.Entities.ApplicationUser
+﻿@model Sevval.Domain.Entities.ApplicationUser
 
 <h4 class="aboutUs-title">Hakkımızda</h4>
 <div class="aboutUs-content">
@@ -37,30 +37,57 @@
     <div class="row g-3">
         <div class="col-md-6 text-center">
             <div class="card shadow-sm">
-                <div class="card-header fw-bold">Seviye 5 Belgesi</div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.Level5CertificatePath))
+                @{
+                    var document1Label = "Belge 1";
+                    if (Model.UserTypes == "Emlakçı")
                     {
-                        <img src="@Model.Level5CertificatePath" alt="Seviye 5 Belgesi" class="img-fluid rounded" />
+                        document1Label = "Seviye 5 Belgesi";
+                    }
+                    else if (Model.UserTypes == "İnşaat")
+                    {
+                        document1Label = "Müteahhitlik Belgesi";
+                    }
+                    else if (Model.UserTypes == "Banka")
+                    {
+                        document1Label = "İmza Sirküleri";
+                    }
+                    else if (Model.UserTypes == "Vakıf")
+                    {
+                        document1Label = "Vakıf Senedi";
+                    }
+                }
+                <div class="card-header fw-bold">@document1Label</div>
+                <div class="card-body">
+                    @{
+                        // Use Document1Path if available, fallback to old Level5CertificatePath for backward compatibility
+                        var doc1Path = !string.IsNullOrEmpty(Model.Document1Path) ? Model.Document1Path : Model.Level5CertificatePath;
+                    }
+                    @if (!string.IsNullOrEmpty(doc1Path))
+                    {
+                        <img src="@doc1Path" alt="@document1Label" class="img-fluid rounded" />
                     }
                     else
                     {
-                        <img src="/images/placeholders/camera.png" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
+                        <img src="/images/placeholders/camera.webp" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
                     }
                 </div>
             </div>
         </div>
         <div class="col-md-6 text-center">
             <div class="card shadow-sm">
-                <div class="card-header fw-bold">Yetki/Vergi Belgesi</div>
+                <div class="card-header fw-bold">Vergi Levhası</div>
                 <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.TaxPlatePath))
+                    @{
+                        // Use Document2Path if available, fallback to old TaxPlatePath for backward compatibility
+                        var doc2Path = !string.IsNullOrEmpty(Model.Document2Path) ? Model.Document2Path : Model.TaxPlatePath;
+                    }
+                    @if (!string.IsNullOrEmpty(doc2Path))
                     {
-                        <img src="@Model.TaxPlatePath" alt="Yetki/Vergi Belgesi" class="img-fluid rounded" />
+                        <img src="@doc2Path" alt="Vergi Levhası" class="img-fluid rounded" />
                     }
                     else
                     {
-                        <img src="/images/placeholders/camera.png" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
+                        <img src="/images/placeholders/camera.webp" alt="Belge Yüklenmemiş" class="img-fluid rounded" />
                     }
                 </div>
             </div>

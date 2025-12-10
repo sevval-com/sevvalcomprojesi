@@ -53,15 +53,15 @@
                     var ilanCount = Model._Ilanlar.Count(i => i.Email == user.Email);
                     if (filter == "All" ||
                     (filter == "Bireysel" && user.UserTypes == "BİREYSEL GİRİŞ") ||
-                    (filter == "Kurumsal" && user.UserTypes == "KURUMSAL GIRIŞ"))
+                    (filter == "Kurumsal" && (user.UserTypes == "KURUMSAL GIRIŞ" || user.UserTypes == "Emlakçı" || user.UserTypes == "İnşaat" || user.UserTypes == "Banka" || user.UserTypes == "Vakıf")))
                     {
                         <tr>
                             <td>@user.FirstName @user.LastName</td>
                             <td>@user.Email</td>
                             <td>@user.UserTypes</td>
-                            <td>@(user.UserTypes == "KURUMSAL GIRIŞ" ? user.CompanyName : "-")</td>
+                            <td>@(user.UserTypes == "KURUMSAL GIRIŞ" || user.UserTypes == "Emlakçı" || user.UserTypes == "İnşaat" || user.UserTypes == "Banka" || user.UserTypes == "Vakıf" ? user.CompanyName : "-")</td>
                             <td>
-                                @if (user.UserTypes == "KURUMSAL GIRIŞ")
+                                @if (user.UserTypes == "KURUMSAL GIRIŞ" || user.UserTypes == "Emlakçı" || user.UserTypes == "İnşaat" || user.UserTypes == "Banka" || user.UserTypes == "Vakıf")
                                 {
                                     @if (user.IsConsultant)
                                     {

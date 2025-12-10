@@ -22,7 +22,7 @@
 
     <!-- Navbar için gerekli olan özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
-    <link rel="icon" type="image/png" href="~/images/favlogo.png">
+    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 </head>
 <body>
@@ -32,7 +32,7 @@
         <div class="navbaar-container">
             <div class="logo">
                 <a href="/">
-                    <img src="~/images/LOGO mavi.png" alt="Firma Logosu">
+                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
                 </a>
                 <span>Şevval Emlak</span>
             </div>
@@ -340,7 +340,7 @@
                                         <tr>
                                             <td>@(item.index + 1)</td>
                                             <td>
-                                                <img src="@(string.IsNullOrEmpty(item.item.ProfilePicturePath) ? "/ImageFiles/boşprofifoto.png" : item.item.ProfilePicturePath)"
+                                                <img src="@(string.IsNullOrEmpty(item.item.ProfilePicturePath) ? "/ImageFiles/boşprofifoto.webp" : item.item.ProfilePicturePath)"
                                                      alt="Profil Fotoğrafı" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                                             </td>
                                             <td>@item.item.FirstName @item.item.LastName</td>

@@ -30,10 +30,10 @@ namespace Sevval.Api.Controllers
         }
 
         [HttpPost(RefreshTokenCommandRequest.Route)]
-        [SwaggerOperation(Summary = "Oturum açma işlemini gerçekleştirir.")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommandRequest request)
+        [SwaggerOperation(Summary = "Oturum açma işlemini gerçekleştirir.")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommandRequest request, CancellationToken cancellationToken)
         {
-            var response = await _mediator.Send(request, CancellationToken.None);
+            var response = await _mediator.Send(request, cancellationToken);
 
             return Ok(response);
         }
@@ -41,3 +41,4 @@ namespace Sevval.Api.Controllers
         
     }
 }
+

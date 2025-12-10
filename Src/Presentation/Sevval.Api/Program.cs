@@ -68,11 +68,11 @@ builder.Services.AddAuthentication(opt =>
         ValidIssuer = tokenOptions.Issuer,
         IssuerSigningKey = SignHelper.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
         ValidAudience = tokenOptions.Audiences[0],
-        ValidateIssuerSigningKey = true, //imzasýný doðrula
+        ValidateIssuerSigningKey = true, //imzasï¿½nï¿½ doï¿½rula
         ValidateAudience = true,
         ValidateIssuer = true,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,//token ömrü tolere etme süresi
+        ClockSkew = TimeSpan.Zero,//token ï¿½mrï¿½ tolere etme sï¿½resi
 
     };
 
@@ -81,26 +81,28 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
 
 
-//builder.Services.AddCors(options =>
-//     options.AddPolicy("SevvalClients", builder =>
-//     {
-//         builder.WithOrigins(
-//             "http://185.48.183.238",
-//             "https://www.Sevval.com",
-//             "https://Sevval.com",
-//             "https://api.Sevval.com",
-//             "http://185.48.183.238:80",
-//             "https://185.48.183.238:443",
-//             "http://localhost:5173",
-//             "http://localhost:7078",
-//             "http://localhost:5174",
-//             "https://localhost:7078"
-//             )
-//         .AllowAnyHeader()
-//         .AllowAnyMethod()
-//         .AllowCredentials();
-//     }
-//     ));
+builder.Services.AddCors(options =>
+     options.AddPolicy("SevvalClients", builder =>
+     {
+         builder.WithOrigins(
+             "http://185.48.183.238",
+             "https://www.Sevval.com",
+             "https://Sevval.com",
+             "https://api.Sevval.com",
+             "http://185.48.183.238:80",
+             "https://185.48.183.238:443",
+             "http://localhost:5173",
+             "http://localhost:7078",
+             "http://localhost:5174",
+             "https://localhost:7078",
+             "http://localhost:5096",
+             "http://localhost:5235"
+             )
+         .AllowAnyHeader()
+         .AllowAnyMethod()
+         .AllowCredentials();
+     }
+     ));
 builder.Services.AddDataProtection()
    .PersistKeysToDbContext<ApplicationDbContext>().SetApplicationName("SevvalApp");
 

@@ -54,7 +54,7 @@ namespace Sevval.Infrastructure.Services
             // 1️⃣ Firmaları filtrele
             var companiesQuery = _readRepository.Queryable().AsNoTracking()
                 .Where(u => !u.IsConsultant &&
-                           (u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
+                           (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
                            || u.UserTypes == "İnşaat" || u.UserTypes == "Banka"));
 
             if (!string.IsNullOrEmpty(request.Search))
@@ -282,7 +282,7 @@ namespace Sevval.Infrastructure.Services
             {
                 var consultantsQuery = _readRepository.Queryable()
                  .Where(u => !u.IsConsultant &&
-                           (u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
+                           (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
                            || u.UserTypes == "İnşaat" || u.UserTypes == "Banka"));
 
                 var totalCount = await consultantsQuery.CountAsync(cancellationToken);

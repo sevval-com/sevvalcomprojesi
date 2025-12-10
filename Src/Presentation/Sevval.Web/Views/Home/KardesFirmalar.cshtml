@@ -1,10 +1,10 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.csproj.Dto.Company.CompanySearchDto
 
 <link rel="stylesheet" href="~/css/kardesfirmalar.css">
 <link rel="stylesheet" href="~/css/anasayfa.css">
-<link rel="icon" type="image/png" href="~/images/favlogo.png">
+<link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 <style>
     body {
@@ -12,7 +12,7 @@
         flex-direction: column;
         min-height: 100vh; /* Sayfa yüksekliğini %100 yapar */
         margin: 0; /* Varsayılan margin'i kaldırır */
-        background-image: url('~/images/arka-plan-resmi.jpg');
+        background-image: url('~/images/arka-plan-resmi.webp');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -912,7 +912,7 @@
 <!-- Başlık artık aynı satırda ortalanacak; aşağıdaki satır içinde yer alıyor -->
 
 <div class="user-list">
-    <form method="get" action="@Url.Action("KardesFirmalar", "Home")" style="margin-bottom: 20px;">
+    <form method="get" action="@Url.Action("Firmalar", "Home")" style="margin-bottom: 20px;">
         <div class="firms-header-row">
             <div class="filters-col">
                 <div class="filter-controls">
@@ -955,7 +955,7 @@
                     !string.IsNullOrEmpty(ViewBag.CurrentDistrict as string) ||
                     !string.IsNullOrEmpty(ViewBag.CurrentSortBy as string))
                     {
-                        <a href="@Url.Action("KardesFirmalar", "Home", new { pageSize = ViewBag.PageSize })"
+                        <a href="@Url.Action("Firmalar", "Home", new { pageSize = ViewBag.PageSize })"
                            class="filter-btn clear-btn">
                             Temizle
                         </a>
@@ -994,7 +994,7 @@
         {
             foreach (var user in Model.Companies)
             {
-                <li class="user-card" data-company="@user.CompanyName?.ToUpper()" style="display: none;" role="listitem">
+                <li class="user-card" data-company="@user.CompanyName?.ToUpper()" role="listitem">
                     <div class="badge-year">
                         @if (user is not null)
                         {
@@ -1020,13 +1020,13 @@
                     </div>
 
                     <div class="img-box loading" aria-hidden="true">
-                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.png" : user.ProfilePicturePath)"
+                        <img src="@(string.IsNullOrEmpty(user.ProfilePicturePath) ? "/ImageFiles/kurumsalbosfoto.webp" : user.ProfilePicturePath)"
                              alt="Profil Fotoğrafı"
                              class="user-profile-picture"
                              width="80" height="80"
                              loading="lazy"
                              onload="this.parentElement.classList.remove('loading')"
-                             onerror="this.src='/ImageFiles/kurumsalbosfoto.png'; this.parentElement.classList.remove('loading')" />
+                             onerror="this.src='/ImageFiles/kurumsalbosfoto.webp'; this.parentElement.classList.remove('loading')" />
                     </div>
 
                     <p class="user-name">
@@ -1112,7 +1112,7 @@
     <!-- Previous Button -->
     @if (hasPreviousPage)
     {
-        <a href="@Url.Action("KardesFirmalar", "Home", new { page = currentPage - 1, pageSize = pageSize,
+        <a href="@Url.Action("Firmalar", "Home", new { page = currentPage - 1, pageSize = pageSize,
             search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
            class="pagination-btn">‹ Önceki</a>
     }
@@ -1124,7 +1124,7 @@
     <!-- First page if not in range -->
     @if (startPage > 1)
     {
-        <a href="@Url.Action("KardesFirmalar", "Home", new { page = 1, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+        <a href="@Url.Action("Firmalar", "Home", new { page = 1, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
            class="pagination-btn">1</a>
         @if (startPage > 2)
         {
@@ -1141,7 +1141,7 @@
         }
         else
         {
-            <a href="@Url.Action("KardesFirmalar", "Home", new { page = i, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+            <a href="@Url.Action("Firmalar", "Home", new { page = i, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
                class="pagination-btn">@i</a>
         }
     }
@@ -1153,14 +1153,14 @@
         {
             <span class="pagination-btn" style="background-color: transparent; border: none; cursor: default;">...</span>
         }
-        <a href="@Url.Action("KardesFirmalar", "Home", new { page = totalPages, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+        <a href="@Url.Action("Firmalar", "Home", new { page = totalPages, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
            class="pagination-btn">@totalPages</a>
     }
 
     <!-- Next Button -->
     @if (hasNextPage)
     {
-        <a href="@Url.Action("KardesFirmalar", "Home", new { page = currentPage + 1, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
+        <a href="@Url.Action("Firmalar", "Home", new { page = currentPage + 1, pageSize = pageSize, search = currentSearch, province = currentProvince, district = currentDistrict, sortBy = currentSortBy })"
            class="pagination-btn">Sonraki ›</a>
     }
     else
@@ -1197,172 +1197,80 @@
 @section Scripts {
 
     <script>
-
-
         document.addEventListener('DOMContentLoaded', function () {
-            // Arama kutusu ve kartlar
-            const searchInput = document.getElementById('searchInput');
-            const userCards = document.querySelectorAll('.user-card');
-
-            // 'ViewBag' ile gelen değerleri JavaScript'e aktarıyoruz
-            const firmCount = parseInt('@firmCounter', 10);  // Sayıya çeviriyoruz
-            const totalUserCount = parseInt('@totalUserCount', 10);  // Sayıya çeviriyoruz
-
-            // Kontrol: Eğer bu değerler geçerli değilse 0 yapalım
-            if (isNaN(firmCount)) {
-                firmCount = 0;
-            }
-            if (isNaN(totalUserCount)) {
-                totalUserCount = 0;
+            // Firma ve danışman sayılarını statik placeholder olarak ayarla (daktilo efekti kaldırıldı - performans için)
+            var firmCount = parseInt('@firmCounter', 10) || 0;
+            var totalUserCount = parseInt('@totalUserCount', 10) || 0;
+            var searchInput = document.getElementById('searchInput');
+            if (searchInput && !searchInput.value) {
+                searchInput.placeholder = firmCount + ' Firma Arasından Arayın...';
             }
 
-
-
-            // Daktilo efekti ile yazı yazma
-            var messages = [
-                `"${firmCount}" Firma Arasından Aramanızı Yapın...`,
-                `Sitemizde "${firmCount}" Firma ve "${totalUserCount}" Danışman bulunmaktadır...`
-            ];
-
-            let currentMessageIndex = 0;
-            let charIndex = 0;
-
-            // Daktilo efektini başlatan fonksiyon
-            function typewriterEffect() {
-                if (charIndex < messages[currentMessageIndex].length) {
-                    document.getElementById('searchInput').setAttribute(
-                        "placeholder",
-                        messages[currentMessageIndex].substring(0, charIndex + 1)
-                    );
-                    charIndex++;
-                    setTimeout(typewriterEffect, 50); // Harfler arası süre (50ms)
-                } else {
-                    setTimeout(() => {
-                        currentMessageIndex = (currentMessageIndex + 1) % messages.length;
-                        charIndex = 0;
-                        typewriterEffect();
-                    }, 3000); // Mesajın tamamının gösterilme süresi (3 saniye)
+            // Sıralama select'ini ViewBag değerine göre ayarla
+            var currentSortBy = '@(ViewBag.CurrentSortBy ?? "")';
+            if (currentSortBy) {
+                var sortBySelect = document.getElementById('sortByFilter');
+                if (sortBySelect) {
+                    sortBySelect.value = currentSortBy;
                 }
             }
-
-            typewriterEffect();
-
-            // Add pressed feedback on tap/click for designated links/buttons
-            function addPressFeedback(selector){
-                document.querySelectorAll(selector).forEach(function(el){
-                    el.classList.add('press-feedback');
-                    el.addEventListener('mousedown', function(){ el.classList.add('pressed'); });
-                    el.addEventListener('mouseup', function(){ el.classList.remove('pressed'); });
-                    el.addEventListener('mouseleave', function(){ el.classList.remove('pressed'); });
-                    el.addEventListener('touchstart', function(){ el.classList.add('pressed'); }, {passive:true});
-                    el.addEventListener('touchend', function(){ el.classList.remove('pressed'); });
-                    el.addEventListener('touchcancel', function(){ el.classList.remove('pressed'); });
-                });
-            }
-
-            addPressFeedback('.pagination-btn, .announcement-minimal, .user-name a, .filter-btn, .search-row-wrap button[type="submit"], .post-ad, .clear-btn, .apply-btn');
         });
-
     </script>
 
 
 
     <script>
-        const userItemsPerPage = 16; // Sayfa başına gösterilecek kullanıcı sayısı
-        let userCurrentPage = 1;
-        const userItems = document.querySelectorAll('.user-card'); // Üyeler
-        const userTotalItems = userItems.length;
-        const userTotalPages = Math.ceil(userTotalItems / userItemsPerPage);
-        const userMaxVisibleButtons = 5; // Görünen maksimum sayfa butonu
-
-        // Sayfa göstermek için fonksiyon
-        function showUserPage(page) {
-            const start = (page - 1) * userItemsPerPage;
-            const end = start + userItemsPerPage;
-
-            userItems.forEach((item, index) => {
-                if (index >= start && index < end) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            userCurrentPage = page;
-
-        }
-
-
-
-        // Sayfa yüklendiğinde pagination'ı başlat
-        document.addEventListener('DOMContentLoaded', function () {
-            showUserPage(userCurrentPage);
-        });
-
-        // Eğer sayfa zaten yüklenmişse hemen başlat
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () {
-                showUserPage(userCurrentPage);
-            });
-        } else {
-            showUserPage(userCurrentPage);
-        }
-
+        // API tabanlı il/ilçe yükleme - büyük JSON dosyası yerine
         $(document).ready(function () {
-            $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
-                // Tüm kategori alanları için il seçeneği doldur
-                ['provinceFilter'].forEach(function (id) {
-                    data.forEach(function (city) {
-                        $(`#${id}`).append(new Option(city.Il, city.Il));
+            var currentProvince = $('#CurrentProvince').val();
+            var currentDistrict = $('#CurrentDistrict').val();
+
+            // İlleri API'den yükle
+            $.ajax({
+                url: '/api/provinces',
+                method: 'GET',
+                dataType: 'json',
+                success: function (provinces) {
+                    provinces.forEach(function (province) {
+                        $('#provinceFilter').append(new Option(province, province));
                     });
-                });
 
-                // Mevcut seçili değerleri al
-                var currentProvince = $('#CurrentProvince').val();
-                var currentDistrict = $('#CurrentDistrict').val();
-
-                // Eğer mevcut il değeri varsa, onu seçili yap
-                if (currentProvince) {
-                    $('#provinceFilter').val(currentProvince);
-
-                    // İlçeleri doldur
-                    var selectedCityData = data.find(c => c.Il === currentProvince);
-                    if (selectedCityData) {
-                        selectedCityData.Ilce.forEach(function (district) {
-                            $('#districtFilter').append(new Option(district.Ilce, district.Ilce));
-                        });
-
-                        // Eğer mevcut ilçe değeri varsa, onu seçili yap
-                        if (currentDistrict) {
-                            $('#districtFilter').val(currentDistrict);
-                        }
+                    // Mevcut il seçili ise
+                    if (currentProvince) {
+                        $('#provinceFilter').val(currentProvince);
+                        // İlçeleri yükle
+                        loadDistricts(currentProvince, currentDistrict);
                     }
                 }
-
-                // İl değiştiğinde ilgili kategorinin ilçelerini doldur
-                ['provinceFilter'].forEach(function (id) {
-                    $(`#${id}`).change(function () {
-                        var selectedCity = $(this).val();
-                        var relatedSemt = $(this).attr('id').replace('provinceFilter', 'districtFilter');
-
-                        // İlçeleri ve mahalleleri temizle
-                        $(`#${relatedSemt}`).empty().append('<option value="">Tüm İlçeler</option>');
-
-                        // İlgili ili bul ve ilçeleri ekle
-                        var selectedCityData = data.find(c => c.Il === selectedCity);
-
-                        if (selectedCityData) {
-                            selectedCityData.Ilce.forEach(function (district) {
-                                $(`#${relatedSemt}`).append(new Option(district.Ilce, district.Ilce));
-                            });
-                        }
-                    });
-                });
-
-
             });
-        });
 
+            // İl değiştiğinde ilçeleri yükle
+            $('#provinceFilter').change(function () {
+                var selectedCity = $(this).val();
+                $('#districtFilter').empty().append('<option value="">Tüm İlçeler</option>');
+
+                if (selectedCity) {
+                    loadDistricts(selectedCity);
+                }
+            });
+
+            function loadDistricts(province, selectedDistrict) {
+                $.ajax({
+                    url: '/api/districts/' + encodeURIComponent(province),
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (districts) {
+                        districts.forEach(function (district) {
+                            $('#districtFilter').append(new Option(district, district));
+                        });
+
+                        if (selectedDistrict) {
+                            $('#districtFilter').val(selectedDistrict);
+                        }
+                    }
+                });
+            }
+        });
     </script>
 
 }

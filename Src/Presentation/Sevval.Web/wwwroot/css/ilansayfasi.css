@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern ve okunaklı yazı tipi */
-    background-image: url('https://i.hizliresim.com/ebmo9vk.png?_gl=1*13rvrbr*_ga*MTU1MzEyMDEzMi4xNzM0MzM3NTkz*_ga_M9ZRXYS2YN*MTczNTM1NzgzOC4zLjEuMTczNTM1ODMzOC4zNS4wLjA.'); /* Arka plan olarak fotoğraf ekleyin */
+    background-image: url('https://i.hizliresim.com/ebmo9vk.webp?_gl=1*13rvrbr*_ga*MTU1MzEyMDEzMi4xNzM0MzM3NTkz*_ga_M9ZRXYS2YN*MTczNTM1NzgzOC4zLjEuMTczNTM1ODMzOC4zNS4wLjA.'); /* Arka plan olarak fotoğraf ekleyin */
     background-size: cover; /* Fotoğrafın tam sayfayı kaplamasını sağlar */
     background-position: center center; /* Fotoğrafın ortalanmasını sağlar */
     background-attachment: fixed; /* Arka planın sayfa kaydırıldığında sabit kalmasını sağlar */

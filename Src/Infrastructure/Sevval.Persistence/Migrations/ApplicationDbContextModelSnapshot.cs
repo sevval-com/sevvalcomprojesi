@@ -309,6 +309,12 @@ namespace Sevval.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Document1Path")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Document2Path")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -538,6 +544,9 @@ namespace Sevval.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("UserFullName")
                         .HasColumnType("TEXT");
 
@@ -681,6 +690,39 @@ namespace Sevval.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("Sevval.Domain.Entities.DeletedAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeletionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecoveryToken")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeletedAt");
+
+                    b.HasIndex("RecoveryToken");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DeletedAccounts");
                 });
 
             modelBuilder.Entity("Sevval.Domain.Entities.District", b =>
@@ -2355,6 +2397,17 @@ namespace Sevval.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("InvitedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Sevval.Domain.Entities.DeletedAccount", b =>
+                {
+                    b.HasOne("Sevval.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Sevval.Domain.Entities.ForgettenPassword", b =>

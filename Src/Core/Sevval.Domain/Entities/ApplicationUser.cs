@@ -9,6 +9,20 @@ public class ApplicationUser : IdentityUser
 {
     public int UserOrder { get; set; }
 
+    /// <summary>
+    /// Formatlanmış Firma No döndürür (K-0001, B-0001 formatında)
+    /// </summary>
+    [NotMapped]
+    public string FormattedFirmaNo
+    {
+        get
+        {
+            if (UserOrder == 0) return "Atanmadı";
+            var prefix = UserTypes == "Bireysel" ? "B" : "K";
+            return $"{prefix}-{UserOrder:D4}";
+        }
+    }
+
     [Required]
     public string FirstName { get; set; } = string.Empty;
 
@@ -24,7 +38,19 @@ public class ApplicationUser : IdentityUser
   
     public string? ProfilePicturePath { get; set; }
     public string? BannerPicturePath { get; set; }
+    
+    // 🆕 Kurumsal Kullanıcılar için Belge Yolları (UserTypes'a göre dinamik)
+    // Emlakçı: Document1 = Seviye 5, Document2 = Vergi Levhası
+    // İnşaat: Document1 = Müteahhitlik Belgesi, Document2 = Vergi Levhası
+    // Banka: Document1 = İmza Sirküleri, Document2 = Vergi Levhası
+    // Vakıf: Document1 = Vakıf Senedi, Document2 = Vergi Levhası
+    public string? Document1Path { get; set; }
+    public string? Document2Path { get; set; }
+    
+    // ⚠️ DEPRECATED: Geriye dönük uyumluluk için tutuyoruz, yeni kayıtlar Document1/2 kullanacak
+    [Obsolete("Use Document1Path instead")]
     public string? Level5CertificatePath { get; set; }
+    [Obsolete("Use Document2Path instead")]
     public string? TaxPlatePath { get; set; }
 
 

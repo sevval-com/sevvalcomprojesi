@@ -29,7 +29,7 @@ public class ConsultantService :  IConsultantService
         try
         {
             var consultantsQuery = _readRepository.Queryable().Where(u => 
-                           u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
+                           u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal" || u.UserTypes == "Vakıf"
                            || u.UserTypes == "İnşaat" || u.UserTypes == "Banka");
 
             if (!string.IsNullOrEmpty(request.Status))
