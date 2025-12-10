@@ -28,8 +28,8 @@ namespace Sevval.Application.Features.User.Commands.CorporateRegister
         }
         private readonly string[] allowedUserTypes = new[]
 {
-    
-    "Kurumsal",
+    "Emlakçı",   // 🆕 Yeni kurumsal tip
+    "Kurumsal",  // ⚠️ Geriye dönük uyumluluk
     "İnşaat",
     "Vakıf",
     "Banka"

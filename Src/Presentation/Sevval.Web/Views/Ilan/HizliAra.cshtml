@@ -189,6 +189,9 @@
         right: 12px;
         width: 36px;
         height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        aspect-ratio: 1;
         border-radius: 50%;
         background: white;
         border: none;
@@ -200,6 +203,13 @@
         transition: 0.2s;
         z-index: 3;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .action-btn i {
+        font-size: 14px;
+        line-height: 1;
     }
 
         .action-btn:hover {
@@ -372,7 +382,7 @@
                         <div class="p-3 border-bottom bg-white">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" name="AnahtarKelime" class="form-control bg-light border-start-0" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
+                                <input type="text" name="anahtarKelime" class="form-control bg-light border-start-0" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
                             </div>
                         </div>
 
@@ -385,7 +395,7 @@
                             </h2>
                             <div id="filterCat" class="accordion-collapse collapse show" data-bs-parent="#desktopFilters">
                                 <div class="accordion-body">
-                                    <select name="Kategori" class="form-select form-select-sm">
+                                    <select name="detayliAramaRequestDTO.Kategori" class="form-select form-select-sm" id="desktopKategoriSelect">
                                         <option value="">Tümü</option>
                                         <option value="Konut (Yaşam Alanı)">Konut</option>
                                         <option value="Arsa">Arsa</option>
@@ -409,8 +419,8 @@
                             <div id="filterPrice" class="accordion-collapse collapse" data-bs-parent="#desktopFilters">
                                 <div class="accordion-body">
                                     <div class="d-flex gap-2">
-                                        <input type="number" name="EnDusukFiyat" class="form-control form-control-sm" placeholder="En Az">
-                                        <input type="number" name="EnYuksekFiyat" class="form-control form-control-sm" placeholder="En Çok">
+                                        <input type="number" name="detayliAramaRequestDTO.EnDusukFiyat" class="form-control form-control-sm" placeholder="En Az" value="@ViewBag.EnDusukFiyat">
+                                        <input type="number" name="detayliAramaRequestDTO.EnYuksekFiyat" class="form-control form-control-sm" placeholder="En Çok" value="@ViewBag.EnYuksekFiyat">
                                     </div>
                                 </div>
                             </div>
@@ -426,8 +436,8 @@
                             <div id="filterArea" class="accordion-collapse collapse" data-bs-parent="#desktopFilters">
                                 <div class="accordion-body">
                                     <div class="d-flex gap-2">
-                                        <input type="number" name="EnAzMetrekare" class="form-control form-control-sm" placeholder="Min">
-                                        <input type="number" name="EnCokMetrekare" class="form-control form-control-sm" placeholder="Max">
+                                        <input type="number" name="detayliAramaRequestDTO.EnAzMetrekare" class="form-control form-control-sm" placeholder="Min" value="@ViewBag.EnAzMetrekare">
+                                        <input type="number" name="detayliAramaRequestDTO.EnCokMetrekare" class="form-control form-control-sm" placeholder="Max" value="@ViewBag.EnCokMetrekare">
                                     </div>
                                 </div>
                             </div>
@@ -446,7 +456,7 @@
                                     <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
                                         <ul class="list-unstyled m-0 small" id="province-list-d"></ul>
                                     </div>
-                                    <input type="hidden" name="Il" id="selectedProvinceD" />
+                                    <input type="hidden" name="detayliAramaRequestDTO.Il" id="selectedProvinceD" value="@ViewBag.Il" />
                                 </div>
                             </div>
                         </div>
@@ -472,7 +482,7 @@
                     <div class="accordion accordion-flush" id="mobileFilters">
 
                         <div class="p-3 bg-light border-bottom">
-                            <input type="text" name="AnahtarKelime" class="form-control" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
+                            <input type="text" name="anahtarKelime" class="form-control" placeholder="Kelime / İlan No" value="@ViewBag.AnahtarKelime">
                         </div>
 
                         <!-- Aynı Kategori Yapısı Mobil İçin -->
@@ -482,12 +492,14 @@
                             </h2>
                             <div id="mFilterCat" class="accordion-collapse collapse show" data-bs-parent="#mobileFilters">
                                 <div class="accordion-body">
-                                    <select name="Kategori" class="form-select">
+                                    <select name="detayliAramaRequestDTO.Kategori" class="form-select" id="mobileKategoriSelect">
                                         <option value="">Tümü</option>
                                         <option value="Konut (Yaşam Alanı)">Konut</option>
                                         <option value="Arsa">Arsa</option>
                                         <option value="Arazi">Arazi</option>
-                                        <!-- Diğerleri -->
+                                        <option value="Bahçe">Bahçe</option>
+                                        <option value="Tarla">Tarla</option>
+                                        <option value="Turistik Tesis">Turistik Tesis</option>
                                         <option value="İş Yeri">İş Yeri</option>
                                     </select>
                                 </div>
@@ -501,8 +513,8 @@
                             <div id="mFilterPrice" class="accordion-collapse collapse" data-bs-parent="#mobileFilters">
                                 <div class="accordion-body">
                                     <div class="row g-2">
-                                        <div class="col-6"><input type="number" name="EnDusukFiyat" class="form-control" placeholder="Min TL"></div>
-                                        <div class="col-6"><input type="number" name="EnYuksekFiyat" class="form-control" placeholder="Max TL"></div>
+                                        <div class="col-6"><input type="number" name="detayliAramaRequestDTO.EnDusukFiyat" class="form-control" placeholder="Min TL" value="@ViewBag.EnDusukFiyat"></div>
+                                        <div class="col-6"><input type="number" name="detayliAramaRequestDTO.EnYuksekFiyat" class="form-control" placeholder="Max TL" value="@ViewBag.EnYuksekFiyat"></div>
                                     </div>
                                 </div>
                             </div>
@@ -518,7 +530,7 @@
                                     <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
                                         <ul class="list-unstyled m-0" id="province-list-m"></ul>
                                     </div>
-                                    <input type="hidden" name="Il" id="selectedProvinceM" />
+                                    <input type="hidden" name="detayliAramaRequestDTO.Il" id="selectedProvinceM" value="@ViewBag.Il" />
                                 </div>
                             </div>
                         </div>
@@ -540,17 +552,17 @@
                     <p class="text-muted small mb-0">Toplam <strong>@Model.Count</strong> ilan bulundu</p>
                 </div>
                 <div class="d-none d-md-block">
-                    <select class="form-select form-select-sm" style="min-width: 150px;">
-                        <option>Sıralama: Önerilen</option>
-                        <option>Fiyat Artan</option>
-                        <option>Fiyat Azalan</option>
+                    <select class="form-select form-select-sm" style="min-width: 150px;" id="sortSelect" onchange="sortResults(this.value)">
+                        <option value="recommended">Sıralama: Önerilen</option>
+                        <option value="price_asc">Fiyat Artan</option>
+                        <option value="price_desc">Fiyat Azalan</option>
                     </select>
                 </div>
             </div>
 
             @if (Model.Count > 0)
             {
-                <div class="row g-3 g-lg-4">
+                <div class="row g-3 g-lg-4" id="resultsContainer">
                     @foreach (var ilan in Model.OrderByDescending(i => i.GirisTarihi))
                     {
                         bool isLand = new[] { "Tarla", "Bağ", "Bahçe", "Arsa", "Arazi" }.Contains(ilan.Category);
@@ -565,7 +577,7 @@
                         col-xl-4: Masaüstünde 3 sütun
                         col-xxl-4: Geniş ekranda 3 sütun (Kullanıcı daha geniş kart istediği için 3 yaptık, önceden 4'tü)
                         */
-                        <div class="col-12 col-md-6 col-xl-4 col-xxl-4 result-item">
+                        <div class="col-12 col-md-6 col-xl-4 col-xxl-4 result-item" data-price="@ilan.IlanFiyati" data-date="@ilan.GirisTarihi.ToString("yyyy-MM-ddTHH:mm:ss")" data-order="@Model.OrderByDescending(i => i.GirisTarihi).ToList().IndexOf(ilan)">
                             <div class="ad-card h-100">
 
                                 <!-- Resim -->
@@ -578,7 +590,7 @@
                                         <i class="fas fa-link"></i>
                                     </button>
 
-                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="d-block h-100">
+                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="d-block h-100" target="_blank">
                                         @if (!string.IsNullOrEmpty(ilan.IlanVitrinImageUrl))
                                         {
                                             <img src="@ilan.IlanVitrinImageUrl" class="card-img-top" alt="@ilan.IlanBasligi" loading="lazy">
@@ -596,7 +608,7 @@
 
                                 <!-- Bilgi -->
                                 <div class="card-body">
-                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="text-decoration-none">
+                                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="text-decoration-none" target="_blank">
                                         <h3 class="ad-title" title="@ilan.IlanBasligi">@ilan.IlanBasligi</h3>
                                     </a>
 
@@ -655,8 +667,12 @@
                                     <div class="company-info" title="@firmaAdi">
                                         <i class="fas fa-user-tie me-1"></i> @firmaAdi
                                     </div>
-                                    <div>
-                                        <i class="far fa-clock me-1"></i> @tarihFormat
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-primary fw-bold" title="İlan No">
+                                            <i class="fas fa-hashtag me-1"></i>@ilan.Id
+                                        </span>
+                                        <span class="text-muted">|</span>
+                                        <span><i class="far fa-clock me-1"></i>@tarihFormat</span>
                                     </div>
                                 </div>
 
@@ -826,5 +842,45 @@
 
         let nextDisabled = currentPage === totalPages ? 'disabled' : '';
         pagination.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" onclick="showPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></a></li>`;
+    }
+
+    // Sayfa yüklenince filtre değerlerini setle
+    document.addEventListener('DOMContentLoaded', function() {
+        var kategoriValue = '@(ViewBag.Kategori ?? "")';
+        if (kategoriValue) {
+            var desktopSelect = document.getElementById('desktopKategoriSelect');
+            var mobileSelect = document.getElementById('mobileKategoriSelect');
+            if (desktopSelect) desktopSelect.value = kategoriValue;
+            if (mobileSelect) mobileSelect.value = kategoriValue;
+        }
+    });
+
+    // --- SIRALAMA FONKSİYONU ---
+    function sortResults(sortType) {
+        var container = document.getElementById('resultsContainer');
+        if (!container) return;
+
+        var items = Array.from(container.querySelectorAll('.result-item'));
+
+        items.sort(function(a, b) {
+            if (sortType === 'price_asc') {
+                return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            } else if (sortType === 'price_desc') {
+                return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            } else {
+                // recommended - varsayılan sıralama (tarih)
+                return parseInt(a.dataset.order) - parseInt(b.dataset.order);
+            }
+        });
+
+        // DOM'u yeniden düzenle
+        items.forEach(function(item) {
+            container.appendChild(item);
+        });
+
+        // Sayfalama varsa güncelle
+        if (typeof showPage === 'function') {
+            showPage(1);
+        }
     }
 </script>

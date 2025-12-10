@@ -271,7 +271,7 @@
         const pageWidth = doc.internal.pageSize.getWidth();
 
         // === Logo ===
-        const logoPath = "/images/sevval_logo.jpg";
+        const logoPath = "/images/sevval_logo.webp";
         doc.addImage(logoPath, "JPEG", 15, 10, 30, 20);
 
         // === Head ===

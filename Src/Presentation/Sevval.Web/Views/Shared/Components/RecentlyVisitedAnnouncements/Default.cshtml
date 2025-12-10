@@ -1,4 +1,4 @@
-@model List<Sevval.Application.Features.RecentlyVisitedAnnouncement.Queries.GetRecentlyVisitedAnnouncement.GetRecentlyVisitedAnnouncementQueryResponse>
+﻿@model List<Sevval.Application.Features.RecentlyVisitedAnnouncement.Queries.GetRecentlyVisitedAnnouncement.GetRecentlyVisitedAnnouncementQueryResponse>
 
 @if (Model != null && Model.Any())
 {
@@ -19,7 +19,7 @@
                             {
                                 <img src="@ilan.IlanVitrinImageUrl" alt="@ilan.IlanBasligi"
                                      loading="lazy"
-                                     onerror="this.src='/ImageFiles/kurumsalbosfoto.png'" />
+                                     onerror="this.src='/ImageFiles/kurumsalbosfoto.webp'" />
                             }
                             <span class="result-price">@ilan.IlanFiyati.ToString("N0") TL</span>
                             @{

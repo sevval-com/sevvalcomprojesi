@@ -402,7 +402,7 @@ public class VideolarSayfasiController : Controller
 
             if (model.KapakFotografi == null)
             {
-                yeniVideo.KapakFotografiYolu = $"https://img.youtube.com/vi/{yeniVideo.VideoYolu}/hqdefault.jpg";
+                yeniVideo.KapakFotografiYolu = $"https://img.youtube.com/vi/{yeniVideo.VideoYolu}/hqdefault.webp";
             }
             else
             {
@@ -486,7 +486,7 @@ public class VideolarSayfasiController : Controller
             video.VideoYolu = ytId;
             if (string.IsNullOrWhiteSpace(video.KapakFotografiYolu))
             {
-                video.KapakFotografiYolu = $"https://img.youtube.com/vi/{ytId}/hqdefault.jpg";
+                video.KapakFotografiYolu = $"https://img.youtube.com/vi/{ytId}/hqdefault.webp";
             }
         }
 
@@ -508,7 +508,7 @@ public class VideolarSayfasiController : Controller
     private async Task<string> GenerateThumbnailAsync(string videoPath)
     {
         string thumbnailsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "VideoSayfasi/Kapaklar");
-        string thumbnailFileName = $"{Path.GetFileNameWithoutExtension(videoPath)}.jpg";
+        string thumbnailFileName = $"{Path.GetFileNameWithoutExtension(videoPath)}.webp";
         string thumbnailFilePath = Path.Combine(thumbnailsFolder, thumbnailFileName);
         string thumbnailWebPath = $"/VideoSayfasi/Kapaklar/{thumbnailFileName}";
         string arguments = $"-i \"{videoPath}\" -ss 00:00:05 -vframes 1 -q:v 2 \"{thumbnailFilePath}\"";

@@ -12,13 +12,26 @@ namespace sevvalemlak.Dto
         public List<ApplicationUser> Firmalar { get; set; }
         public List<ApplicationUser> Danismanlar { get; set; }
 
-        // Filtreleme alanları
+        // --- Mevcut Filtreler ---
         public string IlanNo { get; set; }
         public string FirmaId { get; set; }
         public string DanismanEmail { get; set; }
+        public string IlanSahibiArama { get; set; }
+
+        // --- Yeni Eklenen Filtreler ---
+        public string BaslikArama { get; set; } // İlan başlığı kelime bazlı arama
+
         public string Sehir { get; set; }
         public string Ilce { get; set; }
-        public string IlanSahibiArama { get; set; }
+        public string Mahalle { get; set; } // Mahalle/Köy filtresi
+
+        // Fiyat Aralığı
+        public decimal? MinFiyat { get; set; }
+        public decimal? MaxFiyat { get; set; }
+
+        // Metrekare Aralığı
+        public double? MinMetrekare { get; set; }
+        public double? MaxMetrekare { get; set; }
 
         // Sayfalama
         public int CurrentPage { get; set; }

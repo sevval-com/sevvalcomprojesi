@@ -14,353 +14,401 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
     <style>
         :root {
             --primary-color: #0d6efd;
             --secondary-color: #6c757d;
-            --light-color: #f8f9fa;
-            --bs-blue: #0d6efd;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #eef5f9;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
 
+        /* Header */
         .page-header {
-            background: linear-gradient(90deg, #0d6efd, #0d6efd);
-            color: #fff;
+            background: #fff;
             padding: 15px 30px;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-            .page-header .logo-details {
-                display: flex;
-                align-items: center;
-            }
-
-                .page-header .logo-details i {
-                    font-size: 30px;
-                    margin-right: 15px;
-                }
-
-            .page-header .logo_name {
-                font-size: 24px;
-                font-weight: 600;
-            }
-
-            .page-header .page-title {
-                font-size: 22px;
-                font-weight: 500;
-                margin: 0;
-            }
-
-        .main-content {
-            padding: 30px;
+        .logo_name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
-        .card {
-            border: 0;
+        /* Sidebar Filtre */
+        .filter-card {
+            background: #fff;
             border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            position: sticky;
+            top: 20px;
         }
 
-        .table-responsive {
+        .filter-header {
+            padding: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            font-weight: 600;
+        }
+
+        .filter-body {
+            padding: 15px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+
+        /* Table */
+        .content-card {
+            background: #fff;
             border-radius: 0.75rem;
-        }
-
-        .table {
-            border-collapse: separate;
-            border-spacing: 0;
+            border: 1px solid #e5e7eb;
             overflow: hidden;
         }
 
-            .table thead th {
-                background-color: var(--primary-color);
-                color: white;
-            }
+        .table thead th {
+            background-color: #f9fafb;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
 
-                .table thead th:first-child {
-                    border-top-left-radius: 0.5rem;
-                }
-
-                .table thead th:last-child {
-                    border-top-right-radius: 0.5rem;
-                }
-
-
-            .table tbody tr:hover {
-                background-color: #f1f5f9;
-            }
-
-            .table td, .table th {
-                vertical-align: middle;
-            }
+        .table tbody tr:hover {
+            background-color: #f9fafb;
+        }
 
         .ilan-thumbnail {
-            width: 100px;
-            height: 70px;
+            width: 80px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 0.5rem;
+            border-radius: 0.375rem;
         }
 
         .ilan-title-link {
             text-decoration: none;
-            color: var(--primary-color);
+            color: #111827;
             font-weight: 600;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 2px;
         }
 
             .ilan-title-link:hover {
-                text-decoration: underline;
+                color: var(--primary-color);
             }
 
-        .btn-group-sm .btn {
+        .meta-info {
             font-size: 0.75rem;
+            color: #6b7280;
         }
 
-        .select2-container .select2-selection--single {
-            height: 38px;
+        /* Select2 Fixes */
+        .select2-container--bootstrap-5 .select2-selection {
+            border-color: #d1d5db;
         }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px;
+        .small-font-select2 {
+            font-size: 0.875rem;
         }
 
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
-        }
-
-        .select2-container--default .select2-selection--single, .form-control, .form-select {
-            border-radius: 0.5rem;
-        }
-
-        .btn {
-            border-radius: 0.5rem;
-            font-weight: 500;
-        }
-
+        /* Pagination */
         .pagination .page-link {
-            border-radius: 0.5rem;
+            border: none;
+            color: #6b7280;
+            margin: 0 2px;
+            border-radius: 0.375rem;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            color: white;
         }
     </style>
 </head>
 <body>
-    <header class="page-header shadow-sm sticky-top">
+    <header class="page-header shadow-sm sticky-top z-3">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="logo-details">
-                <span class="logo_name">Şevval Ofis</span>
+                <span class="logo_name"><i class="fa-solid fa-building-user me-2"></i>Şevval Ofis</span>
             </div>
-            <h1 class="page-title d-none d-md-block">@ViewData["Title"]</h1>
-            <a href="@Url.Action("Index", "SevvalOfis")" class="btn btn-outline-light"><i class="fa-solid fa-arrow-left me-2"></i>Panele Dön</a>
+            <div class="d-flex align-items-center gap-3">
+                <h1 class="h5 mb-0 d-none d-md-block text-secondary">@ViewData["Title"]</h1>
+                <a href="@Url.Action("Index", "SevvalOfis")" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Panele Dön</a>
+            </div>
         </div>
     </header>
 
-    <main class="main-content">
-        <div class="container-fluid">
-            <!-- Filtreleme Bölümü -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fa-solid fa-filter me-2 text-primary"></i>Filtrele
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Index" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-2">
-                                <label for="ilanNo" class="form-label">İlan No</label>
-                                <input type="text" class="form-control" id="ilanNo" name="ilanNo" value="@Model.IlanNo">
+    <div class="container-fluid py-4">
+        <form asp-action="Index" method="get" id="filterForm">
+            <div class="row g-4">
+                <!-- SOL PANEL: FİLTRELEME -->
+                <aside class="col-lg-3 col-xl-2">
+                    <div class="filter-card shadow-sm">
+                        <div class="filter-header d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-filter me-2 text-primary"></i>Filtrele</span>
+                            <a href="@Url.Action("Index")" class="btn btn-link btn-sm text-decoration-none p-0">Temizle</a>
+                        </div>
+                        <div class="filter-body">
+                            <!-- İlan No -->
+                            <div class="filter-group">
+                                <label class="filter-label">İlan No</label>
+                                <input type="number" class="form-control form-control-sm" name="ilanNo" value="@Model.IlanNo" placeholder="Örn: 1024">
                             </div>
-                            <div class="col-md-3">
-                                <label for="firmaId" class="form-label">Firma</label>
-                                <select class="form-select" id="firmaId" name="firmaId" data-placeholder="Tüm Firmalar">
-                                    <option value=""></option>
+
+                           @*  <!-- Başlık Arama -->
+                            <div class="filter-group">
+                                <label class="filter-label">İlan Başlığı</label>
+                                <input type="text" class="form-control form-control-sm" name="baslikArama" value="@Model.BaslikArama" placeholder="Kelime ara...">
+                            </div> *@
+
+                           @*  <!-- Konum (Cascading) -->
+                            <hr class="my-3 text-secondary opacity-25">
+                            <div class="filter-group">
+                                <label class="filter-label">İl</label>
+                                <select class="form-select form-select-sm select2-basic" id="sehirSelect" name="sehir">
+                                    <option value="">Tümü</option>
+                                    <!-- JSON'dan dolacak -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">İlçe</label>
+                                <select class="form-select form-select-sm select2-basic" id="ilceSelect" name="ilce" disabled>
+                                    <option value="">Önce İl Seçin</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Mahalle / Köy</label>
+                                <select class="form-select form-select-sm select2-basic" id="mahalleSelect" name="mahalle" disabled>
+                                    <option value="">Önce İlçe Seçin</option>
+                                </select>
+                            </div> *@
+
+                            <!-- Fiyat -->
+                            <hr class="my-3 text-secondary opacity-25">
+                            <div class="filter-group">
+                                <label class="filter-label">Fiyat (TL)</label>
+                                <div class="d-flex gap-2">
+                                    <input type="number" class="form-control form-control-sm" name="minFiyat" value="@Model.MinFiyat" placeholder="En az">
+                                    <input type="number" class="form-control form-control-sm" name="maxFiyat" value="@Model.MaxFiyat" placeholder="En çok">
+                                </div>
+                            </div>
+
+                            <!-- Metrekare -->
+                            <div class="filter-group">
+                                <label class="filter-label">Metrekare (m²)</label>
+                                <div class="d-flex gap-2">
+                                    <input type="number" class="form-control form-control-sm" name="minMetrekare" value="@Model.MinMetrekare" placeholder="En az">
+                                    <input type="number" class="form-control form-control-sm" name="maxMetrekare" value="@Model.MaxMetrekare" placeholder="En çok">
+                                </div>
+                            </div>
+
+                            <!-- Firma / Danışman -->
+                            <hr class="my-3 text-secondary opacity-25">
+                            <div class="filter-group">
+                                <label class="filter-label">Firma</label>
+                                <select class="form-select form-select-sm select2-basic" id="firmaId" name="firmaId">
+                                    <option value="">Tüm Firmalar</option>
                                     @foreach (var firma in Model.Firmalar.Where(f => !string.IsNullOrEmpty(f.CompanyName)).OrderBy(f => f.CompanyName))
                                     {
                                         <option value="@firma.Id" selected="@(Model.FirmaId == firma.Id)">@firma.CompanyName</option>
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label for="danismanEmail" class="form-label">Danışman</label>
-                                <select class="form-select" id="danismanEmail" name="danismanEmail" disabled data-placeholder="Önce Firma Seçin">
-                                    <option value=""></option>
+                            <div class="filter-group">
+                                <label class="filter-label">Danışman</label>
+                                <select class="form-select form-select-sm select2-basic" id="danismanEmail" name="danismanEmail" disabled>
+                                    <option value="">Tüm Danışmanlar</option>
                                 </select>
                             </div>
-@*                             <div class="col-md-2">
-                                <label for="sehir" class="form-label">Şehir</label>
-                                <input type="text" class="form-control" id="sehir" name="sehir" value="@Model.Sehir">
+
+                            <!-- İlan Sahibi Arama -->
+                            <div class="filter-group">
+                                <label class="filter-label">İlan Sahibi Ara</label>
+                                <input type="text" class="form-control form-control-sm" name="ilanSahibiArama" value="@Model.IlanSahibiArama" placeholder="İsim veya şirket...">
                             </div>
-                            <div class="col-md-2">
-                                <label for="ilce" class="form-label">İlçe</label>
-                                <input type="text" class="form-control" id="ilce" name="ilce" value="@Model.Ilce">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="ilanSahibiArama" class="form-label">İlan Sahibi / Firma Adı</label>
-                                <input type="text" class="form-control" id="ilanSahibiArama" name="ilanSahibiArama" value="@Model.IlanSahibiArama" placeholder="Ad, soyad veya firma adı...">
-                            </div>
- *@                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-magnifying-glass"></i> Ara</button>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <a asp-action="Index" class="btn btn-secondary w-100"><i class="fa-solid fa-rotate-left"></i> Temizle</a>
-                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fa-solid fa-search me-1"></i> Sonuçları Getir</button>
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Toplu İşlem Bölümü -->
-            <div id="bulk-actions" class="card shadow-sm mb-4" style="display: none;">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div>
-                        <span id="selection-count" class="fw-bold">0</span> ilan seçildi.
                     </div>
-                    <div>
-                        <button class="btn btn-primary" id="bulk-assign-btn"><i class="fa-solid fa-user-tag me-2"></i>Toplu Ata</button>
-                        <button class="btn btn-danger" id="bulk-delete-btn"><i class="fa-solid fa-trash me-2"></i>Toplu Sil</button>
+                </aside>
+
+                <!-- SAĞ PANEL: İLAN LİSTESİ -->
+                <main class="col-lg-9 col-xl-10">
+
+                    <!-- Toplu İşlem Barı -->
+                    <div id="bulk-actions" class="alert alert-info d-flex align-items-center justify-content-between py-2 mb-3 shadow-sm" style="display: none;">
+                        <div>
+                            <i class="fa-solid fa-check-double me-2"></i>
+                            <span id="selection-count" class="fw-bold">0</span> ilan seçildi.
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-light border" id="bulk-assign-btn"><i class="fa-solid fa-user-tag text-primary me-1"></i>Toplu Ata</button>
+                            <button type="button" class="btn btn-sm btn-light border text-danger" id="bulk-delete-btn"><i class="fa-solid fa-trash me-1"></i>Toplu Sil</button>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- İlan Tablosu -->
-            <div class="card shadow-sm">
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 50px;" class="text-center"><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>
-                                <th scope="col" style="width: 120px;">Görsel</th>
-                                <th scope="col">İlan Bilgileri</th>
-                                <th scope="col" style="width: 150px;">Fiyat</th>
-                                <th scope="col">Sahip</th>
-                                <th scope="col">Firma</th>
-                                <th scope="col" class="text-center" style="width: 200px;">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Ilanlar)
+                    <!-- İlan Tablosu -->
+                    <div class="content-card shadow-sm">
+                        <div class="table-responsive">
+                            <table class="table mb-0 align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;" class="text-center"><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>
+                                        <th style="width: 100px;">Görsel</th>
+                                        <th>İlan Bilgileri</th>
+                                        <th style="width: 130px;">Fiyat</th>
+                                        <th>Sahip</th>
+                                        <th>Firma</th>
+                                        <th class="text-end" style="width: 140px;">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Ilanlar.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                <i class="fa-solid fa-folder-open fa-2x mb-3 d-block"></i>
+                                                Aradığınız kriterlere uygun ilan bulunamadı.
+                                            </td>
+                                        </tr>
+                                    }
+                                    @foreach (var item in Model.Ilanlar)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><input class="form-check-input row-checkbox" type="checkbox" value="@item.Ilan.Id"></td>
+                                            <td>
+                                                <img src="@(item.VitrinFotografi != null ? "https://www.sevval.com" + item.VitrinFotografi.Url : "https://placehold.co/100x70/EFEFEF/AAAAAA?text=Resim+Yok")"
+                                                     class="ilan-thumbnail" alt="İlan Görseli">
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("ilansayfasi", "Ilan", new { id = item.Ilan.Id })" target="_blank" class="ilan-title-link">
+                                                    @(string.IsNullOrEmpty(item.Ilan.Title) ? "Başlıksız İlan" : item.Ilan.Title)
+                                                </a>
+                                                <div class="meta-info">
+                                                    <span class="badge bg-light text-dark border me-1">#@item.Ilan.Id</span>
+                                                    <span>@item.Ilan.sehir / @item.Ilan.semt</span>
+                                                    @if (!string.IsNullOrEmpty(item.Ilan.mahalleKoy))
+                                                    {
+                                                        <span> / @item.Ilan.mahalleKoy</span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark">@item.Ilan.Price.ToString("N0") ₺</div>
+                                                <div class="small text-muted">@item.Ilan.Area m²</div>
+                                            </td>
+                                            <td>
+                                                @if (item.IlanSahibi != null)
+                                                {
+                                                    <div class="fw-medium text-dark">@item.IlanSahibi.FirstName @item.IlanSahibi.LastName</div>
+                                                    <div class="meta-info small">@item.IlanSahibi.Email</div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic">Bilinmiyor</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary text-white fw-normal">@item.FirmaAdi</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-light btn-sm border" type="button" data-bs-toggle="dropdown">
+                                                        <i class="fa-solid fa-ellipsis"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                        <li><a class="dropdown-item" href="@Url.Action("Edit", "Ilan", new { id = item.Ilan.Id })"><i class="fa-solid fa-pencil text-warning me-2"></i>Düzenle</a></li>
+                                                        <li><button class="dropdown-item btn-ata" data-id="@item.Ilan.Id"><i class="fa-solid fa-user-tag text-primary me-2"></i>Ata</button></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><button class="dropdown-item text-danger btn-sil" data-id="@item.Ilan.Id"><i class="fa-solid fa-trash me-2"></i>Sil</button></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Footer / Sayfalama -->
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
+                            <div class="small text-muted">
+                                Toplam <strong>@Model.TotalCount</strong> ilan bulundu.
+                            </div>
+                            @if (Model.TotalPages > 1)
                             {
-                                <tr>
-                                    <td class="text-center"><input class="form-check-input row-checkbox" type="checkbox" value="@item.Ilan.Id"></td>
-                                    <td>
-                                        <img src="@(item.VitrinFotografi != null ? "https://www.sevval.com" + item.VitrinFotografi.Url : "https://placehold.co/100x70/EFEFEF/AAAAAA?text=N/A")"
-                                             class="ilan-thumbnail" alt="@item.Ilan.Title">
-                                    </td>
-                                    <td>
-                                        <a href="@Url.Action("ilansayfasi", "Ilan", new { id = item.Ilan.Id })" target="_blank" class="ilan-title-link">@item.Ilan.Title</a>
-                                        <div class="text-muted small">ID: @item.Ilan.Id | @item.Ilan.sehir / @item.Ilan.semt</div>
-                                    </td>
-                                    <td class="fw-bold text-danger">@item.Ilan.Price.ToString("N0") TL</td>
-                                    <td>
-                                        @if (item.IlanSahibi != null)
-                                        {
-                                            <span>@item.IlanSahibi.FirstName @item.IlanSahibi.LastName</span>
+                                <nav>
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                            <button type="submit" form="filterForm" name="page" value="1" class="page-link">&laquo;</button>
+                                        </li>
+                                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                            <button type="submit" form="filterForm" name="page" value="@(Model.CurrentPage - 1)" class="page-link">‹</button>
+                                        </li>
+
+                                        @{
+                                            int startPage = Math.Max(1, Model.CurrentPage - 2);
+                                            int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
                                         }
-                                        else
+
+                                        @for (int i = startPage; i <= endPage; i++)
                                         {
-                                            <span class="text-muted">Bilinmiyor</span>
+                                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                                <button type="submit" form="filterForm" name="page" value="@i" class="page-link">@i</button>
+                                            </li>
                                         }
-                                    </td>
-                                    <td><span class="badge bg-secondary">@item.FirmaAdi</span></td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="@Url.Action("Edit", "Ilan", new { id = item.Ilan.Id })" class="btn btn-outline-secondary" title="Düzenle"><i class="fa-solid fa-pencil"></i></a>
-                                            <button class="btn btn-outline-primary btn-ata" data-id="@item.Ilan.Id" title="Ata"><i class="fa-solid fa-user-tag"></i></button>
-                                            <button class="btn btn-outline-danger btn-sil" data-id="@item.Ilan.Id" title="Sil"><i class="fa-solid fa-trash"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                            <button type="submit" form="filterForm" name="page" value="@(Model.CurrentPage + 1)" class="page-link">›</button>
+                                        </li>
+                                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                            <button type="submit" form="filterForm" name="page" value="@Model.TotalPages" class="page-link">&raquo;</button>
+                                        </li>
+                                    </ul>
+                                </nav>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+                    </div>
+                </main>
             </div>
+        </form>
+    </div>
 
-            <!-- Sayfalama -->
-            @if (Model.TotalPages > 1)
-            {
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <!-- İlk Sayfa -->
-                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = 1, ilanNo = Model.IlanNo, firmaId = Model.FirmaId, danismanEmail = Model.DanismanEmail, sehir = Model.Sehir, ilce = Model.Ilce, ilanSahibiArama = Model.IlanSahibiArama })">İlk</a>
-                        </li>
-                        <!-- Önceki Sayfa -->
-                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, ilanNo = Model.IlanNo, firmaId = Model.FirmaId, danismanEmail = Model.DanismanEmail, sehir = Model.Sehir, ilce = Model.Ilce, ilanSahibiArama = Model.IlanSahibiArama })">Önceki</a>
-                        </li>
-
-                        @{
-                            int totalPages = Model.TotalPages;
-                            int currentPage = Model.CurrentPage;
-                            int visiblePages = 5;
-                            int startPage = Math.Max(1, currentPage - 2);
-                            int endPage = Math.Min(totalPages, currentPage + 2);
-
-                            if (startPage == 1)
-                            {
-                                endPage = Math.Min(totalPages, visiblePages);
-                            }
-                            if (endPage == totalPages)
-                            {
-                                startPage = Math.Max(1, totalPages - visiblePages + 1);
-                            }
-                        }
-
-                        @if (startPage > 1)
-                        {
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                        }
-
-                        @for (int i = startPage; i <= endPage; i++)
-                        {
-                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { page = i, ilanNo = Model.IlanNo, firmaId = Model.FirmaId, danismanEmail = Model.DanismanEmail, sehir = Model.Sehir, ilce = Model.Ilce, ilanSahibiArama = Model.IlanSahibiArama })">@i</a>
-                            </li>
-                        }
-
-                        @if (endPage < totalPages)
-                        {
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                        }
-
-                        <!-- Sonraki Sayfa -->
-                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, ilanNo = Model.IlanNo, firmaId = Model.FirmaId, danismanEmail = Model.DanismanEmail, sehir = Model.Sehir, ilce = Model.Ilce, ilanSahibiArama = Model.IlanSahibiArama })">Sonraki</a>
-                        </li>
-                        <!-- Son Sayfa -->
-                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, ilanNo = Model.IlanNo, firmaId = Model.FirmaId, danismanEmail = Model.DanismanEmail, sehir = Model.Sehir, ilce = Model.Ilce, ilanSahibiArama = Model.IlanSahibiArama })">Son</a>
-                        </li>
-                    </ul>
-                </nav>
-            }
-        </div>
-    </main>
     <!-- Atama Modalı -->
     <div class="modal fade" id="ataModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">İlan Ata</h5>
+                    <h5 class="modal-title">Danışman Ata</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="modalIlanId" />
                     <div class="mb-3">
-                        <label for="modalFirmaSelect" class="form-label">1. Firma Seçin</label>
+                        <label class="form-label">Firma</label>
                         <select class="form-select" id="modalFirmaSelect">
-                            <option value="">Firma seçiniz...</option>
+                            <option value="">Seçiniz...</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="modalDanismanSelect" class="form-label">2. Danışman Seçin</label>
+                        <label class="form-label">Danışman</label>
                         <select class="form-select" id="modalDanismanSelect" disabled>
                             <option value="">Önce firma seçiniz...</option>
                         </select>
@@ -368,344 +416,287 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-primary" id="modalAtaButton" disabled>Atamayı Tamamla</button>
+                    <button type="button" class="btn btn-primary" id="modalAtaButton" disabled>Kaydet</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Onay Modalı -->
-    <div class="modal fade" id="onayModal" tabindex="-1" aria-labelledby="onayModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="onayModalTitle"><i class="fa-solid fa-circle-question me-2"></i>Onay Gerekiyor</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="onayModalMesaj"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-primary" id="onayModalOnaylaButton">Evet, Onayla</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Onay/Bilgi Modalları -->
+    <div class="modal fade" id="onayModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header bg-light"><h5 class="modal-title fs-6">Onay</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p id="onayModalMesaj" class="mb-0"></p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">İptal</button><button type="button" class="btn btn-sm btn-primary" id="onayModalOnaylaButton">Onayla</button></div></div></div></div>
+    <div class="modal fade" id="bilgiModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fs-6" id="bilgiModalTitle">Bilgi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p id="bilgiModalMesaj" class="mb-0"></p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Tamam</button></div></div></div></div>
 
-    <!-- Bilgi/Sonuç Modalı -->
-    <div class="modal fade" id="bilgiModal" tabindex="-1" aria-labelledby="bilgiModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header text-white" id="bilgiModalHeader">
-                    <h5 class="modal-title" id="bilgiModalTitle"></h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="bilgiModalMesaj" class="mb-0"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Kapat</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $(document).ready(function () {
-            const onayModal = new bootstrap.Modal(document.getElementById('onayModal'));
-            const bilgiModal = new bootstrap.Modal(document.getElementById('bilgiModal'));
-
-            // Bilgi/Sonuç Modalı için genel bir fonksiyon
-            function showInfoModal(message, type = 'info') {
-                const modalTitle = $('#bilgiModalTitle');
-                const modalHeader = $('#bilgiModalHeader');
-                const modalMessage = $('#bilgiModalMesaj');
-
-                modalMessage.text(message);
-
-                // Reset header class
-                modalHeader.removeClass('bg-success bg-danger bg-warning bg-primary');
-
-                switch (type) {
-                    case 'success':
-                        modalTitle.html('<i class="fa-solid fa-circle-check me-2"></i>Başarılı');
-                        modalHeader.addClass('bg-success');
-                        break;
-                    case 'error':
-                        modalTitle.html('<i class="fa-solid fa-circle-xmark me-2"></i>Hata');
-                        modalHeader.addClass('bg-danger');
-                        break;
-                    case 'warning':
-                        modalTitle.html('<i class="fa-solid fa-triangle-exclamation me-2"></i>Uyarı');
-                        modalHeader.addClass('bg-warning text-dark'); // Sarı arkaplan için
-                        break;
-                    default:
-                        modalTitle.html('<i class="fa-solid fa-circle-info me-2"></i>Bilgi');
-                        modalHeader.addClass('bg-primary');
-                        break;
+            // --- Select2 ---
+            // Tüm select elementlerine Select2 uygula (Artık İl/İlçe/Mahalle de dahil)
+            $('.select2-basic').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownCssClass: "small-font-select2",
+                language: {
+                    noResults: function () {
+                        return "Sonuç bulunamadı";
+                    }
                 }
-                bilgiModal.show();
+            });
+
+            // --- LOKASYON YÖNETİMİ ---
+            var locationData = [];
+            // encodeURI kullanımı: Dosya yolundaki Türkçe karakterleri güvenli hale getirir
+            const jsonUrl = encodeURI('/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json');
+
+            $.getJSON(jsonUrl, function (data) {
+                console.log("JSON Yüklendi:", data.length + " kayıt");
+                locationData = data;
+
+                // Şehirleri Doldur
+                var sehirSelect = $('#sehirSelect');
+                sehirSelect.empty().append('<option value="">Tümü</option>');
+
+                $.each(data, function (index, item) {
+                    // Standart yapı: item.name
+                    if (item.name) {
+                        sehirSelect.append(new Option(item.name, item.name, false, false));
+                    }
+                });
+
+                // Seçili Şehir Varsa Set Et
+                var selectedSehir = '@Html.Raw(Model.Sehir)';
+                if (selectedSehir) {
+                    sehirSelect.val(selectedSehir).trigger('change');
+                }
+            }).fail(function(jqxhr, textStatus, error){
+                console.error("JSON Hatası:", error);
+                console.error("Yol:", jsonUrl);
+                alert("Lokasyon verileri yüklenemedi. Konsol hatalarını kontrol edin.");
+            });
+
+            // Şehir Seçilince
+            $('#sehirSelect').on('change', function () {
+                var cityName = $(this).val();
+                var ilceSelect = $('#ilceSelect');
+                var mahalleSelect = $('#mahalleSelect');
+
+                ilceSelect.empty().append('<option value="">Önce İl Seçin</option>').prop('disabled', true);
+                mahalleSelect.empty().append('<option value="">Önce İlçe Seçin</option>').prop('disabled', true);
+
+                if (cityName) {
+                    var city = locationData.find(x => x.name === cityName);
+                    // Dosya yapısında 'counties' veya 'ilceler' olabilir, ikisini de kontrol et
+                    var counties = city ? (city.counties || city.ilceler) : null;
+
+                    if (counties) {
+                        ilceSelect.empty().append('<option value="">Tümü</option>').prop('disabled', false);
+
+                        $.each(counties, function (index, item) {
+                            var name = item.name || item.ilce_adi; // Olası property isimleri
+                            if(name) {
+                                ilceSelect.append(new Option(name, name, false, false));
+                            }
+                        });
+
+                        // Seçili İlçe Varsa Set Et
+                        var selectedIlce = '@Html.Raw(Model.Ilce)';
+                        // Sadece ilk yüklemede veya kullanıcı henüz elle değiştirmediyse
+                        if (selectedIlce && !ilceSelect.data('loaded')) {
+                            if(ilceSelect.find("option[value='" + selectedIlce + "']").length > 0) {
+                                ilceSelect.val(selectedIlce).trigger('change');
+                                ilceSelect.data('loaded', true);
+                            }
+                        }
+                    }
+                }
+            });
+
+            // İlçe Seçilince
+            $('#ilceSelect').on('change', function () {
+                var cityName = $('#sehirSelect').val();
+                var districtName = $(this).val();
+                var mahalleSelect = $('#mahalleSelect');
+
+                mahalleSelect.empty().append('<option value="">Önce İlçe Seçin</option>').prop('disabled', true);
+
+                if (cityName && districtName) {
+                    var city = locationData.find(x => x.name === cityName);
+                    if (city) {
+                        var counties = city.counties || city.ilceler;
+                        var district = counties.find(x => (x.name === districtName || x.ilce_adi === districtName));
+
+                        // Dosya yapısında 'neighborhoods' veya 'mahalleler' olabilir
+                        var neighborhoods = district ? (district.neighborhoods || district.mahalleler) : null;
+
+                        if (neighborhoods) {
+                            mahalleSelect.empty().append('<option value="">Tümü</option>').prop('disabled', false);
+
+                            $.each(neighborhoods, function (index, item) {
+                                var name = item.name || item.mahalle_adi; // Olası property isimleri
+                                if(name) {
+                                    mahalleSelect.append(new Option(name, name, false, false));
+                                }
+                            });
+
+                            // Seçili Mahalle Varsa
+                            var selectedMahalle = '@Html.Raw(Model.Mahalle)';
+                            if (selectedMahalle && !mahalleSelect.data('loaded')) {
+                                if(mahalleSelect.find("option[value='" + selectedMahalle + "']").length > 0) {
+                                    mahalleSelect.val(selectedMahalle);
+                                    mahalleSelect.data('loaded', true);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- FİRMA / DANIŞMAN CASCADE ---
+            const firmaSelectFilter = $('#firmaId');
+            const danismanSelectFilter = $('#danismanEmail');
+
+            function loadDanismanlar(firmaId, targetSelect, selectedValue = null) {
+                targetSelect.empty().append('<option value="">Yükleniyor...</option>').prop('disabled', true).trigger('change');
+
+                if (!firmaId) {
+                    targetSelect.empty().append('<option value="">Tüm Danışmanlar</option>').prop('disabled', true).trigger('change');
+                    return;
+                }
+
+                $.get('@Url.Action("GetDanismanlarForFirma")', { firmaId: firmaId }, function (data) {
+                    targetSelect.empty().append('<option value="">Tüm Danışmanlar</option>');
+                    data.forEach(function (u) {
+                        const isSelected = u.email === selectedValue;
+                        const option = new Option(u.name, u.email, isSelected, isSelected);
+                        targetSelect.append(option);
+                    });
+                    targetSelect.prop('disabled', false).trigger('change');
+                });
             }
 
+            if(firmaSelectFilter.val()) {
+                loadDanismanlar(firmaSelectFilter.val(), danismanSelectFilter, "@Model.DanismanEmail");
+            }
 
-            // Onay Modalı için genel bir fonksiyon
-            function showConfirmationModal(message, onConfirm) {
-                $('#onayModalMesaj').text(message);
-                $('#onayModalOnaylaButton').off('click').on('click', function () {
+            firmaSelectFilter.on('change', function() {
+                loadDanismanlar($(this).val(), danismanSelectFilter);
+            });
+
+            // --- TOPLU İŞLEM MANTIĞI ---
+            const selectAll = $('#select-all-checkbox');
+            const rowChecks = $('.row-checkbox');
+            const bulkPanel = $('#bulk-actions');
+            const countSpan = $('#selection-count');
+
+            function toggleBulkPanel() {
+                const checkedCount = $('.row-checkbox:checked').length;
+                countSpan.text(checkedCount);
+                if(checkedCount > 0) bulkPanel.fadeIn();
+                else bulkPanel.fadeOut();
+            }
+
+            selectAll.change(function() {
+                rowChecks.prop('checked', $(this).prop('checked'));
+                toggleBulkPanel();
+            });
+
+            rowChecks.change(function() {
+                if(!$(this).prop('checked')) selectAll.prop('checked', false);
+                toggleBulkPanel();
+            });
+
+            // --- MODALLAR VE AJAX İŞLEMLERİ ---
+            const onayModal = new bootstrap.Modal(document.getElementById('onayModal'));
+            const bilgiModal = new bootstrap.Modal(document.getElementById('bilgiModal'));
+            const ataModal = new bootstrap.Modal(document.getElementById('ataModal'));
+
+            function showInfo(msg) { $('#bilgiModalMesaj').text(msg); bilgiModal.show(); }
+
+            function showConfirm(msg, callback) {
+                $('#onayModalMesaj').text(msg);
+                $('#onayModalOnaylaButton').off('click').on('click', function() {
                     onayModal.hide();
-                    onConfirm();
+                    callback();
                 });
                 onayModal.show();
             }
 
-            // Select2 kütüphanesini filtreleme dropdownlarına uygula
-            $('#firmaId').select2({
-                placeholder: "Tüm Firmalar",
-                allowClear: true
-            });
-
-            const danismanSelect = $('#danismanEmail').select2({
-                placeholder: "Önce Firma Seçin",
-                allowClear: true
-            });
-
-            function loadDanismanlarForFilter(firmaId) {
-                const selectedDanisman = "@Model.DanismanEmail";
-                danismanSelect.html('<option value=""></option>').prop('disabled', true).trigger('change');
-
-                if(!firmaId) {
-                     danismanSelect.select2({ placeholder: "Önce Firma Seçin" });
-                     return;
-                }
-
-                danismanSelect.select2({ placeholder: "Yükleniyor..." });
-
-                 $.get('@Url.Action("GetDanismanlarForFirma")', { firmaId: firmaId }, function (danismanlar) {
-                    danismanSelect.prop('disabled', false);
-                    danismanSelect.select2({ placeholder: "Tüm Danışmanlar" });
-
-                    danismanlar.forEach(function (danisman) {
-                        const isSelected = danisman.email === selectedDanisman;
-                        const newOption = new Option(danisman.name, danisman.email, isSelected, isSelected);
-                        danismanSelect.append(newOption);
-                    });
-                    danismanSelect.trigger('change');
-                });
-            }
-
-            // Sayfa yüklendiğinde mevcut firma seçiliyse danışmanları yükle
-            const initialFirmaId = $('#firmaId').val();
-            if(initialFirmaId){
-                loadDanismanlarForFilter(initialFirmaId);
-            }
-
-            $('#firmaId').on('change', function(){
-                const firmaId = $(this).val();
-                loadDanismanlarForFilter(firmaId);
-            });
-
-
-            // Tekli Silme işlemi
-            $('.btn-sil').on('click', function () {
-                const ilanId = $(this).data('id');
-                const message = ilanId + ' numaralı ilanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.';
-
-                showConfirmationModal(message, function() {
-                    $.post('@Url.Action("Sil")', { ilanId: ilanId }, function (response) {
-                        if (response.success) {
-                            showInfoModal(response.message, 'success');
-                            setTimeout(() => location.reload(), 1500);
-                        } else {
-                            showInfoModal('Hata: ' + response.message, 'error');
-                        }
+            // Silme (Tekli)
+            $('.btn-sil').click(function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                showConfirm(id + ' nolu ilanı silmek istediğinize emin misiniz?', function() {
+                    $.post('@Url.Action("Sil")', { ilanId: id }, function(res) {
+                         showInfo(res.message);
+                         if(res.success) setTimeout(() => location.reload(), 1500);
                     });
                 });
-            });
-
-            // Atama modalı işlemleri
-            const ataModal = new bootstrap.Modal(document.getElementById('ataModal'));
-
-            function openAtaModal(ilanIds) {
-                 $('#modalIlanId').val(ilanIds.join(','));
-
-                const firmaSelect = $('#modalFirmaSelect');
-                firmaSelect.html('<option value="">Yükleniyor...</option>').prop('disabled', true);
-                $('#modalDanismanSelect').html('<option value="">Önce firma seçiniz...</option>').prop('disabled', true);
-                $('#modalAtaButton').prop('disabled', true);
-
-                $.get('@Url.Action("GetFirmalar")', function (firmalar) {
-                    firmaSelect.html('<option value="">Firma seçiniz...</option>');
-                    firmalar.forEach(function (firma) {
-                        if(firma.name){
-                             firmaSelect.append(new Option(firma.name, firma.id));
-                        }
-                    });
-                    firmaSelect.prop('disabled', false);
-                });
-
-                ataModal.show();
-            }
-
-            // Tekli "Ata" butonu
-            $('.btn-ata').on('click', function () {
-                const ilanId = $(this).data('id');
-                openAtaModal([ilanId]);
-            });
-
-            // Firma seçildiğinde danışmanları yükle (Modal içinde)
-            $('#modalFirmaSelect').on('change', function () {
-                const firmaId = $(this).val();
-                const danismanSelect = $('#modalDanismanSelect');
-                $('#modalAtaButton').prop('disabled', true);
-
-                if (!firmaId) {
-                    danismanSelect.html('<option value="">Önce firma seçiniz...</option>').prop('disabled', true);
-                    return;
-                }
-
-                danismanSelect.html('<option value="">Yükleniyor...</option>').prop('disabled', true);
-
-                $.get('@Url.Action("GetDanismanlarForFirma")', { firmaId: firmaId }, function (danismanlar) {
-                    danismanSelect.html('<option value="">Danışman seçiniz...</option>');
-                    danismanlar.forEach(function (danisman) {
-                        danismanSelect.append(new Option(danisman.name, danisman.email));
-                    });
-                    danismanSelect.prop('disabled', false);
-                });
-            });
-
-            // Danışman seçildiğinde Ata butonunu aktif et
-            $('#modalDanismanSelect').on('change', function () {
-                const danismanEmail = $(this).val();
-                $('#modalAtaButton').prop('disabled', !danismanEmail);
-            });
-
-            // Atamayı Tamamla (Modal)
-            $('#modalAtaButton').on('click', function () {
-                const danismanEmail = $('#modalDanismanSelect').val();
-                const ilanIdsString = $('#modalIlanId').val();
-                const ilanIds = ilanIdsString.split(',').map(id => parseInt(id.trim()));
-
-                if (!danismanEmail || ilanIds.length === 0) {
-                    showInfoModal('Lütfen bir danışman seçin.', 'warning');
-                    return;
-                }
-
-                const isBulk = ilanIds.length > 1;
-                const actionUrl = isBulk ? '@Url.Action("TopluAta")' : '@Url.Action("Ata")';
-                const postData = isBulk ? { ilanIds: ilanIds, danismanEmail: danismanEmail } : { ilanId: ilanIds[0], danismanEmail: danismanEmail };
-                const message = ilanIds.length + ' ilanı seçilen danışmana atamak istediğinizden emin misiniz?';
-
-                showConfirmationModal(message, function() {
-                     $.ajax({
-                        url: actionUrl,
-                        type: 'POST',
-                        data: postData,
-                        success: function (response) {
-                             if (response.success) {
-                                ataModal.hide();
-                                showInfoModal(response.message, 'success');
-                                setTimeout(() => location.reload(), 1500);
-                            } else {
-                                showInfoModal('Hata: ' + response.message, 'error');
-                            }
-                        },
-                        error: function(){
-                             showInfoModal('Atama işlemi sırasında bir sunucu hatası oluştu.', 'error');
-                        }
-                    });
-                });
-            });
-
-
-            // --- TOPLU İŞLEM SCRIPTLERI ---
-            const bulkActionsPanel = $('#bulk-actions');
-            const selectionCountSpan = $('#selection-count');
-            const selectAllCheckbox = $('#select-all-checkbox');
-            const rowCheckboxes = $('.row-checkbox');
-            const bulkDeleteBtn = $('#bulk-delete-btn');
-            const bulkAssignBtn = $('#bulk-assign-btn');
-
-            function updateBulkActionsPanel() {
-                const selectedCount = rowCheckboxes.filter(':checked').length;
-                selectionCountSpan.text(selectedCount);
-
-                if (selectedCount > 0) {
-                    bulkActionsPanel.slideDown();
-                } else {
-                    bulkActionsPanel.slideUp();
-                }
-            }
-
-            selectAllCheckbox.on('change', function () {
-                rowCheckboxes.prop('checked', $(this).prop('checked'));
-                updateBulkActionsPanel();
-            });
-
-            rowCheckboxes.on('change', function () {
-                if (!$(this).prop('checked')) {
-                    selectAllCheckbox.prop('checked', false);
-                } else {
-                    if (rowCheckboxes.filter(':checked').length === rowCheckboxes.length) {
-                        selectAllCheckbox.prop('checked', true);
-                    }
-                }
-                updateBulkActionsPanel();
             });
 
             // Toplu Silme
-            bulkDeleteBtn.on('click', function () {
-                const selectedIds = rowCheckboxes.filter(':checked').map(function () {
-                    return parseInt($(this).val());
-                }).get();
-
-                if (selectedIds.length === 0) {
-                    showInfoModal('Lütfen silmek için en az bir ilan seçin.', 'warning');
-                    return;
-                }
-                const message = selectedIds.length + ' ilanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.';
-
-                showConfirmationModal(message, function() {
-                     $.ajax({
-                        url: '@Url.Action("TopluSil")',
-                        type: 'POST',
-                        data: { ilanIds: selectedIds },
-                        success: function (response) {
-                             if (response.success) {
-                                showInfoModal(response.message, 'success');
-                                setTimeout(() => location.reload(), 1500);
-                            } else {
-                                showInfoModal('Hata: ' + response.message, 'error');
-                            }
-                        },
-                        error: function(){
-                             showInfoModal('Toplu silme işlemi sırasında bir sunucu hatası oluştu.', 'error');
-                        }
+            $('#bulk-delete-btn').click(function() {
+                const ids = $('.row-checkbox:checked').map((_, el) => $(el).val()).get();
+                if(ids.length === 0) return;
+                showConfirm(ids.length + ' adet ilanı silmek istediğinize emin misiniz?', function() {
+                    $.post('@Url.Action("TopluSil")', { ilanIds: ids }, function(res) {
+                        showInfo(res.message);
+                        if(res.success) setTimeout(() => location.reload(), 1500);
                     });
                 });
             });
 
-            // Toplu Atama butonu
-            bulkAssignBtn.on('click', function() {
-                const selectedIds = rowCheckboxes.filter(':checked').map(function () {
-                    return parseInt($(this).val());
-                }).get();
+            // Atama (Modal Açma)
+            function openAta(ids) {
+                $('#modalIlanId').val(ids.join(','));
+                const fSelect = $('#modalFirmaSelect');
+                fSelect.html('<option>Yükleniyor...</option>');
+                $.get('@Url.Action("GetFirmalar")', function(data) {
+                    fSelect.html('<option value="">Seçiniz...</option>');
+                    data.forEach(d => fSelect.append(new Option(d.name, d.id)));
+                });
+                ataModal.show();
+            }
 
-                if (selectedIds.length === 0) {
-                    showInfoModal('Lütfen atamak için en az bir ilan seçin.', 'warning');
-                    return;
-                }
+            // Tekli Atama
+            $('.btn-ata').click(function(e) {
+                e.preventDefault();
+                openAta([$(this).data('id')]);
+            });
 
-                openAtaModal(selectedIds);
+            // Toplu Atama
+            $('#bulk-assign-btn').click(function() {
+                const ids = $('.row-checkbox:checked').map((_, el) => $(el).val()).get();
+                if(ids.length === 0) return;
+                openAta(ids);
+            });
+
+            // Modal İçi Firma Değişimi
+            $('#modalFirmaSelect').change(function() {
+                const fId = $(this).val();
+                loadDanismanlar(fId, $('#modalDanismanSelect'));
+                $('#modalAtaButton').prop('disabled', true);
+            });
+
+            $('#modalDanismanSelect').change(function() {
+                $('#modalAtaButton').prop('disabled', !$(this).val());
+            });
+
+            // Atama Kaydet
+            $('#modalAtaButton').click(function() {
+                const ids = $('#modalIlanId').val().split(',');
+                const mail = $('#modalDanismanSelect').val();
+                const url = ids.length > 1 ? '@Url.Action("TopluAta")' : '@Url.Action("Ata")';
+                const data = ids.length > 1 ? { ilanIds: ids, danismanEmail: mail } : { ilanId: ids[0], danismanEmail: mail };
+
+                $.post(url, data, function(res) {
+                    ataModal.hide();
+                    showInfo(res.message);
+                    if(res.success) setTimeout(() => location.reload(), 1500);
+                });
             });
         });
     </script>
 </body>
 </html>
-

@@ -121,7 +121,7 @@ public class InvestmentRequestService : IInvestmentRequestService
             if (!string.IsNullOrEmpty(targetCity))
             {
                 var usersToNotify = _readApplicationUserRepository.Queryable()
-                    .Where(user => user.City == targetCity && user.UserTypes == "Kurumsal" &&
+                    .Where(user => user.City == targetCity && (user.UserTypes == "Emlakçı" || user.UserTypes == "Kurumsal") &&
                     user.IsActive == "active")
                     .Select(user => user.Email)
                     .ToList();

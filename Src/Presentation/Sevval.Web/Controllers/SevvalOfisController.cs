@@ -1,4 +1,4 @@
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,14 +29,16 @@ namespace YourProjectNamespace.Controllers
         private readonly INetGsmService _netGsmService;
         private readonly IUserClientService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<SevvalOfisController> _logger;
 
-        public SevvalOfisController(IConfiguration configuration, ApplicationDbContext context, INetGsmService netGsmService, IUserClientService userService, UserManager<ApplicationUser> userManager)
+        public SevvalOfisController(IConfiguration configuration, ApplicationDbContext context, INetGsmService netGsmService, IUserClientService userService, UserManager<ApplicationUser> userManager, ILogger<SevvalOfisController> logger)
         {
             _configuration = configuration;
             _context = context;
             _netGsmService = netGsmService;
             _userService = userService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         private async Task<IActionResult> CheckUserAuthorization()
@@ -115,8 +117,8 @@ namespace YourProjectNamespace.Controllers
             // Tüm sorguları paralel olarak çalıştır
 
 
-            // "KURUMSAL GİRİŞ" ve "Bireysel" için sayıları al
-            var corporateCount = users.Where(x => x.UserTypes == "Kurumsal")?.Count() ?? 0;
+            // "Emlakçı" (ve eski "Kurumsal") ve "Bireysel" için sayıları al
+            var corporateCount = users.Where(x => x.UserTypes == "Emlakçı" || x.UserTypes == "Kurumsal")?.Count() ?? 0;
             var individualCount = users.Where(x => x.UserTypes == "Bireysel")?.Count() ?? 0;
             var bankCount = users.Where(x => x.UserTypes == "Banka")?.Count() ?? 0;
             var buildingCount = users.Where(x => x.UserTypes == "İnşaat")?.Count() ?? 0;
@@ -176,7 +178,7 @@ namespace YourProjectNamespace.Controllers
             return BadRequest(); // Hatalı yanıt
         }
 
-        public async Task<IActionResult> Uyelikler(string filter = "All", int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Uyelikler(string filter = "All", int page = 1, int pageSize = 50)
         {
             var authorizationResult = await CheckUserAuthorization();
             if (authorizationResult != null) return authorizationResult;
@@ -185,8 +187,29 @@ namespace YourProjectNamespace.Controllers
             // Tüm kullanıcıları ve ilanları çekmek yerine, sadece ilgili olanları çekmek daha verimli olabilir
             // Bu örnekte tüm kullanıcıları ve ilanları çekmeye devam ediyoruz ancak Select ile iyileştirme yapıyoruz.
 
+            // 🆕 ConsultantInvitations'ı önceden yükle (Danışman-Firma ilişkisi için)
+            var consultantInvitations = await _context.ConsultantInvitations
+                .AsNoTracking()
+                .Where(ci => ci.Status == "Accepted")
+                .ToDictionaryAsync(ci => ci.Email, ci => ci.InvitedBy);
+
             // Tüm kullanıcıları al (filtreleme için)
             var allUsers = await _context.Users.AsNoTracking().ToListAsync();
+
+            // 🆕 Her kullanıcı için firma bilgisini belirle (Danışman ise bağlı olduğu firma)
+            foreach (var user in allUsers)
+            {
+                if (user.IsConsultant && consultantInvitations.ContainsKey(user.Email))
+                {
+                    var invitedById = consultantInvitations[user.Email];
+                    var companyOwner = allUsers.FirstOrDefault(u => u.Id == invitedById);
+                    if (companyOwner != null)
+                    {
+                        // Geçici olarak CompanyName'e firma sahibinin şirket adını yazıyoruz
+                        user.CompanyName = $"{companyOwner.CompanyName} (Danışman)";
+                    }
+                }
+            }
 
             // Sadece 'active' ilanları veritabanı seviyesinde filtrele
             var activeIlanlar = await _context.IlanBilgileri
@@ -204,17 +227,40 @@ namespace YourProjectNamespace.Controllers
                 })
                 .ToListAsync();
 
-            // Filtreleme uygula
+            // Onay bekleyen kullanıcı sayısını hesapla - Case-insensitive karşılaştırma
+            var pendingCount = allUsers.Count(u => 
+                !string.IsNullOrWhiteSpace(u.IsActive) && 
+                u.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase));
+            
+            // Debug için tüm IsActive değerlerini ve sayılarını logla
+            var isActiveStats = allUsers
+                .GroupBy(u => u.IsActive ?? "(null)")
+                .Select(g => new { Value = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+            
+            _logger.LogInformation("IsActive değerleri ve dağılımı: {Stats}", 
+                string.Join(", ", isActiveStats.Select(s => $"'{s.Value}': {s.Count}")));
+            _logger.LogInformation("Onay bekleyen (passive) kullanıcı sayısı: {Count}", pendingCount);
+            
+            ViewBag.PendingCount = pendingCount;
+
+            // Filtreleme uygula - Case-insensitive karşılaştırma
             var filteredUsers = allUsers.Where(user =>
                 filter == "All" ||
-                (filter == "Bireysel" && user.UserTypes == "Bireysel") ||
-                (filter == "Kurumsal" && user.UserTypes == "Kurumsal") ||
-                (filter == "Vakıf" && user.UserTypes == "Vakıf") ||
-                (filter == "İnşaat" && user.UserTypes == "İnşaat") ||
-                (filter == "Banka" && user.UserTypes == "Banka") ||
-                (filter == "ücretsiz" && user.IsSubscribed == "ücretsiz") ||
-                (filter == "ücretli" && user.IsSubscribed == "ücretli")
+                (filter == "OnayBekleyen" && !string.IsNullOrWhiteSpace(user.IsActive) && user.IsActive.Trim().Equals("passive", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Bireysel" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Bireysel", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Emlakçı" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Emlakçı", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Kurumsal" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Kurumsal", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Vakıf" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Vakıf", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "İnşaat" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("İnşaat", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "Banka" && !string.IsNullOrWhiteSpace(user.UserTypes) && user.UserTypes.Trim().Equals("Banka", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "ücretsiz" && !string.IsNullOrWhiteSpace(user.IsSubscribed) && user.IsSubscribed.Trim().Equals("ücretsiz", StringComparison.OrdinalIgnoreCase)) ||
+                (filter == "ücretli" && !string.IsNullOrWhiteSpace(user.IsSubscribed) && user.IsSubscribed.Trim().Equals("ücretli", StringComparison.OrdinalIgnoreCase))
             ).ToList();
+            
+            // Debug için filtrelenmiş kullanıcı sayısını logla
+            _logger.LogInformation("Filtre: {Filter}, Bulunan kullanıcı sayısı: {Count}", filter, filteredUsers.Count);
 
             // Toplam kayıt sayısı
             var totalRecords = filteredUsers.Count;
@@ -243,6 +289,181 @@ namespace YourProjectNamespace.Controllers
             ViewBag.HasNextPage = page < totalPages;
             model.PageSize = pageSize;
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveUser(string userId)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+                }
+
+                user.IsActive = "active";
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    // Kullanıcıya onay maili gönder
+                    try
+                    {
+                        await SendApprovalEmail(user.Email, user.FirstName, user.LastName);
+                    }
+                    catch (Exception emailEx)
+                    {
+                        _logger.LogError(emailEx, "Onay maili gönderilemedi: {Email}", user.Email);
+                    }
+
+                    return Json(new { success = true, message = "Kullanıcı başarıyla onaylandı" });
+                }
+
+                return Json(new { success = false, message = "Kullanıcı onaylanırken hata oluştu" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ApproveUser hatası: {UserId}", userId);
+                return Json(new { success = false, message = "Bir hata oluştu" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkApprove(List<string> selectedIds)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            if (selectedIds == null || !selectedIds.Any())
+            {
+                return Json(new { success = false, message = "Hiçbir kullanıcı seçilmedi" });
+            }
+
+            try
+            {
+                // Case-insensitive karşılaştırma için ToLower() kullan
+                var users = await _context.Users
+                    .Where(u => selectedIds.Contains(u.Id) && 
+                                u.IsActive != null && 
+                                u.IsActive.ToLower().Trim() == "passive")
+                    .ToListAsync();
+
+                if (!users.Any())
+                {
+                    return Json(new { success = false, message = "Onaylanacak bekleyen kullanıcı bulunamadı" });
+                }
+
+                int approvedCount = 0;
+                foreach (var user in users)
+                {
+                    user.IsActive = "active";
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        approvedCount++;
+                        // Email gönderimi opsiyonel
+                        try
+                        {
+                            await SendApprovalEmail(user.Email, user.FirstName, user.LastName);
+                        }
+                        catch (Exception emailEx)
+                        {
+                            _logger.LogError(emailEx, "Toplu onay maili gönderilemedi: {Email}", user.Email);
+                        }
+                    }
+                }
+
+                return Json(new { success = true, message = $"{approvedCount} kullanıcı başarıyla onaylandı" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "BulkApprove hatası");
+                return Json(new { success = false, message = "Bir hata oluştu" });
+            }
+        }
+
+        private async Task SendApprovalEmail(string toEmail, string firstName, string lastName)
+        {
+            var smtpConfig = _configuration.GetSection("EmailSettings");
+            var smtpServer = smtpConfig["SmtpServer"];
+            var smtpPort = int.Parse(smtpConfig["SmtpPort"]);
+            var smtpUser = smtpConfig["Username"];
+            var smtpPassword = smtpConfig["Password"];
+            var fromAddress = smtpConfig["FromAddress"];
+
+            var subject = "Üyeliğiniz Onaylandı - Şevval Emlak";
+            var body = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <h2 style='color: #0d6efd;'>Tebrikler {firstName} {lastName}!</h2>
+                    <p>Şevval Emlak üyeliğiniz başarıyla onaylanmıştır.</p>
+                    <p>Artık platformumuzdaki tüm özellikleri kullanabilirsiniz.</p>
+                    <p><a href='https://www.sevvalemlak.com' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Siteye Git</a></p>
+                    <br>
+                    <p>İyi günler dileriz,</p>
+                    <p><strong>Şevval Emlak Ekibi</strong></p>
+                </body>
+                </html>";
+
+            using var client = new SmtpClient(smtpServer, smtpPort)
+            {
+                Credentials = new NetworkCredential(smtpUser, smtpPassword),
+                EnableSsl = true
+            };
+
+            var mailMessage = new MailMessage(fromAddress, toEmail, subject, body)
+            {
+                IsBodyHtml = true
+            };
+
+            await client.SendMailAsync(mailMessage);
+        }
+
+        // 🆕 Üye İstatistikleri API (Modal için)
+        [HttpGet]
+        public async Task<IActionResult> GetMemberStats(string userId)
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+                }
+
+                // İlan istatistiklerini hesapla
+                var userIlanlar = await _context.IlanBilgileri
+                    .AsNoTracking()
+                    .Where(i => i.Email == user.Email)
+                    .ToListAsync();
+
+                var stats = new
+                {
+                    userId = userId,
+                    fullName = $"{user.FirstName} {user.LastName}",
+                    email = user.Email,
+                    toplamIlanSayisi = userIlanlar.Count,
+                    fotografliIlanSayisi = userIlanlar.Count(i => !string.IsNullOrEmpty(i.ProfilePicture)),
+                    fotografsizIlanSayisi = userIlanlar.Count(i => string.IsNullOrEmpty(i.ProfilePicture)),
+                    videoluIlanSayisi = userIlanlar.Count(i => !string.IsNullOrEmpty(i.VideoLink)),
+                    videosuzIlanSayisi = userIlanlar.Count(i => string.IsNullOrEmpty(i.VideoLink)),
+                    sonIlanTarihi = userIlanlar.Any() ? userIlanlar.Max(i => i.GirisTarihi).ToString("dd.MM.yyyy HH:mm") : "Henüz ilan yok"
+                };
+
+                return Json(new { success = true, data = stats });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetMemberStats hatası: {UserId}", userId);
+                return Json(new { success = false, message = "İstatistikler yüklenirken hata oluştu" });
+            }
         }
 
         [HttpPost]
@@ -614,7 +835,7 @@ namespace YourProjectNamespace.Controllers
 
             var query = _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false);
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false);
 
             if (!string.IsNullOrEmpty(request.City))
             {
@@ -707,7 +928,7 @@ namespace YourProjectNamespace.Controllers
 
             var sehirler = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false)
                 .Select(u => u.City)
                 .Distinct()
                 .OrderBy(c => c)
@@ -715,7 +936,7 @@ namespace YourProjectNamespace.Controllers
 
             var ilceler = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false)
                 .Where(u => string.IsNullOrEmpty(request.City) || u.City == request.City)
                 .Select(u => u.District)
                 .Distinct()
@@ -785,7 +1006,7 @@ namespace YourProjectNamespace.Controllers
 
             var districts = await _context.Users
                 .AsNoTracking()
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false && u.City == city)
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false && u.City == city)
                 .Select(u => u.District)
                 .Distinct()
                 .OrderBy(d => d)
@@ -803,7 +1024,7 @@ namespace YourProjectNamespace.Controllers
         {
             var query = _context.Users
                 .AsNoTracking() // Sadece okunacağı için takip etmeyi kapat
-                .Where(u => u.UserTypes == "Kurumsal" && u.IsConsultant == false);
+                .Where(u => (u.UserTypes == "Emlakçı" || u.UserTypes == "Kurumsal") && u.IsConsultant == false);
 
             if (!string.IsNullOrEmpty(city))
             {
@@ -1078,7 +1299,7 @@ namespace YourProjectNamespace.Controllers
             string siteName = "sevvalemlak.com.tr";
 
             // Logo dosya yolu
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.png");
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "favlogo.webp");
 
             var mail = new MailMessage();
             mail.From = new MailAddress(fromAddress, siteName);
@@ -1086,7 +1307,7 @@ namespace YourProjectNamespace.Controllers
             mail.IsBodyHtml = true;
 
             // Logo’yu embed et
-            var inlineLogo = new LinkedResource(logoPath, MediaTypeNames.Image.Jpeg)
+            var inlineLogo = new LinkedResource(logoPath, "image/webp")
             {
                 ContentId = "logoImage"
             };
@@ -1645,7 +1866,7 @@ namespace YourProjectNamespace.Controllers
 <body>
     <div class='email-container'>
         <div class='header'>
-            <img src='https://i.hizliresim.com/sw39o6d.png' alt='Sevval Emlak Logo' class='logo' />
+            <img src='https://i.hizliresim.com/sw39o6d.webp' alt='Sevval Emlak Logo' class='logo' />
             <h1 style='color: #fff; margin:0; font-size: 22px;'>
                 VARSA BİZDEN İYİSİ, O DA BİZDEN BİRİSİ
             </h1>
@@ -2018,5 +2239,111 @@ namespace YourProjectNamespace.Controllers
 
             return await createAndReturnView(displayMessage, isSuccess);
         }
+
+        /// <summary>
+        /// 🆕 Numaraları kayıt tarihine göre oluştur
+        /// ŞEVVAL EMLAK her zaman K-0001
+        /// Kurumsal ve Bireysel ayrı numaralandırma
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> CreateNumbersByRegistrationDate()
+        {
+            var authorizationResult = await CheckUserAuthorization();
+            if (authorizationResult != null) return Json(new { success = false, message = "Yetkiniz yok" });
+
+            try
+            {
+                // Tüm kullanıcıları al
+                var allUsers = await _context.Users.ToListAsync();
+                
+                // 🏆 ŞEVVAL EMLAK'ı bul (sftumen41@gmail.com)
+                var sevvalUser = allUsers.FirstOrDefault(u => 
+                    u.Email != null && u.Email.Equals("sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase));
+
+                int totalProcessed = 0;
+
+                // 📋 BİREYSEL KULLANICILAR - Kayıt tarihine göre B-0001, B-0002...
+                var bireyselUsers = allUsers
+                    .Where(u => u.UserTypes == "Bireysel")
+                    .OrderBy(u => u.RegistrationDate)
+                    .ToList();
+                
+                int bireyselCounter = 1;
+                foreach (var user in bireyselUsers)
+                {
+                    user.UserOrder = bireyselCounter++;
+                    _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                    totalProcessed++;
+                }
+
+                // 🏢 KURUMSAL KULLANICILAR - Kayıt tarihine göre sırala
+                var kurumsalUsers = allUsers
+                    .Where(u => u.UserTypes != "Bireysel")
+                    .OrderBy(u => u.RegistrationDate)
+                    .ToList();
+
+                // 🔥 ÖNCE ŞEVVAL EMLAK'I İŞLE
+                if (sevvalUser != null && kurumsalUsers.Contains(sevvalUser))
+                {
+                    // 1. ŞEVVAL EMLAK → K-0001
+                    sevvalUser.UserOrder = 1;
+                    _context.Users.Update(sevvalUser); // Açıkça güncelleme olarak işaretle
+                    totalProcessed++;
+                    _logger.LogInformation("✅ ŞEVVAL EMLAK (ID: {Id}) → K-0001 atandı (Kayıt: {Date})", 
+                        sevvalUser.Id, sevvalUser.RegistrationDate.ToString("dd.MM.yyyy HH:mm"));
+                    
+                    // 2. DİĞER KURUMSAL KULLANICILAR - ŞEVVAL EMLAK HARİÇ
+                    int kurumsalCounter = 2;
+                    foreach (var user in kurumsalUsers.Where(u => u.Id != sevvalUser.Id))
+                    {
+                        user.UserOrder = kurumsalCounter;
+                        _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                        _logger.LogInformation("   → {Email} → K-{Number:D4} (Kayıt: {Date})", 
+                            user.Email, kurumsalCounter, user.RegistrationDate.ToString("dd.MM.yyyy HH:mm"));
+                        kurumsalCounter++;
+                        totalProcessed++;
+                    }
+                }
+                else
+                {
+                    // ŞEVVAL EMLAK YOKSA veya Bireysel ise - Normal sıralama
+                    _logger.LogWarning("⚠️ ŞEVVAL EMLAK (sftumen41@gmail.com) kurumsal kullanıcı olarak bulunamadı!");
+                    
+                    int kurumsalCounter = 1;
+                    foreach (var user in kurumsalUsers)
+                    {
+                        user.UserOrder = kurumsalCounter++;
+                        _context.Users.Update(user); // Açıkça güncelleme olarak işaretle
+                        totalProcessed++;
+                    }
+                }
+
+                // 💾 Değişiklikleri veritabanına kaydet
+                var savedCount = await _context.SaveChangesAsync();
+                _logger.LogInformation("💾 Database'e {SavedCount} değişiklik kaydedildi", savedCount);
+
+                _logger.LogInformation("✅ CreateNumbersByRegistrationDate: {Count} kullanıcı numaralandırıldı", totalProcessed);
+
+                // Mesaj oluştur
+                var kurumsalCount = kurumsalUsers.Count;
+                var bireyselCount = bireyselUsers.Count;
+                
+                var message = sevvalUser != null && kurumsalUsers.Contains(sevvalUser)
+                    ? $"✅ Numaralandırma tamamlandı!\n\n🏆 ŞEVVAL EMLAK → K-0001\n📊 Kurumsal: {kurumsalCount} kullanıcı (K-0001 - K-{kurumsalCount:D4})\n📊 Bireysel: {bireyselCount} kullanıcı (B-0001 - B-{bireyselCount:D4})\n\n🔄 Toplam: {totalProcessed} kullanıcı"
+                    : $"✅ Numaralandırma tamamlandı!\n\n📊 Kurumsal: {kurumsalCount} kullanıcı\n📊 Bireysel: {bireyselCount} kullanıcı\n\n🔄 Toplam: {totalProcessed} kullanıcı";
+
+                return Json(new 
+                { 
+                    success = true, 
+                    message = message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "CreateNumbersByRegistrationDate: Hata oluştu");
+                return Json(new { success = false, message = "Hata: " + ex.Message });
+            }
+        }
+
     }
 }

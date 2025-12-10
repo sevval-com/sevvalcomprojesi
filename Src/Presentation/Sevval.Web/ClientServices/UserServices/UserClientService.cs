@@ -2,6 +2,7 @@
 using Sevval.Application.Features.Common;
 using Sevval.Application.Features.User.Commands.ConfirmEstate;
 using Sevval.Application.Features.User.Commands.CorporateRegister;
+using Sevval.Application.Features.User.Commands.DeleteUser;
 using Sevval.Application.Features.User.Commands.ForgottenPassword;
 using Sevval.Application.Features.User.Commands.IndividualRegister;
 using Sevval.Application.Features.User.Commands.LoginWithSocialMedia;
@@ -172,6 +173,70 @@ namespace sevvalemlak.csproj.ClientServices.UserServices
                 Message = "Kayıt işlemi başarısız oldu.",
                 Data = null
             };
+        }
+
+        public async Task<ApiResponse<DeleteUserCommandResponse>> DeleteUser(string userId, string password, string confirmationText)
+        {
+            try
+            {
+                // API endpoint POST bekliyor ve request body'de şifre + onay metni istiyor
+                var requestBody = new
+                {
+                    Password = password,
+                    ConfirmationText = confirmationText,
+                    DeletionReason = "Web üzerinden silme"
+                };
+
+                var response = await _httpClient.PostAsJsonAsync(
+                    GeneralConstants.BaseClientUrl + "/api/v1/account/delete",
+                    requestBody,
+                    CancellationToken.None
+                );
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<DeleteUserCommandResponse>>();
+                    return result ?? new ApiResponse<DeleteUserCommandResponse>
+                    {
+                        IsSuccessfull = false,
+                        Message = "Yanıt boş döndü.",
+                        Data = null,
+                        Code = 200
+                    };
+                }
+
+                // Hata durumunda detaylı log için response body'yi oku
+                var errorContent = await response.Content.ReadAsStringAsync();
+                
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    IsSuccessfull = false,
+                    Message = $"Hesap silme başarısız. Status: {response.StatusCode}, Detail: {errorContent}",
+                    Data = null,
+                    Code = (int)response.StatusCode
+                };
+            }
+            catch (HttpRequestException httpEx)
+            {
+                // Network/connection hatası
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    IsSuccessfull = false,
+                    Message = $"API bağlantı hatası: {httpEx.Message}. Lütfen internet bağlantınızı kontrol edin.",
+                    Data = null,
+                    Code = 503
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<DeleteUserCommandResponse>
+                {
+                    IsSuccessfull = false,
+                    Message = $"Beklenmeyen hata: {ex.Message}",
+                    Data = null,
+                    Code = 500
+                };
+            }
         }
 
 

@@ -6,12 +6,33 @@
     {
         @foreach (var consultant in Model)
         {
+            string consultantPhotoPath = consultant.ProfilePhoto;
+            if (!string.IsNullOrEmpty(consultantPhotoPath))
+            {
+                consultantPhotoPath = consultantPhotoPath.Replace("\\", "/");
+                if (!consultantPhotoPath.StartsWith("http"))
+                {
+                    if (consultantPhotoPath.Contains("wwwroot/"))
+                    {
+                        consultantPhotoPath = consultantPhotoPath.Substring(consultantPhotoPath.IndexOf("wwwroot/") + 8);
+                    }
+                    else if (consultantPhotoPath.Contains("wwwroot"))
+                    {
+                        consultantPhotoPath = consultantPhotoPath.Substring(consultantPhotoPath.IndexOf("wwwroot") + 7);
+                    }
+                    if (!consultantPhotoPath.StartsWith("/"))
+                    {
+                        consultantPhotoPath = "/" + consultantPhotoPath;
+                    }
+                    consultantPhotoPath = "https://www.sevval.com" + consultantPhotoPath;
+                }
+            }
             <div class="user-card mb-4">
                 <div class="user-card-body">
                     <div class="consultant-profile-img-container mb-3">
-                        @if (!string.IsNullOrEmpty(consultant.ProfilePhoto))
+                        @if (!string.IsNullOrEmpty(consultantPhotoPath))
                         {
-                            <img src="@consultant.ProfilePhoto" alt="Profil Fotoğrafı" class="img-fluid rounded-circle consultant-profile-img">
+                            <img src="@consultantPhotoPath" alt="Profil Fotoğrafı" class="img-fluid rounded-circle consultant-profile-img">
                         }
                         else
                         {

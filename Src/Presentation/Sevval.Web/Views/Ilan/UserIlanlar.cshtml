@@ -18,19 +18,53 @@
         padding: 5px 10px;
         font-size: 14px;
         font-weight: bold;
-        border-radius: 5px;}
+        border-radius: 5px;
+    }
+    .ilan-no-badge {
+        color: #007bff;
+        font-size: 13px;
+    }
+    .ilan-no-badge i {
+        margin-right: 3px;
+    }
 </style>
 
 
 
 
     <!-- Üst Bar (Profil Bilgileri) -->
+    @{
+        string userPhotoPath = Model.User.ProfilePicturePath;
+        if (!string.IsNullOrEmpty(userPhotoPath))
+        {
+            userPhotoPath = userPhotoPath.Replace("\\", "/");
+            if (!userPhotoPath.StartsWith("http"))
+            {
+                if (userPhotoPath.Contains("wwwroot/"))
+                {
+                    userPhotoPath = userPhotoPath.Substring(userPhotoPath.IndexOf("wwwroot/") + 8);
+                }
+                else if (userPhotoPath.Contains("wwwroot"))
+                {
+                    userPhotoPath = userPhotoPath.Substring(userPhotoPath.IndexOf("wwwroot") + 7);
+                }
+                if (!userPhotoPath.StartsWith("/"))
+                {
+                    userPhotoPath = "/" + userPhotoPath;
+                }
+                userPhotoPath = "https://www.sevval.com" + userPhotoPath;
+            }
+        }
+        else
+        {
+            userPhotoPath = "/images/common/defaultuser.webp";
+        }
+    }
     <div class="container-fluid header-bar">
         <div class="container">
             <div class="profile-container">
                 <div class="d-flex align-items-center">
-                    <img src="@(!string.IsNullOrEmpty(Model.User.ProfilePicturePath) 
-? Model.User.ProfilePicturePath : "/images/common/defaultuser.png")" onerror="this.onerror=null; this.src='/images/common/defaultuser.png';"
+                    <img src="@userPhotoPath" onerror="this.onerror=null; this.src='/images/common/defaultuser.webp';"
                          class="profile-img" alt="Profil Resmi">
                     <div class="profile-info">
                         <h3>@Model.User.FirstName @Model.User.LastName</h3>
@@ -105,6 +139,7 @@
 
                             <div class="card-body">
                                 <h5 class="card-title text-primary text-truncate">@ilan.Title</h5>
+                                <p class="ilan-no-badge mb-2"><i class="fas fa-hashtag"></i> <strong>İlan No:</strong> @ilan.Id</p>
                                 @{
                                     var details = new List<string>();
 
@@ -142,6 +177,9 @@
                                 }
                                 <p class="giristarihi"><b>Giriş Tarihi:</b> @ilan.GirisTarihi.ToString("dd.MM.yyyy") - @ilan.GirisTarihi.ToString("HH:mm")</p>
                                 <p class="giristarihi"><b>Son Tarih:</b> @ilan.GirisTarihi.AddMonths(3).ToString("dd.MM.yyyy")</p>
+                                <button type="button" class="copy-link-btn" onclick="copyIlanLink(@ilan.Id, event)" title="Linki Kopyala">
+                                    <i class="fas fa-link"></i> Linki Kopyala
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -154,5 +192,77 @@
         <p class="text-muted text-center">Bu Danışmana ait ilan bulunmamaktadır.</p>
     }
 
-   
+<style>
+    .copy-link-btn {
+        background: #009cfb;
+        border: none;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-top: 10px;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+    .copy-link-btn:hover {
+        background: #0083d6;
+    }
+
+    .copy-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .copy-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+<script>
+    function copyIlanLink(ilanId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const link = window.location.origin + '/Ilan/ilansayfasi/' + ilanId;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(link).then(() => {
+                showCopyToast('Link kopyalandı!');
+            });
+        } else {
+            let ta = document.createElement('textarea');
+            ta.value = link;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showCopyToast('Link kopyalandı!');
+        }
+    }
+
+    function showCopyToast(message) {
+        let toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.classList.add('show'); }, 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+</script>
+
+
 

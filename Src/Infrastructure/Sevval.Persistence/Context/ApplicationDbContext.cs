@@ -30,7 +30,8 @@ namespace Sevval.Persistence.Context
         {
             _httpContextAccessor = httpContextAccessor;
             Database.ExecuteSqlRaw("PRAGMA foreign_keys=OFF;");
-            
+            Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL;");
+            Database.ExecuteSqlRaw("PRAGMA busy_timeout=5000;");
         }
 
         private const int DefaultDecimalPrecision = 18;
@@ -111,6 +112,8 @@ namespace Sevval.Persistence.Context
         public DbSet<IdentityUserRole<string>> UserRoles { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RecentlyVisitedAnnouncement> RecentlyVisitedAnnouncements { get; set; }
+        
+        public DbSet<DeletedAccount> DeletedAccounts { get; set; }
 
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -265,6 +268,25 @@ namespace Sevval.Persistence.Context
 
             modelBuilder.Entity<ConsultantInvitation>()
                 .HasIndex(c => c.Email);
+
+            // DeletedAccount configuration
+            modelBuilder.Entity<DeletedAccount>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserId).IsRequired().HasMaxLength(128);
+                entity.Property(e => e.DeletedAt).IsRequired();
+                entity.Property(e => e.DeletionReason).IsRequired(false).HasMaxLength(500);
+                entity.Property(e => e.RecoveryToken).IsRequired(false).HasMaxLength(100);
+
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.DeletedAt);
+                entity.HasIndex(e => e.RecoveryToken);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             // VisitorCount tablosu için konfigürasyon
             modelBuilder.Entity<VisitorCount>()

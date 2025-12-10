@@ -20,4 +20,8 @@ public class Comment
     public ApplicationUser User { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    // Yeni eklenen alan: Yorum onay durumu. 
+    // Varsayılan false, yani admin onaylayana kadar görünmez.
+    public bool IsApproved { get; set; } = false;
 }
