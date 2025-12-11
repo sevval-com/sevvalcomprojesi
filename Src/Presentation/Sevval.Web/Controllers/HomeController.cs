@@ -341,15 +341,20 @@ public class HomeController : Controller
         var allUsers = _context.Users
             .AsNoTracking()
             .Where(u => !string.IsNullOrEmpty(u.UserTypes) // Sadece kullanıcı tipi olanlar
-                && !string.IsNullOrEmpty(u.ProfilePicturePath) // Fotoğraf yolu dolu olmalı
+                && u.ProfilePicturePath != null // Null olmamalı
+                && u.ProfilePicturePath.Trim() != "" // Boş string olmamalı
+                && u.ProfilePicturePath.Length > 5 // Çok kısa yollar geçersiz
                 && (u.ProfilePicturePath.Contains("/uploads/profiles/") // Kendi yüklediği fotoğraflar
+                    || u.ProfilePicturePath.Contains("/uploads/") // uploads klasöründeki fotoğraflar
                     || (u.ProfilePicturePath.StartsWith("https://www.sevvalemlak.com") && u.ProfilePicturePath.Contains("/uploads/"))) // Production'daki gerçek fotoğraflar
                 && !u.ProfilePicturePath.Contains("kurumsalbosfoto") // Varsayılan kurumsal fotoğraf değil
                 && !u.ProfilePicturePath.Contains("boşprofifoto") // Varsayılan profil fotoğraf değil
                 && !u.ProfilePicturePath.Contains("bosprofifoto") // Varsayılan profil fotoğraf değil (türkçe karaktersiz)
-                && !u.ProfilePicturePath.Contains("defaultUser")) // Varsayılan kullanıcı fotoğrafı değil
+                && !u.ProfilePicturePath.Contains("defaultUser") // Varsayılan kullanıcı fotoğrafı değil
+                && !u.ProfilePicturePath.Contains("flaticon") // CDN varsayılan fotoğrafı değil
+                && !u.ProfilePicturePath.Contains("149071")) // Varsayılan avatar değil
             .OrderByDescending(u => u.RegistrationDate)
-            .Take(10) // İsteğe göre sayıyı artırabilirsiniz
+            .Take(20) // Daha fazla kullanıcı göster
             .ToList();
 
         // Yolların düzeltilmesi

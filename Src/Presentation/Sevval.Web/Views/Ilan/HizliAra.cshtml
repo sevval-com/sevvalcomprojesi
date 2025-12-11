@@ -462,6 +462,8 @@
                         </div>
 
                     </div>
+                    <input type="hidden" name="detayliAramaRequestDTO.Siralama" id="desktopSiralama" value="@ViewBag.Siralama" />
+                    <input type="hidden" name="detayliAramaRequestDTO.Sayfa" id="desktopSayfa" value="1" />
                     <div class="p-3 bg-white border-top rounded-bottom">
                         <button type="submit" class="btn btn-primary w-100 btn-sm fw-bold py-2">
                             Filtreleri Uygula
@@ -536,6 +538,8 @@
                         </div>
 
                     </div>
+                    <input type="hidden" name="detayliAramaRequestDTO.Siralama" id="mobileSiralama" value="@ViewBag.Siralama" />
+                    <input type="hidden" name="detayliAramaRequestDTO.Sayfa" id="mobileSayfa" value="1" />
                     <div class="p-3 mt-auto border-top">
                         <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Sonuçları Göster</button>
                     </div>
@@ -549,13 +553,17 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h4 class="fw-bold mb-1">Arama Sonuçları</h4>
-                    <p class="text-muted small mb-0">Toplam <strong>@Model.Count</strong> ilan bulundu</p>
+                    <p class="text-muted small mb-0">Toplam <strong>@ViewBag.ToplamIlanSayisi</strong> ilan bulundu</p>
                 </div>
                 <div class="d-none d-md-block">
-                    <select class="form-select form-select-sm" style="min-width: 150px;" id="sortSelect" onchange="sortResults(this.value)">
-                        <option value="recommended">Sıralama: Önerilen</option>
-                        <option value="price_asc">Fiyat Artan</option>
-                        <option value="price_desc">Fiyat Azalan</option>
+                    <select class="form-select form-select-sm" style="min-width: 180px;" id="sortSelect" onchange="changeSorting(this.value)">
+                        @{
+                            string siralama = ViewBag.Siralama ?? "date_desc";
+                        }
+                        <option value="date_desc" selected="@(siralama == "date_desc")">En Yeni</option>
+                        <option value="date_asc" selected="@(siralama == "date_asc")">En Eski</option>
+                        <option value="price_asc" selected="@(siralama == "price_asc")">Fiyat (Artan)</option>
+                        <option value="price_desc" selected="@(siralama == "price_desc")">Fiyat (Azalan)</option>
                     </select>
                 </div>
             </div>
@@ -563,7 +571,7 @@
             @if (Model.Count > 0)
             {
                 <div class="row g-3 g-lg-4" id="resultsContainer">
-                    @foreach (var ilan in Model.OrderByDescending(i => i.GirisTarihi))
+                    @foreach (var ilan in Model)
                     {
                         bool isLand = new[] { "Tarla", "Bağ", "Bahçe", "Arsa", "Arazi" }.Contains(ilan.Category);
                         string firmaAdi = string.IsNullOrEmpty(ilan.FirmaAdi) ? "Şevval Emlak" : ilan.FirmaAdi;
@@ -577,7 +585,7 @@
                         col-xl-4: Masaüstünde 3 sütun
                         col-xxl-4: Geniş ekranda 3 sütun (Kullanıcı daha geniş kart istediği için 3 yaptık, önceden 4'tü)
                         */
-                        <div class="col-12 col-md-6 col-xl-4 col-xxl-4 result-item" data-price="@ilan.IlanFiyati" data-date="@ilan.GirisTarihi.ToString("yyyy-MM-ddTHH:mm:ss")" data-order="@Model.OrderByDescending(i => i.GirisTarihi).ToList().IndexOf(ilan)">
+                        <div class="col-12 col-md-6 col-xl-4 col-xxl-4 result-item">
                             <div class="ad-card h-100">
 
                                 <!-- Resim -->
@@ -682,9 +690,47 @@
                 </div>
 
                 <!-- Sayfalama -->
-                <div class="d-flex justify-content-center mt-5 mb-5">
-                    <ul class="pagination" id="paginationControls"></ul>
-                </div>
+                @if (ViewBag.ToplamSayfa > 1)
+                {
+                    <div class="d-flex justify-content-center mt-5 mb-5">
+                        <nav aria-label="Sayfa navigasyonu">
+                            <ul class="pagination" id="paginationControls">
+                                @{
+                                    int mevcutSayfa = ViewBag.MevcutSayfa;
+                                    int toplamSayfa = ViewBag.ToplamSayfa;
+                                }
+
+                                <!-- Önceki -->
+                                <li class="page-item @(mevcutSayfa == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(@(mevcutSayfa - 1))">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                @for (int i = 1; i <= toplamSayfa; i++)
+                                {
+                                    if (i == 1 || i == toplamSayfa || (i >= mevcutSayfa - 2 && i <= mevcutSayfa + 2))
+                                    {
+                                        <li class="page-item @(i == mevcutSayfa ? "active" : "")">
+                                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(@i)">@i</a>
+                                        </li>
+                                    }
+                                    else if (i == mevcutSayfa - 3 || i == mevcutSayfa + 3)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link border-0">...</span></li>
+                                    }
+                                }
+
+                                <!-- Sonraki -->
+                                <li class="page-item @(mevcutSayfa == toplamSayfa ? "disabled" : "")">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(@(mevcutSayfa + 1))">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
             }
             else
             {
@@ -704,14 +750,24 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // --- Mevcut filtre değerlerini sakla ---
+    var currentFilters = {
+        anahtarKelime: '@(ViewBag.AnahtarKelime ?? "")',
+        kategori: '@(ViewBag.Kategori ?? "")',
+        enDusukFiyat: '@(ViewBag.EnDusukFiyat ?? "")',
+        enYuksekFiyat: '@(ViewBag.EnYuksekFiyat ?? "")',
+        enAzMetrekare: '@(ViewBag.EnAzMetrekare ?? "")',
+        enCokMetrekare: '@(ViewBag.EnCokMetrekare ?? "")',
+        il: '@(ViewBag.Il ?? "")',
+        siralama: '@(ViewBag.Siralama ?? "date_desc")',
+        sayfa: @(ViewBag.MevcutSayfa ?? 1),
+        toplamSayfa: @(ViewBag.ToplamSayfa ?? 1)
+    };
+
     // --- İL/İLÇE YÜKLEME VE ARAMA ---
     document.addEventListener("DOMContentLoaded", function () {
-        showPage(1);
-
         // JSON Yolu: Blob URL hatasını önlemek için absolute path kullanıyoruz
         const jsonPath = "/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json";
-        // encodeURI ile Türkçe karakterleri kodluyoruz
-        // + Parantezleri manuel düzeltiyoruz
         const safeUrl = new URL(encodeURI(jsonPath).replace(/\(/g, '%28').replace(/\)/g, '%29'), window.location.origin).href;
 
         fetch(safeUrl)
@@ -726,6 +782,20 @@
                 setupSearchListener('province-search-m', 'province-list-m');
             })
             .catch(error => console.error("Hata:", error));
+
+        // Kategori değerlerini setle
+        var kategoriValue = currentFilters.kategori;
+        if (kategoriValue) {
+            var desktopSelect = document.getElementById('desktopKategoriSelect');
+            var mobileSelect = document.getElementById('mobileKategoriSelect');
+            if (desktopSelect) desktopSelect.value = kategoriValue;
+            if (mobileSelect) mobileSelect.value = kategoriValue;
+        }
+
+        // Kartlara animasyon ekle
+        document.querySelectorAll('.result-item').forEach(function(item) {
+            item.classList.add('animate__animated', 'animate__fadeIn');
+        });
     });
 
     function setupSearchListener(inputId, listId) {
@@ -754,7 +824,6 @@
 
             li.onclick = () => {
                 document.getElementById(hiddenInputId).value = city.Il;
-                // Seçim efekti
                 Array.from(ul.children).forEach(c => {
                     c.style.backgroundColor = "transparent";
                     c.style.color = "#333";
@@ -774,7 +843,6 @@
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(link).then(() => showToast('Link kopyalandı!'));
         } else {
-            // Fallback
             let ta = document.createElement('textarea');
             ta.value = link;
             document.body.appendChild(ta);
@@ -796,91 +864,56 @@
         Toast.fire({ icon: 'success', title: message })
     }
 
-    // --- SAYFALAMA ---
-    const itemsPerPage = 12;
-    const items = document.querySelectorAll('.result-item');
-    const totalItems = items.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    let currentPage = 1;
+    // --- SIRALAMA DEĞİŞTİRME (Server-side) ---
+    function changeSorting(sortValue) {
+        // Loading göster
+        showLoading();
 
-    function showPage(page) {
-        if (totalItems === 0) return;
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
+        // Hidden inputları güncelle
+        document.getElementById('desktopSiralama').value = sortValue;
+        document.getElementById('mobileSiralama').value = sortValue;
 
-        items.forEach((item, index) => {
-            if (index >= start && index < end) {
-                item.style.display = 'block';
-                item.classList.add('animate__animated', 'animate__fadeIn');
-            } else {
-                item.style.display = 'none';
-                item.classList.remove('animate__animated', 'animate__fadeIn');
-            }
-        });
+        // Sayfa 1'e dön ve formu submit et
+        document.getElementById('desktopSayfa').value = 1;
 
-        currentPage = page;
-        updatePaginationUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Desktop formunu submit et
+        var form = document.querySelector('.filter-sidebar form');
+        if (form) {
+            form.submit();
+        }
     }
 
-    function updatePaginationUI() {
-        const pagination = document.getElementById('paginationControls');
-        pagination.innerHTML = '';
-        if (totalPages <= 1) return;
+    // --- SAYFA DEĞİŞTİRME (Server-side) ---
+    function goToPage(page) {
+        if (page < 1 || page > currentFilters.toplamSayfa) return;
 
-        let prevDisabled = currentPage === 1 ? 'disabled' : '';
-        pagination.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" onclick="showPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></a></li>`;
+        // Loading göster
+        showLoading();
 
-        for (let i = 1; i <= totalPages; i++) {
-            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                let activeClass = i === currentPage ? 'active' : '';
-                pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="showPage(${i})">${i}</a></li>`;
-            } else if (i === currentPage - 2 || i === currentPage + 2) {
-                pagination.innerHTML += `<li class="page-item disabled"><span class="page-link border-0">...</span></li>`;
-            }
+        // Hidden inputları güncelle
+        document.getElementById('desktopSayfa').value = page;
+        document.getElementById('mobileSayfa').value = page;
+
+        // Desktop formunu submit et
+        var form = document.querySelector('.filter-sidebar form');
+        if (form) {
+            form.submit();
         }
-
-        let nextDisabled = currentPage === totalPages ? 'disabled' : '';
-        pagination.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" onclick="showPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></a></li>`;
     }
 
-    // Sayfa yüklenince filtre değerlerini setle
-    document.addEventListener('DOMContentLoaded', function() {
-        var kategoriValue = '@(ViewBag.Kategori ?? "")';
-        if (kategoriValue) {
-            var desktopSelect = document.getElementById('desktopKategoriSelect');
-            var mobileSelect = document.getElementById('mobileKategoriSelect');
-            if (desktopSelect) desktopSelect.value = kategoriValue;
-            if (mobileSelect) mobileSelect.value = kategoriValue;
-        }
-    });
-
-    // --- SIRALAMA FONKSİYONU ---
-    function sortResults(sortType) {
+    // --- LOADING GÖSTER ---
+    function showLoading() {
         var container = document.getElementById('resultsContainer');
-        if (!container) return;
-
-        var items = Array.from(container.querySelectorAll('.result-item'));
-
-        items.sort(function(a, b) {
-            if (sortType === 'price_asc') {
-                return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
-            } else if (sortType === 'price_desc') {
-                return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
-            } else {
-                // recommended - varsayılan sıralama (tarih)
-                return parseInt(a.dataset.order) - parseInt(b.dataset.order);
-            }
-        });
-
-        // DOM'u yeniden düzenle
-        items.forEach(function(item) {
-            container.appendChild(item);
-        });
-
-        // Sayfalama varsa güncelle
-        if (typeof showPage === 'function') {
-            showPage(1);
+        if (container) {
+            container.style.opacity = '0.5';
+            container.style.pointerEvents = 'none';
         }
+
+        // Loading overlay ekle
+        var overlay = document.createElement('div');
+        overlay.id = 'loadingOverlay';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;';
+        overlay.innerHTML = '<div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"><span class="visually-hidden">Yükleniyor...</span></div>';
+        document.body.appendChild(overlay);
     }
 </script>

@@ -23,5 +23,10 @@
         public bool? VideoDurumu { get; set; }
         public DateTime? GirisTarihi { get; set; }  // Nullable yapıldı
         public string? IlanVitrinImageUrl { get; set; }  // Nullable yapıldı
+
+        // Sıralama ve Sayfalama
+        public string? Siralama { get; set; } // price_asc, price_desc, date_desc, date_asc
+        public int Sayfa { get; set; } = 1;
+        public int SayfaBoyutu { get; set; } = 12;
     }
 }
