@@ -3269,8 +3269,29 @@ public class IlanController : Controller
             )
         );
 
+        // Toplam ilan sayısını al (sayfalama için)
+        var toplamIlanSayisi = await query.CountAsync();
+
+        // Sıralama uygula (veritabanı seviyesinde)
+        // SQLite decimal tipinde ORDER BY desteklemediği için double'a cast ediyoruz
+        IOrderedQueryable<Sevval.Domain.Entities.IlanModel> orderedQuery = detayliAramaRequestDTO.Siralama switch
+        {
+            "price_asc" => query.OrderBy(x => (double)x.Price),
+            "price_desc" => query.OrderByDescending(x => (double)x.Price),
+            "date_asc" => query.OrderBy(x => x.GirisTarihi),
+            _ => query.OrderByDescending(x => x.GirisTarihi) // Varsayılan: En yeni önce
+        };
+
+        // Sayfalama parametreleri
+        int sayfa = detayliAramaRequestDTO.Sayfa > 0 ? detayliAramaRequestDTO.Sayfa : 1;
+        int sayfaBoyutu = detayliAramaRequestDTO.SayfaBoyutu > 0 ? detayliAramaRequestDTO.SayfaBoyutu : 12;
+        int toplamSayfa = (int)Math.Ceiling((double)toplamIlanSayisi / sayfaBoyutu);
+
         // Verileri çek (E-posta adresini de çekiyoruz ki kullanıcıyı bulabilelim)
-        var arananIlanlar = await query.Select(x => new
+        var arananIlanlar = await orderedQuery
+            .Skip((sayfa - 1) * sayfaBoyutu)
+            .Take(sayfaBoyutu)
+            .Select(x => new
         {
             x.Id,
             Description = x.Description ?? "",
@@ -3347,18 +3368,31 @@ public class IlanController : Controller
             });
         }
 
+        // Kategori sayıları için ayrı sorgu (tüm filtrelenmiş sonuçlar üzerinden)
+        var kategoriSayilari = await query
+            .GroupBy(x => x.Category)
+            .Select(g => new { Kategori = g.Key, Sayi = g.Count() })
+            .ToListAsync();
+
         var kategoriIlanSayilari = new
         {
-            KonutIlanlariCount = arananIlanlar.Count(i => i.Category == "Konut (Yaşam Alanı)"),
-            IsYeriIlanlariCount = arananIlanlar.Count(i => i.Category == "İş Yeri"),
-            TuristikTesisIlanlariCount = arananIlanlar.Count(i => i.Category == "Turistik Tesis"),
-            ArsaIlanlariCount = arananIlanlar.Count(i => i.Category == "Arsa"),
-            BahceIlanlariCount = arananIlanlar.Count(i => i.Category == "Bahçe"),
-            TarlaIlanlariCount = arananIlanlar.Count(i => i.Category == "Tarla")
+            KonutIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "Konut (Yaşam Alanı)")?.Sayi ?? 0,
+            IsYeriIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "İş Yeri")?.Sayi ?? 0,
+            TuristikTesisIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "Turistik Tesis")?.Sayi ?? 0,
+            ArsaIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "Arsa")?.Sayi ?? 0,
+            BahceIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "Bahçe")?.Sayi ?? 0,
+            TarlaIlanlariCount = kategoriSayilari.FirstOrDefault(k => k.Kategori == "Tarla")?.Sayi ?? 0
         };
 
         ViewBag.KategoriIlanSayilari = kategoriIlanSayilari;
         ViewBag.AnahtarKelime = anahtarKelime;
+
+        // Sayfalama bilgileri
+        ViewBag.ToplamIlanSayisi = toplamIlanSayisi;
+        ViewBag.MevcutSayfa = sayfa;
+        ViewBag.ToplamSayfa = toplamSayfa;
+        ViewBag.SayfaBoyutu = sayfaBoyutu;
+        ViewBag.Siralama = detayliAramaRequestDTO.Siralama ?? "date_desc";
 
         // Filtre değerlerini ViewBag'e aktar (form state koruma için)
         ViewBag.Kategori = detayliAramaRequestDTO.Kategori;

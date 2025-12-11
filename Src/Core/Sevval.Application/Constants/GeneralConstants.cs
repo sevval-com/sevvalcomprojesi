@@ -10,7 +10,7 @@
         //public const string ConnectionString = "Data Source=C:\\inetpub\\SevvalBackEnd\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
 
         //dev-mac
-        public const string BaseUrl = "http://localhost:5096";
+        public const string BaseUrl = "http://localhost:5400";
         public const string WwwRootPath = "/Users/murat/Desktop/sevvalEmlak/sevko/Src/Presentation/Sevval.Web/wwwroot";
         public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
         public const string BaseClientUrl = "http://94.73.131.202:8090"; // Production API
