@@ -1593,8 +1593,10 @@
             const totalResponse = await fetch('/api/visitor/total');
             const totalCount = await totalResponse.json();
             // Sayıları HTML'de güncelle ve formatla (navbar için)
-            document.getElementById('active-visitors-navbar').textContent = formatNumber(activeCount);
-            document.getElementById('total-visitors-navbar').textContent = formatNumber(totalCount);
+            const activeNumber = activeCount.data?.activeVisitorCount || activeCount.data?.ActiveVisitorCount || 0;
+            const totalNumber = totalCount.data?.totalVisitorCount || totalCount.data?.TotalVisitorCount || 0;
+            document.getElementById('active-visitors-navbar').textContent = formatNumber(activeNumber);
+            document.getElementById('total-visitors-navbar').textContent = formatNumber(totalNumber);
         } catch (error) {
             console.error('Ziyaretçi sayıları güncellenirken hata oluştu:', error);
         }
@@ -1981,9 +1983,11 @@
                 const totalResponse = await fetch('/api/visitor/total');
                 const totalCount = await totalResponse.json();
                 const activeEl = document.getElementById('active-visitors-navbar');
-                if(activeEl) activeEl.textContent = formatNumber(activeCount);
+                const activeNumber = activeCount.data?.activeVisitorCount || activeCount.data?.ActiveVisitorCount || 0;
+                if(activeEl) activeEl.textContent = formatNumber(activeNumber);
                 const totalEl = document.getElementById('total-visitors-navbar');
-                if(totalEl) totalEl.textContent = formatNumber(totalCount);
+                const totalNumber = totalCount.data?.totalVisitorCount || totalCount.data?.TotalVisitorCount || 0;
+                if(totalEl) totalEl.textContent = formatNumber(totalNumber);
             } catch (error) { }
         }
         async function recordVisitor() { try { await fetch('/api/visitor/enter', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); } catch (error) { } }
