@@ -1592,9 +1592,17 @@
             // Toplam ziyaretçi sayısını al
             const totalResponse = await fetch('/api/visitor/total');
             const totalCount = await totalResponse.json();
+            
+            // API response formatı: { Data: { ActiveVisitorCount: number, TotalVisitorCount: number } }
+            const activeVisitorCount = activeCount?.Data?.ActiveVisitorCount || activeCount?.data?.activeVisitorCount || activeCount?.ActiveVisitorCount || activeCount || 0;
+            const totalVisitorCount = totalCount?.Data?.TotalVisitorCount || totalCount?.data?.totalVisitorCount || totalCount?.TotalVisitorCount || totalCount || 0;
+            
             // Sayıları HTML'de güncelle ve formatla (navbar için)
-            document.getElementById('active-visitors-navbar').textContent = formatNumber(activeCount);
-            document.getElementById('total-visitors-navbar').textContent = formatNumber(totalCount);
+            const activeEl = document.getElementById('active-visitors-navbar');
+            if (activeEl) activeEl.textContent = formatNumber(activeVisitorCount);
+            
+            const totalEl = document.getElementById('total-visitors-navbar');
+            if (totalEl) totalEl.textContent = formatNumber(totalVisitorCount);
         } catch (error) {
             console.error('Ziyaretçi sayıları güncellenirken hata oluştu:', error);
         }
@@ -1973,18 +1981,28 @@
         typewriterEffect();
 
         // Diğer scriptler (Visitor, LazyLoad vb.)
-        function formatNumber(number) { return number.toLocaleString('tr-TR'); }
+        function formatNumber(number) { 
+            const num = typeof number === 'number' ? number : parseInt(number) || 0;
+            return num.toLocaleString('tr-TR'); 
+        }
         async function updateVisitorCounts() {
             try {
                 const activeResponse = await fetch('/api/visitor/active');
                 const activeCount = await activeResponse.json();
                 const totalResponse = await fetch('/api/visitor/total');
                 const totalCount = await totalResponse.json();
+                
+                // API response formatı: { Data: { ActiveVisitorCount: number, TotalVisitorCount: number } }
+                const activeVisitorCount = activeCount?.Data?.ActiveVisitorCount || activeCount?.data?.activeVisitorCount || activeCount?.ActiveVisitorCount || activeCount || 0;
+                const totalVisitorCount = totalCount?.Data?.TotalVisitorCount || totalCount?.data?.totalVisitorCount || totalCount?.TotalVisitorCount || totalCount || 0;
+                
                 const activeEl = document.getElementById('active-visitors-navbar');
-                if(activeEl) activeEl.textContent = formatNumber(activeCount);
+                if(activeEl) activeEl.textContent = formatNumber(activeVisitorCount);
                 const totalEl = document.getElementById('total-visitors-navbar');
-                if(totalEl) totalEl.textContent = formatNumber(totalCount);
-            } catch (error) { }
+                if(totalEl) totalEl.textContent = formatNumber(totalVisitorCount);
+            } catch (error) { 
+                console.error('Ziyaretçi sayıları güncellenirken hata oluştu:', error);
+            }
         }
         async function recordVisitor() { try { await fetch('/api/visitor/enter', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); } catch (error) { } }
         async function exitVisitor(visitorId) { try { await fetch(`/api/visitor/exit?visitorId=${visitorId}`, { method: 'POST' }); } catch (error) { } }

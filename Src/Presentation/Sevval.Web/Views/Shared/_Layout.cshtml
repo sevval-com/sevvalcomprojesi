@@ -705,9 +705,9 @@
                 {
                     <a href="#" class="login" id="giris-buton">Giriş Yap</a>
                 }
-                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
+                <!-- İlan Ver butonu -->
                 <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-a
                     <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
                 </div>
             </div>
