@@ -3,33 +3,35 @@ async function updateVisitorCounts() {
     try {
         // Aktif ziyaretçi sayısını al
         const activeResponse = await fetch('/api/visitor/active');
-
-
         const activeCount = await activeResponse.json();
 
         // Toplam ziyaretçi sayısını al
         const totalResponse = await fetch('/api/visitor/total');
         const totalCount = await totalResponse.json();
+        
         // Sayıları HTML'de güncelle ve formatla
-
+        // API response formatı: { Data: { ActiveVisitorCount: number, TotalVisitorCount: number } }
+        const activeVisitorCount = activeCount?.Data?.ActiveVisitorCount || activeCount?.data?.activeVisitorCount || activeCount?.ActiveVisitorCount || activeCount || 0;
+        const totalVisitorCount = totalCount?.Data?.TotalVisitorCount || totalCount?.data?.totalVisitorCount || totalCount?.TotalVisitorCount || totalCount || 0;
 
         const activeEl = document.getElementById('active-visitors-navbar');
-        if (activeEl) activeEl.textContent = formatNumber(activeCount.data.activeVisitorCount);
+        if (activeEl) activeEl.textContent = formatNumber(activeVisitorCount);
 
         const totalNavbarEl = document.getElementById('total-visitors-navbar');
-        if (totalNavbarEl) totalNavbarEl.textContent = formatNumber(totalCount.data.totalVisitorCount);
+        if (totalNavbarEl) totalNavbarEl.textContent = formatNumber(totalVisitorCount);
 
         const totalAboutEl = document.getElementById('total-visitors-about');
-        if (totalAboutEl) totalAboutEl.textContent = formatNumber(totalCount.data.totalVisitorCount);
+        if (totalAboutEl) totalAboutEl.textContent = formatNumber(totalVisitorCount);
     } catch (error) {
-
         console.error('Ziyaretçi sayıları güncellenirken hata oluştu:', error);
     }
 }
 
 // Sayıyı noktalarla formatlayan fonksiyon
 function formatNumber(number) {
-    return number.toLocaleString('tr-TR'); // Türkçe formatı kullanır
+    // Sayı kontrolü ekle
+    const num = typeof number === 'number' ? number : parseInt(number) || 0;
+    return num.toLocaleString('tr-TR'); // Türkçe formatı kullanır
 }
 
 
