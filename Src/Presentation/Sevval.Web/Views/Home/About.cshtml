@@ -1460,6 +1460,9 @@
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 </script>
+<div class="about-hidden-test">
+    <a href="@Url.Action("ParselSorgu", "Drone")" class="about-hidden-test-link">test</a>
+</div>
 <div class="floating-icon">
     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=sftumen41@gmail.com&su=Talep" title="Talep Gönder" target="_blank">
         <img src="~/images/Talep.webp" alt="Talep Gönder">
@@ -1514,11 +1517,24 @@
         z-index: 1001;
     }
 
-    .whatsapp-image {
-        width: 90px;
-        height: auto;
-        transition: transform 0.3s;
-    }
+.whatsapp-image {
+    width: 90px;
+    height: auto;
+    transition: transform 0.3s;
+}
+
+.about-hidden-test {
+    margin: 12px 0 4px;
+    text-align: right;
+    padding-right: 6px;
+}
+
+.about-hidden-test-link {
+    font-size: 11px;
+    color: #94a3b8;
+    opacity: 0.45;
+    text-decoration: none;
+}
     
 
         .whatsapp-image:hover {
@@ -1527,4 +1543,3 @@
        
         
 </style>
-
