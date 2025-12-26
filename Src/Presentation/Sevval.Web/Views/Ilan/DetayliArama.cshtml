@@ -1,0 +1,284 @@
+﻿@model List<DetayliAramaRequestDTO>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detaylı Arama</title>
+    <link rel="stylesheet" href="~/css/detayli-arama.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 class="form-title">Detaylı Arama</h2>
+        </div>
+
+        <form asp-action="DetayliIlanAra" asp-controller="Ilan" method="post" class="search-form">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Kategori" class="form-label">Kategori:</label>
+                    <select id="Kategori" name="Kategori" class="form-control">
+                        <option value="">Tümü</option>
+                        <option value="Konut">Konut (Yaşam Alanı)</option>
+                        <option value="Arsa">Arsa</option>
+                        <option value="Arazi">Arazi</option>
+                        <option value="Bahçe">Bahçe</option>
+                        <option value="Tarla">Tarla</option>
+                        <option value="Arsa">Turistik Tesis</option>
+                        <option value="İş Yeri">İşYeri</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="FiyatMin" class="form-label">Min Fiyat:</label>
+                    <input type="text" id="FiyatMin" name="EnDusukFiyat" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="FiyatMax" class="form-label">Max Fiyat:</label>
+                    <input type="text" id="FiyatMax" name="EnYuksekFiyat" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sehir" class="form-label">İl:</label>
+                    <select id="sehir" name="Il" class="form-control">
+                        <option value="">İl Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="semt" class="form-label">İlçe:</label>
+                    <select id="semt" name="Ilce" class="form-control">
+                        <option value="">İlçe Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mahalleKoy" class="form-label">Mahalle/Köy:</label>
+                    <select id="mahalleKoy" name="Mahalle" class="form-control">
+                        <option value="">Mahalle/Köy Seçiniz</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="MetrekareMin" class="form-label">Min Metrekare:</label>
+                    <input type="text" id="MetrekareMin" name="EnAzMetrekare" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="MetrekareMax" class="form-label">Max Metrekare:</label>
+                    <input type="text" id="MetrekareMax" name="EnCokMetrekare" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="KonutDurumu" class="form-label">Konut Durumu:</label>
+                    <select id="KonutDurumu" name="KonutDurumu" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Satılık">Satılık</option>
+                        <option value="Kiralık">Kiralık</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="MulkTipi" class="form-label">Mülk Tipi:</label>
+                    <select id="MulkTipi" name="MulkTipi" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Konut">Konut</option>
+                        <option value="Arsa">Arsa</option>
+                        <option value="İşyeri">İş Yeri</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="OdaSayisi" class="form-label">Oda Sayısı:</label>
+                    <input type="text" id="OdaSayisi" name="OdaSayisi" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="BinaYasi" class="form-label">Bina Yaşı:</label>
+                    <input type="text" id="BinaYasi" name="BinaYasi" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Isitma" class="form-label">Isıtma Tipi:</label>
+                    <select id="Isitma" name="IsitmaTipi" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Doğalgaz">Doğalgaz</option>
+                        <option value="Kömür">Kömür</option>
+                        <option value="Elektrik">Elektrik</option>
+                        <option value="Soba">Soba</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Balkon" class="form-label">Balkon:</label>
+                    <select id="Balkon" name="BalkonSayisi" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Var">Var</option>
+                        <option value="Yok">Yok</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Asansor" class="form-label">Asansör:</label>
+                    <select id="Asansor" name="AsansorDurumu" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Var">Var</option>
+                        <option value="Yok">Yok</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Otopark" class="form-label">Otopark:</label>
+                    <select id="Otopark" name="OtoparkDurumu" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="Var">Var</option>
+                        <option value="Yok">Yok</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="HasPhotos" class="form-label">Fotoğrafı Olan İlanlar:</label>
+                    <select id="HasPhotos" name="FotograDurumu" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="true">Evet</option>
+                        <option value="false">Hayır</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="HasVideos" class="form-label">Video Olan İlanlar:</label>
+                    <select id="HasVideos" name="VideoDurumu" class="form-control">
+                        <option value="">Seçiniz</option>
+                        <option value="true">Evet</option>
+                        <option value="false">Hayır</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="FavoriSayisi" class="form-label">Favori Sayısı:</label>
+                    <input type="text" id="FavoriSayisi" name="FavoriSayisi" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="MesajSayisi" class="form-label">Mesaj Sayısı:</label>
+                    <input type="text" id="MesajSayisi" name="MesajSayisi" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="TelefonAramaSayisi" class="form-label">Telefon Arama Sayısı:</label>
+                    <input type="text" id="TelefonAramaSayisi" name="TelefonAramaSayisi" class="form-control" />
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Filtrele</button>
+        </form>
+    </div>
+
+  @*   <form asp-action="DetayliIlanAra" asp-controller="Ilan" method="post">
+        <div>
+            <label for="İl Girişi">İl giriniz:</label>
+            <input type="text" id="Il" name="Il" />
+        </div>
+        <button type="submit">Ara</button>
+    </form> *@
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // JSON verisini wwwroot/data klasöründen almak için AJAX kullanımı
+            $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+                // Şehir seçeneklerini doldur
+                data.forEach(function (city) {
+                    $('#sehir').append(new Option(city.Il, city.Il));
+                });
+
+                // İl değiştiğinde ilçeleri güncelle
+                $('#sehir').change(function () {
+                    var selectedCity = $(this).val();
+                    var selectedCityData = data.find(c => c.Il === selectedCity);
+
+                    // İlçe ve mahalle seçeneklerini temizle
+                    $('#semt').empty().append('<option value="">İlçe Seçiniz</option>');
+                    $('#mahalleKoy').empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+
+                    if (selectedCityData) {
+                        // İlçeleri ekle
+                        selectedCityData.Ilce.forEach(function (district) {
+                            $('#semt').append(new Option(district.Ilce, district.Ilce));
+                        });
+                    }
+                });
+
+                // İlçe değiştiğinde mahalle seçeneklerini güncelle
+                $('#semt').change(function () {
+                    var selectedCity = $('#sehir').val();
+                    var selectedDistrict = $(this).val();
+                    var selectedCityData = data.find(c => c.Il === selectedCity);
+                    var selectedDistrictData = selectedCityData.Ilce.find(d => d.Ilce === selectedDistrict);
+
+                    // Mahalle seçeneğini temizle
+                    $('#mahalleKoy').empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+
+                    if (selectedDistrictData) {
+                        // Mahalleleri ekle
+                        selectedDistrictData.Semt.forEach(function (neighborhood) {
+                            neighborhood.Mahalle.forEach(function (mah) {
+                                $('#mahalleKoy').append(new Option(mah.Mahalle, mah.Mahalle));
+                            });
+                        });
+                    }
+                });
+
+                // Seçilen şehir, ilçe ve mahalleyi birleştirerek konumu inputa yaz
+                $('#sehir, #semt, #mahalleKoy').on('change', function () {
+                    var sehir = $('#sehir').val();
+                    var semt = $('#semt').val();
+                    var mahalle = $('#mahalleKoy').val();
+
+                    // Konum bilgilerini birleştir
+                    var konum = [];
+                    if (sehir) {
+                        konum.push(sehir);
+                    }
+                    if (semt) {
+                        konum.push(semt);
+                    }
+                    if (mahalle) {
+                        konum.push(mahalle);
+                    }
+
+                    // Eğer konum bilgisi varsa, virgülle ayırarak input alanına yaz
+                    if (konum.length > 0) {
+                        $('#location-input').val(konum.join(', ')); // Virgülle ayırarak
+
+                        // Haritayı güncelle
+                        updateMapLocation(konum.join(', ')); // Bu fonksiyon harita güncelleme işlemini yapar
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+﻿/* Genel panel stil ayarları */
+.panel {
+    border: 1px solid #ccc; /* Kenarlık */
+    border-radius: 5px; /* Yuvarlatılmış köşeler */
+    padding: 15px; /* İç boşluk */
+    margin: 10px; /* Dış boşluk */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Gölge efekti */
+}
+
+/* Mobil görünüm için */
+@media (max-width: 400px) {
+    .panel {
+        width: 40%; /* Genişliği %90 yaparak daha küçük görünüm */
+        font-size: 0.7em; /* Metin boyutunu biraz küçült */
+    }
+
+        /* Metin kaymasını engellemek için */
+        .panel p, .panel h1, .panel h2, .panel h3 {
+            overflow-wrap: break-word; /* Kelime kırılması */
+            word-wrap: break-word; /* Kelime kırılması */
+            word-break: break-all; /* Kelime sonlarında kırılma */
+        }
+    /* 400x616 ekran boyutuna özel stil */
+    @media (max-width: 400px) and (max-height: 616px) {
+        .panel {
+            width: 60%; /* Genişliği %90 yaparak daha küçük görünüm */
+            max-width: 350px; /* Maksimum genişlik */
+            font-size: 0.4em; /* Metin boyutunu biraz küçült */
+            margin: 5px auto; /* Dış boşluk ayarlaması */
+        }
+
+            /* Metin kaymasını engellemek için */
+            .panel p, .panel h1, .panel h2, .panel h3 {
+                overflow-wrap: break-word; /* Kelime kırılması */
+                word-wrap: break-word; /* Kelime kırılması */
+                word-break: break-all; /* Kelime sonlarında kırılma */
+                white-space: normal; /* Satır sonu kırılması */
+            }
+    }
+}

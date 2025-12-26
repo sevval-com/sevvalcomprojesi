@@ -1,0 +1,205 @@
+﻿body {
+    display: flex; /* Flexbox kullanarak yerleştirme */
+    flex-direction: column; /* Dikey yerleştirme */
+    justify-content: center; /* Dikeyde ortala */
+    align-items: center; /* Yatayda ortala */
+    height: 100vh; /* Sayfanın yüksekliğini al */
+    margin: 0; /* Varsayılan margin'leri sıfırla */
+    padding: 100px 0 0; /* Üstten boşluk ekle, sağdan ve soldan boşluğu sıfırla */
+    background-color: #c6deee; /* Açık arka plan rengi */
+    font-family: 'Calibri', sans-serif; /* Yazı tipi olarak Calibri kullan */
+}
+
+/* Navbar stili */
+.navbar {
+    background-color: #4caf50; /* Koyu yeşil arka plan */
+    padding: 0; /* Padding'i sıfır yaparak kenarlara yapışmasını sağla */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: fixed; /* 'sticky' yerine 'fixed' kullanarak her zaman üste sabitle */
+    top: 0;
+    left: 0; /* Sol kenara yapışık */
+    right: 0; /* Sağ kenara yapışık */
+    z-index: 100;
+    width: 100%; /* Genişliği %100 */
+    height: 60px; /* Sabit yükseklik, isteğe göre ayarlanabilir */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s ease;
+}
+
+    .navbar a {
+        color: #ffffff;
+        text-align: center;
+        padding: 15px 20px; /* Daha az padding ile düzenlendi */
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        margin: 0 10px; /* Sağ ve sol aralığı ayarlayın */
+    }
+
+        .navbar a:hover {
+            background-color: #388e3c;
+            transform: scale(1.05);
+        }
+
+.ilan-detay {
+    position: absolute; /* Konumlandırma için mutlak pozisyon */
+    top: 45px; /* Üstten boşluk bırak */
+    left: 50%; /* Sol kenardan ortala */
+    transform: translateX(-50%); /* Sol kenardan ortalamak için sola kaydır */
+    display: flex; /* Flexbox kullanarak içerik düzeni */
+    justify-content: space-between; /* Başlık ve fiyatı aralarına eşit boşluk bırak */
+    align-items: center; /* Üst kısmında hizala */
+    background-color: #ffffff; /* Beyaz arka plan rengi */
+    border: 2px solid #000; /* Siyah çerçeve ekle */
+    border-radius: 0px; /* Köşeleri yuvarlat */
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3); /* Daha belirgin gölge efekti */
+    padding: 20px; /* İç boşluk ekle */
+    width: 90vw; /* Genişlik %90, sabit değil */
+    max-width: 955px; /* Maksimum genişlik */
+    margin: 20px auto; /* Dışarıdan boşluk ekle ve otomatik yatay ortala */
+    transition: box-shadow 0.3s ease; /* Sadece gölge için geçiş efekti ekle */
+}
+
+.ilan-title {
+    font-size: 1.6rem; /* Başlık boyutunu azalt */
+    font-weight: bold; /* Kalın yazı */
+    color: #3498db; /* Mavi başlık rengi */
+    text-align: left; /* Soldan hizalı yazı */
+    margin: 0; /* Varsayılan margin'leri sıfırla */
+    border-bottom: 2px solid #3498db; /* Başlık altında mavi çizgi */
+    padding-bottom: 10px; /* Alt boşluk ekle */
+    text-transform: uppercase; /* Büyük harf ile yaz */
+    letter-spacing: 1px; /* Harfler arasında boşluk ekle */
+    flex: 1; /* Başlık kutusunu genişlet */
+}
+
+.ilan-price {
+    font-size: 2rem; /* Fiyat boyutunu artır */
+    color: #13b900; /* Kırmızı fiyat rengi */
+    margin: 0; /* Varsayılan margin'leri sıfırla */
+    font-weight: bold; /* Kalın yazı */
+    text-align: right; /* Sağa hizalı yazı */
+    padding: 10px; /* İç boşluk ekle */
+    background-color: #f9f9f9; /* Fiyat arka plan rengi */
+    border-radius: 8px; /* Fiyat kutusunun köşelerini yuvarlat */
+    flex-shrink: 0; /* Fiyat kutusunu daraltma */
+}
+
+.detay-panel {
+    display: flex; /* Flexbox kullanarak düzenle */
+    justify-content: space-between; /* Eşit boşluk bırak */
+    width: 90vw; /* Genişliği %90 yap */
+    max-width: 950px; /* Maksimum genişlik */
+    margin: 10px auto; /* Dışarıdan boşluk ekle ve otomatik yatay ortala */
+    position: relative; /* Göreli konumlandırma */
+    top: 110px; /* Üstten konumlandırma */
+    border: 2px solid #000; /* Siyah çerçeve ekle */
+}
+
+.detay-bolum {
+    flex: 1; /* Her bölümün eşit genişlikte olmasını sağla */
+    background-color: #ffffff; /* Beyaz arka plan */
+    border-radius: 8px; /* Köşeleri yuvarlat */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+    padding: 20px; /* İç boşluk ekle */
+    text-align: center; /* Ortadan hizalı yazı */
+    cursor: default; /* Tıklanabilir kursoru kaldır */
+}
+
+.photo-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #3498db;
+    padding: 10px;
+    background-color: #f9f9f9;
+    width: 90vw;
+    max-width: 950px;
+    height: 520px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    position: relative; /* Mutlak konumlandırmadan relative konuma geçildi */
+    margin: 20px auto; /* Dışarıdan boşluk ekle ve otomatik yatay ortala */
+}
+
+.photo-gallery {
+    width: 100%;
+    height: 100%; /* Fotoğraf galerisi container'in tüm yüksekliğini kaplasın */
+}
+
+.carousel-item img {
+    width: 100%; /* Genişliği %100 yaparak container'e uyumlu hale getir */
+    height: 100%; /* Yüksekliği %100 yaparak container'in yüksekliğine uyumlu hale getir */
+    object-fit: cover; /* Fotoğrafın boyutunu kırpmadan uygun şekilde sığdır */
+}
+
+.large-photo {
+    width: 100%; /* Genişliği %100 yaparak responsive hale getir */
+    height: auto; /* Yüksekliği otomatik ayarla */
+}
+
+.small-photos {
+    flex: 1; /* Küçük fotoğraflar için daha az yer kapla */
+    display: flex; /* Flexbox kullanarak dikey düzenle */
+    flex-direction: column; /* Dikey hizalama */
+    justify-content: space-between; /* Aralarındaki boşluğu eşit dağıt */
+    padding-left: 10px; /* Küçük fotoğraflar alanının soluna boşluk ekle */
+}
+
+.ilan-photo {
+    border-radius: 5px; /* Fotoğraf köşelerini yuvarlat */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+    border: 2px solid #000; /* Siyah çerçeve ekle */
+}
+
+    .ilan-photo.large {
+        max-width: 100%; /* Büyük fotoğrafın genişliğini %100'e ayarla */
+        height: auto; /* Yüksekliği otomatik ayarla */
+    }
+
+    .ilan-photo.small {
+        width: 100%; /* Küçük fotoğraflar için genişliği %100 yap */
+        height: auto; /* Yüksekliği otomatik ayarla */
+        margin-bottom: 10px; /* Altına boşluk ekle */
+    }
+
+/* Mobil cihazlar için özel stiller */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Dikey düzen */
+        height: auto; /* Yükseklik otomatik ayarla */
+    }
+
+    .ilan-detay {
+        flex-direction: column; /* Dikey düzen */
+    }
+
+    .ilan-title {
+        font-size: 1.4rem; /* Mobilde başlık boyutunu azalt */
+    }
+
+    .ilan-price {
+        font-size: 1.5rem; /* Mobilde fiyat boyutunu azalt */
+    }
+
+    .detay-panel {
+        flex-direction: column; /* Dikey düzen */
+    }
+
+    .photo-container {
+        height: auto; /* Yüksekliği otomatik ayarla */
+    }
+
+    .small-photos {
+        flex-direction: row; /* Küçük fotoğrafları yan yana diz */
+    }
+
+    .ilan-photo.small {
+        margin-bottom: 0; /* Alt boşluğu kaldır */
+    }
+}

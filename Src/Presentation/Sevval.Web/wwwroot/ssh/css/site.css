@@ -1,0 +1,474 @@
+﻿/* === SSH Tasarım Stili === */
+
+/* Renk Paleti */
+:root {
+    --ice-blue: #b9e6ff;
+    --frozen-blue: #74c2e1;
+    --deep-blue: #4da0c0;
+    --white: #ffffff;
+    --text-dark: #1b2a41;
+}
+
+/* === GENEL === */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, var(--ice-blue), var(--white));
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 110px; 
+    overflow-x: hidden;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    /*padding: 20px 10px 40px; */
+    box-sizing: border-box;
+}
+
+/* === FORM === */
+.wizard-container {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    width: 100%;
+    margin: 40px auto;
+    transition: 0.3s ease;
+}
+
+.wizard-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wizard-title {
+    color: var(--deep-blue);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.wizard-subtitle {
+    color: #6a6a6a;
+    font-size: 16px;
+}
+
+.wizard-progress {
+    position: relative;
+    margin: 25px 0;
+    height: 6px;
+    background: var(--ice-blue);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.wizard-progress-bar {
+    position: absolute;
+    height: 6px;
+    background: var(--frozen-blue);
+    width: 33%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    position: relative;
+}
+
+    .wizard-steps .step {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--ice-blue);
+        color: var(--text-dark);
+        text-align: center;
+        line-height: 34px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        z-index: 2;
+    }
+
+    .wizard-steps::before {
+        content: "";
+        position: absolute;
+        top: 16px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--ice-blue);
+        border-radius: 3px;
+        z-index: 1;
+    }
+
+    .wizard-steps .step.active {
+        background: var(--deep-blue);
+        color: var(--white);
+        box-shadow: 0 0 12px rgba(116, 194, 225, 0.7);
+        transform: scale(1.05);
+    }
+
+.form-step {
+    display: none;
+    animation: fadeIn 0.6s ease;
+}
+
+    .form-step.active {
+        display: block;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1e6f1;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* === BUTTONS === */
+.btn-next, .btn-prev, .btn-submit {
+    background: var(--deep-blue);
+    color: var(--white);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+    .btn-next:hover, .btn-prev:hover, .btn-submit:hover {
+        background: var(--frozen-blue);
+    }
+
+.btn-prev {
+    background: #d9edf7;
+    color: var(--text-dark);
+}
+
+/* === ❄ HEADER === */
+header {
+    width: 100%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 12px 0;
+    box-shadow: 0 3px 10px rgba(15, 63, 97, 0.15);
+    border-bottom: none !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #0F3F61 !important;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important; 
+    font-weight: 600;
+    transition: 0.3s ease;
+    padding: 8px 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1); 
+}
+
+    .navbar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.3); 
+        color: #fff !important; 
+        box-shadow: 0 0 8px rgba(255,255,255,0.4); 
+    }
+
+/* === ❄ FOOTER === */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(180deg, #A9D6F5, #D8EEF8);
+    color: #0F3F61 !important;
+    text-align: center;
+    padding: 14px 10px;
+    font-weight: 500;
+    box-shadow: 0 -4px 12px rgba(137, 190, 230, 0.25);
+    z-index: 1000;
+}
+
+    footer a {
+        color: #0F3F61 !important;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+        footer a:hover {
+            text-decoration: none;
+            color: #053F61 !important;
+        }
+
+
+@supports(padding: max(0px)) {
+    body {
+        padding-bottom: calc(110px + env(safe-area-inset-bottom));
+    }
+
+    footer {
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 992px) {
+    .wizard-container {
+        max-width: 600px;
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 10px 10px 30px;
+    }
+
+    .wizard-container {
+        max-width: 480px;
+        padding: 25px;
+    }
+
+    .wizard-title {
+        font-size: 22px;
+    }
+
+    .wizard-steps .step {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .wizard-container {
+        max-width: 400px;
+        padding: 20px;
+    }
+
+    .wizard-title {
+        font-size: 20px;
+    }
+
+    .wizard-subtitle {
+        font-size: 14px;
+    }
+
+    footer {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    body {
+        padding-bottom: 120px;
+    }
+}
+
+@media (max-width: 425px) {
+    .wizard-container {
+        max-width: 340px;
+        padding: 18px;
+    }
+
+    .wizard-title {
+        font-size: 18px;
+    }
+
+    .wizard-steps .step {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 375px) {
+    .wizard-container {
+        max-width: 310px;
+        padding: 16px;
+    }
+
+    .wizard-title {
+        font-size: 17px;
+    }
+
+    .wizard-subtitle {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 320px) {
+    .wizard-container {
+        max-width: 280px;
+        padding: 14px;
+    }
+
+    .wizard-title {
+        font-size: 16px;
+    }
+
+    .wizard-steps .step {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+}
+
+/*---------------*/
+
+/* Progress bar - step */
+.wizard-progress {
+    position: relative;
+    height: 4px;
+    background: var(--ice-blue);
+    border-radius: 3px;
+    margin: 25px 0 10px 0;
+    overflow: hidden;
+}
+
+#wizardProgress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 33%;
+    background: var(--deep-blue);
+    transition: width 0.4s ease;
+    border-radius: 3px;
+}
+
+/* Step butonları */
+.wizard-steps {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    position: relative;
+    margin-bottom: 25px;
+}
+
+    .wizard-steps .step {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #d3ebf9, #a4d5f2);
+        color: var(--deep-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .wizard-steps .step.active {
+            background: linear-gradient(145deg, var(--deep-blue), var(--frozen-blue));
+            color: #fff;
+            box-shadow: 0 0 10px rgba(77,160,192,0.6);
+            transform: scale(1.1);
+        }
+
+.step-title::before {
+    display: none !important;
+}
+
+/* Butonlar */
+.btn-next, .btn-prev, .btn-submit {
+    background: linear-gradient(135deg, var(--deep-blue), var(--frozen-blue));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 24px;
+    box-shadow: 0 4px 8px rgba(77,160,192,0.2);
+    transition: all 0.3s ease;
+}
+
+    .btn-next:hover, .btn-prev:hover, .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(77,160,192,0.3);
+    }
+
+.btn-prev {
+    background: linear-gradient(135deg, #d7eef8, #b3e2f5);
+    color: var(--text-dark);
+}
+
+    .btn-prev:hover {
+        background: linear-gradient(135deg, #a9d6f5, #74c2e1);
+        color: #fff;
+    }
+
+    .btn-next i, .btn-prev i, .btn-submit i {
+        margin-right: 6px;
+        font-size: 1rem;
+    }
+
+/* Mobil uyum */
+@media (max-width: 576px) {
+    .wizard-steps {
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .wizard-steps .step {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+        }
+}

@@ -1,0 +1,19 @@
+@model IEnumerable<Sevval.Application.Features.Announcement.Queries.GetAnnouncementCountByType.GetAnnouncementCountByTypeQueryResponse>
+
+@{
+    Layout = null;
+}
+
+<div class="katagoriler">
+    @foreach (var item in Model)
+    {
+        <div class="kategori">
+            <div class="kategori-resim">
+                <img src="@item.ImagePath" alt="@item.Type İlanları">
+            </div>
+            <p>@item.Type İlanları</p>
+            <p>@item.Count İlan</p>
+        </div>
+    }
+   
+</div>

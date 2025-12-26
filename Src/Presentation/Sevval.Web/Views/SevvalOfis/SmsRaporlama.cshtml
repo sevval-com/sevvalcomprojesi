@@ -1,0 +1,105 @@
+﻿@model List<sevvalemlak.Dto.SmsReportDTO>
+@{
+    ViewData["Title"] = "SMS Raporlama";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/css/mail.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">SMS Gönderim Raporları</h2>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                Henüz SMS gönderimi yapılmamış veya raporlar bulunamadı.
+            </div>
+        }
+        else
+        {
+            <div class="accordion" id="smsReportAccordion">
+                @foreach (var group in Model)
+                {
+                    <div class="accordion-item mb-3">
+                        <h2 class="accordion-header" id="heading@(group.JobId)">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse@(group.JobId)" aria-expanded="false" aria-controls="collapse@(group.JobId)">
+                                <div class="w-100 d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <strong>@group.SendDate.ToString("dd.MM.yyyy HH:mm")</strong>
+                                        <span class="ms-3 text-muted">@(group.Message.Length > 50 ? group.Message.Substring(0, 50) + "..." : group.Message)</span>
+                                    </span>
+                                    <span>
+                                        <span class="badge bg-success">Başarılı: @group.SuccessCount</span>
+                                        <span class="badge bg-danger ms-1">Başarısız: @group.FailedCount</span>
+                                        <span class="badge bg-secondary ms-1">Toplam: @group.TotalCount</span>
+                                    </span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse@(group.JobId)" class="accordion-collapse collapse" aria-labelledby="heading@(group.JobId)">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <strong>Mesaj:</strong> @group.Message
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Job ID:</strong> @group.JobId
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Telefon</th>
+                                                <th>Durum</th>
+                                                <th>Kod</th>
+                                                <th>Açıklama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var record in group.Records)
+                                            {
+                                                <tr class="@(record.Status == "success" ? "table-success" : "table-danger")">
+                                                    <td>@record.PhoneNumber</td>
+                                                    <td>
+                                                        @if (record.Status == "success")
+                                                        {
+                                                            <span class="badge bg-success">Başarılı</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-danger">Başarısız</span>
+                                                        }
+                                                    </td>
+                                                    <td>@record.ResponseCode</td>
+                                                    <td>@record.ResponseDescription</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Geri dönüş butonu ekleyelim -->
+        <div class="mt-4">
+            <a href="@Url.Action("SmsMesaj", "SevvalOfis")" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> SMS Sayfasına Dön
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

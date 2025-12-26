@@ -1,0 +1,380 @@
+﻿/* ===============================
+   PANEL ALL FORMS HANDLER STYLES
+   =============================== */
+
+/* ROOT */
+:root {
+    --panel-primary: #007bff;
+    --panel-primary-dark: #0056b3;
+    --panel-bg: #f7faff;
+    --panel-text: #0a2342;
+    --panel-muted: #6c757d;
+}
+
+/* GENEL WRAPPER */
+.panel-forms-wrapper {
+    background: var(--panel-bg);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    font-family: 'Poppins', 'Inter', sans-serif;
+    color: var(--panel-text);
+}
+
+/* HEADER */
+.panel-forms-header {
+    text-align: center;
+    padding: 20px 10px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--panel-primary), var(--panel-primary-dark));
+    color: white;
+    box-shadow: 0 8px 24px rgba(0, 86, 179, 0.25);
+    transition: transform 0.3s ease;
+}
+
+    .panel-forms-header:hover {
+        transform: translateY(-3px);
+    }
+
+    .panel-forms-header h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .panel-forms-header p {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+/* FİLTRELER */
+.panel-forms-filters {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 123, 255, 0.15);
+}
+
+    .panel-forms-filters input,
+    .panel-forms-filters select {
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .panel-forms-filters input:focus,
+        .panel-forms-filters select:focus {
+            border-color: var(--panel-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+#btnFilter {
+    background: linear-gradient(135deg, var(--panel-primary), var(--panel-primary-dark));
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+    #btnFilter:hover {
+        background: linear-gradient(135deg, var(--panel-primary-dark), var(--panel-primary));
+        transform: translateY(-1px);
+    }
+
+#btnReset {
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* TABLO */
+.panel-forms-table table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0, 86, 179, 0.08);
+    width: 100%;
+}
+
+.panel-forms-table thead {
+    background: linear-gradient(135deg, var(--panel-primary), var(--panel-primary-dark));
+    color: white;
+}
+
+.panel-forms-table th {
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.panel-forms-table td {
+    vertical-align: middle;
+    font-size: 0.72rem;
+    color: #333;
+}
+
+.panel-forms-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transition: 0.2s;
+}
+
+/* İŞLEM BUTONLARI */
+.panel-forms-actions i {
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin: 0 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+    .panel-forms-actions i.bi-pencil-square {
+        color: var(--panel-primary);
+    }
+
+        .panel-forms-actions i.bi-pencil-square:hover {
+            color: var(--panel-primary-dark);
+            transform: scale(1.1);
+        }
+
+    .panel-forms-actions i.bi-trash-fill {
+        color: #dc3545;
+    }
+
+        .panel-forms-actions i.bi-trash-fill:hover {
+            color: #a71d2a;
+            transform: scale(1.1);
+        }
+
+/* =======================================================
+   RESPONSIVE 
+   ======================================================= */
+
+/* TABLET (≤ 992px) */
+@media (max-width: 992px) {
+    .panel-forms-wrapper {
+        padding: 18px;
+    }
+
+    .panel-forms-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .panel-forms-filters .row > div {
+        margin-bottom: 10px;
+    }
+
+    table.table {
+        font-size: 0.9rem;
+    }
+
+    .panel-forms-actions i {
+        font-size: 1rem;
+    }
+}
+
+/* MOBİL (≤ 768px) */
+@media (max-width: 768px) {
+    .panel-forms-header {
+        padding: 15px 10px;
+    }
+
+        .panel-forms-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .panel-forms-header p {
+            font-size: 0.85rem;
+        }
+
+    .panel-forms-filters {
+        padding: 15px;
+    }
+
+        .panel-forms-filters input,
+        .panel-forms-filters select {
+            font-size: 0.85rem;
+        }
+
+    .panel-forms-table th,
+    .panel-forms-table td {
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .panel-forms-actions i {
+        font-size: 0.95rem;
+    }
+}
+
+/* KÜÇÜK MOBİL (≤ 480px) */
+@media (max-width: 480px) {
+    .panel-forms-wrapper {
+        padding: 10px;
+    }
+
+    .panel-forms-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .panel-forms-header p {
+        display: none;
+    }
+
+    .panel-forms-filters {
+        padding: 10px;
+    }
+
+        .panel-forms-filters .btn {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+    .panel-forms-table table {
+        font-size: 0.8rem;
+    }
+
+    .panel-forms-table th:nth-child(n+5),
+    .panel-forms-table td:nth-child(n+5) {
+        display: none; 
+    }
+
+    #formsTable td, #formsTable th {
+        text-align: center !important;
+    }
+
+    #pageSizeSelect {
+        min-width: 80px;
+    }
+
+    #formDetailBody p {
+        margin-bottom: 6px;
+        font-size: 0.92rem;
+    }
+
+    .pdf-table th {
+        font-weight: 700;
+        border-bottom: 1px solid #999;
+    }
+
+    .pdf-table td {
+        border-bottom: 1px solid #ddd;
+    }
+
+}
+
+
+/* RESPONSIVE */
+
+.panel-forms-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 992px) {
+    .panel-forms-filters .row > div {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .panel-forms-filters .row > div {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.panel-forms-table td button {
+    white-space: nowrap;
+    padding: 4px 8px;
+}
+
+@media (max-width: 420px) {
+    .panel-forms-table table {
+        font-size: 0.75rem;
+    }
+
+    .panel-forms-header h2 {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 1600px) {
+    .panel-forms-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+}
+
+/* STATUS BADGE COLORS */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-approved {
+    background: #28a745;
+    color: #fff;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: #000;
+}
+
+.status-rejected {
+    background: #dc3545;
+    color: #fff;
+}
+
+.status-default {
+    background: #6c757d;
+    color: #fff;
+}
+
+
+@media (max-width: 576px) {
+    .panel-forms-table table {
+        display: block;
+    }
+
+    #formsTable thead {
+        display: none;
+    }
+
+    #formsTable tr {
+        display: block;
+        background: #fff;
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    #formsTable td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+    }
+
+        #formsTable td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #007bff;
+        }
+
+    /* PAGINATION */
+    #pagination button {
+        border-radius: 6px;
+        min-width: 35px;
+    }
+
+    #pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+
+}

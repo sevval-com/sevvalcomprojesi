@@ -1,0 +1,103 @@
+﻿/* Danışmanlar Sayfası Genel Stili */
+.consultants-popup {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.consultants-title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.consultants-description {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.consultants-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* Her bir danışman item'ı */
+.consultant-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 48%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+    .consultant-item:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+/* Fotoğraf için stil */
+.consultant-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+/* Danışman ismi ve açıklama kısmı */
+.consultant-item h3 {
+    font-size: 22px;
+    margin: 0 0 10px;
+}
+
+.consultant-item p {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* WhatsApp icon için stil */
+.whatsapp-container {
+    margin-left: auto;
+}
+
+.whatsapp-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Mobil Uyumlu Tasarım */
+@media (max-width: 768px) {
+    .consultants-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .consultant-item {
+        width: 100%;
+    }
+
+    .consultant-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .consultant-item h3 {
+        font-size: 18px;
+    }
+
+    .consultant-item p {
+        font-size: 14px;
+    }
+
+    .whatsapp-icon {
+        width: 28px;
+        height: 28px;
+    }
+}

@@ -1,0 +1,73 @@
+﻿@model Sevval.Domain.Entities.IlanModel
+
+<div class="container mt-5">
+    <h2>İlan Ver</h2>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">İlan Başlığı</label>
+            <input asp-for="Title" class="form-control" required />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Açıklama</label>
+            <textarea asp-for="Description" class="form-control" required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Price" class="form-label">Fiyat</label>
+            <input asp-for="Price" type="number" class="form-control" step="0.01" required />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Category" class="form-label">Kategori</label>
+            <select asp-for="Category" class="form-select" required>
+                <option value="">Seçiniz</option>
+                <option value="Konut">Konut</option>
+                <option value="Arsa">Arsa</option>
+                <!-- Diğer kategorileri buraya ekleyin -->
+            </select>
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="KonutDurumu" class="form-label">Konut Durumu</label>
+            <select asp-for="KonutDurumu" class="form-select" required>
+                <option value="">Seçiniz</option>
+                <option value="Satılık">Satılık</option>
+                <option value="Kiralık">Kiralık</option>
+            </select>
+            <span asp-validation-for="KonutDurumu" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MulkTipi" class="form-label">Mülk Tipi</label>
+            <input asp-for="MulkTipi" class="form-control" required />
+            <span asp-validation-for="MulkTipi" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Area" class="form-label">Metrekare</label>
+            <input asp-for="Area" type="number" class="form-control" required />
+            <span asp-validation-for="Area" class="text-danger"></span>
+        </div>
+
+        <!-- Diğer alanlar için benzer şekilde input veya select elemanları ekleyin -->
+
+        <div class="mb-3">
+            <label asp-for="UploadedFiles" class="form-label">Fotoğraflar Yükle</label>
+            <input asp-for="UploadedFiles" type="file" class="form-control" multiple />
+            <span asp-validation-for="UploadedFiles" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">İlanı Kaydet</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

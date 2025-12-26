@@ -1,0 +1,136 @@
+﻿/* Genel Stil Ayarları */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Açık gri Bootstrap arka planı */
+    color: #212529; /* Koyu metin rengi */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Bölümü (Diğer sayfalarla uyumlu) */
+.header-bg {
+    background-color: #007bff; /* Bootstrap mavisi */
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Silme Onay Kartı */
+.delete-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 50px auto; /* Merkezleme ve üst/alt boşluk */
+    max-width: 600px; /* Maksimum genişlik */
+    text-align: center; /* İçeriği ortala */
+}
+
+.delete-title {
+    color: #dc3545; /* Kırmızı başlık */
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.delete-confirmation-text {
+    color: #343a40;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+.delete-info-list {
+    list-style: none; /* Liste işaretini kaldır */
+    padding: 0;
+    text-align: left; /* Listeyi sola hizala */
+    margin-bottom: 30px;
+}
+
+    .delete-info-list dt {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+
+    .delete-info-list dd {
+        margin-bottom: 15px;
+        color: #6c757d;
+    }
+
+.delete-image-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    margin-top: 10px;
+}
+
+/* Butonlar */
+.confirm-delete-btn {
+    background-color: #dc3545; /* Kırmızı Sil butonu */
+    border-color: #dc3545;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .confirm-delete-btn:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+        transform: translateY(-2px);
+    }
+
+.cancel-delete-btn {
+    color: #007bff; /* Mavi İptal butonu */
+    font-weight: 500;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    padding: 12px 25px; /* Butonlarla aynı boyutta boşluk */
+    border-radius: 50px;
+}
+
+    .cancel-delete-btn:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+/* Footer Bölümü (Diğer sayfalarla aynı stil) */
+.footer-bg {
+    background-color: #343a40; /* Koyu gri footer */
+    color: white;
+    padding: 20px 0;
+    margin-top: auto; /* Footer'ı alta sabitle */
+    text-align: center;
+}
+
+/* Animasyonlar (Tüm sayfalarla uyumlu) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

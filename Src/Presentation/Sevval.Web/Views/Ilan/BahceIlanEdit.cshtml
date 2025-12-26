@@ -1,0 +1,44 @@
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+
+<form method="post" asp-action="SaveBahceIlanEdit">
+    <input type="hidden" name="Id" value="@Model._Ilanlar.FirstOrDefault()?.Id" />
+
+    <!-- Temel Bilgiler -->
+    <div class="form-group">
+        <label for="Title">İlan Başlığı</label>
+        <input type="text" id="Title" name="Title" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Title" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Açıklama</label>
+        <textarea id="Description" name="Description" class="form-control" rows="5" required>@Model._Ilanlar.FirstOrDefault()?.Description</textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="Price">Fiyat</label>
+        <input type="number" id="Price" name="Price" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Price" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Area">Alan (m²)</label>
+        <input type="number" id="Area" name="Area" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.Area" />
+    </div>
+
+    <!-- Konum Bilgileri -->
+    <div class="form-group">
+        <label for="sehir">İl</label>
+        <input type="text" id="sehir" name="sehir" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.sehir" required />
+    </div>
+
+    <div class="form-group">
+        <label for="semt">İlçe</label>
+        <input type="text" id="semt" name="semt" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.semt" required />
+    </div>
+
+    <div class="form-group">
+        <label for="mahalleKoy">Mahalle/Köy</label>
+        <input type="text" id="mahalleKoy" name="mahalleKoy" class="form-control" value="@Model._Ilanlar.FirstOrDefault()?.mahalleKoy" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

@@ -1,0 +1,123 @@
+﻿@model YourProjectName.Models.Blog
+@{
+    // SEO dostu sekme başlığı: Direkt yazının başlığı olacak
+    ViewData["Title"] = Model.Title;
+    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+
+    // Admin olarak görünecek ek e-posta adresleri
+    var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
+    var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO için meta açıklaması: Yazının kısa açıklamasını veya ilk birkaç cümlesini kullanabiliriz -->
+    <meta name="description" content="@(Model.ShortDescription != null ? Html.Raw(Model.ShortDescription.Length > 160 ? Model.ShortDescription.Substring(0, 157) + "..." : Model.ShortDescription) : "Şevval Emlak Blog'da gayrimenkul dünyasına dair detaylı yazılar.")" />
+    <!-- SEO için anahtar kelimeler: Yazı başlığı, kategori ve ilgili terimler eklenebilir -->
+    <meta name="keywords" content="@(Model.Title), @(Model.Category), gayrimenkul, emlak, emlakçılık, blog yazısı, @(Model.Author)" />
+    <!-- Yazar bilgisi -->
+    <meta name="author" content="@Model.Author" />
+    <!-- Sayfa başlığı -->
+    <title>@ViewData["Title"] - Şevval Emlak Blog</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- İsteğe bağlı, ikonlar için -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- DetailsBlog.css dosyasını buraya bağlıyoruz -->
+    <link rel="stylesheet" href="~/css/DetailsBlog.css">
+
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-WSQR6TXV');</script>
+    <!-- End Google Tag Manager -->
+
+</head>
+<body>
+
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSQR6TXV"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Header Bölümü (Index.cshtml ile aynı stil) -->
+    <header class="header-bg py-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
+                <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
+            </div>
+            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+            {
+                <nav>
+                    <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
+                    </a>
+                </nav>
+            }
+        </div>
+    </header>
+
+    <main class="container my-5 flex-grow-1 animate-fade-in">
+        <div class="blog-details-card">
+            <h1 class="blog-details-title">@Model.Title</h1>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Title" class="blog-details-image">
+            }
+            else
+            {
+                <img src="https://placehold.co/1200x600/cccccc/333333?text=G%C3%B6rsel+Yok" alt="Görsel Yok" class="blog-details-image">
+            }
+            <div class="blog-details-meta">
+                <span>Yazar: <span class="font-semibold">@Model.Author</span></span>
+                <span>Yayınlanma Tarihi: <span class="font-semibold">@Model.PublishDate.ToShortDateString()</span></span>
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
+                    <span>Kategori: <span class="font-semibold">@Model.Category</span></span>
+                }
+            </div>
+            <div class="blog-content">
+                @Html.Raw(Model.Content.Replace("\n", "<br/>")) @* Yeni satırları HTML'ye çevir *@
+            </div>
+            <div class="d-flex justify-content-between items-center mt-6 border-top pt-4 border-gray-200">
+                <a href="@Url.Action("Index", "Blog")" class="btn btn-secondary back-btn d-flex align-items-center">
+                    <i class="bi bi-arrow-left me-2"></i> Tüm Yazılara Geri Dön
+                </a>
+                @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+                {
+                    <div class="d-flex gap-3">
+                        <a href="@Url.Action("Edit", "Blog", new { id = Model.Id })" class="btn admin-action-btn edit">
+                            Düzenle
+                        </a>
+                        <a href="@Url.Action("Delete", "Blog", new { id = Model.Id })" class="btn admin-action-btn delete">
+                            Sil
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Bölümü (Index.cshtml ile aynı stil) -->
+    <footer class="footer-bg text-center">
+        <div class="container">
+            <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
+            <p class="small mt-1">Modern ve İlham Veren Blog Deneyimi.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS ve bağımlılıkları -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+﻿@{
+    ViewData["Title"] = "Mülkünü Hızlı Sat";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d6efd; /* Sevval Mavisi Tonu */
+            --primary-hover: #0b5ed7;
+            --bg-light: #f8f9fa;
+            --border-radius: 16px;
+            --step-active: #0d6efd;
+            --step-completed: #198754;
+            --step-inactive: #e9ecef;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: #343a40;
+            padding-bottom: 80px;
+        }
+
+        /* Header Image */
+        .header-section {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-content {
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: none;
+            padding: 40px;
+            margin-top: -60px; /* Overlap effect */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Step Progress Bar */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--step-inactive);
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+
+        .step-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            width: 25%;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid var(--step-inactive);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 700;
+            color: #adb5bd;
+            transition: all 0.3s ease;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #adb5bd;
+            transition: all 0.3s ease;
+        }
+
+        /* Active & Completed States */
+        .step-item.active .step-circle {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.2);
+        }
+        .step-item.active .step-label { color: var(--primary-color); }
+
+        .step-item.completed .step-circle {
+            border-color: var(--step-completed);
+            background: var(--step-completed);
+            color: white;
+        }
+        .step-item.completed .step-label { color: var(--step-completed); }
+
+        /* Selection Cards (Category & Status) */
+        .selection-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+        .selection-card:hover {
+            border-color: #b6d4fe;
+            background-color: #f8fbff;
+            transform: translateY(-3px);
+        }
+
+        .selection-card.selected {
+            border-color: var(--primary-color);
+            background-color: #e7f1ff;
+            color: var(--primary-color);
+        }
+
+        .selection-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: inherit;
+        }
+        
+        .selection-card h6 { font-weight: 600; margin: 0; }
+
+        /* Form Controls */
+        .form-label { font-weight: 500; font-size: 0.9rem; color: #495057; }
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+        }
+        
+        .currency-wrap { position: relative; }
+        .currency-symbol {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn-action {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        /* Success Modal Overlay */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .success-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .checkmark-circle {
+            width: 80px; height: 80px;
+            background: #d1e7dd;
+            color: #198754;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div class="header-content">
+            <h2 class="fw-bold mb-1">Mülkünü Bizimle Değerlendir</h2>
+            <p class="opacity-75">Hızlı, güvenilir ve profesyonel satış süreci.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="form-card">
+                    
+                    <div class="step-indicator">
+                        <div class="step-item active" id="step-ind-1">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Kategori</div>
+                        </div>
+                        <div class="step-item" id="step-ind-2">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Durum</div>
+                        </div>
+                        <div class="step-item" id="step-ind-3">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Mülk Bilgileri</div>
+                        </div>
+                        <div class="step-item" id="step-ind-4">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">İletişim</div>
+                        </div>
+                    </div>
+
+                    <form id="propertyForm" novalidate>
+                        <input type="hidden" id="SelectedCategory" name="Category">
+                        <input type="hidden" id="SelectedStatus" name="Status">
+
+                        <div class="form-step" id="step-1">
+                            <h4 class="text-center mb-4">Gayrimenkul Türünü Seçiniz</h4>
+                            <div class="row g-3 justify-content-center">
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('Konut', this)">
+                                        <i class="fa-solid fa-house-chimney"></i>
+                                        <h6>Konut</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('İş Yeri', this)">
+                                        <i class="fa-solid fa-briefcase"></i>
+                                        <h6>İş Yeri</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('Arsa', this)">
+                                        <i class="fa-solid fa-map-location-dot"></i>
+                                        <h6>Arsa</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('Tarla', this)">
+                                        <i class="fa-solid fa-wheat-awn"></i>
+                                        <h6>Tarla</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('Bahçe', this)">
+                                        <i class="fa-solid fa-tree"></i>
+                                        <h6>Bahçe</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="selection-card" onclick="app.setCategory('Turistik Tesis', this)">
+                                        <i class="fa-solid fa-hotel"></i>
+                                        <h6>Turistik Tesis</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-primary btn-action" id="btn-step1" disabled onclick="app.nextStep(2)">Devam Et <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="form-step d-none" id="step-2">
+                            <h4 class="text-center mb-4">Ne Yapmak İstiyorsunuz?</h4>
+                            <div class="row g-4 justify-content-center">
+                                <div class="col-6 col-md-5">
+                                    <div class="selection-card" onclick="app.setStatus('Satılık', this)">
+                                        <i class="fa-solid fa-tags text-danger"></i>
+                                        <h6>Satılık</h6>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-5">
+                                    <div class="selection-card" onclick="app.setStatus('Kiralık', this)">
+                                        <i class="fa-solid fa-key text-success"></i>
+                                        <h6>Kiralık</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3 justify-content-center mt-5">
+                                <button type="button" class="btn btn-outline-secondary btn-action" onclick="app.prevStep(1)">Geri</button>
+                                <button type="button" class="btn btn-primary btn-action" id="btn-step2" disabled onclick="app.nextStep(3)">Devam Et</button>
+                            </div>
+                        </div>
+
+                        <div class="form-step d-none" id="step-3">
+                            <h4 class="text-center mb-4">Mülk Detayları</h4>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label required">İl</label>
+                                    <select class="form-select" id="CitySelect" required onchange="app.loadDistricts()">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label required">İlçe</label>
+                                    <select class="form-select" id="DistrictSelect" required disabled onchange="app.loadNeighborhoods()">
+                                        <option value="">Önce İl Seçin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label required">Mahalle</label>
+                                    <select class="form-select" id="NeighborhoodSelect" required disabled>
+                                        <option value="">Önce İlçe Seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="ResidentialFields" class="d-none">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Oda Sayısı</label>
+                                        <select class="form-select" name="RoomCount">
+                                            <option value="">Seçiniz</option>
+                                            <option>1+1</option><option>2+1</option><option>3+1</option><option>4+1</option><option>Diğer</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Metrekare (Brüt)</label>
+                                        <input type="number" class="form-control" name="Area" placeholder="m2">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Bulunduğu Kat</label>
+                                        <input type="text" class="form-control" name="Floor">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Isıtma</label>
+                                        <select class="form-select" name="Heating">
+                                            <option value="">Seçiniz</option>
+                                            <option>Kombi</option><option>Merkezi</option><option>Klima</option><option>Yok</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="LandFields" class="d-none">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ada No</label>
+                                        <input type="text" class="form-control" name="AdaNo">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Parsel No</label>
+                                        <input type="text" class="form-control" name="ParselNo">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Metrekare</label>
+                                        <input type="number" class="form-control" name="LandArea">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">İmar Durumu</label>
+                                        <select class="form-select" name="Zoning">
+                                            <option value="">Seçiniz</option>
+                                            <option>Konut</option><option>Ticari</option><option>Tarım</option><option>Sanayi</option>
+                                        </select>
+                                    </div>
+                                     <div class="col-md-6">
+                                        <label class="form-label">Tapu Durumu</label>
+                                        <select class="form-select" name="TitleDeedStatus">
+                                            <option value="">Seçiniz</option>
+                                            <option>Müstakil Parsel</option><option>Hisseli</option><option>Zilliyet</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-12">
+                                    <label class="form-label required">Talep Edilen Fiyat</label>
+                                    <div class="currency-wrap">
+                                        <input type="text" class="form-control form-control-lg" id="PriceInput" required 
+                                               placeholder="0" style="font-weight: 700; color: var(--primary-color);">
+                                        <span class="currency-symbol">₺</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 justify-content-center mt-5">
+                                <button type="button" class="btn btn-outline-secondary btn-action" onclick="app.prevStep(2)">Geri</button>
+                                <button type="button" class="btn btn-primary btn-action" onclick="app.validateAndNext(4)">Devam Et</button>
+                            </div>
+                        </div>
+
+                        <div class="form-step d-none" id="step-4">
+                            <h4 class="text-center mb-4">Size Nasıl Ulaşalım?</h4>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label required">Adınız</label>
+                                    <input type="text" class="form-control" name="FirstName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label required">Soyadınız</label>
+                                    <input type="text" class="form-control" name="LastName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label required">Telefon Numarası</label>
+                                    <input type="tel" class="form-control" id="PhoneInput" name="Phone" placeholder="05XX XXX XX XX" required maxlength="15">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">E-Posta (Opsiyonel)</label>
+                                    <input type="email" class="form-control" name="Email">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Varsa Eklemek İstedikleriniz</label>
+                                    <textarea class="form-control" rows="3" name="Notes"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 justify-content-center mt-5">
+                                <button type="button" class="btn btn-outline-secondary btn-action" onclick="app.prevStep(3)">Geri</button>
+                                <button type="submit" class="btn btn-success btn-action shadow">Başvuruyu Tamamla</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-overlay" id="successModal">
+        <div class="success-content">
+            <div class="checkmark-circle">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Tebrikler!</h3>
+            <p class="text-muted mb-4">
+                Talebiniz başarıyla alınmıştır. Uzman ekibimiz mülkünüzü inceleyip en kısa sürede 
+                sizinle iletişime geçecektir.
+            </p>
+            <div class="alert alert-primary py-2 mb-4">
+                <small><i class="fa-solid fa-phone me-2"></i>Destek Hattı: <strong>+90 (212) 955 55 41</strong></small>
+            </div>
+            <button class="btn btn-primary w-100" onclick="window.location.reload()">
+                Ana Sayfaya Dön (<span id="countdown">10</span>)
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        /**
+         * PropertyForm Uygulaması
+         * Tüm form mantığını kapsayan modüler yapı
+         */
+        const app = {
+            state: {
+                currentStep: 1,
+                category: null,
+                status: null,
+                isLandType: false // Arsa/Tarla tipi mi?
+            },
+            
+            data: {
+                cities: [] // JSON'dan dolacak
+            },
+
+            init: function() {
+                this.loadCitiesData();
+                this.bindEvents();
+            },
+
+            // --- Navigasyon ---
+            nextStep: function(targetStep) {
+                // Mevcut adımı gizle
+                document.getElementById(`step-${this.state.currentStep}`).classList.add('d-none');
+                
+                // Hedef adımı göster
+                document.getElementById(`step-${targetStep}`).classList.remove('d-none');
+                
+                // Progress Bar Güncelle
+                this.updateProgressBar(targetStep);
+                
+                this.state.currentStep = targetStep;
+
+                // 3. Adımdayız, alanları göster/gizle
+                if(targetStep === 3) {
+                    this.togglePropertyFields();
+                }
+            },
+
+            prevStep: function(targetStep) {
+                this.nextStep(targetStep); // Logic aynı, sadece geri gidiyoruz
+            },
+
+            updateProgressBar: function(step) {
+                for (let i = 1; i <= 4; i++) {
+                    const el = document.getElementById(`step-ind-${i}`);
+                    el.classList.remove('active', 'completed');
+                    
+                    if (i < step) el.classList.add('completed');
+                    if (i === step) el.classList.add('active');
+                }
+            },
+
+            // --- Seçim Mantığı ---
+            setCategory: function(val, element) {
+                this.state.category = val;
+                document.getElementById('SelectedCategory').value = val;
+                
+                // Görsel seçim
+                document.querySelectorAll('#step-1 .selection-card').forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+                
+                // Arsa grubu kontrolü
+                const landTypes = ['Arsa', 'Tarla', 'Bahçe'];
+                this.state.isLandType = landTypes.includes(val);
+
+                // Butonu aktif et
+                document.getElementById('btn-step1').disabled = false;
+            },
+
+            setStatus: function(val, element) {
+                this.state.status = val;
+                document.getElementById('SelectedStatus').value = val;
+
+                document.querySelectorAll('#step-2 .selection-card').forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+
+                document.getElementById('btn-step2').disabled = false;
+            },
+
+            togglePropertyFields: function() {
+                const resFields = document.getElementById('ResidentialFields');
+                const landFields = document.getElementById('LandFields');
+
+                if (this.state.isLandType) {
+                    resFields.classList.add('d-none');
+                    landFields.classList.remove('d-none');
+                } else {
+                    resFields.classList.remove('d-none');
+                    landFields.classList.add('d-none');
+                }
+            },
+
+            // --- Veri Çekme (Simüle Edilmiş) ---
+            loadCitiesData: async function() {
+                try {
+                    // Gerçek projede: fetch('/data/TR-İl-İlçe.json')
+                    // Burada örnek veri kullanıyoruz:
+                    const mockData = [
+                        { "Il": "İstanbul", "Ilce": [ {"Ilce": "Kadıköy"}, {"Ilce": "Beşiktaş"}, {"Ilce": "Üsküdar"} ] },
+                        { "Il": "Ankara", "Ilce": [ {"Ilce": "Çankaya"}, {"Ilce": "Keçiören"} ] },
+                        { "Il": "İzmir", "Ilce": [ {"Ilce": "Bornova"}, {"Ilce": "Karşıyaka"} ] },
+                        { "Il": "Antalya", "Ilce": [ {"Ilce": "Muratpaşa"}, {"Ilce": "Konyaaltı"}, {"Ilce": "Alanya"} ] },
+                        { "Il": "Muğla", "Ilce": [ {"Ilce": "Bodrum"}, {"Ilce": "Fethiye"}, {"Ilce": "Marmaris"} ] }
+                    ];
+                    
+                    this.data.cities = mockData;
+                    
+                    const citySelect = document.getElementById('CitySelect');
+                    this.data.cities.forEach(c => {
+                        citySelect.add(new Option(c.Il, c.Il));
+                    });
+
+                } catch (error) {
+                    console.error("Şehir verisi yüklenemedi", error);
+                }
+            },
+
+            loadDistricts: function() {
+                const selectedCity = document.getElementById('CitySelect').value;
+                const distSelect = document.getElementById('DistrictSelect');
+                const neighSelect = document.getElementById('NeighborhoodSelect');
+
+                distSelect.innerHTML = '<option value="">Seçiniz</option>';
+                neighSelect.innerHTML = '<option value="">Önce İlçe Seçin</option>';
+                distSelect.disabled = true;
+                neighSelect.disabled = true;
+
+                if (!selectedCity) return;
+
+                const cityData = this.data.cities.find(c => c.Il === selectedCity);
+                if (cityData) {
+                    cityData.Ilce.forEach(d => {
+                        distSelect.add(new Option(d.Ilce, d.Ilce));
+                    });
+                    distSelect.disabled = false;
+                }
+            },
+
+            loadNeighborhoods: function() {
+                // Mahalle verisi genellikle çok büyük olduğu için ayrı bir API isteği ile çekilmesi önerilir.
+                // Burada basitçe açıyoruz.
+                const neighSelect = document.getElementById('NeighborhoodSelect');
+                neighSelect.innerHTML = '<option value="">Seçiniz</option>';
+                neighSelect.disabled = false;
+                
+                // Örnek Mahalleler
+                ['Merkez Mah.', 'Cumhuriyet Mah.', 'Atatürk Mah.', 'Yeni Mah.'].forEach(m => {
+                    neighSelect.add(new Option(m, m));
+                });
+            },
+
+            // --- Validasyon ve Formatlama ---
+            formatPrice: function(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val === '') return;
+                input.value = new Intl.NumberFormat('tr-TR').format(val);
+            },
+
+            formatPhone: function(input) {
+                let x = input.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                input.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+            },
+
+            validateAndNext: function(nextStepId) {
+                // Basit validasyon: Zorunlu alanlar dolu mu?
+                const currentStepEl = document.getElementById(`step-${this.state.currentStep}`);
+                const requiredInputs = currentStepEl.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                        
+                        // Input değişince kırmızılığı kaldır
+                        input.addEventListener('input', () => input.classList.remove('is-invalid'), {once: true});
+                    }
+                });
+
+                if (isValid) {
+                    this.nextStep(nextStepId);
+                } else {
+                    // İlk boş alana odaklan
+                    const firstInvalid = currentStepEl.querySelector('.is-invalid');
+                    if(firstInvalid) firstInvalid.focus();
+                    
+                    // Opsiyonel: Toast mesajı gösterebilirsin
+                    // alert("Lütfen zorunlu alanları doldurunuz.");
+                }
+            },
+
+            // --- Form Gönderimi ---
+            handleFormSubmit: async function(e) {
+                e.preventDefault();
+                
+                // Son validasyon kontrolü (Step 4)
+                const form = e.target;
+                if (!form.checkValidity()) {
+                    e.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                // Butonu kilitle
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gönderiliyor...';
+
+                try {
+                    // Backend'e veri gönderimi simülasyonu
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+                    console.log("Gönderilen Veri:", data);
+
+                    // Sunucu yanıtı için bekleme süresi (2 saniye)
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Başarı Modalını Aç
+                    this.showSuccessModal();
+
+                } catch (error) {
+                    alert("Bir hata oluştu. Lütfen tekrar deneyiniz.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            },
+
+            showSuccessModal: function() {
+                const modal = document.getElementById('successModal');
+                modal.style.display = 'block';
+
+                let count = 10;
+                const countEl = document.getElementById('countdown');
+                
+                const interval = setInterval(() => {
+                    count--;
+                    countEl.innerText = count;
+                    if (count <= 0) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                }, 1000);
+            },
+
+            bindEvents: function() {
+                // Fiyat Formatlama
+                const priceInput = document.getElementById('PriceInput');
+                if(priceInput) {
+                    priceInput.addEventListener('input', (e) => this.formatPrice(e.target));
+                }
+
+                // Telefon Formatlama
+                const phoneInput = document.getElementById('PhoneInput');
+                if(phoneInput) {
+                    phoneInput.addEventListener('input', (e) => this.formatPhone(e.target));
+                }
+
+                // Form Submit
+                document.getElementById('propertyForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
+            }
+        };
+
+        // Uygulamayı Başlat
+        document.addEventListener('DOMContentLoaded', () => app.init());
+
+    </script>
+</body>
+</html>

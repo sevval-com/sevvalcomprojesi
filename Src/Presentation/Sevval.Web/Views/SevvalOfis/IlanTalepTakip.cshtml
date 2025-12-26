@@ -1,0 +1,291 @@
+﻿@model IEnumerable<Sevval.Domain.Entities.SatisTalep>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İlan Talep Takip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4c3;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .table-responsive {
+            margin-top: 2rem;
+        }
+
+        .action-icon {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+            .action-icon:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+        .edit-interested-person {
+            display: none; /* Başlangıçta gizle */
+        }
+
+        td:hover .edit-interested-person {
+            display: inline-block; /* Hücreye gelindiğinde göster */
+        }
+
+        .interested-person-display {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* İçeriği ortala */
+            gap: 5px; /* İkon ve yazı arasına boşluk ekle */
+        }
+
+        .remove-icon {
+            display: inline-flex; /* inline-flex kullanın */
+            align-items: center;
+            justify-content: center;
+            width: 20px; /* İstenen çap */
+            height: 20px;
+            border-radius: 50%;
+            background-color: red;
+            color: white;
+            font-size: 12px; /* Çarpı işareti boyutu */
+            cursor: pointer; /* Tıklanabilir olduğunu belirt */
+            margin-left: 5px; /* İsteğe bağlı: Yazıdan biraz uzaklaştırın */
+        }
+
+            .remove-icon:hover {
+                background-color: darkred; /* Hover efekti */
+            }
+
+    </style>
+</head>
+<body class="bg-light p-4">
+    <div class="container">
+        <h2 class="text-center text-teal mb-4">İlan Talep Takip</h2>
+        <div class="table-responsive shadow-sm rounded bg-white">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>İsim</th>
+                        <th>Soyisim</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Yaşadığı Şehir</th>
+                        <th>Oluşturma Tarihi</th>
+                        <th class="text-center">Detay</th>
+                        <th class="text-center">İlgilenen Kişi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.RequestNumber</td>
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            <td>@item.Email</td>
+                            <td>@item.Phone</td>
+                            <td>@item.LivingCity</td>
+                            <td>@(item.CreatedDate?.ToString("dd.MM.yyyy HH:mm"))</td>
+                            <td class="text-center">
+                                <button class="btn btn-outline-primary btn-sm btn-detail"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detailModal"
+                                        data-firstname="@item.FirstName"
+                                        data-lastname="@item.LastName"
+                                        data-email="@item.Email"
+                                        data-phone="@item.Phone"
+                                        data-livingcity="@item.LivingCity"
+                                        data-createddate="@(item.CreatedDate?.ToString("dd.MM.yyyy HH:mm"))"
+                                        data-category="@item.selectCategory"
+                                        data-status="@item.selectStatus"
+                                        data-rooms="@item.Rooms"
+                                        data-area="@item.Area"
+                                        data-buildingage="@item.BuildingAge"
+                                        data-floor="@item.Floor"
+                                        data-bathrooms="@item.Bathrooms"
+                                        data-heating="@item.HeatingSystem"
+                                        data-parking="@item.Parking"
+                                        data-price="@item.Price"
+                                        data-rescity="@item.ResidentialCity"
+                                        data-resdistrict="@item.ResidentialDistrict"
+                                        data-resvillage="@item.ResidentialVillage"
+                                        data-landada="@item.LandAda"
+                                        data-landparsel="@item.LandParsel"
+                                        data-landarea="@item.LandArea"
+                                        data-slope="@item.Slope"
+                                        data-road="@item.RoadCondition"
+                                        data-distance="@item.DistanceToSettlement"
+                                        data-zoning="@item.ZoningStatus"
+                                        data-landcity="@item.LandCity"
+                                        data-landdistrict="@item.LandDistrict"
+                                        data-landvillage="@item.LandVillage"
+                                        data-landprice="@item.LandPrice">
+                                    Detay Gör
+                                </button>
+                            </td>
+                            <td class="text-center">
+                                <div class="interested-person-display">
+                                    @if (string.IsNullOrEmpty(item.InterestedPerson))
+                                    {
+                                        <span>&times;</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.InterestedPerson</span>
+                                    }
+                                    @if (string.IsNullOrEmpty(item.InterestedPerson))
+                                    {
+                                        <i class="fas fa-pencil-alt action-icon edit-interested-person"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editInterestedPersonModal"
+                                           data-request-number="@item.RequestNumber">
+                                        </i>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="detailModalLabel">Talep Detayı</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="detailForm">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editInterestedPersonModal" tabindex="-1" aria-labelledby="editInterestedPersonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="editInterestedPersonModalLabel">İlgilenen Kişi Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editInterestedPersonForm">
+                        <div class="mb-3">
+                            <label for="interestedPersonInput" class="form-label">İlgilenen Kişi:</label>
+                            <input type="text" class="form-control" id="interestedPersonInput" name="interestedPerson" required>
+                            <input type="hidden" id="editRequestNumber" name="requestNumber">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" id="saveInterestedPerson">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const detailModalElement = document.getElementById('detailModal');
+            const editInterestedPersonModalElement = document.getElementById('editInterestedPersonModal');
+            const editInterestedPersonForm = document.getElementById('editInterestedPersonForm');
+            const interestedPersonInput = document.getElementById('interestedPersonInput');
+            const editRequestNumberInput = document.getElementById('editRequestNumber');
+            const saveInterestedPersonButton = document.getElementById('saveInterestedPerson');
+
+            const detailModal = new bootstrap.Modal(detailModalElement);
+            const editInterestedPersonModal = new bootstrap.Modal(editInterestedPersonModalElement);
+
+            detailModalElement.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                const form = detailModalElement.querySelector('#detailForm');
+                form.innerHTML = '';
+
+                Array.from(btn.attributes).forEach(attr => {
+                    if (attr.name.startsWith('data-') && !['data-bs-toggle', 'data-bs-target'].includes(attr.name)) {
+                        const key = attr.name.replace('data-', '');
+                        const value = attr.value;
+                        if (value && value.trim() !== '') {
+                            const formGroup = document.createElement('div');
+                            formGroup.classList.add('mb-3');
+                            const label = document.createElement('label');
+                            label.classList.add('form-label', 'fw-bold');
+                            label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                            const input = document.createElement('input');
+                            input.classList.add('form-control');
+                            input.readOnly = true;
+                            input.value = value;
+                            formGroup.appendChild(label);
+                            formGroup.appendChild(input);
+                            form.appendChild(formGroup);
+                        }
+                    }
+                });
+            });
+
+            editInterestedPersonModalElement.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                const requestNumber = btn.getAttribute('data-request-number');
+                editRequestNumberInput.value = requestNumber;
+                interestedPersonInput.value = ''; //inputu temizle
+            });
+
+            saveInterestedPersonButton.addEventListener('click', function () {
+                const requestNumber = editRequestNumberInput.value;
+                const interestedPerson = interestedPersonInput.value;
+
+                if (interestedPerson.trim() !== "") {
+                    // Veritabanına güncelleme isteği gönder
+                    fetch('/SevvalOfis/UpdateInterestedPerson', { // URL'yi doğru ayarlayın
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `requestNumber=${requestNumber}&interestedPerson=${encodeURIComponent(interestedPerson)}`,
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Modal'ı kapat ve tabloyu güncelle
+                                editInterestedPersonModal.hide();
+                                window.location.reload(); // Sayfayı yenile
+                            } else {
+                                alert('İlgilenen kişi güncellenemedi.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Bir hata oluştu.');
+                        });
+                }
+                else{
+                     alert("İlgilenen Kişi Değeri Boş Olamaz!");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+@model Sevval.Domain.Entities.MembershipChangeRequest
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Üyelik Değişim Talebi</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <strong>Kullanıcı:</strong> @Model.User.Email
+            </div>
+            <div class="mb-3">
+                <strong>Mevcut Üyelik:</strong> @Model.CurrentType
+            </div>
+            <div class="mb-3">
+                <strong>İstenen Üyelik:</strong> @Model.RequestedType
+            </div>
+            @if (!string.IsNullOrEmpty(Model.CompanyName))
+            {
+                <div class="mb-3">
+                    <strong>Şirket Adı:</strong> @Model.CompanyName
+                </div>
+                <div class="mb-3">
+                    <strong>Şirket Adresi:</strong> @Model.CompanyAddress
+                </div>
+                <div class="mb-3">
+                    <strong>Vergi No:</strong> @Model.TaxNumber
+                </div>
+                <div class="mb-3">
+                    <strong>Telefon:</strong> @Model.PhoneNumber
+                </div>
+            }
+            <div class="mb-3">
+                <strong>Talep Tarihi:</strong> @Model.RequestDate.ToLocalTime()
+            </div>
+
+            <form method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="token" value="@Context.Request.Query["token"]" />
+                
+                <div class="mb-3">
+                    <label class="form-label">Not (Opsiyonel)</label>
+                    <textarea name="note" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" name="action" value="Approved" class="btn btn-success">
+                        <i class="fas fa-check me-2"></i>Onayla
+                    </button>
+                    <button type="submit" name="action" value="Rejected" class="btn btn-danger">
+                        <i class="fas fa-times me-2"></i>Reddet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

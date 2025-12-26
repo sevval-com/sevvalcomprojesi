@@ -1,0 +1,73 @@
+﻿/* Paneli kapsayan div */
+.active-users-container {
+    overflow-x: auto; /* Sağa sola kaydırılabilirlik sağla */
+    white-space: nowrap; /* Panelin satır kaydırmasını engelle */
+    padding: 10px; /* Kapsayıcıya hafif padding */
+    position: relative; /* Konumu ayarlamak için relative yap */
+}
+
+/* Aktif ziyaretçi paneli */
+.active-users-panel {
+    background-color: #28a745; /* Yeşil arka plan rengi */
+    color: rgba(255, 255, 255, 0.9); /* Beyaz yazı rengi (RGBA kullanarak) */
+    padding: 20px; /* Daha fazla iç boşluk */
+    border-radius: 25px; /* Oval köşeler */
+    width: 350px; /* Varsayılan genişlik (boyut ayarlama yapılabilir) */
+    min-width: 250px; /* Minimum genişlik */
+    max-width: 400px; /* Maksimum genişlik */
+    margin: 25px auto; /* Ortaya hizalama */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+    text-align: center; /* Metni ortala */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Daha belirgin gölge efekti */
+    transition: transform 0.3s, box-shadow 0.3s; /* Geçiş efekti */
+    position: absolute; /* Panelin pozisyonunu elle ayarlamak için absolute yap */
+    top: 3235px; /* Üstten 50px yukarıda başlat */
+    left: 300px; /* Soldan 50px sola başlat */
+}
+
+    .active-users-panel:hover {
+        transform: scale(1.05); /* Hover etkisi: hafif büyütme */
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* Hover etkisi: gölgeyi artır */
+    }
+
+    .active-users-panel h3 {
+        margin: 0; /* Varsayılan margin'i sıfırla */
+        font-size: 1.5em; /* Daha büyük yazı boyutu */
+        font-weight: 600; /* Daha kalın yazı */
+        color: rgba(255, 255, 255, 0.9); /* Beyaz yazı */
+    }
+
+/* Medya Sorguları ile Responsive Tasarım */
+
+/* 400px ve altındaki ekranlar için */
+@media (max-width: 400px) {
+    .active-users-panel {
+        top: 20px; /* Üstten 20px */
+        left: 20px; /* Soldan 20px */
+        width: 90%; /* Genişliği %90 yap */
+        padding: 15px; /* Padding'i azalt */
+        font-size: 1.0em; /* Yazı boyutunu azalt */
+    }
+}
+
+/* 616px ve altındaki ekranlar için */
+@media (max-width: 616px) {
+    .active-users-panel {
+        top: 30px; /* Üstten 30px */
+        left: 30px; /* Soldan 30px */
+        width: 85%; /* Genişliği %85 yap */
+        padding: 15px; /* Padding'i azalt */
+        font-size: 1.0em; /* Yazı boyutunu azalt */
+    }
+}
+
+/* 768px ve altındaki ekranlar için */
+@media (max-width: 768px) {
+    .active-users-panel {
+        top: 6100px; /* Üstten 40px */
+        left: 80px; /* Soldan 40px */
+        width: 30%; /* Genişliği %80 yap */
+        padding: 9px; /* Normal padding */
+        font-size: 0.6em; /* Yazı boyutunu biraz büyüt */
+    }
+}

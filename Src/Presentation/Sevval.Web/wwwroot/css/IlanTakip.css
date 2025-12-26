@@ -1,0 +1,142 @@
+﻿/* Genel stil ayarları */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+    color: #007bff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Modern tablo başlığı */
+.table-title {
+    background: linear-gradient(90deg, #007bff, #00b4db);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 1rem;
+    text-align: center;
+    border: none;
+    width: 100%;
+    top: 19px;
+    position: relative;
+}
+
+/* Sticky header */
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    background-color: #e9f5ff;
+    z-index: 2;
+    border-bottom: 2px solid #007bff;
+}
+
+/* Buton ayarları */
+.btn-primary, .btn-success {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+    .btn-primary:hover, .btn-success:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+/* Modern tablo kapsayıcı - scroll en üstte */
+.modern-table-wrapper {
+    border: 2px solid #007bff;
+    border-radius: 0.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 1.5rem;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    /* Scroll’u yukarı taşımak için */
+    transform: rotateX(180deg);
+    /* Firefox scrollbar rengi */
+    scrollbar-width: thin;
+    scrollbar-color: #007bff #e9f5ff;
+}
+
+    /* İçeriği tekrar doğru çevir */
+    .modern-table-wrapper > .modern-table {
+        transform: rotateX(180deg);
+    }
+
+/* Tablo stili */
+.modern-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+    .modern-table th,
+    .modern-table td {
+        white-space: nowrap;
+        padding: 0.75rem;
+        text-align: center;
+        border-right: 1px solid #007bff;
+        border-bottom: 1px solid #007bff;
+    }
+
+    .modern-table tbody tr:hover {
+        background-color: #f0f8ff;
+    }
+
+.number-column {
+    width: 50px;
+}
+
+/* WebKit tarayıcılar için scrollbar stili */
+.modern-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.modern-table-wrapper::-webkit-scrollbar-track {
+    background: #e9f5ff;
+}
+
+.modern-table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 4px;
+    border: 1px solid #e9f5ff;
+}
+
+/* Responsive ayarlar */
+@media (max-width: 768px) {
+    .table-title {
+        font-size: 1.25rem;
+        padding: 0.75rem;
+    }
+
+    .modern-table th,
+    .modern-table td {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Hücre içerisinde kalem ikonunun konumlandırılması ve görünürlüğü */
+td {
+    position: relative;
+}
+
+.edit-icon {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    background-color: #007bff; /* Mavi arka plan */
+    color: #ffffff; /* Beyaz ikon rengi */
+    padding: 2px 5px; /* İkon etrafında boşluk */
+    border-radius: 3px; /* Hafif yuvarlatılmış kenarlar */
+}
+
+td:hover .edit-icon {
+    display: inline-block;
+}
+

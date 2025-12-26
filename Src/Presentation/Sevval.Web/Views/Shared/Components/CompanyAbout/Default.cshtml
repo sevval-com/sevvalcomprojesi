@@ -1,0 +1,69 @@
+@model Sevval.Domain.Entities.ApplicationUser
+
+<h4 class="aboutUs-title">Hakkımızda</h4>
+<div class="aboutUs-content">
+    <p><strong>Şirket İsmi:</strong> @Model.CompanyName</p>
+    <p><strong>Şirketin Bulunduğu Bölge:</strong> @Model.City / @Model.District</p>
+
+    <hr class="aboutUs-divider">
+
+    <h5 class="aboutUs-subtitle">Firma Sahibi Bilgileri:</h5>
+    <p><strong>İsim Soyisim:</strong> @Model.FirstName @Model.LastName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Telefon No:</strong> @(Model.PhoneNumber?.StartsWith("0") == true ? Model.PhoneNumber : "0" + Model.PhoneNumber)</p>
+
+    <hr class="aboutUs-divider">
+
+    <!-- Harita Konumu -->
+    <div id="map" class="aboutUs-map"></div>
+    <p class="map-warning">
+        Bu adres Google İşletme sayfanızdan çekilmiştir. Adres yanlışsa Google Maps'teki adresinizi düzeltiniz.
+    </p>
+
+    <!-- CSS ile Stil Verme -->
+    <style>
+        .map-warning {
+            font-size: 14px;
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+
+    <!-- Konumun Açık Adresi -->
+    <div id="address" class="aboutUs-address"></div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&callback=initMap" async defer></script>
+
+<script>
+    function initMap() {
+        // Şirketin konumunu almak için adres (şehir ve ilçe)
+        var address = '@Model.City, @Model.District, @Model.CompanyName';
+
+        // Geocoding servisi ile adresi koordinatlara çevirme
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'address': address }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var location = results[0].geometry.location;
+
+                // Haritayı başlatma ve adresin koordinatlarına odaklanma
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 15,
+                    center: location
+                });
+
+                // Konum işareti (marker) ekleme
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: location
+                });
+
+                // Adresi ekrana yazdırma
+                var formattedAddress = results[0].formatted_address;
+                document.getElementById('address').innerHTML = '<strong>Adres:</strong> ' + formattedAddress;
+            } else {
+                alert('Konum bulunamadı: ' + status);
+            }
+        });
+    }
+</script>

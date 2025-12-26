@@ -1,0 +1,962 @@
+@{
+    ViewData["Title"] = "Parsel Sorgulama";
+}
+
+@section style {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <style>
+        :root {
+            --parsel-ink: #0f172a;
+            --parsel-muted: #6b7280;
+            --parsel-border: #e2e8f0;
+            --parsel-surface: #ffffff;
+            --parsel-shell: #f8fafc;
+            --parsel-hero: #0a1f3f;
+            --parsel-accent: #0ea5e9;
+            --parsel-accent-2: #f59e0b;
+            --parsel-success: #22c55e;
+            --parsel-danger: #ef4444;
+            --parsel-ring: rgba(14, 165, 233, 0.18);
+            --parsel-shadow: 0 18px 45px rgba(0, 9, 45, 0.16);
+            --parsel-font: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+        }
+
+        .parsel-hero {
+            background: radial-gradient(120% 120% at 10% 10%, rgba(14, 165, 233, 0.28), transparent 45%), radial-gradient(110% 120% at 90% 20%, rgba(37, 99, 235, 0.25), transparent 55%), linear-gradient(135deg, #0c4da2, #0ea5e9);
+            color: #e2e8f0;
+            padding: 60px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parsel-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(60% 80% at 70% 50%, rgba(255, 255, 255, 0.08), transparent 60%);
+            pointer-events: none;
+        }
+
+        .parsel-hero .container { position: relative; z-index: 1; max-width: 1100px; }
+
+        .parsel-hero h1 {
+            font-family: var(--parsel-font);
+            letter-spacing: -0.02em;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .eyebrow {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(248, 250, 252, 0.7);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            backdrop-filter: blur(6px);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 13px;
+            background: rgba(14, 165, 233, 0.12);
+            color: #e0f2fe;
+            border: 1px solid rgba(14, 165, 233, 0.35);
+        }
+
+        .pill.secondary {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fef3c7;
+            border-color: rgba(245, 158, 11, 0.32);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .hero-stat {
+            background: rgba(15, 23, 42, 0.38);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 14px 16px;
+            border-radius: 14px;
+        }
+
+        .hero-stat small { color: rgba(248, 250, 252, 0.65); }
+
+        .status-card {
+            background: var(--parsel-surface);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+            color: var(--parsel-ink);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            background: var(--parsel-success);
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .status-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--parsel-border);
+            color: var(--parsel-muted);
+            font-weight: 600;
+        }
+
+        .status-label[data-tone="error"] { color: var(--parsel-danger); border-color: rgba(239, 68, 68, 0.25); }
+        .status-label[data-tone="success"] { color: var(--parsel-success); border-color: rgba(34, 197, 94, 0.25); }
+
+        .status-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .status-metrics .metric {
+            padding: 12px;
+            border: 1px dashed var(--parsel-border);
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .parsel-shell {
+            background: linear-gradient(180deg, #0f5bbf, #0ea5e9);
+            padding: 32px 0 64px;
+            margin-top: -18px;
+        }
+
+        .parsel-shell .container {
+            max-width: 1320px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        .surface {
+            background: var(--parsel-surface);
+            border: 1px solid var(--parsel-border);
+            border-radius: 18px;
+            box-shadow: var(--parsel-shadow);
+            padding: 22px;
+            height: 100%;
+            width: 100%;
+            max-width: 520px;
+            margin: 0;
+        }
+
+        #form-panel {
+            padding-left: 8px;
+        }
+
+        .surface h5, .surface h6 { color: var(--parsel-ink); font-weight: 800; }
+
+        .section-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--parsel-muted);
+            font-size: 13px;
+        }
+
+        .stepper span {
+            padding: 6px 10px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--parsel-border);
+            font-weight: 700;
+            color: var(--parsel-ink);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px 16px;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        @@media (min-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        @@media (min-width: 992px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .action-cell {
+            align-self: flex-end;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: var(--parsel-ink);
+            margin-bottom: 6px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 14px;
+            min-height: 48px;
+            border: 1px solid var(--parsel-border);
+            box-shadow: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            font-weight: 600;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--parsel-accent);
+            box-shadow: 0 0 0 3px var(--parsel-ring);
+        }
+
+        .hint {
+            color: var(--parsel-muted);
+            font-size: 13px;
+        }
+
+        .btn-primary-parsel {
+            background: linear-gradient(90deg, var(--parsel-accent), #2563eb);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 800;
+            min-width: 170px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .btn-primary-parsel:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(37, 99, 235, 0.26); }
+        .btn-primary-parsel:active { transform: translateY(0); }
+        .btn-primary-parsel:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .btn-ghost {
+            border: 1px solid var(--parsel-border);
+            background: #fff;
+            color: var(--parsel-ink);
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-weight: 700;
+        }
+
+        .btn-ghost:hover { background: #f8fafc; }
+
+        .btn-loader {
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .btn-primary-parsel.is-loading .btn-loader { display: inline-block; }
+        .btn-primary-parsel .btn-label { display: inline-flex; gap: 8px; align-items: center; }
+        .btn-primary-parsel.is-loading .btn-label { opacity: 0.85; }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .map-wrap {
+            border: 1px solid var(--parsel-border);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            background: #eef2ff;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            min-height: 320px;
+            max-height: 620px;
+        }
+
+        .map-wrap.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #parsel-map {
+            position: absolute;
+            inset: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .map-meta .item {
+            border: 1px dashed var(--parsel-border);
+            border-radius: 12px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .map-meta strong { color: var(--parsel-ink); }
+
+        .toggle-raw {
+            color: var(--parsel-muted);
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        pre#parsel-result {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            max-height: 260px;
+            overflow: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .badge-soft {
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--parsel-ink);
+            font-weight: 700;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        .muted-list {
+            display: grid;
+            gap: 8px;
+            color: var(--parsel-muted);
+            font-size: 14px;
+        }
+
+        .d-none { display: none !important; }
+
+        .map-surface { display: flex; width: 100%; }
+        @@media (min-width: 992px) { .map-surface { display: flex; } }
+
+        .parsel-layout {
+            display: grid;
+            gap: 28px;
+            align-items: flex-start;
+            width: 100%;
+            justify-content: flex-start;
+            justify-items: flex-start;
+        }
+
+        @@media (min-width: 992px) {
+    .parsel-layout {
+        grid-template-columns: 420px 1fr; /* form sabit, harita esnek */
+        align-items: stretch; /* YÜKSEKLİK EŞİTLEME */
+    }
+}
+.map-surface,
+.map-surface .surface {
+    max-width: none !important;
+}
+
+.map-wrap {
+    height: 100%;
+    min-height: unset;   /* eski min-height'i iptal */
+    aspect-ratio: unset; /* 16/9'u iptal */
+}
+.parsel-shell .container {
+    max-width: 100% !important;
+}
+
+        .map-only .parsel-layout {
+            grid-template-columns: 1fr;
+            justify-items: center;
+        }
+
+        .map-only #form-panel { display: none; }
+
+        .map-only #map-surface {
+            display: flex !important;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .map-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .map-actions .btn-primary-parsel {
+            padding: 10px 16px;
+            min-width: 0;
+            font-size: 14px;
+        }
+
+        @@media (max-width: 768px) {
+            .parsel-hero { padding: 46px 0 36px; }
+            .status-row { flex-direction: column; align-items: flex-start; }
+            .section-head { flex-direction: column; }
+        }
+    </style>
+}
+
+<section class="parsel-shell">
+    <div class="container">
+        <div class="parsel-layout">
+            <div class="d-flex justify-content-center" id="form-panel">
+                <div class="surface">
+                    <div class="section-head">
+                        <div>
+                            <div class="text-uppercase text-muted fw-semibold small mb-1">Parsel Sorgu</div>
+                        </div>
+                        <div class="stepper">
+                            <span>1</span> İlçe/Mahalle seçimi
+                            <span>2</span> Ada-Parsel
+                            <span>3</span> Polygon
+                        </div>
+                    </div>
+                    <form id="parsel-form" class="form-grid">
+                        <input type="hidden" id="mahalle-id-input" />
+                        <div>
+                            <label class="form-label">İl</label>
+                            <select class="form-select" aria-label="İl seçiniz" id="il-select">
+                                <option selected disabled>İl seçiniz</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">İlçe</label>
+                            <select class="form-select" aria-label="İlçe seçiniz" id="ilce-select" disabled>
+                                <option selected disabled>İlçe seçiniz</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Mahalle</label>
+                            <select class="form-select" aria-label="Mahalle seçiniz" id="mahalle-select" disabled>
+                                <option selected disabled>Mahalle seçiniz</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Ada</label>
+                            <input type="text" class="form-control" id="ada-input" placeholder="Örn: 123" autocomplete="off">
+                        </div>
+                        <div>
+                            <label class="form-label">Parsel</label>
+                            <input type="text" class="form-control" id="parsel-input" placeholder="Örn: 45" autocomplete="off">
+                        </div>
+                        <div class="action-cell">
+                            <label class="form-label text-muted">Sorgu</label>
+                            <button type="submit" class="btn-primary-parsel w-100" id="sorgula-btn">
+                                <span class="btn-label"><i class="fa-solid fa-magnifying-glass"></i> Sorgula</span>
+                                <span class="btn-loader" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center map-surface" id="map-surface">
+                <div class="surface w-100">
+                    <div class="section-head">
+                        <div class="map-actions">
+                            <button type="button" class="btn-ghost" id="yeni-sorgu-btn" style="display:none;">Yeni sorgu</button>
+                            <button type="button" class="btn-primary-parsel" id="video-btn" style="display:none;">
+                                <i class="fa-solid fa-video me-2"></i> Video Oluştur
+                            </button>
+                        </div>
+                    </div>
+                    <div class="map-wrap">
+                        <div id="parsel-map"></div>
+                    </div>
+                    <pre id="parsel-result" class="d-none mt-3"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const baseUrl = '/api/tkgm';
+            const els = {
+                il: document.getElementById('il-select'),
+                ilce: document.getElementById('ilce-select'),
+                mahalle: document.getElementById('mahalle-select'),
+                ada: document.getElementById('ada-input'),
+                parsel: document.getElementById('parsel-input'),
+                mahalleId: document.getElementById('mahalle-id-input'),
+                form: document.getElementById('parsel-form'),
+                status: document.getElementById('status-text'),
+                mapState: document.getElementById('map-state'),
+                polygonState: document.getElementById('polygon-state'),
+                link: document.getElementById('parsel-link'),
+                tkgmOpen: document.getElementById('tkgm-open-btn'),
+                resetBtn: document.getElementById('reset-btn'),
+                result: document.getElementById('parsel-result'),
+                rawToggle: document.getElementById('raw-toggle'),
+                sorgulaBtn: document.getElementById('sorgula-btn'),
+                mahalleChip: document.getElementById('mahalle-chip'),
+                queryCount: document.getElementById('query-count'),
+                lastQuery: document.getElementById('last-query'),
+                selectedIl: document.getElementById('selected-il'),
+                selectedIlce: document.getElementById('selected-ilce'),
+                selectedMahalle: document.getElementById('selected-mahalle'),
+                tkgmHint: document.getElementById('tkgm-link-hint'),
+                mapWrap: document.querySelector('.map-wrap'),
+                mapSurface: document.getElementById('map-surface'),
+                formPanel: document.getElementById('form-panel'),
+                shell: document.querySelector('.parsel-shell'),
+                yeniSorgu: document.getElementById('yeni-sorgu-btn'),
+                videoBtn: document.getElementById('video-btn')
+            };
+
+            const state = {
+                tkgmUrl: '',
+                map: null,
+                polygonLayer: null,
+                queryCount: 0,
+                lastQuery: {
+                    ada: '',
+                    parsel: ''
+                },
+                selection: {
+                    il: null,
+                    ilce: null,
+                    mahalle: null
+                }
+            };
+
+            const setText = (el, text) => {
+                if (el) el.textContent = text;
+            };
+
+            const setStatus = (text, tone = 'info') => {
+                if (!els.status) return;
+                els.status.textContent = text;
+                els.status.dataset.tone = tone;
+            };
+
+            const setButtonLoading = (isLoading) => {
+                if (!els.sorgulaBtn) return;
+                els.sorgulaBtn.classList.toggle('is-loading', isLoading);
+                els.sorgulaBtn.disabled = isLoading;
+            };
+
+            const setSummary = () => {
+                setText(els.selectedIl, `İl: ${state.selection.il?.name ?? '—'}`);
+                setText(els.selectedIlce, `İlçe: ${state.selection.ilce?.name ?? '—'}`);
+                setText(els.selectedMahalle, `Mahalle: ${state.selection.mahalle?.name ?? '—'}`);
+                setText(els.mahalleChip, `Mahalle kodu: ${state.selection.mahalle?.id ?? '—'}`);
+            };
+
+            const ensureMap = async () => {
+                await ensureLeaflet();
+                if (!state.map) {
+                    state.map = L.map('parsel-map');
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19,
+                        attribution: 'Tiles © Powered by EmlakCozum.com'
+                    }).addTo(state.map);
+                    state.map.setView([39.0, 35.0], 6);
+                }
+                els.mapWrap?.classList.add('is-visible');
+            };
+
+            const ensureLeaflet = () => {
+                if (window.L) return Promise.resolve();
+                return new Promise((resolve, reject) => {
+                    const existing = document.getElementById('leaflet-js');
+                    if (existing) {
+                        existing.addEventListener('load', () => resolve());
+                        existing.addEventListener('error', reject);
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.id = 'leaflet-js';
+                    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                    script.crossOrigin = '';
+                    script.onload = () => resolve();
+                    script.onerror = (e) => reject(e);
+                    document.body.appendChild(script);
+                });
+            };
+
+            const fetchJson = async (url) => {
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) {
+                    const err = new Error(res.statusText || 'İstek hatası');
+                    err.status = res.status;
+                    throw err;
+                }
+                return res.json();
+            };
+
+            const resetSelect = (selectEl, placeholder) => {
+                selectEl.innerHTML = `<option selected disabled>${placeholder}</option>`;
+            };
+
+            const normalizeList = (raw) => {
+                if (!raw) return [];
+                if (Array.isArray(raw)) return raw;
+                if (Array.isArray(raw.features)) return raw.features;
+                const candidate = raw.data || raw.Data || raw.items || raw.Items || raw.result || raw.Result;
+                if (Array.isArray(candidate)) return candidate;
+                const values = Object.values(raw);
+                return Array.isArray(values) ? values : [];
+            };
+
+            const pickProp = (obj, keys) => {
+                for (const key of keys) {
+                    if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
+                }
+                return '';
+            };
+
+            const setSelectLoading = (selectEl, placeholder) => {
+                resetSelect(selectEl, placeholder);
+                const opt = document.createElement('option');
+                opt.disabled = true;
+                opt.selected = true;
+                opt.textContent = 'Yükleniyor...';
+                selectEl.appendChild(opt);
+            };
+
+            const loadIller = async () => {
+                try {
+                    setSelectLoading(els.il, 'İl seçiniz');
+                    setStatus('İller yükleniyor...', 'info');
+                    const raw = await fetchJson(`${baseUrl}/il`);
+                    const data = normalizeList(raw);
+                    resetSelect(els.il, 'İl seçiniz');
+                    data.forEach((item) => {
+                        const props = item.properties || item;
+                        const rawId = pickProp(props, ['ilKodu', 'ilId', 'id', 'Id', 'IlKodu', 'Il', 'kod', 'Kod', 'text', 'Text']);
+                        const rawKod = pickProp(props, ['kod', 'Kod', 'ilKodu', 'IlKodu']);
+                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
+                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
+                        const name = pickProp(props, ['ilAdi', 'ad', 'IlAdi', 'Il', 'name', 'Ad', 'text', 'Text']);
+                        if (!name) return;
+                        const opt = document.createElement('option');
+                        opt.value = cleanedKod || cleanedId || name;
+                        opt.textContent = name;
+                        els.il.appendChild(opt);
+                    });
+                    setStatus('Hazır.', 'success');
+                } catch (err) {
+                    console.error('İller alınamadı', err);
+                    if (err.status === 403) {
+                        setStatus('Günlük TKGM limitine takıldık (403). Lütfen bir süre sonra tekrar deneyin.', 'error');
+                    } else {
+                        setStatus('İl listesi alınamadı.', 'error');
+                    }
+                }
+            };
+
+            const loadIlceler = async (ilKodu) => {
+                try {
+                    setSelectLoading(els.ilce, 'İlçe seçiniz');
+                    els.ilce.disabled = true;
+                    els.mahalle.disabled = true;
+                    setStatus('İlçeler yükleniyor...', 'info');
+                    const raw = await fetchJson(`${baseUrl}/ilce/${ilKodu}`);
+                    const data = normalizeList(raw);
+                    resetSelect(els.ilce, 'İlçe seçiniz');
+                    data.forEach((item) => {
+                        const props = item.properties || item;
+                        const rawId = pickProp(props, ['ilceKodu', 'ilceId', 'id', 'Id', 'IlceKodu', 'Ilce', 'kod', 'Kod']);
+                        const rawKod = pickProp(props, ['kod', 'Kod', 'ilceKodu', 'IlceKodu']);
+                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
+                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
+                        const name = pickProp(props, ['ilceAdi', 'ad', 'IlceAdi', 'Ilce', 'name', 'Ad', 'text', 'Text']);
+                        if (!name) return;
+                        const opt = document.createElement('option');
+                        opt.value = cleanedKod || cleanedId || name;
+                        opt.textContent = name;
+                        els.ilce.appendChild(opt);
+                    });
+                    els.ilce.disabled = false;
+                    setStatus('İlçeler hazır.', 'success');
+                } catch (err) {
+                    console.error('İlçeler alınamadı', err);
+                    setStatus('İlçe listesi alınamadı.', 'error');
+                }
+            };
+
+            const loadMahalleler = async (ilKodu, ilceKodu) => {
+                try {
+                    setSelectLoading(els.mahalle, 'Mahalle seçiniz');
+                    els.mahalle.disabled = true;
+                    setStatus('Mahalleler yükleniyor...', 'info');
+                    const raw = await fetchJson(`${baseUrl}/mahalle/${ilKodu}/${ilceKodu}`);
+                    const data = normalizeList(raw);
+                    resetSelect(els.mahalle, 'Mahalle seçiniz');
+                    data.forEach((item) => {
+                        const props = item.properties || item;
+                        const rawId = pickProp(props, ['mahalleKodu', 'mahalleId', 'id', 'Id', 'MahalleKodu', 'Mahalle', 'kod', 'Kod']);
+                        const rawKod = pickProp(props, ['kod', 'Kod', 'mahalleKodu', 'MahalleKodu']);
+                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
+                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
+                        const name = pickProp(props, ['mahalleAdi', 'ad', 'MahalleAdi', 'Mahalle', 'name', 'Ad', 'text', 'Text']);
+                        if (!name) return;
+                        const opt = document.createElement('option');
+                        opt.value = cleanedKod || cleanedId || name;
+                        opt.dataset.mahalleId = cleanedKod || cleanedId || pickProp(props, ['mahalleId', 'mahalleKodu', 'id', 'Id', 'MahalleId', 'MahalleKodu']);
+                        opt.textContent = name;
+                        els.mahalle.appendChild(opt);
+                    });
+                    els.mahalle.disabled = false;
+                    setStatus('Mahalleler hazır.', 'success');
+                } catch (err) {
+                    console.error('Mahalleler alınamadı', err);
+                    setStatus('Mahalle listesi alınamadı.', 'error');
+                }
+            };
+
+            els.il.addEventListener('change', () => {
+                const selected = els.il.options[els.il.selectedIndex];
+                state.selection.il = { code: selected?.value, name: selected?.textContent };
+                state.selection.ilce = null;
+                state.selection.mahalle = null;
+                els.mahalleId.value = '';
+                setSummary();
+                resetSelect(els.ilce, 'İlçe seçiniz');
+                resetSelect(els.mahalle, 'Mahalle seçiniz');
+                els.ilce.disabled = true;
+                els.mahalle.disabled = true;
+                if (state.selection.il?.code) {
+                    loadIlceler(state.selection.il.code);
+                }
+            });
+
+            els.ilce.addEventListener('change', () => {
+                const selected = els.ilce.options[els.ilce.selectedIndex];
+                state.selection.ilce = { code: selected?.value, name: selected?.textContent };
+                state.selection.mahalle = null;
+                els.mahalleId.value = '';
+                setSummary();
+                resetSelect(els.mahalle, 'Mahalle seçiniz');
+                els.mahalle.disabled = true;
+                if (state.selection.il?.code && state.selection.ilce?.code) {
+                    loadMahalleler(state.selection.il.code, state.selection.ilce.code);
+                }
+            });
+
+            els.mahalle.addEventListener('change', () => {
+                const selected = els.mahalle.options[els.mahalle.selectedIndex];
+                const id = selected?.dataset?.mahalleId || '';
+                els.mahalleId.value = id;
+                state.selection.mahalle = { code: selected?.value, id, name: selected?.textContent };
+                setSummary();
+            });
+
+            const renderPolygon = async (geometry) => {
+                try {
+                    await ensureMap();
+                    const coords = geometry?.coordinates?.[0];
+                    if (!coords?.length) {
+                        setStatus('Polygon verisi bulunamadı.', 'error');
+                        setText(els.polygonState, 'Polygon alınamadı');
+                        return;
+                    }
+                    const latlngs = coords.map(([lng, lat]) => [lat, lng]);
+                    if (state.polygonLayer) {
+                        state.map.removeLayer(state.polygonLayer);
+                    }
+                    state.polygonLayer = L.polygon(latlngs, { color: '#2563eb', weight: 3, fillOpacity: 0.35 }).addTo(state.map);
+                    state.map.fitBounds(state.polygonLayer.getBounds(), { padding: [12, 12] });
+                    setTimeout(() => state.map?.invalidateSize(), 80);
+                    setText(els.polygonState, 'Polygon çizildi');
+                    setText(els.mapState, 'Harita güncel');
+                    setStatus('Polygon alındı.', 'success');
+                } catch (err) {
+                    console.error('Harita çizim hatası', err);
+                    setText(els.polygonState, 'Harita çizilemedi');
+                    setStatus('Polygon alındı, harita çizilemedi.', 'error');
+                }
+            };
+
+            const buildTkgmUrl = () => {
+                const ilName = state.selection.il?.name;
+                const ilceName = state.selection.ilce?.name;
+                const mahalleName = state.selection.mahalle?.name;
+                if (!ilName || !ilceName || !mahalleName) return '';
+                return `https://parselsorgu.tkgm.gov.tr/#ara/idari/${encodeURIComponent(ilName)}/${encodeURIComponent(ilceName)}/${encodeURIComponent(mahalleName)}`;
+            };
+
+            els.form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const ada = els.ada.value.trim();
+                const parsel = els.parsel.value.trim();
+                const mahalleId = els.mahalleId.value.trim();
+
+                if (!state.selection.il || !state.selection.ilce || !state.selection.mahalle) {
+                    setStatus('Lütfen il, ilçe ve mahalle seçin.', 'error');
+                    return;
+                }
+                if (!mahalleId) {
+                    setStatus('Mahalle kodu otomatik dolmalı.', 'error');
+                    return;
+                }
+                if (!ada || !parsel) {
+                    setStatus('Ada ve parsel zorunlu.', 'error');
+                    return;
+                }
+
+                state.lastQuery = { ada, parsel };
+                state.tkgmUrl = buildTkgmUrl();
+                if (state.tkgmUrl) {
+                    if (els.link) {
+                        els.link.style.display = 'inline-flex';
+                        els.link.href = state.tkgmUrl;
+                    }
+                    if (els.tkgmOpen) els.tkgmOpen.disabled = false;
+                    setText(els.tkgmHint, 'üretildi');
+                    els.tkgmHint?.classList.add('text-success');
+                }
+
+                setStatus('Parsel bilgisi alınıyor...', 'info');
+                setText(els.mapState, 'Bekleniyor');
+                setText(els.polygonState, 'Polygon bekleniyor');
+                els.result.classList.add('d-none');
+                await ensureMap();
+                if (els.videoBtn) els.videoBtn.style.display = 'none';
+                setButtonLoading(true);
+
+                try {
+                    const data = await fetchJson(`/api/tkgm/parsel-geo?mahalleId=${encodeURIComponent(mahalleId)}&ada=${encodeURIComponent(ada)}&parsel=${encodeURIComponent(parsel)}`);
+                    els.result.textContent = JSON.stringify(data, null, 2);
+                    state.queryCount += 1;
+                    setText(els.queryCount, state.queryCount.toString());
+                    setText(els.lastQuery, `${ada} / ${parsel}`);
+                    await renderPolygon(data?.geometry);
+                    if (els.videoBtn) els.videoBtn.style.display = 'inline-flex';
+                } catch (err) {
+                    console.error('Polygon alınamadı', err);
+                    setStatus('Polygon alınamadı.', 'error');
+                    setText(els.polygonState, 'İstek başarısız');
+                } finally {
+                    setButtonLoading(false);
+                }
+            });
+
+            if (els.tkgmOpen) {
+                els.tkgmOpen.addEventListener('click', () => {
+                    if (state.tkgmUrl) window.open(state.tkgmUrl, '_blank', 'noopener');
+                });
+            }
+
+            if (els.resetBtn) {
+                els.resetBtn.addEventListener('click', () => {
+                    els.form.reset();
+                    state.selection = { il: null, ilce: null, mahalle: null };
+                    els.mahalleId.value = '';
+                    state.tkgmUrl = '';
+                    if (els.link) els.link.style.display = 'none';
+                    if (els.tkgmOpen) els.tkgmOpen.disabled = true;
+                    setSummary();
+                    setStatus('Form sıfırlandı.', 'info');
+                    setText(els.polygonState, 'Polygon bekleniyor');
+                    setText(els.mapState, 'Harita temizlendi');
+                    els.mapWrap?.classList.add('is-visible');
+                    if (els.videoBtn) els.videoBtn.style.display = 'none';
+                    if (state.map && state.polygonLayer) {
+                        state.map.removeLayer(state.polygonLayer);
+                        state.polygonLayer = null;
+                    }
+                });
+            }
+
+            if (els.yeniSorgu) {
+                els.yeniSorgu.addEventListener('click', () => {
+                    els.form?.reset();
+                    state.selection = { il: null, ilce: null, mahalle: null };
+                    setSummary();
+                    setText(els.polygonState, 'Polygon bekleniyor');
+                    setText(els.mapState, 'Harita temizlendi');
+                    if (els.link) els.link.style.display = 'none';
+                    if (els.tkgmOpen) els.tkgmOpen.disabled = true;
+                    if (els.videoBtn) els.videoBtn.style.display = 'none';
+                    if (state.map && state.polygonLayer) {
+                        state.map.removeLayer(state.polygonLayer);
+                        state.polygonLayer = null;
+                    }
+                });
+            }
+
+            if (els.rawToggle) {
+                els.rawToggle.addEventListener('click', () => {
+                    const isHidden = els.result.classList.contains('d-none');
+                    els.result.classList.toggle('d-none', !isHidden);
+                    els.rawToggle.innerHTML = isHidden
+                        ? '<i class="fa-regular fa-eye-slash me-2"></i>JSON çıktısını gizle'
+                        : '<i class="fa-regular fa-file-code me-2"></i>JSON çıktısını göster';
+                });
+            }
+
+            if (els.videoBtn) {
+                els.videoBtn.addEventListener('click', () => {
+                    const params = new URLSearchParams();
+                    const addParam = (key, value) => {
+                        if (value) params.set(key, value);
+                    };
+                    addParam('il', state.selection.il?.name);
+                    addParam('ilce', state.selection.ilce?.name);
+                    addParam('mahalle', state.selection.mahalle?.name);
+                    addParam('ada', state.lastQuery.ada || els.ada?.value.trim());
+                    addParam('parsel', state.lastQuery.parsel || els.parsel?.value.trim());
+                    const query = params.toString();
+                    window.location.href = query ? `/Drone/Olustur?${query}` : '/Drone/Olustur';
+                });
+            }
+
+            loadIller();
+            setSummary();
+            ensureMap();
+        });
+    </script>
+}

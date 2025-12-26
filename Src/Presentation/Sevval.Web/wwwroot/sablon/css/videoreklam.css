@@ -1,0 +1,12 @@
+﻿/* Başlangıçta */
+.moving-gif {
+    position: absolute;
+    top: 50px; /* Yukarıdan 50px */
+    left: 90px; /* Soldan 50px */
+}
+
+/* Hover durumunda */
+.gif-container:hover .moving-gif {
+    top: 70px; /* Yukarıdan 70px */
+    left: 70px; /* Soldan 70px */
+}

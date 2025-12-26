@@ -1,0 +1,624 @@
+@{
+    ViewData["Title"] = "Kategori Yönetimi";
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+}
+<style>
+    @@media (max-width: 768px) {
+        .category-item-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Kategori Yönetimi</h1>
+            <p class="mt-2 text-gray-600">Videolarınızın kategorilerini düzenleyin ve yönetin</p>
+        </div>
+
+        <!-- Kategori Listesi -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Mevcut Kategoriler</h2>
+            </div>
+            
+            <div id="categoriesList" class="p-6">
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span class="ml-2 text-gray-500">Kategoriler yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yeni Kategori Ekleme -->
+        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Yeni Kategori Ekle</h2>
+            </div>
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Sol Taraf - Form -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Adı</label>
+                            <input type="text" id="newCategoryName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Örn: Teknoloji">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hazır İkonlar</label>
+                            <select id="newCategoryIcon" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">İkon seçin...</option>
+                                <option value="education">🎓 Eğitim</option>
+                                <option value="technology">💻 Teknoloji</option>
+                                <option value="real-estate">🏠 Emlak</option>
+                                <option value="travel">🗺️ Seyahat</option>
+                                <option value="health">❤️ Sağlık</option>
+                                <option value="sports">🏃 Spor</option>
+                                <option value="food">🍽️ Yemek</option>
+                                <option value="music">🎵 Müzik</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Özel SVG İkon</label>
+                            
+                            <!-- Dosya Yükleme -->
+                            <div class="mb-3">
+                                <label for="svgFileInput" class="block text-xs font-medium text-gray-600 mb-1">SVG Dosyası Yükle</label>
+                                <input type="file" id="svgFileInput" accept=".svg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <p class="text-xs text-gray-500 mt-1">SVG dosyası seçin (maksimum 1MB)</p>
+                            </div>
+                            
+                            <!-- Manuel SVG Girişi -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Veya SVG Kodunu Yapıştır</label>
+                                <textarea id="customSvgIcon" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="SVG kodunu buraya yapıştırın..."></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Örnek: &lt;svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"&gt;...&lt;/svg&gt;</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Renk Seçin</label>
+                            <select id="newCategoryColor" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="bg-blue-100 text-blue-800 border-blue-200">Mavi</option>
+                                <option value="bg-purple-100 text-purple-800 border-purple-200">Mor</option>
+                                <option value="bg-green-100 text-green-800 border-green-200">Yeşil</option>
+                                <option value="bg-orange-100 text-orange-800 border-orange-200">Turuncu</option>
+                                <option value="bg-red-100 text-red-800 border-red-200">Kırmızı</option>
+                                <option value="bg-indigo-100 text-indigo-800 border-indigo-200">İndigo</option>
+                                <option value="bg-yellow-100 text-yellow-800 border-yellow-200">Sarı</option>
+                                <option value="bg-pink-100 text-pink-800 border-pink-200">Pembe</option>
+                                <option value="bg-gray-100 text-gray-800 border-gray-200">Gri</option>
+                            </select>
+                        </div>
+
+                        <button id="addCategoryBtn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Kategori Ekle
+                        </button>
+                    </div>
+
+                    <!-- Sağ Taraf - Önizleme -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-medium text-gray-700">Önizleme</h3>
+                        <div id="categoryPreview" class="p-4 border border-gray-200 rounded-lg bg-gray-50 min-h-[100px] flex items-center justify-center">
+                            <span class="text-gray-500 text-sm">Kategori adı girin ve önizleme görün</span>
+                        </div>
+                        
+                        <div class="text-xs text-gray-500">
+                            <p><strong>İpucu:</strong></p>
+                            <ul class="list-disc list-inside space-y-1 mt-2">
+                                <li>Hazır ikonları seçebilir veya özel SVG yapıştırabilirsiniz</li>
+                                <li>SVG'de class="w-4 h-4" kullanın</li>
+                                <li>fill="currentColor" kullanın ki renk uyumlu olsun</li>
+                                <li>viewBox="0 0 20 20" standart boyut için idealdir</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Düzenleme Modalı -->
+<div id="editModal" class="fixed inset-0 bg-black/40 z-50 hidden">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="w-full max-w-3xl bg-white rounded-lg shadow-xl border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Kategoriyi Düzenle</h2>
+                <button onclick="closeEditCategoryModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <div class="p-6">
+                <input type="hidden" id="editCategoryId" />
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Sol Taraf - Form -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Adı</label>
+                            <input type="text" id="editCategoryName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Örn: Teknoloji" oninput="updateEditPreview()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hazır İkonlar</label>
+                            <select id="editCategoryIcon" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateEditPreview()">
+                                <option value="">İkon seçin...</option>
+                                <option value="education">🎓 Eğitim</option>
+                                <option value="technology">💻 Teknoloji</option>
+                                <option value="real-estate">🏠 Emlak</option>
+                                <option value="travel">🗺️ Seyahat</option>
+                                <option value="health">❤️ Sağlık</option>
+                                <option value="sports">🏃 Spor</option>
+                                <option value="food">🍽️ Yemek</option>
+                                <option value="music">🎵 Müzik</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Özel SVG İkon</label>
+                            <div class="mb-3">
+                                <label for="editSvgFileInput" class="block text-xs font-medium text-gray-600 mb-1">SVG Dosyası Yükle</label>
+                                <input type="file" id="editSvgFileInput" accept=".svg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="handleEditSvgFileUpload(event)">
+                                <p class="text-xs text-gray-500 mt-1">SVG dosyası seçin (maksimum 1MB)</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Veya SVG Kodunu Yapıştır</label>
+                                <textarea id="editCustomSvgIcon" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="SVG kodunu buraya yapıştırın..." oninput="updateEditPreview()"></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Renk Seçin</label>
+                            <select id="editCategoryColor" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateEditPreview()">
+                                <option value="bg-blue-100 text-blue-800 border-blue-200">Mavi</option>
+                                <option value="bg-purple-100 text-purple-800 border-purple-200">Mor</option>
+                                <option value="bg-green-100 text-green-800 border-green-200">Yeşil</option>
+                                <option value="bg-orange-100 text-orange-800 border-orange-200">Turuncu</option>
+                                <option value="bg-red-100 text-red-800 border-red-200">Kırmızı</option>
+                                <option value="bg-indigo-100 text-indigo-800 border-indigo-200">İndigo</option>
+                                <option value="bg-yellow-100 text-yellow-800 border-yellow-200">Sarı</option>
+                                <option value="bg-pink-100 text-pink-800 border-pink-200">Pembe</option>
+                                <option value="bg-gray-100 text-gray-800 border-gray-200">Gri</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Sağ Taraf - Önizleme -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-medium text-gray-700">Önizleme</h3>
+                        <div id="editCategoryPreview" class="p-4 border border-gray-200 rounded-lg bg-gray-50 min-h-[100px] flex items-center justify-center">
+                            <span class="text-gray-500 text-sm">Kategori adı girin ve önizleme görün</span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <p><strong>İpucu:</strong></p>
+                            <ul class="list-disc list-inside space-y-1 mt-2">
+                                <li>Hazır ikonları seçebilir veya özel SVG yapıştırabilirsiniz</li>
+                                <li>SVG'de class="w-4 h-4" kullanın</li>
+                                <li>fill="currentColor" kullanın ki renk uyumlu olsun</li>
+                                <li>viewBox="0 0 20 20" standart boyut için idealdir</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
+                <button onclick="closeEditCategoryModal()" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200">Vazgeç</button>
+                <button onclick="saveEditedCategory()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kaydet</button>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            
+            // Yeni kategori ekleme
+            document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
+            
+            // Önizleme güncelleme
+            document.getElementById('newCategoryName').addEventListener('input', updatePreview);
+            document.getElementById('newCategoryIcon').addEventListener('change', updatePreview);
+            document.getElementById('customSvgIcon').addEventListener('input', updatePreview);
+            document.getElementById('newCategoryColor').addEventListener('change', updatePreview);
+            document.getElementById('svgFileInput').addEventListener('change', handleSvgFileUpload);
+        });
+
+        // Kategorileri yükle
+        async function loadCategories() {
+            try {
+                const response = await fetch('/Category/GetCategories');
+                const result = await response.json();
+                
+                if (!result.success) {
+                    showError(result.message);
+                    return;
+                }
+                
+                const categories = result.categories || [];
+                window.__categories = categories; // cache for edit modal
+                renderCategories(categories);
+            } catch (error) {
+                console.error('Kategoriler yüklenemedi:', error);
+                showError('Kategoriler yüklenemedi');
+            }
+        }
+
+        // Kategorileri render et
+        function renderCategories(categories) {
+            const container = document.getElementById('categoriesList');
+            
+            if (categories.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-gray-500">Henüz kategori bulunmuyor</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const categoriesHtml = categories.map(category => `
+                <div class="category-item p-4 border border-gray-200 rounded-lg mb-4 hover:bg-gray-50" data-id="${category.id}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="category-icon">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${category.color || 'bg-blue-100 text-blue-800 border-blue-200'}">
+                                    ${category.icon || getIconByType('') || getCategoryIcon(category.name)}
+                                    <span>${category.name}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 category-item-buttons">
+                            <button onclick="openEditCategoryModal('${category.id}')" class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">
+                                Düzenle
+                            </button>
+                            <button onclick="deleteCategory('${category.id}', '${escapeHtml(category.name)}')" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200">
+                                Sil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = categoriesHtml;
+        }
+
+        // Kategori ikonunu al
+        function getCategoryIcon(category) {
+            const iconMap = {
+                'Eğitim': '🎓',
+                'Teknoloji': '💻',
+                'Emlak': '🏠',
+                'Seyahat': '🗺️',
+                'Sağlık': '❤️',
+                'Spor': '🏃',
+                'Yemek': '🍽️',
+                'Müzik': '🎵'
+            };
+            
+            return `<span class="text-2xl">${iconMap[category] || '📁'}</span>`;
+        }
+
+        // HTML escape helper
+        function escapeHtml(str) {
+            return (str || '').toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getColorOptions(selected) {
+            const colors = [
+                'bg-blue-100 text-blue-800 border-blue-200',
+                'bg-purple-100 text-purple-800 border-purple-200',
+                'bg-green-100 text-green-800 border-green-200',
+                'bg-orange-100 text-orange-800 border-orange-200',
+                'bg-red-100 text-red-800 border-red-200',
+                'bg-indigo-100 text-indigo-800 border-indigo-200',
+                'bg-yellow-100 text-yellow-800 border-yellow-200',
+                'bg-pink-100 text-pink-800 border-pink-200',
+                'bg-gray-100 text-gray-800 border-gray-200'
+            ];
+            return colors.map(c => `<option value="${c}" ${c === (selected || '') ? 'selected' : ''}>${c.split(' ')[0].replace('bg-','').replace('-100','')}</option>`).join('');
+        }
+
+        // Edit Modal
+        function openEditCategoryModal(id) {
+            const cat = (window.__categories || []).find(c => c.id === id);
+            if (!cat) return;
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = cat.name || '';
+            document.getElementById('editCategoryColor').value = cat.color || 'bg-blue-100 text-blue-800 border-blue-200';
+            document.getElementById('editCustomSvgIcon').value = (cat.icon || '');
+            document.getElementById('editCategoryIcon').value = '';
+            updateEditPreview();
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditCategoryModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        async function saveEditedCategory() {
+            const id = document.getElementById('editCategoryId').value;
+            const name = document.getElementById('editCategoryName').value.trim();
+            const color = document.getElementById('editCategoryColor').value;
+            const selectedIcon = document.getElementById('editCategoryIcon').value;
+            const customSvg = document.getElementById('editCustomSvgIcon').value.trim();
+
+            if (!name) { showError('Kategori adı gerekli'); return; }
+
+            let icon = '';
+            if (customSvg) icon = customSvg; else if (selectedIcon) icon = getIconByType(selectedIcon);
+
+            try {
+                const response = await fetch('/Category/UpdateCategory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, icon, color })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showSuccess(result.message);
+                    closeEditCategoryModal();
+                    loadCategories();
+                } else {
+                    showError(result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                showError('Kategori güncellenemedi');
+            }
+        }
+
+        function updateEditPreview() {
+            const name = document.getElementById('editCategoryName').value.trim();
+            const selectedIcon = document.getElementById('editCategoryIcon').value;
+            const customSvg = document.getElementById('editCustomSvgIcon').value.trim();
+            const color = document.getElementById('editCategoryColor').value;
+            const preview = document.getElementById('editCategoryPreview');
+            if (!name) { preview.innerHTML = '<span class="text-gray-500 text-sm">Kategori adı girin ve önizleme görün</span>'; return; }
+            let iconHtml = '';
+            if (customSvg) iconHtml = customSvg; else if (selectedIcon) iconHtml = getIconByType(selectedIcon); else iconHtml = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>';
+            preview.innerHTML = `
+                <span class="category-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${color}">
+                    ${iconHtml}
+                    ${name}
+                </span>
+            `;
+        }
+
+        function handleEditSvgFileUpload(event) {
+            const file = event.target.files[0]; if (!file) return;
+            if (file.size > 1024 * 1024) { showError('Dosya boyutu 1MB\'dan büyük olamaz'); return; }
+            if (file.type !== 'image/svg+xml' && !file.name.toLowerCase().endsWith('.svg')) { showError('Lütfen geçerli bir SVG dosyası seçin'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let svgContent = e.target.result; svgContent = optimizeSvgForIcon(svgContent);
+                document.getElementById('editCustomSvgIcon').value = svgContent; updateEditPreview(); showSuccess('SVG dosyası yüklendi');
+            };
+            reader.onerror = function(){ showError('Dosya okunamadı'); };
+            reader.readAsText(file);
+        }
+
+        // Kategori sil
+        async function deleteCategory(id, categoryName) {
+            if (!confirm(`"${categoryName}" kategorisini silmek istediğinizden emin misiniz?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/Category/DeleteCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        name: categoryName
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(result.message);
+                    loadCategories();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                console.error('Kategori silinemedi:', error);
+                showError('Kategori silinemedi');
+            }
+        }
+
+        // Önizleme güncelle
+        function updatePreview() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const selectedIcon = document.getElementById('newCategoryIcon').value;
+            const customSvg = document.getElementById('customSvgIcon').value.trim();
+            const color = document.getElementById('newCategoryColor').value;
+            
+            const preview = document.getElementById('categoryPreview');
+            
+            if (!name) {
+                preview.innerHTML = '<span class="text-gray-500 text-sm">Kategori adı girin ve önizleme görün</span>';
+                return;
+            }
+
+            let iconHtml = '';
+            if (customSvg) {
+                // Özel SVG kullan
+                iconHtml = customSvg;
+            } else if (selectedIcon) {
+                // Hazır ikon kullan
+                iconHtml = getIconByType(selectedIcon);
+            } else {
+                // Varsayılan ikon
+                iconHtml = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>';
+            }
+
+            preview.innerHTML = `
+                <span class="category-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${color}">
+                    ${iconHtml}
+                    ${name}
+                </span>
+            `;
+        }
+
+        // SVG dosya yükleme
+        function handleSvgFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Dosya boyutu kontrolü (1MB)
+            if (file.size > 1024 * 1024) {
+                showError('Dosya boyutu 1MB\'dan büyük olamaz');
+                return;
+            }
+
+            // Dosya tipi kontrolü
+            if (file.type !== 'image/svg+xml' && !file.name.toLowerCase().endsWith('.svg')) {
+                showError('Lütfen geçerli bir SVG dosyası seçin');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let svgContent = e.target.result;
+                
+                // SVG içeriğini temizle ve optimize et
+                svgContent = optimizeSvgForIcon(svgContent);
+                
+                // Textarea'ya yaz
+                document.getElementById('customSvgIcon').value = svgContent;
+                
+                // Önizlemeyi güncelle
+                updatePreview();
+                
+                showSuccess('SVG dosyası başarıyla yüklendi!');
+            };
+            
+            reader.onerror = function() {
+                showError('Dosya okunamadı');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // SVG'yi ikon için optimize et
+        function optimizeSvgForIcon(svgContent) {
+            // SVG etiketini bul ve class ekle
+            let optimizedSvg = svgContent;
+            
+            // Eğer class yoksa ekle
+            if (!optimizedSvg.includes('class=')) {
+                optimizedSvg = optimizedSvg.replace(/<svg/, '<svg class="w-4 h-4"');
+            } else {
+                // Mevcut class'a w-4 h-4 ekle
+                optimizedSvg = optimizedSvg.replace(/class="([^"]*)"/, 'class="$1 w-4 h-4"');
+            }
+            
+            // fill="currentColor" ekle (yoksa)
+            if (!optimizedSvg.includes('fill=')) {
+                optimizedSvg = optimizedSvg.replace(/<svg/, '<svg fill="currentColor"');
+            } else {
+                // Mevcut fill'i currentColor ile değiştir
+                optimizedSvg = optimizedSvg.replace(/fill="[^"]*"/, 'fill="currentColor"');
+            }
+            
+            // viewBox ekle (yoksa)
+            if (!optimizedSvg.includes('viewBox=')) {
+                optimizedSvg = optimizedSvg.replace(/<svg/, '<svg viewBox="0 0 24 24"');
+            }
+            
+            return optimizedSvg;
+        }
+
+        // İkon tipine göre SVG döndür
+        function getIconByType(type) {
+            const icons = {
+                'education': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.114 11.114 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path></svg>',
+                'technology': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>',
+                'real-estate': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>',
+                'travel': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>',
+                'health': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>',
+                'sports': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+                'food': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path></svg>',
+                'music': '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>'
+            };
+            
+            return icons[type] || icons['education'];
+        }
+
+        // Yeni kategori ekle
+        async function addNewCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const selectedIcon = document.getElementById('newCategoryIcon').value;
+            const customSvg = document.getElementById('customSvgIcon').value.trim();
+            const color = document.getElementById('newCategoryColor').value;
+            
+            if (!name) {
+                showError('Kategori adı gerekli');
+                return;
+            }
+
+            try {
+                // İkon belirleme
+                let icon = '';
+                if (customSvg) {
+                    icon = customSvg;
+                } else if (selectedIcon) {
+                    icon = getIconByType(selectedIcon);
+                }
+
+                const requestData = {
+                    name: name,
+                    icon: icon,
+                    color: color
+                };
+
+                const response = await fetch('/Category/CreateCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(result.message);
+                    
+                    // Formu temizle
+                    document.getElementById('newCategoryName').value = '';
+                    document.getElementById('newCategoryIcon').value = '';
+                    document.getElementById('customSvgIcon').value = '';
+                    document.getElementById('svgFileInput').value = '';
+                    document.getElementById('newCategoryColor').value = 'bg-blue-100 text-blue-800 border-blue-200';
+                    updatePreview();
+                    
+                    // Kategorileri yeniden yükle
+                    loadCategories();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                console.error('Kategori ekleme hatası:', error);
+                showError('Kategori eklenirken bir hata oluştu');
+            }
+        }
+
+        // Başarı mesajı göster
+        function showSuccess(message) {
+            alert('✅ ' + message);
+        }
+
+        // Hata mesajı göster
+        function showError(message) {
+            alert('❌ ' + message);
+        }
+    </script>
+}

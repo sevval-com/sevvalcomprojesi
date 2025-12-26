@@ -1,0 +1,671 @@
+@model sevvalemlak.csproj.Dto.RealEstates.RealEstateSearchDto
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Şehirlere Göre Emlakçılar";
+    Layout = null;
+    var selectedCity = ViewBag.SelectedCity as string ?? "";
+    var selectedDistrict = ViewBag.SelectedDistrict as string ?? "";
+    var companySearch = ViewBag.CompanySearch as string ?? "";
+    var sortBy = ViewBag.SortBy as string ?? "CompanyName";
+    var sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    var addressFilter = ViewBag.AddressFilter as string ?? "All";
+    var announcementFilter = ViewBag.AnnouncementFilter as string ?? "All";
+    var ilanSayilari = ViewBag.IlanSayilari as Dictionary<string, int> ?? new Dictionary<string, int>();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="~/css/sehiremlakcı.css">
+    <style>
+        .enhanced-controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+
+            .filter-group label {
+                font-weight: 600;
+                margin-bottom: 5px;
+                color: #333;
+            }
+
+            .filter-group select, .filter-group input {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .enhanced-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+            .enhanced-table th {
+                background: #343a40;
+                color: white;
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                cursor: pointer;
+                user-select: none;
+                position: relative;
+            }
+
+                .enhanced-table th:hover {
+                    background: #495057;
+                }
+
+                .enhanced-table th.sortable::after {
+                    content: ' ⇅';
+                    opacity: 0.5;
+                }
+
+                .enhanced-table th.sort-asc::after {
+                    content: ' ↑';
+                    opacity: 1;
+                }
+
+                .enhanced-table th.sort-desc::after {
+                    content: ' ↓';
+                    opacity: 1;
+                }
+
+            .enhanced-table td {
+                padding: 12px;
+                border-bottom: 1px solid #eee;
+                vertical-align: middle;
+            }
+
+            .enhanced-table tr:hover {
+                background: #f8f9fa;
+            }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .announcement-count {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+            .announcement-count.zero {
+                background: #dc3545;
+            }
+
+        .registration-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stats-bar {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .phone-number {
+            font-family: monospace;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h2><i class="fas fa-building"></i> Şehirlere Göre Emlakçılar</h2>
+
+    <div class="enhanced-controls">
+        <form method="get" id="filterForm">
+            
+            <div class="filter-row">
+
+                <div class="filter-group search-bar">
+                    <label for="companySearch"><i class="fas fa-search"></i> Firma Adı Ara:</label>
+                    <input type="text" name="companySearch" id="companySearch" value="@companySearch" placeholder="Firma adı yazın...">
+                </div>
+
+                <div class="filter-group">
+                    <label for="city"><i class="fas fa-map-marker-alt"></i> Şehir:</label>
+                    <select name="city" id="city" asp-for="@selectedCity" onchange="updateDistricts()">
+                        <option value="">Tüm Şehirler</option>
+                        @foreach (var city in Model.Announcements.AvailableCities)
+                        {
+                            <option value="@city">@city</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="district"><i class="fas fa-map"></i> İlçe:</label>
+                    <select name="district" id="district" asp-for="@selectedDistrict">
+                        <option value="">Tüm İlçeler</option>
+                        @foreach (var district in Model.Announcements.AvailableDistricts ?? new List<string>())
+                        {
+                            <option value="@district">@district</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="addressFilter"><i class="fas fa-address-card"></i> Açık Adres:</label>
+                    <select name="addressFilter" asp-for="@addressFilter" id="addressFilter">
+                        <option value="All">Tümü</option>
+                        <option value="WithAddress">Açık Adresi Olanlar</option>
+                        <option value="WithoutAddress">Açık Adresi Olmayanlar</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="announcementFilter"><i class="fas fa-bullhorn"></i> İlan Durumu:</label>
+                    <select name="announcementFilter" id="announcementFilter" asp-for="@announcementFilter">
+                        <option value="All">Tümü</option>
+                        <option value="WithAnnouncements">İlanı Olanlar</option>
+                        <option value="WithoutAnnouncements">İlanı Olmayanlar</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortBy"><i class="fas fa-sort"></i> Sıralama:</label>
+                    <select name="sortBy" id="sortBy" asp-for="@sortBy">
+                        <option value="CompanyName">Firma Adı</option>
+                        <option value="FirstName">Ad</option>
+                        <option value="City">Şehir</option>
+                        <option value="RegistrationDate">Katılma Tarihi</option>
+                        <option value="AnnouncementCount">İlan Sayısı</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortOrder"><i class="fas fa-sort-amount-up"></i> Yön:</label>
+                    <select name="sortOrder" id="sortOrder" asp-for="SortOrder">
+                        <option value="ASC">A-Z / Artan</option>
+                        <option value="DESC">Z-A / Azalan</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="pageSize"><i class="fas fa-list"></i> Sayfa Boyutu:</label>
+                    <select name="pageSize" id="pageSize" asp-for="PageSize" onchange="this.form.submit()">
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            
+
+             
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filtrele</button>
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()"><i class="fas fa-times"></i> Temizle</button>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-info"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a href="@Url.Action("DownloadExcel", "SevvalOfis", new { city = selectedCity, district = selectedDistrict, companySearch = companySearch })" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel İndir</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="stats-bar">
+        <strong>Toplam Emlakçı: @Model.Announcements.Users.Count</strong> |
+        <strong>İlanlı Emlakçı: @Model.Announcements.Users.Count(u => ilanSayilari.ContainsKey(u.Id) && ilanSayilari[u.Id] > 0)</strong> |
+        <strong>İlansız Emlakçı: @Model.Announcements.Users.Count(u => !ilanSayilari.ContainsKey(u.Id) || ilanSayilari[u.Id] == 0)</strong>
+    </div>
+
+    <table class="enhanced-table">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable('city')">
+                    <i class="fas fa-map-marker-alt"></i> Şehir/İlçe
+                </th>
+                <th class="sortable" onclick="sortTable('name')">
+                    <i class="fas fa-user"></i> İsim
+                </th>
+                <th class="sortable" onclick="sortTable('company')">
+                    <i class="fas fa-building"></i> Firma Adı
+                </th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-phone"></i> Telefon</th>
+                <th><i class="fas fa-bullhorn"></i> İlan Sayısı</th>
+                <th><i class="fas fa-calendar"></i> Katılma Tarihi</th>
+                <th><i class="fas fa-address-card"></i> Açık Adres</th>
+                <th><i class="fas fa-cogs"></i> İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emlakci in Model.Announcements.Users)
+            {
+                var ilanSayisi = ilanSayilari.ContainsKey(emlakci.Id) ? ilanSayilari[emlakci.Id] : 0;
+                <tr>
+                    <td>
+                        <strong>@emlakci.City</strong><br>
+                        <small class="text-muted">@emlakci.District</small>
+                    </td>
+                    <td>
+                        <strong>@emlakci.FirstName @emlakci.LastName</strong>
+                    </td>
+                    <td>
+                        <strong>@emlakci.CompanyName</strong>
+                    </td>
+                    <td>
+                        <a href="mailto:@emlakci.Email" class="text-primary">
+                            <i class="fas fa-envelope"></i> @emlakci.Email
+                        </a>
+                    </td>
+                    <td>
+                        <span class="phone-number">@emlakci.PhoneNumber</span>
+                    </td>
+                    <td>
+                        <span class="announcement-count @(ilanSayisi == 0 ? "zero" : "")">
+                            @ilanSayisi İlan
+                        </span>
+                    </td>
+                    <td>
+                        <div class="registration-date">
+                            @emlakci.RegistrationDate.ToString("dd.MM.yyyy")<br>
+                            <small>@emlakci.RegistrationDate.ToString("HH:mm")</small>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info open-address-btn"
+                                data-userid="@emlakci.Id"
+                                data-acikadres="@(string.IsNullOrEmpty(emlakci.AcikAdres) ? "" : emlakci.AcikAdres)">
+                            <i class="fas fa-map-marker-alt"></i> Adres
+                        </button>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="@Url.Action("MailGonder", "SevvalOfis", new { email = emlakci.Email})"
+                               class="btn btn-sm btn-primary" title="Mail Gönder">
+                                <i class="fas fa-envelope"></i> Mail Gönder
+                            </a>
+                            <a href="@Url.Action("SmsMesaj", "SevvalOfis", new { phone = emlakci.PhoneNumber})"
+                               class="btn btn-sm btn-success" title="SMS Gönder">
+                                <i class="fas fa-sms"></i> SMS Gönder
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="pagination-info">
+        <span class="text-muted">
+            Toplam @ViewBag.TotalRecords kayıt bulundu.
+            Sayfa @ViewBag.CurrentPage / @ViewBag.TotalPages
+            (Sayfa başına @ViewBag.PageSize kayıt gösteriliyor)
+        </span>
+    </div>
+
+    <nav aria-label="Sayfa navigasyonu">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SehirlereGoreEmlakcilar", new {
+                        city = ViewBag.SelectedCity,
+                        district = ViewBag.SelectedDistrict,
+                        companySearch = ViewBag.CompanySearch,
+                        sortBy = ViewBag.SortBy,
+                        sortOrder = ViewBag.SortOrder,
+                        addressFilter = ViewBag.AddressFilter,
+                        announcementFilter = ViewBag.AnnouncementFilter,
+                        pageSize = ViewBag.PageSize,
+                        page = 1
+                    })">
+                        <i class="fas fa-angle-double-left"></i> İlk
+                    </a>
+                </li>
+            }
+
+            @if (ViewBag.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SehirlereGoreEmlakcilar", new {
+                        city = ViewBag.SelectedCity,
+                        district = ViewBag.SelectedDistrict,
+                        companySearch = ViewBag.CompanySearch,
+                        sortBy = ViewBag.SortBy,
+                        sortOrder = ViewBag.SortOrder,
+                        addressFilter = ViewBag.AddressFilter,
+                        announcementFilter = ViewBag.AnnouncementFilter,
+                        pageSize = ViewBag.PageSize,
+                        page = ViewBag.CurrentPage - 1
+                    })">
+                        <i class="fas fa-angle-left"></i> Önceki
+                    </a>
+                </li>
+            }
+
+            @{
+                int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("SehirlereGoreEmlakcilar", new {
+                        city = ViewBag.SelectedCity,
+                        district = ViewBag.SelectedDistrict,
+                        companySearch = ViewBag.CompanySearch,
+                        sortBy = ViewBag.SortBy,
+                        sortOrder = ViewBag.SortOrder,
+                        addressFilter = ViewBag.AddressFilter,
+                        announcementFilter = ViewBag.AnnouncementFilter,
+                        pageSize = ViewBag.PageSize,
+                        page = i
+                    })">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (ViewBag.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SehirlereGoreEmlakcilar", new {
+                        city = ViewBag.SelectedCity,
+                        district = ViewBag.SelectedDistrict,
+                        companySearch = ViewBag.CompanySearch,
+                        sortBy = ViewBag.SortBy,
+                        sortOrder = ViewBag.SortOrder,
+                        addressFilter = ViewBag.AddressFilter,
+                        announcementFilter = ViewBag.AnnouncementFilter,
+                        pageSize = ViewBag.PageSize,
+                        page = ViewBag.CurrentPage + 1
+                    })">
+                        Sonraki <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("SehirlereGoreEmlakcilar", new {
+                        city = ViewBag.SelectedCity,
+                        district = ViewBag.SelectedDistrict,
+                        companySearch = ViewBag.CompanySearch,
+                        sortBy = ViewBag.SortBy,
+                        sortOrder = ViewBag.SortOrder,
+                        addressFilter = ViewBag.AddressFilter,
+                        announcementFilter = ViewBag.AnnouncementFilter,
+                        pageSize = ViewBag.PageSize,
+                        page = ViewBag.TotalPages
+                    })">
+                        Son <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    <div id="openAddressModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="displayAddressDiv">
+                <p id="openAddressText"></p>
+                <button id="editAddressButton" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i> Düzenle
+                </button>
+            </div>
+            <div id="editAddressDiv" style="display: none;">
+                <input type="text" id="addressInput" placeholder="Yeni açık adresinizi giriniz" class="form-control mb-2" />
+                <button id="saveAddressButton" class="btn btn-sm btn-success">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+
+        // Modal elemanları
+        const modal = document.getElementById("openAddressModal");
+        const closeModal = document.querySelector(".close");
+        const openAddressText = document.getElementById("openAddressText");
+        const editAddressButton = document.getElementById("editAddressButton");
+        const displayAddressDiv = document.getElementById("displayAddressDiv");
+        const editAddressDiv = document.getElementById("editAddressDiv");
+        const addressInput = document.getElementById("addressInput");
+        const saveAddressButton = document.getElementById("saveAddressButton");
+
+        // İlçe güncelleme fonksiyonu
+        function updateDistricts() {
+            const citySelect = document.getElementById('city');
+            const districtSelect = document.getElementById('district');
+            const selectedCity = citySelect.value;
+
+            // İlçe seçeneklerini temizle
+            districtSelect.innerHTML = '<option value="">Tüm İlçeler</option>';
+
+            if (selectedCity) {
+                // AJAX ile ilçeleri getir
+                fetch(`@Url.Action("GetDistricts", "SevvalOfis")?city=${encodeURIComponent(selectedCity)}`)
+                    .then(response => response.json())
+                    .then(districts => {
+                        districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district;
+                            option.textContent = district;
+                            districtSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('İlçeler yüklenirken hata:', error));
+            }
+        }
+
+        // Filtreleri temizleme fonksiyonu
+        function clearFilters() {
+            document.getElementById('city').value = '';
+            document.getElementById('district').value = '';
+            document.getElementById('companySearch').value = '';
+            document.getElementById('addressFilter').value = 'All';
+            document.getElementById('announcementFilter').value = 'All';
+            document.getElementById('sortBy').value = 'CompanyName';
+            document.getElementById('sortOrder').value = 'ASC';
+            document.getElementById('filterForm').submit();
+        }
+
+        // Tablo sıralama fonksiyonu
+        function sortTable(column) {
+            const currentSortBy = '@sortBy';
+            const currentSortOrder = '@sortOrder';
+            let newSortOrder = 'ASC';
+
+            if (currentSortBy === column && currentSortOrder === 'ASC') {
+                newSortOrder = 'DESC';
+            }
+
+            document.getElementById('sortBy').value = column;
+            document.getElementById('sortOrder').value = newSortOrder;
+            document.getElementById('filterForm').submit();
+        }
+
+        // Butonlara tıklama event'i
+        document.querySelectorAll(".open-address-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                currentUserId = this.getAttribute("data-userid");
+                let acikAdres = this.getAttribute("data-acikadres");
+                openAddressText.textContent = (!acikAdres || acikAdres.trim() === "")
+                    ? "Açık adres bulunmamaktadır"
+                    : acikAdres;
+                // Varsayılan olarak düzenleme alanını gizle
+                displayAddressDiv.style.display = "block";
+                editAddressDiv.style.display = "none";
+                modal.style.display = "block";
+            });
+        });
+
+        // Modal kapatma
+        closeModal.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+        window.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        // Düzenle butonuna tıklama: text kısmını inputa çevir
+        editAddressButton.addEventListener("click", function () {
+            addressInput.value = openAddressText.textContent === "Açık adres bulunmamaktadır"
+                ? ""
+                : openAddressText.textContent;
+            displayAddressDiv.style.display = "none";
+            editAddressDiv.style.display = "block";
+        });
+
+        // Kaydet butonuna tıklama: AJAX ile yeni değeri gönder
+        saveAddressButton.addEventListener("click", function () {
+            const newAddress = addressInput.value.trim();
+
+            fetch('@Url.Action("UpdateOpenAddress", "SevvalOfis")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@Antiforgery.GetAndStoreTokens(ViewContext.HttpContext).RequestToken'
+                },
+                body: JSON.stringify({ userId: currentUserId, openAddress: newAddress })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        openAddressText.textContent = newAddress === ""
+                            ? "Açık adres bulunmamaktadır"
+                            : newAddress;
+                        // Tablodaki ilgili butonun data-acikadres attribute'unu güncelle
+                        document.querySelector(`.open-address-btn[data-userid="${currentUserId}"]`)
+                            .setAttribute("data-acikadres", newAddress);
+
+                        // Başarı mesajı göster
+                        alert("Açık adres başarıyla güncellendi!");
+                    } else {
+                        alert("Adres güncellenirken bir hata oluştu.");
+                    }
+                    displayAddressDiv.style.display = "block";
+                    editAddressDiv.style.display = "none";
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Bir hata oluştu.");
+                });
+        });
+
+        // Sayfa yüklendiğinde sıralama durumunu göster
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentSortBy = '@sortBy';
+            const currentSortOrder = '@sortOrder';
+
+            // Sıralama sütununu işaretle
+            const headers = document.querySelectorAll('.enhanced-table th.sortable');
+            headers.forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            // Mevcut sıralama sütununu işaretle
+            if (currentSortBy) {
+                const activeHeader = document.querySelector(`th[onclick*="${currentSortBy.toLowerCase()}"]`);
+                if (activeHeader) {
+                    activeHeader.classList.add(currentSortOrder === 'ASC' ? 'sort-asc' : 'sort-desc');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

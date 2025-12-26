@@ -1,0 +1,257 @@
+﻿.container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: nowrap; /* Taşmadan sabit kalmasını sağla */
+}
+
+.filter-panel {
+    width: 300px; /* Filtre panelinin genişliği */
+    margin-left: 20px; /* Tablonun solundan biraz boşluk bırak */
+    border: 4px solid #007bff; /* Mavi çerçeve */
+    border-radius: 12px; /* Kenarları yuvarlamak için */
+    padding: 20px; /* İç boşluk */
+    background-color: #f8f9fa; /* Daha açık arka plan rengi */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Gölgelendirme */
+    z-index: 10; /* Diğer bileşenlerin üzerinde görünmesi için */
+}
+
+/* Responsive için */
+@media (max-width: 768px) {
+    .filter-panel {
+        width: 100%; /* Küçük ekranlarda tam genişlik */
+        margin: 0 0 20px 0; /* Üstten boşluk bırak */
+    }
+
+    .custom-table {
+        width: 100%; /* Tablonun genişliği tam dolsun */
+        margin: 20px 0; /* Üst ve alt için 20px boşluk */
+    }
+}
+
+.custom-table {
+    width: 70%; /* Tablonun genişliği */
+    border-collapse: collapse;
+    background-color: #ffffff;
+    margin: 70px 0 20px 20px; /* Üst ve alt için 20px, sol için 20px, sağ için 0px boşluk */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive için */
+@media (max-width: 768px) {
+    .custom-table {
+        width: 100%; /* Küçük ekranlarda tam genişlik */
+        margin: 20px 0; /* Üst ve alt için 20px boşluk */
+    }
+}
+
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.custom-table tr {
+    margin-bottom: 20px; /* İlanlar arasında boşluk */
+    border: 4px solid #007bff; /* Mavi çerçeve */
+    border-radius: 8px; /* Kenarları yuvarlamak için */
+    overflow: hidden; /* Taşmayı gizlemek için */
+}
+
+.photo-cell {
+    width: 100%; /* Fotoğraf hücresinin genişliği */
+    height: 300px; /* Fotoğraf hücresinin yüksekliği */
+    text-align: center; /* Metin ortalamak için */
+    overflow: hidden; /* Taşmayı gizlemek için */
+    border: 4px solid #007bff; /* Mavi çerçeve */
+    border-radius: 1px; /* Kenarları yuvarlamak için */
+    display: flex; /* Flexbox kullanımı */
+    justify-content: center; /* Yatay ortalama */
+    align-items: center; /* Dikey ortalama */
+}
+
+.panel-image {
+    width: 100%; /* Resmin genişliği */
+    height: 100%; /* Resmin yüksekliğini hücre yüksekliğine ayarlayın */
+    object-fit: contain; /* Resmi tamamen göstermek için */
+    border-radius: 8px; /* Resmin kenarlarını yuvarlamak için */
+}
+
+.camera-icon {
+    font-size: 80px; /* İkon boyutu */
+    color: #007bff; /* İkon rengi */
+}
+
+.info-cell {
+    width: 50%; /* Bilgi hücresinin genişliğini ayarlayın */
+    padding-left: 20px;
+    vertical-align: top;
+}
+
+/* Responsive için */
+@media (max-width: 768px) {
+    .info-cell {
+        width: 100%; /* Küçük ekranlarda tam genişlik */
+        padding-left: 0; /* Sol padding'i kaldır */
+    }
+}
+
+.price {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.title {
+    font-size: 1.2em;
+    margin-top: 5px;
+    font-weight: normal;
+}
+
+.details {
+    margin-top: 10px;
+    color: #555;
+}
+
+.date-cell {
+    width: 10%;
+    text-align: right;
+    position: relative;
+}
+
+/* Responsive için */
+@media (max-width: 768px) {
+    .date-cell {
+        width: auto; /* Küçük ekranlarda otomatik genişlik */
+        text-align: left; /* Metni sola hizala */
+    }
+}
+
+.date-info {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.close-button {
+    display: none;
+    background: none;
+    border: none;
+    color: red;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.date-cell:hover .close-button {
+    display: inline;
+}
+
+.ilan-id {
+    margin-top: 5px; /* Üstten boşluk */
+    font-size: 0.9em; /* Font boyutu */
+    color: #555; /* Renk */
+}
+
+.filter-panel:hover {
+    transform: scale(1.03); /* Üzerine gelindiğinde hafif büyüme efekti */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); /* Hoverda daha belirgin gölge efekti */
+}
+
+.filter-panel h3 {
+    margin-top: 0; /* Başlık üst boşluğunu kaldır */
+    font-size: 1.6em; /* Başlık boyutunu büyüt */
+    color: #007bff; /* Başlık rengi */
+    border-bottom: 2px solid #007bff; /* Başlığın altında mavi bir çizgi */
+    padding-bottom: 10px; /* Başlık ile çizgi arasında boşluk */
+    font-family: 'Arial', sans-serif; /* Başlık fontu */
+}
+
+.filter-item {
+    margin-bottom: 20px; /* Her filtre öğesi arasında boşluk */
+}
+
+    .filter-item label {
+        display: block; /* Etiketin üzerine yazı yerleştirilmesi */
+        margin-bottom: 5px; /* Etiket ile input arasında boşluk */
+        font-weight: bold; /* Etiketin kalın olması için */
+        color: #333; /* Etiket rengi */
+    }
+
+    .filter-item input,
+    .filter-item select {
+        width: 100%; /* Genişliği doldur */
+        padding: 12px; /* İç boşluk */
+        border: 2px solid #007bff; /* Kenar rengi mavi */
+        border-radius: 6px; /* Kenarları yuvarlamak için */
+        transition: border-color 0.3s, box-shadow 0.3s; /* Kenar rengi ve gölge geçişi */
+        font-size: 16px; /* Giriş alanı font boyutu */
+    }
+
+        .filter-item input:focus,
+        .filter-item select:focus {
+            border-color: #0056b3; /* Odaklanıldığında kenar rengi değişimi */
+            outline: none; /* Kenar kutusu yok */
+            box-shadow: 0 0 5px rgba(0, 91, 187, 0.5); /* Odaklandığında hafif bir gölge */
+        }
+
+.filter-button {
+    background-color: #007bff; /* Buton rengi */
+    color: white; /* Buton metni rengi */
+    border: none; /* Kenar yok */
+    padding: 1px 20px; /* İç boşluk */
+    border-radius: 6px; /* Kenarları yuvarlamak için */
+    cursor: pointer; /* İmleç değişimi */
+    font-weight: bold; /* Kalın metin */
+    font-size: 16px; /* Buton font boyutu */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Buton geçişi */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Buton gölge efekti */
+}
+
+    .filter-button:hover {
+        background-color: #0056b3; /* Hover rengi */
+        transform: translateY(-3px); /* Hoverda yukarı kayma efekti */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Hoverda daha belirgin gölge efekti */
+    }
+
+    .filter-button:active {
+        transform: translateY(1px); /* Tıklandığında hafif aşağı kayma */
+    }
+
+.footer {
+    clear: both; /* Her iki taraftan da boşluk bırak */
+    padding: 20px; /* İç boşluk */
+    text-align: center; /* Ortadan hizalama */
+    background-color: #007bff; /* Arka plan rengi */
+    color: white; /* Yazı rengi */
+}
+
+
+.search-container {
+    display: flex;
+    margin-bottom: -50px; /* Tablo ile arama çubuğu arasına boşluk */
+    margin-left: 20px;
+    margin-top: 25px;
+
+}
+
+.search-box {
+    width: 100%;
+    max-width: 400px; /* Genişlik ayarı */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #007bff;
+    border: 4px solid #007bff; /* Mavi çerçeve */
+    border-radius: 5px;
+    outline: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .search-box:hover,
+    .search-box:focus {
+        border-color: #007bff;
+        box-shadow: 0px 2px 6px rgba(0, 123, 255, 0.3);
+    }

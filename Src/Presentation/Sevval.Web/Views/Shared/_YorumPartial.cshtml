@@ -1,0 +1,20 @@
+﻿@model Sevval.Web.Models.VideoYorum
+
+<div class="comment-container flex items-start gap-4" data-comment-id="@Model.Id">
+    <img src="@(Model.Kullanici.ProfilePicturePath ?? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.Kullanici.FirstName)}+{Uri.EscapeDataString(Model.Kullanici.LastName)}&background=random&color=fff")"
+         class="w-10 h-10 rounded-full flex-shrink-0" alt="@(Model.Kullanici.FirstName) profili" />
+    <div class="flex-1">
+        <div class="flex items-center gap-2 mb-0.5">
+            <p class="font-semibold text-slate-800 text-sm">@(Model.Kullanici.FirstName) @(Model.Kullanici.LastName)</p>
+            @if (Model.UserId == Model.Video.YukleyenKullaniciId)
+            {
+                <i class="fas fa-check-circle text-blue-500 text-xs" title="Video Sahibi"></i>
+            }
+            <span class="text-slate-400 text-xs">@Model.YorumTarihi.ToString("d MMM yyyy")</span>
+        </div>
+        <p class="text-slate-700 text-sm">@Model.YorumMetni</p>
+        <div class="mt-2">
+            <button class="reply-button text-xs font-bold text-slate-500 hover:underline">YANITLA</button>
+        </div>
+    </div>
+</div>

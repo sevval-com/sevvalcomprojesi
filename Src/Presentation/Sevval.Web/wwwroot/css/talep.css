@@ -1,0 +1,238 @@
+﻿/* Genel stiller */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6; /* Daha iyi okunabilirlik için satır yüksekliği ayarlandı */
+}
+
+.card {
+    border-radius: 0.75rem; /* Daha tutarlı yuvarlaklık için rem kullanıldı */
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05); /* Daha az belirgin gölge */
+    border: 1px solid #e0e0e0; /* Kenarlık eklendi */
+    margin-bottom: 1.5rem; /* Alt kenar boşluğu eklendi */
+}
+
+.card-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    color: white;
+    padding: 1.25rem; /* Daha tutarlı dolgu */
+    border-bottom: none;
+    border-radius: 0.75rem 0.75rem 0 0; /* Üst köşeleri yuvarlat */
+}
+
+.card-title {
+    margin-bottom: 0;
+    font-size: 1.25rem; /* Daha küçük başlık */
+    font-weight: 600;
+}
+
+.table-responsive {
+    border: 1px solid #dee2e6;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 0; /* İç dolguyu kaldır */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    background-color: white; /* Tablo arka planı beyaz */
+    border-radius: 0.75rem; /* Tablo için kenar yuvarlaklığı */
+    overflow: hidden; /* İçerik taşmasını önle */
+}
+
+    .data-table thead th {
+        background: #2c3e50;
+        color: white;
+        font-weight: 600;
+        border-bottom: 2px solid #1a252f;
+        padding: 0.75rem;
+        text-align: left;
+        font-size: 0.9rem; /* Başlık yazı boyutu */
+    }
+
+    .data-table tbody td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #f8f9fa;
+        font-size: 0.9rem; /* Hücre yazı boyutu */
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+.table-hover tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.07); /* Daha hafif hover efekti */
+}
+
+.status-badge {
+    padding: 0.35em 0.65em;
+    border-radius: 1rem;
+    font-size: 0.75rem; /* Rozet yazı boyutu */
+    white-space: nowrap; /* Metnin kaymasını önler */
+}
+
+/* Mobil uyumluluk için düzenlemeler */
+@media (max-width: 768px) {
+    .card {
+        border-radius: 0; /* Kart kenarlarını düzleştir */
+        margin-bottom: 1rem;
+        border: 1px solid #e0e0e0; /* Mobil görünümde kenarlık ekle */
+    }
+
+    .card-header {
+        border-radius: 0; /* Başlık kenarlarını düzleştir */
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        border: none;
+        padding: 0;
+    }
+
+    .data-table {
+        border-radius: 0; /* Tablo kenarlarını düzleştir */
+        box-shadow: none;
+    }
+
+        .data-table thead {
+            display: none; /* Başlıkları mobil görünümde gizle */
+        }
+
+        .data-table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.75rem; /* Hücre kenar yuvarlaklığı */
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05); /* Daha hafif gölge */
+            padding: 0.5rem;
+        }
+
+        .data-table tbody td {
+            display: flex;
+            padding: 1.5rem;
+            border-bottom: 1px solid #f8f9fa;
+            position: relative;
+            font-size: 0.9rem;
+            align-items: center;
+            position: relative;
+        }
+
+            .data-table tbody td:last-child {
+                border-bottom: none;
+            }
+
+            .data-table tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 1.5rem;
+                top: 0.5rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                color: #777;
+                white-space: nowrap;
+            }
+
+            .data-table tbody td span {
+                display: block;
+                width: calc(100% - 5rem);
+                text-align: right;
+                padding-left: 50%;
+                font-size: 0.9rem;
+            }
+
+            .data-table tbody td .btn-group {
+                position: absolute;
+                top: 0.25rem;
+                right: 0.25rem;
+                display: flex;
+                flex-direction: row;
+                gap: 0.25rem;
+            }
+
+            .data-table tbody td .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+                line-height: 1;
+            }
+
+    .card-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+}
+
+/* Modal stilleri */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.modal-title {
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+    .modal-body label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 0.25rem;
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .modal-body p.form-control-plaintext {
+        color: #333;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+    .modal-footer .btn {
+        margin-left: 0.5rem;
+    }
+
+        .modal-footer .btn:first-child {
+            margin-left: 0;
+        }
+
+/* İşlemler Modalı Butonları */
+#islemlerModal .modal-body .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+@media (min-width: 768px) {
+    #islemlerModal .modal-body .btn {
+        width: auto;
+        margin-right: 0.5rem;
+        display: inline-block;
+    }
+
+        #islemlerModal .modal-body .btn:last-child {
+            margin-right: 0;
+        }
+}

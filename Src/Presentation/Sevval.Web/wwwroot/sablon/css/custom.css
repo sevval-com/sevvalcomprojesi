@@ -1,0 +1,11 @@
+﻿#music-toggle {
+    position: absolute; /* Mutlak konumlandırma */
+    top: 20px; /* Logonun hemen üstünde */
+    left: 20px; /* Sol köşede */
+    background-color: rgba(255, 255, 255, 0.8); /* Yarı saydam beyaz arka plan */
+    border: 2px solid #000; /* Kenarlık */
+    border-radius: 5px; /* Köşeleri yuvarla */
+    cursor: pointer;
+    font-size: 24px;
+    animation: blink 1s infinite; /* Yanıp sönme efekti */
+}

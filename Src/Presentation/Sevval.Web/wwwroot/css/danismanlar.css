@@ -1,0 +1,86 @@
+﻿
+.container {
+    max-width: 1289px;
+    margin: 0 auto;
+}
+
+/* Danışmanlar sayfası stil ayarları */
+.danismanlar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Sayfanın tamamını kapsayacak şekilde hizala */
+    margin-top: -280px;
+}
+
+.danismanlar-table {
+    width: 80%;
+    max-width: 1000px;
+    border-collapse: collapse;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+    border-radius: 10px;
+    overflow: hidden; /* Kenarlardaki yuvarlak köşelere uyumlu */
+    background-color: #fff; /* Tablo arka plan rengi beyaz */
+}
+
+    .danismanlar-table th, .danismanlar-table td {
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd; /* Hücreler arasına ince çizgi */
+    }
+
+    /* Başlık renkleri mavi */
+    .danismanlar-table th {
+        background-color: #007bff; /* Mavi arka plan */
+        color: white; /* Beyaz yazı rengi */
+        font-weight: bold;
+    }
+
+    /* Hücreler */
+    .danismanlar-table td {
+        font-size: 14px;
+        color: #333; /* Koyu gri yazı rengi */
+    }
+
+    /* Çift satırlarda farklı arka plan rengi */
+    .danismanlar-table tr:nth-child(even) {
+        background-color: #f7f7f7; /* Açık gri arka plan */
+    }
+
+    /* Üzerine gelindiğinde satırın rengini değiştirme */
+    .danismanlar-table tr:hover {
+        background-color: #dbe9fd; /* Mavi tonlarında hover efekti */
+    }
+
+/* Medya sorguları */
+@media (max-width: 768px) {
+    .danismanlar-table {
+        width: 100%;
+        font-size: 14px; /* Genel font boyutunu küçült */
+    }
+
+        .danismanlar-table th, .danismanlar-table td {
+            padding: 10px; /* Hücre iç boşluklarını azalt */
+            font-size: 12px; /* Mobilde yazıları daha kompakt hale getir */
+        }
+
+    .danismanlar-container {
+        height: auto; /* Yüksekliği içeriğe göre ayarla */
+        margin-top: -150px; /* Mobilde margin düzenlemesi */
+    }
+}
+
+@media (max-width: 480px) {
+    .danismanlar-container {
+        margin-top: -100px;
+    }
+
+    .danismanlar-table th, .danismanlar-table td {
+        padding: 8px; /* Daha dar hücre iç boşlukları */
+        font-size: 10px; /* Daha küçük yazılar */
+    }
+
+    .danismanlar-table {
+        border-radius: 5px; /* Daha küçük kenar yuvarlatması */
+    }
+}

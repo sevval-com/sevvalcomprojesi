@@ -1,0 +1,187 @@
+﻿@model TumIlanlarDTO
+
+@{
+    ViewData["Title"] = "Şevval Ofis";
+    Layout = null;
+}
+
+<!-- CSS Bağlantısı -->
+<link rel="stylesheet" href="~/css/site.css">
+
+
+<!-- İlan Tablosu ve Arama Çubuğu -->
+<div class="form-group">
+    <label for="search">İlan No'ya Göre Ara:</label>
+    <input type="text" id="search" class="form-control" placeholder="İlan No girin" oninput="validateInput()" onkeyup="searchTable()" />
+</div>
+<form method="get" action="@Url.Action("TumIlanlar", "SevvalOfis")" class="mb-3">
+    <div class="row g-3">
+        <div class="col-lg-3 col-md-6">
+            <label for="CompanyFilter" class="form-label">Firma Seçin</label>
+            <select name="companyName" id="CompanyFilter" class="form-select">
+                <option value="">Tüm Firmalar</option>
+                @foreach (var company in (Model.UsersWithCompany ?? new List<dynamic>())
+                .Select(u => u.CompanyName).Distinct())
+                {
+                        <option value="@company">@company</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <label for="UserFilter" class="form-label">Üye Seçin</label>
+            <select name="selectedUser" id="UserFilter" class="form-select">
+                <option value="">Tüm Üyeler</option>
+                @foreach (var user in (Model.UsersWithCompany ?? new List<dynamic>())
+                .Select(u => u.User))
+                {
+                        <option value="@user.Email">@user.FirstName @user.LastName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <label for="StatusFilter" class="form-label">Durum Seçin</label>
+            <select name="status" id="StatusFilter" class="form-select">
+                <option value="">Tüm Durumlar</option>
+                <option value="active">Aktif</option>
+                <option value="archive">Arşivlendi</option>
+                <option value="deleted">Silindi</option>
+            </select>
+        </div>
+
+        <!-- Kategori Filtreleme -->
+        <div class="col-lg-3 col-md-6">
+            <label for="CategoryFilter" class="form-label">Kategori Seçin</label>
+            <select name="category" id="CategoryFilter" class="form-select">
+                <option value="">Tüm Kategoriler</option>
+                <option value="Konut (Yaşam Alanı)">Konut (Yaşam Alanı)</option>
+                <option value="Arsa">Arazi</option>
+                <option value="Bahçe">Bahçe</option>
+                <option value="Tarla">Tarla</option>
+                <option value="Turistik Tesis">Turistik Tesis</option>
+                <option value="İş Yeri">İş Yeri</option>
+            </select>
+        </div>
+
+        <div class="col-lg-3 col-md-6 d-flex align-items-end justify-content-between gap-2 button-container">
+            <button type="submit" class="btn btn-primary w-50">Filtrele</button>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary w-50 site-return-btn">Siteye Geri Dön</a>
+        </div>
+    </div>
+</form>
+
+
+
+
+<table class="table" id="ilanTable">
+    <thead>
+        <tr>
+            <th>İlan No</th>
+            <th>İlan Başlığı</th>
+            <th>İlan Türü</th>
+            <th>Fiyat</th>
+            <th>Kullanıcı Adı</th>
+            <th>Durum</th>
+            <th>Şirket Adı</th>
+            <th>Aksiyon</th>
+            <th>Oto. Silinme Tarihi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ilan in Model._Ilanlar)
+        {
+            var userWithCompany = Model.UsersWithCompany.FirstOrDefault(u => u.User.Email == ilan.Email);
+            var deleteDate = ilan.GirisTarihi.AddYears(2); // 2 yıl sonrası silinme tarihi
+            <tr class="ilan-row" data-id="@ilan.Id">
+                <td>@ilan.Id</td>
+                <td>@ilan.Title</td>
+                <td>@ilan.KonutDurumu</td>
+                <td>@(ilan.Price.ToString("N0")) TL</td>
+                <td>@ilan?.FirstName @ilan?.LastName</td>
+                <td>@ilan?.Status</td>
+                <td>@userWithCompany?.CompanyName</td>
+                <td>
+                    <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="btn btn-info">Detay</a>
+                </td>
+                <td>
+                    @if (ilan.Status == "archive")
+                    {
+                        <span class="countdown" data-delete-date="@deleteDate.ToString("yyyy-MM-ddTHH:mm:ss")">Hesaplanıyor...</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const countdownElements = document.querySelectorAll(".countdown");
+
+        countdownElements.forEach((element) => {
+            const deleteDate = new Date(element.dataset.deleteDate);
+
+            function updateCountdown() {
+                const now = new Date();
+                const timeRemaining = deleteDate - now;
+
+                if (timeRemaining > 0) {
+                    const months = Math.floor(timeRemaining / (1000 * 60 * 60 * 24 * 30)); // Ayları hesapla
+                    const days = Math.floor((timeRemaining % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24)); // Günleri hesapla
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // Saatleri hesapla
+
+                    element.textContent = `${months} ay : ${days} gün : ${hours} saat`;
+                } else {
+                    element.textContent = "Silinme süresi doldu!";
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000); // Her saniye günceller
+        });
+    });
+</script>
+
+
+
+<script>
+    function validateInput() {
+        var input = document.getElementById("search");
+        var value = input.value;
+
+        // Yalnızca sayılar girmeye izin veririz, harf ve özel karakterleri engelleriz
+        input.value = value.replace(/[^0-9]/g, ''); // Sayısal olmayan karakterleri kaldır
+    }
+
+    function searchTable() {
+        var input = document.getElementById("search");
+        var filter = input.value.trim(); // Arama değerini al ve baştaki/sondaki boşlukları kaldır
+
+        var table = document.getElementById("ilanTable");
+        var rows = table.getElementsByTagName("tr");
+
+        // Eğer arama çubuğu boşsa, tüm satırları göster
+        if (filter === "") {
+            for (var i = 1; i < rows.length; i++) {
+                rows[i].style.display = ""; // Tüm satırları göster
+            }
+            return; // Eğer boşsa işlem sonlanır
+        }
+
+        // Tablodaki satırlara göz atıyoruz
+        for (var i = 1; i < rows.length; i++) { // Başlık satırını atlıyoruz (i=1)
+            var row = rows[i];
+            var ilanNo = row.getElementsByTagName("td")[0]; // İlan No (0. index)
+            if (ilanNo) {
+                var ilanNoValue = ilanNo.textContent || ilanNo.innerText;
+                // Arama değeri ile tam eşleşme kontrolü yapıyoruz
+                if (ilanNoValue.trim() === filter) {
+                    row.style.display = ""; // Eşleşiyorsa göster
+                } else {
+                    row.style.display = "none"; // Eşleşmiyorsa gizle
+                }
+            }
+        }
+    }
+</script>

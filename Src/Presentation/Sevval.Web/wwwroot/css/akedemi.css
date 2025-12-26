@@ -1,0 +1,121 @@
+﻿/* Sayfanın genel düzeni */
+.countdown-container {
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Başlık tasarımı */
+h2 {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #007bff; /* Mavi renk */
+    margin-bottom: 30px;
+}
+
+/* Tarih yazısının stilini belirleme */
+.target-date {
+    font-size: 1.2em; /* Daha küçük yazı boyutu */
+    color: #007bff; /* Aynı mavi renk */
+    font-weight: 400;
+    margin-top: -10px; /* Başlıkla daha yakın bir konum */
+}
+
+
+/* Geri sayım kutularının düzeni */
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Her bir zaman öğesinin kutusu */
+.countdown-item {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 120px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Hafif mavi gölge */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+    .countdown-item:hover {
+        transform: scale(1.1); /* Hover efektiyle kutunun büyümesi */
+        box-shadow: 0 6px 25px rgba(0, 123, 255, 0.5); /* Hoverda daha belirgin gölge */
+    }
+
+    .countdown-item span {
+        display: block;
+        font-size: 3em;
+        font-weight: bold;
+        color: #007bff; /* Mavi renk */
+        transition: color 0.3s ease;
+    }
+
+        .countdown-item span:hover {
+            color: #0056b3; /* Hoverda renk değişimi */
+        }
+
+    .countdown-item p {
+        font-size: 1em;
+        color: #333;
+        margin-top: 10px;
+        font-weight: 500;
+    }
+/* Mobil uyumlu tasarım */
+@media (max-width: 768px) {
+    .countdown-timer {
+        display: flex; /* Flex düzenini aktif et */
+        flex-direction: row; /* Yatay sıralama */
+        justify-content: space-between; /* Öğeler arasına boşluk bırak */
+        gap: 10px; /* Aralarındaki boşluk */
+        flex-wrap: wrap; /* Eğer gerekirse öğeler bir sonraki satıra geçsin */
+    }
+
+    .countdown-item {
+        width: calc(20% - 10px); /* 5 öğe yan yana sığacak şekilde genişlik */
+        box-sizing: border-box; /* Padding ve border'ı genişlikten çıkar */
+        text-align: center; /* İçeriği ortala */
+    }
+
+    h2 {
+        font-size: 1.8em; /* Başlık boyutunu küçült */
+    }
+
+    .target-date {
+        font-size: 1em; /* Tarih boyutunu küçült */
+    }
+
+    .countdown-item span {
+        font-size: 2em; /* Sayı boyutunu küçült */
+    }
+
+    .countdown-item p {
+        font-size: 0.9em; /* Metin boyutunu küçült */
+    }
+}
+
+/* Daha küçük cihazlar için (telefonlar) */
+@media (max-width: 480px) {
+    .countdown-timer {
+        justify-content: space-around; /* Öğeleri eşit aralıklarla hizala */
+    }
+
+    .countdown-item {
+        width: calc(20% - 8px); /* Daha dar alan için genişliği küçült */
+        padding: 10px; /* Daha az boşluk */
+    }
+
+        .countdown-item span {
+            font-size: 1.8em; /* Sayı boyutunu küçült */
+        }
+
+        .countdown-item p {
+            font-size: 0.8em; /* Metin boyutunu küçült */
+        }
+
+    h2 {
+        font-size: 1.6em; /* Başlığı daha küçült */
+    }
+}

@@ -1,0 +1,27 @@
+﻿#whatsappIcon {
+    position: fixed;
+    bottom: 25px;
+    left: 20px;
+    z-index: 1000;
+}
+
+    #whatsappIcon img {
+        width: 85px; /* İkonun boyutu */
+        height: 85px;
+        cursor: pointer;
+        animation: blink-animation 4s infinite;
+    }
+
+@keyframes blink-animation {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

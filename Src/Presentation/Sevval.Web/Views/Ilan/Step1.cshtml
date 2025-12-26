@@ -1,0 +1,113 @@
+﻿@{
+    Layout = null; // Layout kullanmak istemediğinizi belirtiyoruz
+    ViewBag.Title = "Kategori Seçimi";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/katagori.css" /> <!-- CSS dosyasına bağlantı -->
+</head>
+<body>
+
+    <h2 class="text-center">Kategori Seçimi</h2>
+
+    <div class="container">
+        <div class="row">
+            <div id="kategoriContainer" class="kategori-container col-md-3">
+                <h4>Kategori Seçin:</h4>
+                <div class="option" onclick="selectOption('KONUT')">KONUT (YAŞAM ALANI)</div>
+                <div class="option" onclick="selectOption('ARSA')">ARSA</div>
+                <div class="option" onclick="selectOption('BAĞ')">BAĞ</div>
+                <div class="option" onclick="selectOption('BAHÇE')">BAHÇE</div>
+                <div class="option" onclick="selectOption('TARLA')">TARLA</div>
+                <div class="option" onclick="selectOption('İŞ YERİ')">İŞ YERİ</div>
+                <div class="option" onclick="selectOption('TURİSTİK TESİS')">TURİSTİK TESİS</div>
+            </div>
+
+            <div id="subKategoriContainer" class="kategori-container col-md-3" style="display: none;">
+                <h4>Alt Kategori Seçin:</h4>
+                <div id="subKategoriOptions" class="option"></div>
+            </div>
+
+            <div id="detayContainer" class="kategori-container col-md-3" style="display: none;">
+                <h4>Detay Seçin:</h4>
+                <div id="detayOptions" class="option"></div>
+            </div>
+
+            <div id="sonucContainer" class="sonuc-container col-md-3" style="display: none;">
+                <h4>Tebrikler!</h4>
+                <p id="secilenBilgiler"></p>
+                <button onclick="location.href='Step2.cshtml'" class="continue-button">Devam Et</button> <!-- Devam Et butonu -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var subKategoriler = {
+            "KONUT": ["SATILIK", "KİRALIK", "DEVREN SATILIK"],
+            "ARSA": ["SATILIK", "KİRALIK", "DEVREN SATILIK"],
+            "BAĞ": ["SATILIK", "KİRALIK", "DEVREN SATILIK"],
+            "BAHÇE": ["SATILIK", "KİRALIK", "DEVREN SATILIK"],
+            "TARLA": ["SATILIK", "KİRALIK", "DEVREN SATILIK"],
+            "İŞ YERİ": ["SATILIK", "KİRALIK", "DEVREN SATILIK", "DEVREN KİRALIK"],
+            "TURİSTİK TESİS": ["SATILIK", "KİRALIK", "DEVREN SATILIK", "DEVREN KİRALIK"]
+        };
+
+        var detaylar = {
+            "KONUT": ["Daire", "Müstakil Ev", "Köy Evi", "Eski", "Kargir Ev", "Dağ Evi", "Kulübe", "Prefabrik", "Bungalow", "Tiny House", "Konteyner", "Loft Daire", "Bina", "Devremülk", "Çiftlik Evi", "Kooperatif", "Villa", "Köşk", "Konak", "Rezidans", "Yalı"],
+            "ARSA": ["Konut İmarlı", "Sanayi İmarlı", "Ticaret İmarlı", "Karma İmarlı", "Tarım İmarlı", "Yeşil Alan İmarlı", "Kamu Alanı İmarlı", "Turizm İmarlı", "Sağlık İmarlı", "Eğitim İmarlı"],
+            "BAĞ": ["Üzüm Bağı", "Çilek Bağı", "Böğürtlen Bağı"],
+            "BAHÇE": ["Elma Bahçesi", "Armut Bahçesi", "Kiraz Bahçesi", "Üzüm Bahçesi", "Çilek Bahçesi", "Nar Bahçesi", "Kivi Bahçesi", "Limon Bahçesi", "Şeftali Bahçesi", "Ahududu Bahçesi", "Böğürtlen Bahçesi", "Greyfurt Bahçesi", "Portakal Bahçesi", "Mandalina Bahçesi", "Avokado Bahçesi", "Muz Bahçesi", "Erik Bahçesi", "Kayısı Bahçesi", "Dut Bahçesi", "Fındık Bahçesi", "Ceviz Bahçesi"],
+            "TARLA": ["Buğday Tarlası", "Mısır Tarlası", "Patates Tarlası", "Arpa Tarlası", "Soğan Tarlası", "Havuç Tarlası", "Pamuk Tarlası", "Nohut Tarlası", "Mercimek Tarlası", "Fasulye Tarlası", "Şeker Pancarı Tarlası", "Yulaf Tarlası", "Çavdar Tarlası", "Soya Fasulyesi Tarlası", "Karpuz Tarlası", "Kavun Tarlası", "Aspir Tarlası", "Zeytin Tarlası", "Çeltik Tarlası", "Kuru Üzüm Tarlası", "Keten Tarlası", "Turp Tarlası", "Domates Tarlası", "Biber Tarlası", "Hubsan Tarlası"],
+            "İŞ YERİ": ["Akaryakıt İstasyonu", "Apartman Dairesi", "Atölye", "AVM", "Büfe", "Büro & Ofis", "Cafe & Bar", "Çiftlik", "Depo & Antrepo", "Düğün Salonu", "Dükkan & Mağaza", "Enerji Santrali", "Fabrika & Üretim Tesisi", "Garaj & Park Yeri", "İmalathane", "İş Hanı Katı & Ofisi", "Kantin", "Kır & Kahvaltı Bahçesi", "Kıraathane", "Tam Bina", "Maden Ocağı", "Otopark", "Pastane", "Fırın & Tatlıcı", "Pazar Yeri", "Plaza", "Plaza Katı & Ofisi", "Radyo İstasyonu & TV Kanalı", "Restoran & Lokanta", "Rezidans Katı & Ofisi", "Sağlık Merkezi", "Sinema & Konferans Salonu", "SPA", "Hamam & Sauna", "Spor Salonu", "Tesis", "Toptan Satış Mağazası", "Üretim Tesis"],
+            "TURİSTİK TESİS": ["Yazlık", "Kışlık", "Kamp Yeri", "Motel", "Otel", "Pansiyon", "Tatil Köyü", "Konaklama Tesis", "Küçük Otel"]
+        };
+
+        function selectOption(selectedOption) {
+            // Seçilen ana kategoriye göre alt kategorileri göster
+            var subKategoriDiv = document.getElementById("subKategoriOptions");
+            subKategoriDiv.innerHTML = ""; // Önceki içerikleri temizle
+
+            if (subKategoriler[selectedOption]) {
+                subKategoriler[selectedOption].forEach(function (subKategori) {
+                    var optionDiv = document.createElement("div");
+                    optionDiv.className = "option";
+                    optionDiv.onclick = function () { selectSubOption(selectedOption, subKategori); };
+                    optionDiv.innerText = subKategori;
+                    subKategoriDiv.appendChild(optionDiv);
+                });
+                document.getElementById("subKategoriContainer").style.display = "block"; // Alt kategori konteynerini göster
+            }
+        }
+
+        function selectSubOption(selectedOption, selectedSubOption) {
+            // Seçilen alt kategoriye göre detayları göster
+            var detayDiv = document.getElementById("detayOptions");
+            detayDiv.innerHTML = ""; // Önceki içerikleri temizle
+
+            if (detaylar[selectedOption]) {
+                detaylar[selectedOption].forEach(function (detay) {
+                    var optionDiv = document.createElement("div");
+                    optionDiv.className = "option";
+                    optionDiv.onclick = function () { showResult(selectedOption, selectedSubOption, detay); };
+                    optionDiv.innerText = detay;
+                    detayDiv.appendChild(optionDiv);
+                });
+                document.getElementById("detayContainer").style.display = "block"; // Detay konteynerini göster
+            }
+        }
+
+        function showResult(selectedOption, selectedSubOption, detay) {
+            // Seçilen bilgileri göster
+            var secilenBilgiler = document.getElementById("secilenBilgiler");
+            secilenBilgiler.innerText = "Seçtiğiniz Kategori: " + selectedOption + " - Alt Kategori: " + selectedSubOption + " - Detay: " + detay;
+            document.getElementById("sonucContainer").style.display = "block"; // Sonuç konteynerini göster
+        }
+    </script>
+</body>
+</html>

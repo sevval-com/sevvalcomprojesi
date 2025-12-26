@@ -1,0 +1,1762 @@
+@{
+    ViewData["Title"] = "Yatırım Formu";
+    Layout = null; // Layout kullanılmıyor
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/mülkümüsatmak.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Yeni Eklenen Step Stilleri */
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 0 10%;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 37px;
+            border-radius: 50%;
+            background: #ddd;
+            display: inline-block;
+            line-height: 30px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #003366;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-number {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .step span {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .step.active span {
+            color: #003366;
+            font-weight: bold;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #ddd;
+            z-index: -1;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+    </style>
+    <style>
+        .currency-indicator {
+            position: absolute;
+            right: 15px;
+            top: 61%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #6c757d;
+        }
+    </style>
+
+    <link href="~/css/investment/step.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="form-container">
+        <!-- Üst fotoğraf alanı -->
+        <div class="form-header">
+            <img src="~/ImageFiles/yatirim.webp" alt="Mülk Satma" class="header-img">
+        </div>
+
+        <!-- Step Container -->
+        <div class="step-container">
+            <div class="step active" id="step-1">
+                <div class="step-number">1</div>
+                <span>Yatırım Türü</span>
+            </div>
+            <div class="step" id="step-2">
+                <div class="step-number">2</div>
+                <span>Bütçe</span>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-number">3</div>
+                <span>Yatırım Tercihleri</span>
+            </div>
+            <div class="step" id="step-4">
+                <div class="step-number">4</div>
+                <span>İletişim Bilgileri</span>
+            </div>
+        </div>
+
+        <!-- Form içerik alanı -->
+        <form id="investment-form" onsubmit="return sendEmail(event)">
+
+            <!-- Gizli alanlar: Kategori ve Durum -->
+
+            <input type="hidden" id="category-input" name="selectCategory" value="">
+
+            <input type="hidden" id="status-input" name="selectStatus" value="">
+
+
+            <div class="form-step" id="step-1-content">
+
+                <label class="category-label"> Hangi Alana Yatırım Yapmak İstiyorsunuz?</label>
+
+                <div class="category-icons">
+
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="category-option" id="Konut" onclick="selectCategory('Konut')">
+                                    <i class="fas fa-home"></i>
+                                    <p>Konut</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="category-option" id="Turistik Tesis" onclick="selectCategory('Turistik Tesis')">
+                                    <i class="fas fa-umbrella-beach"></i>
+                                    <p>Turistik Tesis</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="category-option" id="İş Yeri" onclick="selectCategory('İş Yeri')">
+                                    <i class="fas fa-briefcase"></i>
+                                    <p>İş Yeri</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><div class="category-divider"></div></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-option" id="Arsa" onclick="selectCategory('Arsa')">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <p>Arsa</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="category-option" id="Tarla" onclick="selectCategory('Tarla')">
+                                    <i class="fas fa-seedling"></i>
+                                    <p>Tarla</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="category-option" id="Bahçe" onclick="selectCategory('Bahçe')">
+                                    <i class="fas fa-leaf"></i>
+                                    <p>Bahçe</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="row" style="text-align: center;margin: auto;">
+
+                    <div class="col-md-3 d-none d-md-block"></div>
+                    <div class="col-md-3 col-sm-12 col-xs-12">
+                        <button type="button" class="home-button" onclick="window.location.href = '/'">Ana Sayfaya Dön</button>
+                    </div>
+                    <div class="col-md-3 col-sm-12 col-xs-12">
+                        <button type="button" class="next-button" onclick="PassToBudget()" id="next-button-1" disabled>Devam</button>
+                    </div>
+
+                    <div class="col-md-3 d-none d-md-block"></div>
+
+
+
+                </div>
+
+              
+            </div>
+
+
+            <!-- 2. Kısım: Durum Seçimi -->
+            <div class="form-step" id="step-2-content" style="display: none;">
+
+                <h2 class="form-title text-center mb-4"> Bütçe  Tercihleri</h2>
+
+                <div class="property-info-container p-4 shadow-sm rounded">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group position-relative">
+                                <label for="min-budget" class="form-label">Minimum Bütçe:</label>
+                                <input type="text" id="min-budget" name="MinBudget" class="form-control shadow-sm" placeholder="Ör: 100.000"
+                                       oninput="formatPrice(this)" onfocus="unformatPrice(this)" onblur="formatPrice(this)"
+                                       style="padding-right: 50px;">
+                                <span class="currency-indicator">TL</span>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-group position-relative">
+                                <label for="max-budget" class="form-label">Maksimum Bütçe:</label>
+                                <input type="text" id="max-budget" name="MaxBudget" class="form-control shadow-sm" placeholder="Ör: 500.000"
+                                       oninput="formatPrice(this)" onfocus="unformatPrice(this)" onblur="formatPrice(this)"
+                                       style="padding-right: 50px;">
+                                <span class="currency-indicator">TL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="text-align: center;margin: auto;">
+
+                    <div class="col-md-3 d-none d-md-block"></div>
+                    <div class="col-md-3 col-sm-12 col-xs-12">
+                        <button type="button" class="home-button" onclick="window.location.href = '/'">Ana Sayfaya Dön</button>
+                    </div>
+                    <div class="col-md-3 col-sm-12 col-xs-12">
+                        <button type="button" class="next-button" onclick="PassToInvestmentChoice()" id="next-button-2" disabled>Devam</button>
+                    </div>
+
+                    <div class="col-md-3 d-none d-md-block"></div>
+
+
+
+                </div>
+
+            </div>
+
+
+            <!-- 3. Kısım: Mülk Bilgileri (Dinamik içerik) -->
+            <div class="form-step" id="step-3-content" style="display: none;">
+                <!-- Konut ve Arazi Bilgileri Seçim Butonları (Gizli) -->
+                <button type="button" onclick="showResidentialInfo()" style="display: none;">Mülk Bilgileri</button>
+                <button type="button" onclick="showLandInfo()" style="display: none;">Mülk Bilgileri</button>
+
+                <!-- Konut Bilgileri -->
+                <div id="residential-info" class="property-info-container p-4 shadow-sm rounded">
+                    <h2 class="form-title text-center mb-4">Mülk Bilgileri</h2>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="ResidentialCity" class="form-label">İl:</label>
+                                <select id="ResidentialCity" name="ResidentialCity" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="ResidentialDistrict" class="form-label">İlçe:</label>
+                                <select id="ResidentialDistrict" name="ResidentialDistrict" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="ResidentialVillage" class="form-label">Köy/Mahalle:</label>
+                                <select id="ResidentialVillage" name="ResidentialVillage" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="rooms" class="form-label">Oda Sayısı:</label>
+                                <select id="rooms" name="rooms" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Stüdyo (1+0)">Stüdyo (1+0)</option>
+                                    <option value="1+1">1+1</option>
+                                    <option value="1.5+1">1.5+1</option>
+                                    <option value="2+0">2+0</option>
+                                    <option value="2+1">2+1</option>
+                                    <option value="2.5+1">2.5+1</option>
+                                    <option value="2+2">2+2</option>
+                                    <option value="3+0">3+0</option>
+                                    <option value="3+1">3+1</option>
+                                    <option value="3.5+1">3.5+1</option>
+                                    <option value="3+2">3+2</option>
+                                    <option value="3+3">3+3</option>
+                                    <option value="4+0">4+0</option>
+                                    <option value="4+1">4+1</option>
+                                    <option value="4.5+1">4.5+1</option>
+                                    <option value="4.5+2">4.5+2</option>
+                                    <option value="4+2">4+2</option>
+                                    <option value="4+3">4+3</option>
+                                    <option value="4+4">4+4</option>
+                                    <option value="5+1">5+1</option>
+                                    <option value="5.5+1">5.5+1</option>
+                                    <option value="5+2">5+2</option>
+                                    <option value="5+3">5+3</option>
+                                    <option value="5+4">5+4</option>
+                                    <option value="6+1">6+1</option>
+                                    <option value="6+2">6+2</option>
+                                    <option value="6.5+1">6.5+1</option>
+                                    <option value="6+3">6+3</option>
+                                    <option value="6+4">6+4</option>
+                                    <option value="7+1">7+1</option>
+                                    <option value="7+2">7+2</option>
+                                    <option value="7+3">7+3</option>
+                                    <option value="8+1">8+1</option>
+                                    <option value="8+2">8+2</option>
+                                    <option value="8+3">8+3</option>
+                                    <option value="8+4">8+4</option>
+                                    <option value="9+1">9+1</option>
+                                    <option value="9+2">9+2</option>
+                                    <option value="9+3">9+3</option>
+                                    <option value="9+4">9+4</option>
+                                    <option value="9+5">9+5</option>
+                                    <option value="9+6">9+6</option>
+                                    <option value="10+1">10+1</option>
+                                    <option value="10+2">10+2</option>
+                                    <option value="10 Üzeri">10 Üzeri</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="area" class="form-label">Metrekare:</label>
+                             
+                                    <div class="range-container">
+                                        <div class="slider-container">
+                                            <div class="slider-track"></div>
+                                            <div class="slider-range" id="sliderRange"></div>
+                                            <input type="range" id="minSlider" onkeyup="updateSlider(this)" class="slider-input min-slider"
+                                               min="0" max="10000" value="1000" step="10">
+                                            <input type="range" id="maxSlider" onkeyup="updateSlider(this)" class="slider-input max-slider"
+                                                   min="0" max="10000" value="5500" step="10">
+                                        </div>
+                                        <div class="range-labels">
+                                            <span>0 m²</span>
+                                        <span>10,000 m²</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="price-display">
+                                        <div class="price-box">
+                                           
+                                            <div class="price-value" id="minPrice">10 m²</div>
+                                        </div>
+                                        <div class="price-separator">—</div>
+                                        <div class="price-box">
+
+                                        <div class="price-value" id="maxPrice">10,000 m²</div>
+                                        </div>
+                                    </div>
+                                  <input type="hidden" id="area" name="area" class="form-control shadow-sm">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="building-age" class="form-label">Bina Yaşı:</label>
+                                <select id="building-age" name="building-age" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5-10 arası">5-10 arası</option>
+                                    <option value="11-15 arası">11-15 arası</option>
+                                    <option value="16-20 arası">16-20 arası</option>
+                                    <option value="21-25 arası">21-25 arası</option>
+                                    <option value="26-30 arası">26-30 arası</option>
+                                    <option value="30 ve üzeri">30 ve üzeri</option>
+                                    <option value="40 ve üzeri">40 ve üzeri</option>
+                                    <option value="50 ve üzeri">50 ve üzeri</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="floor" class="form-label">Kaçıncı Kat:</label>
+                                <select id="floor" name="floor" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Giriş Altı Kot 4">Giriş Altı Kot 4</option>
+                                    <option value="Giriş Altı Kot 3">Giriş Altı Kot 3</option>
+                                    <option value="Giriş Altı Kot 2">Giriş Altı Kot 2</option>
+                                    <option value="Giriş Altı Kot 1">Giriş Altı Kot 1</option>
+                                    <option value="Bodrum Kat">Bodrum Kat</option>
+                                    <option value="Zemin Kat">Zemin Kat</option>
+                                    <option value="Bahçe Katı">Bahçe Katı</option>
+                                    <option value="Giriş Katı">Giriş Katı</option>
+                                    <option value="Yüksek Giriş">Yüksek Giriş</option>
+                                    <option value="Ara Kat">Ara Kat</option>
+                                    <option value="Müstakil">Müstakil</option>
+                                    <option value="Villa Tipi">Villa Tipi</option>
+                                    <option value="Çatı Katı">Çatı Katı</option>
+                                    <option value="En Üst Kat">En Üst Kat</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    <option value="32">32</option>
+                                    <option value="33">33</option>
+                                    <option value="34">34</option>
+                                    <option value="35">35</option>
+                                    <option value="36">36</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                    <option value="42">42</option>
+                                    <option value="43">43</option>
+                                    <option value="44">44</option>
+                                    <option value="45">45</option>
+                                    <option value="46">46</option>
+                                    <option value="47">47</option>
+                                    <option value="48">48</option>
+                                    <option value="49">49</option>
+                                    <option value="50 ve üzeri">50 ve üzeri</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="bathrooms" class="form-label">Banyo Sayısı:</label>
+                                <select id="bathrooms" name="bathrooms" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7 ve üzeri">7 ve üzeri</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="heating-system" class="form-label">Isıtma Sistemi:</label>
+                                <select id="heating-system" name="heating-system" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="Soba">Soba</option>
+                                    <option value="Doğalgaz Sobası">Doğalgaz Sobası</option>
+                                    <option value="Kat Kaloriferi">Kat Kaloriferi</option>
+                                    <option value="Merkezi">Merkezi</option>
+                                    <option value="Merkezi (Pay Ölçer)">Merkezi (Pay Ölçer)</option>
+                                    <option value="Kombi (Doğalgaz)">Kombi (Doğalgaz)</option>
+                                    <option value="Kombi (Elektrik)">Kombi (Elektrik)</option>
+                                    <option value="Yerden Isıtma">Yerden Isıtma</option>
+                                    <option value="Klima">Klima</option>
+                                    <option value="Fancoil Ünitesi">Fancoil Ünitesi</option>
+                                    <option value="Güneş Enerjisi">Güneş Enerjisi</option>
+                                    <option value="Elektrikli Radyatör">Elektrikli Radyatör</option>
+                                    <option value="Jeotermal">Jeotermal</option>
+                                    <option value="Şömine">Şömine</option>
+                                    <option value="VRV">VRV</option>
+                                    <option value="Isı Pompası">Isı Pompası</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="parking" class="form-label">Balkon:</label>
+                                <select id="parking" name="parking" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7 ve üzeri">7 ve üzeri</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row" style="text-align: center;margin: auto;">
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="button" class="home-button" onclick="window.location.href = '/'">Ana Sayfaya Dön</button>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="button" class="next-button" onclick="validateStep3()">Devam</button>
+                        </div>
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+
+
+
+                    </div>
+                   </div>
+
+
+                <!-- Arazi Bilgileri -->
+                <div id="land-info" class="property-info-container p-4 shadow-sm rounded">
+                    <h2 class="form-title text-center mb-4">Mülk Bilgileri</h2>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="LandCity" class="form-label">İl:</label>
+                                <select id="LandCity" name="LandCity" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="LandDistrict" class="form-label">İlçe:</label>
+                                <select id="LandDistrict" name="LandDistrict" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="LandVillage" class="form-label">Köy/Mahalle:</label>
+                                <select id="LandVillage" name="LandVillage" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        
+                        <div class="col-md-4">
+                            <div class="info-group">
+                                <label for="landArea" class="form-label">Metrekare:</label>
+                                <div class="range-container">
+                                    <div class="slider-container">
+                                        <div class="slider-track"></div>
+                                        <div class="slider-range" id="sliderRangeLand"></div>
+                                        <input type="range" id="minSliderLand" onkeyup="updateSliderLand(this)" class="slider-input min-slider"
+                                               min="0" max="100000" value="5000" step="10">
+                                        <input type="range" id="maxSliderLand" onkeyup="updateSliderLand(this)" class="slider-input max-slider"
+                                               min="0" max="100000" value="50000" step="10">
+                                    </div>
+                                    <div class="range-labels">
+                                        <span>0 m²</span>
+                                        <span>10,000,00 m²</span>
+                                    </div>
+                                </div>
+
+                                <div class="price-display">
+                                    <div class="price-box">
+
+                                        <div class="price-value" id="minPriceLand">0 m²</div>
+                                    </div>
+                                    <div class="price-separator">—</div>
+                                    <div class="price-box">
+
+                                        <div class="price-value" id="maxPriceLand">10,000,00 m²</div>
+                                    </div>
+                                </div>
+
+
+                                <input type="hidden" id="landArea" name="LandArea">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="slope" class="form-label">Meyil Durumu:</label>
+                                <select id="slope" name="Slope" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Düz">Düz</option>
+                                    <option value="Hafif Meyilli">Hafif Meyilli</option>
+                                    <option value="Meyilli">Meyilli</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="road-condition" class="form-label">Yol Durumu:</label>
+                                <select id="road-condition" name="RoadCondition" class="form-select shadow-sm">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="Toprak Yollu">Toprak Yollu</option>
+                                    <option value="Kadastral Yollu">Kadastral Yollu</option>
+                                    <option value="Yola 1 Parsel">Yola 1 Parsel</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="distanceToSettlement" class="form-label">Yerleşim Yerine Uzaklığı:</label>
+                                <div class="range-container">
+                                    <div class="slider-container">
+                                        <div class="slider-track"></div>
+                                        <div class="slider-range" id="sliderRangeDistance"></div>
+                                        <input type="range" id="minSliderDistance" onkeyup="updateSliderDistance(this)" class="slider-input min-slider"
+                                               min="0" max="2500" value="10" step="10">
+                                        <input type="range" id="maxSliderDistance" onkeyup="updateSliderDistance(this)" class="slider-input max-slider"
+                                               min="0" max="2500" value="1000" step="10">
+                                    </div>
+                                    <div class="range-labels">
+                                        <span>0 m</span>
+                                        <span>2,500 m</span>
+                                    </div>
+                                </div>
+
+                                <div class="price-display">
+                                    <div class="price-box">
+
+                                        <div class="price-value" id="minPriceDistance">0 m</div>
+                                    </div>
+                                    <div class="price-separator">—</div>
+                                    <div class="price-box">
+
+                                        <div class="price-value" id="maxPriceDistance">2,500 m</div>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <input type="hidden" id="distanceToSettlement" name="DistanceToSettlement"/>
+                                
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-group">
+                                <label for="zoning-status" class="form-label">İmar Durumu:</label>
+                                <select id="zoning-status" name="ZoningStatus" class="form-select shadow-sm">
+                                    <option value="Imari Yok">İmarı Yok</option>
+                                    <option value="Konut İmarlı">Konut İmarlı</option>
+                                    <option value="Sanayi İmarlı">Sanayi İmarlı</option>
+                                    <option value="Ticaret İmarlı">Ticaret İmarlı</option>
+                                    <option value="Karma Kullanım İmarlı">Karma Kullanım İmarlı</option>
+                                    <option value="Tarım İmarlı">Tarım İmarlı</option>
+                                    <option value="Turizm İmarlı">Turizm İmarlı</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="text-align: center;margin: auto;">
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="button" class="home-button" onclick="window.location.href = '/'">Ana Sayfaya Dön</button>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="button" class="next-button" onclick="validateLandStep()">Devam</button>
+                        </div>
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+
+
+
+                    </div>
+
+
+                  </div>
+
+
+            </div>
+
+
+
+
+            <!-- 4. Kısım: Mülk Sahibi Bilgileri -->
+            <div class="form-step" id="step-4-content" style="display: none;">
+                <!-- Kişisel Bilgiler -->
+                <div id="user-info" class="info-section p-5 shadow-lg rounded-lg bg-light">
+                    <h2 class="info-title text-center mb-4 text-primary">Kişisel Bilgiler</h2>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="first-name" class="label text-muted">Adı:</label>
+                                <input type="text"
+                                       id="first-name"
+                                       name="FirstName"
+                                       class="input-field form-control shadow-sm"
+                                       placeholder=""
+                                       required
+                                       minlength="3"
+                                       oninput="this.value = this.value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ ]/g, '')"
+                                       onkeypress="return event.keyCode !== 32 || this.value.trim().length === 0"
+                                       onblur="validateNameLength(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="last-name" class="label text-muted">Soyadı:</label>
+                                <input type="text"
+                                       id="last-name"
+                                       name="LastName"
+                                       class="input-field form-control shadow-sm"
+                                       placeholder=""
+                                       required
+                                       minlength="3"
+                                       pattern="[A-Za-zçÇğĞıİöÖşŞüÜ ]+"
+                                       oninput="this.value = this.value.replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ ]/g, '')"
+                                       onkeypress="return event.keyCode !== 32 || this.value.trim().length > 0"
+                                       onblur="validateNameLength(this)">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="label text-muted">Mail:</label>
+                                <input type="email" id="email" name="Email" class="input-field form-control shadow-sm" placeholder="" required
+                                       oninput="this.value = this.value.toLowerCase();">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone" class="label text-muted">Telefon:</label>
+                                <input type="tel" id="phone" name="Phone" class="input-field form-control shadow-sm" placeholder="" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="city" class="label text-muted">Yaşadığınız Şehir:</label>
+                                <select id="city" name="LivingCity" class="form-control shadow-sm" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Adana">Adana</option>
+                                    <option value="Adıyaman">Adıyaman</option>
+                                    <option value="Afyonkarahisar">Afyonkarahisar</option>
+                                    <option value="Ağrı">Ağrı</option>
+                                    <option value="Aksaray">Aksaray</option>
+                                    <option value="Amasya">Amasya</option>
+                                    <option value="Ankara">Ankara</option>
+                                    <option value="Antalya">Antalya</option>
+                                    <option value="Ardahan">Ardahan</option>
+                                    <option value="Artvin">Artvin</option>
+                                    <option value="Aydın">Aydın</option>
+                                    <option value="Balıkesir">Balıkesir</option>
+                                    <option value="Bartın">Bartın</option>
+                                    <option value="Batman">Batman</option>
+                                    <option value="Bayburt">Bayburt</option>
+                                    <option value="Bilecik">Bilecik</option>
+                                    <option value="Bingöl">Bingöl</option>
+                                    <option value="Bitlis">Bitlis</option>
+                                    <option value="Bolu">Bolu</option>
+                                    <option value="Burdur">Burdur</option>
+                                    <option value="Bursa">Bursa</option>
+                                    <option value="Çanakkale">Çanakkale</option>
+                                    <option value="Çankırı">Çankırı</option>
+                                    <option value="Çorum">Çorum</option>
+                                    <option value="Denizli">Denizli</option>
+                                    <option value="Diyarbakır">Diyarbakır</option>
+                                    <option value="Düzce">Düzce</option>
+                                    <option value="Edirne">Edirne</option>
+                                    <option value="Elazığ">Elazığ</option>
+                                    <option value="Erzincan">Erzincan</option>
+                                    <option value="Erzurum">Erzurum</option>
+                                    <option value="Eskişehir">Eskişehir</option>
+                                    <option value="Gaziantep">Gaziantep</option>
+                                    <option value="Giresun">Giresun</option>
+                                    <option value="Gümüşhane">Gümüşhane</option>
+                                    <option value="Hakkari">Hakkari</option>
+                                    <option value="Hatay">Hatay</option>
+                                    <option value="Iğdır">Iğdır</option>
+                                    <option value="Isparta">Isparta</option>
+                                    <option value="İstanbul">İstanbul</option>
+                                    <option value="İzmir">İzmir</option>
+                                    <option value="Kahramanmaraş">Kahramanmaraş</option>
+                                    <option value="Karabük">Karabük</option>
+                                    <option value="Karaman">Karaman</option>
+                                    <option value="Kars">Kars</option>
+                                    <option value="Kastamonu">Kastamonu</option>
+                                    <option value="Kayseri">Kayseri</option>
+                                    <option value="Kırıkkale">Kırıkkale</option>
+                                    <option value="Kırklareli">Kırklareli</option>
+                                    <option value="Kırşehir">Kırşehir</option>
+                                    <option value="Kilis">Kilis</option>
+                                    <option value="Kocaeli">Kocaeli</option>
+                                    <option value="Konya">Konya</option>
+                                    <option value="Kütahya">Kütahya</option>
+                                    <option value="Malatya">Malatya</option>
+                                    <option value="Manisa">Manisa</option>
+                                    <option value="Mardin">Mardin</option>
+                                    <option value="Mersin">Mersin</option>
+                                    <option value="Muğla">Muğla</option>
+                                    <option value="Muş">Muş</option>
+                                    <option value="Nevşehir">Nevşehir</option>
+                                    <option value="Niğde">Niğde</option>
+                                    <option value="Ordu">Ordu</option>
+                                    <option value="Osmaniye">Osmaniye</option>
+                                    <option value="Rize">Rize</option>
+                                    <option value="Sakarya">Sakarya</option>
+                                    <option value="Samsun">Samsun</option>
+                                    <option value="Siirt">Siirt</option>
+                                    <option value="Sinop">Sinop</option>
+                                    <option value="Sivas">Sivas</option>
+                                    <option value="Şanlıurfa">Şanlıurfa</option>
+                                    <option value="Şırnak">Şırnak</option>
+                                    <option value="Tekirdağ">Tekirdağ</option>
+                                    <option value="Tokat">Tokat</option>
+                                    <option value="Trabzon">Trabzon</option>
+                                    <option value="Tunceli">Tunceli</option>
+                                    <option value="Uşak">Uşak</option>
+                                    <option value="Van">Van</option>
+                                    <option value="Yalova">Yalova</option>
+                                    <option value="Yozgat">Yozgat</option>
+                                    <option value="Zonguldak">Zonguldak</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="text-align: center;margin: auto;">
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="button" class="home-button" onclick="window.location.href = '/'">Ana Sayfaya Dön</button>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
+                            <button type="submit" class="submit-btn btn btn-primary btn-lg shadow-lg mt-1">Gönder</button>
+                        </div>
+
+                        <div class="col-md-3 d-none d-md-block"></div>
+
+
+
+                    </div>
+
+                    
+
+                </div>
+
+             </div>
+
+
+        </form>
+
+    </div>
+
+  
+    <div id="success-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 139, 0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; text-align: center; width: 80%; max-width: 400px; box-shadow: 0 8px 16px rgba(0, 0, 139, 0.3);">
+            <h2 style="color: #003366; font-size: 24px; margin-bottom: 10px;">Tebrikler!</h2>
+            <p id="success-message" style="color: #003366; font-size: 16px; margin-bottom: 10px;">Talebiniz başarıyla alınmıştır. Talebiniz, şirketimizin paneline iletilmiş olup, en kısa sürede onay sürecine alınacaktır. Onayın ardından, mülkünüzün bulunduğu bölgedeki yetkili emlak danışmanlarımızla paylaşılacaktır. Danışmanlarımızdan alacağınız geri bildirimler için lütfen bizimle iletişime geçiniz:</p>
+            <p style="color: #003366; font-size: 16px; margin-bottom: 20px;">İletişim: <a href="tel:+902129555541" style="color: #003366; text-decoration: underline;">+90 (212) 955 55 41</a></p>
+            <button id="redirect-button" onclick="redirectToHome()" style="background: #003366; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.3s;">
+                Ana Sayfaya Dön (<span id="countdown">30</span>)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let minSlider = document.getElementById('minSlider');
+        let maxSlider = document.getElementById('maxSlider');
+        let sliderRange = document.getElementById('sliderRange');
+        let minPriceDisplay = document.getElementById('minPrice');
+        let maxPriceDisplay = document.getElementById('maxPrice');
+        let area = document.getElementById('area');
+
+
+        let minSliderLand = document.getElementById('minSliderLand');
+        let maxSliderLand  = document.getElementById('maxSliderLand');
+        let sliderRangeLand = document.getElementById('sliderRangeLand');
+        let minPriceDisplayLand = document.getElementById('minPriceLand');
+        let maxPriceDisplayLand = document.getElementById('maxPriceLand');
+        let areaLand = document.getElementById('landArea');
+
+
+        let minSliderDistance = document.getElementById('minSliderDistance');
+        let maxSliderDistance = document.getElementById('maxSliderDistance');
+        let sliderRangeDistance = document.getElementById('sliderRangeDistance');
+        let minPriceDisplayDistance = document.getElementById('minPriceDistance');
+        let maxPriceDisplayDistance = document.getElementById('maxPriceDistance');
+        let areaDistance = document.getElementById('distanceToSettlement');
+
+        function updateSlider(activeSlider) {
+             
+            
+
+          
+
+            area.value = minSlider.value + ' m² - ' + maxSlider.value + ' m²';
+            let minVal = parseInt(minSlider.value);
+            let maxVal = parseInt(maxSlider.value);
+
+            // Ensure minimum gap of 10
+            const gap = 10;
+
+            if (minVal >= maxVal - gap) {
+                if (activeSlider === minSlider) {
+                    minSlider.value = maxVal - gap;
+                    minVal = maxVal - gap;
+                } else if (activeSlider === maxSlider) {
+                    maxSlider.value = minVal + gap;
+                    maxVal = minVal + gap;
+                }
+            }
+
+            // Update price displays
+            minPriceDisplay.textContent = formatMeter(minVal);
+            maxPriceDisplay.textContent = formatMeter(maxVal);
+
+            // Update visual range
+            const minPercent = (minVal / 10000) * 100;
+            const maxPercent = (maxVal / 10000) * 100;
+
+            sliderRange.style.left = minPercent + '%';
+            sliderRange.style.width = (maxPercent - minPercent) + '%';
+
+            // Adjust z-index for better interaction
+            if (minVal > maxVal - 500) {
+                minSlider.style.zIndex = 5;
+                maxSlider.style.zIndex = 4;
+            } else {
+                minSlider.style.zIndex = 4;
+                maxSlider.style.zIndex = 5;
+            }
+        }
+
+        function updateSliderLand(activeSlider) {
+          
+          
+
+            areaLand.value = minSliderLand.value + ' m² - ' + maxSliderLand.value + ' m²';
+            let minVal = parseInt(minSliderLand .value);
+            let maxVal = parseInt(maxSliderLand.value);
+
+            // Ensure minimum gap of 10
+            const gap = 10;
+
+            if (minVal >= maxVal - gap) {
+                if (activeSlider === minSliderLand) {
+                    minSliderLand.value = maxVal - gap;
+                    minVal = maxVal - gap;
+                } else if (activeSlider === maxSliderLand) {
+                    maxSliderLand.value = minVal + gap;
+                    maxVal = minVal + gap;
+                }
+            }
+
+            // Update price displays
+            minPriceDisplayLand.textContent = formatMeter(minVal);
+            maxPriceDisplayLand.textContent = formatMeter(maxVal);
+
+            // Update visual range
+            const minPercent = (minVal / 100000) * 100;
+            const maxPercent = (maxVal / 100000) * 100;
+
+            sliderRangeLand.style.left = minPercent + '%';
+            sliderRangeLand.style.width = (maxPercent - minPercent) + '%';
+
+            // Adjust z-index for better interaction
+            if (minVal > maxVal - 500) {
+                minSliderLand.style.zIndex = 5;
+                maxSliderLand.style.zIndex = 4;
+            } else {
+                minSliderLand.style.zIndex = 4;
+                maxSliderLand.style.zIndex = 5;
+            }
+        }
+
+        function updateSliderDistance(activeSlider) {
+
+
+
+            areaDistance.value = minSliderDistance.value + ' m - ' + maxSliderDistance.value +' m';
+            let minVal = parseInt(minSliderDistance.value);
+            let maxVal = parseInt(maxSliderDistance.value);
+
+            // Ensure minimum gap of 10
+            const gap = 10;
+
+            if (minVal >= maxVal - gap) {
+                if (activeSlider === minSliderDistance) {
+                    minSliderDistance.value = maxVal - gap;
+                    minVal = maxVal - gap;
+                } else if (activeSlider === maxSliderDistance) {
+                    maxSliderDistance.value = minVal + gap;
+                    maxVal = minVal + gap;
+                }
+            }
+
+            // Update price displays
+            minPriceDisplayDistance.textContent = formatMeter2(minVal);
+            maxPriceDisplayDistance.textContent = formatMeter2(maxVal);
+
+            // Update visual range
+            const minPercent = (minVal / 2500) * 100;
+            const maxPercent = (maxVal / 2500) * 100;
+
+            sliderRangeDistance.style.left = minPercent + '%';
+            sliderRangeDistance.style.width = (maxPercent - minPercent) + '%';
+
+            // Adjust z-index for better interaction
+            if (minVal > maxVal - 500) {
+                minSliderDistance.style.zIndex = 5;
+                maxSliderDistance.style.zIndex = 4;
+            } else {
+                minSliderDistance.style.zIndex = 4;
+                maxSliderDistance.style.zIndex = 5;
+            }
+        }
+
+
+        function formatMeter(value) {
+            return new Intl.NumberFormat('en-US').format(value) + ' m²';
+        }
+        function formatMeter2(value) {
+            return new Intl.NumberFormat('en-US').format(value) + ' m';
+        }
+        
+
+        // Event listeners
+        minSlider.addEventListener('input', function () {
+            updateSlider(this);
+        });
+        maxSlider.addEventListener('input', function () {
+            updateSlider(this);
+        });
+        minSlider.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+        maxSlider.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+
+
+        minSliderLand.addEventListener('input', function () {
+            updateSliderLand(this);
+        });
+        maxSliderLand.addEventListener('input', function () {
+            updateSliderLand(this);
+        });
+        minSliderLand.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+        maxSliderLand.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+
+        minSliderDistance.addEventListener('input', function () {
+            updateSliderDistance(this);
+        });
+        maxSliderDistance.addEventListener('input', function () {
+            updateSliderDistance(this);
+        });
+        minSliderDistance.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+        maxSliderDistance.addEventListener('mousedown', function () {
+            this.style.zIndex = 6;
+        });
+
+        // Initialize
+        updateSlider(null);
+        updateSliderLand(null);
+        updateSliderDistance(null);
+    </script>
+
+    <script>
+        let countdownTime = 30; // 30 saniye geri sayım
+        let countdownInterval; // Geri sayımı kontrol edecek değişken
+        const countdownElement = document.getElementById('countdown');
+        const successModal = document.getElementById('success-modal');
+        const successMessageElement = document.getElementById('success-message'); // Yeni eklenen id
+
+        function startCountdown() {
+            // Önceki geri sayımı temizle
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownTime = 30; // Geri sayımı sıfırla
+            countdownElement.textContent = countdownTime; // İlk değeri göster
+
+            countdownInterval = setInterval(() => {
+                countdownTime--;
+                countdownElement.textContent = countdownTime;
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval); // Sayacı durdur
+                    redirectToHome(); // Ana sayfaya yönlendir
+                }
+            }, 1000);
+        }
+
+        function redirectToHome() {
+            window.location.href = '/'; // Ana sayfaya yönlendir
+        }
+
+        // Form gönderildiğinde modalı göster ve geri sayımı başlat
+        document.getElementById('investment-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Formun varsayılan davranışını engelle
+            successModal.style.display = 'block'; // Modalı görünür yap
+
+            // Burada, FormController.cs'den gelen mesajı alıp modalın mesajına yazabilirsiniz.
+            // Bu örnekte, sunucudan gelen bir mesajın "response.message" içinde olduğunu varsayıyoruz.
+            // Eğer sunucudan mesaj gelmiyorsa, varsayılan mesajı koruyabilirsiniz.
+            const response = { message: "Talebiniz başarıyla alınmıştır. İlgili talebiniz, şirketimizin paneline iletilmiş olup, en kısa sürede onay sürecine alınacaktır. Onayın ardından, mülkünüzün bulunduğu bölgedeki yetkili emlak danışmanlarımızla paylaşılacaktır. Danışmanlarımızdan alacağınız geri bildirimler için lütfen bizimle iletişime geçiniz: +90 (212) 955 55 41" }; // Örnek veri
+            if (response && response.message) {
+                successMessageElement.innerHTML = response.message; // Mesajı güncelle
+            } else {
+                successMessageElement.textContent = "Talebiniz başarıyla alınmıştır.";
+            }
+
+            startCountdown(); // Geri sayımı başlat
+        });
+    </script>
+
+    <script>
+        // Ortak değişkenler
+        let selectedCategory = null;
+        let selectedStatus = null;
+        let currentActiveStep = 1;
+
+        // Adım güncelleme fonksiyonu
+        function updateStepIndicator(stepNumber) {
+            // Tüm adım göstergelerini resetle
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+
+            // Önceki adımları tamamlanmış olarak işaretle
+            for (let i = 1; i < stepNumber; i++) {
+                const stepElement = document.getElementById(`step-${i}`);
+                if (stepElement) stepElement.classList.add('completed');
+            }
+
+            // Aktif adımı işaretle
+            const activeStep = document.getElementById(`step-${stepNumber}`);
+            if (activeStep) activeStep.classList.add('active');
+
+            // Mevcut aktif adımı güncelle
+            currentActiveStep = stepNumber;
+        }
+
+
+
+        // Durum seçim fonksiyonu
+        function selectStatus(status) {
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            const selectedElement = document.getElementById(status);
+            selectedElement.classList.add('selected');
+            selectedStatus = status;
+            document.getElementById('status-input').value = selectedStatus;
+            document.getElementById('next-button-2').disabled = false;
+        }
+
+       
+
+        // Dinamik içerik yükleme fonksiyonu
+        function loadDynamicContent() {
+            const residentialInfo = document.getElementById('residential-info');
+            const landInfo = document.getElementById('land-info');
+            const showResidential = ['Konut', 'Turistik Tesis', 'İş Yeri'].includes(selectedCategory);
+
+            residentialInfo.style.display = showResidential ? 'block' : 'none';
+            landInfo.style.display = showResidential ? 'none' : 'block';
+        }
+
+        // Sayfa yüklendiğinde ilk adımı aktif et
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStepIndicator(1);
+        });
+    </script>
+
+    <script>
+
+
+        function validateLandStep() {
+            let errorMessages = [];
+
+            // Zorunlu alan kontrolü
+            const requiredFields = [
+                'LandCity', 'LandDistrict', 'LandVillage',
+                 'landArea',
+                'slope', 'road-condition',
+                'distanceToSettlement', 'zoning-status',
+                'min-budget', "max-budget"
+            ];
+
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field) return;
+
+                const value = field.value.trim();
+                const isEmpty = (field.tagName === 'SELECT' && field.value === '') ||
+                    (field.tagName === 'INPUT' && value === '');
+
+                if (isEmpty) {
+                    field.style.border = '2px solid red';
+                    errorMessages.push(`"${field.labels[0].innerText}" alanı zorunludur!`);
+                }
+            });
+
+            // Fiyat validasyonu
+            const priceInputMin = document.getElementById('min-budget');
+            const rawPriceMin = priceInputMin.value.replace(/\./g, '').replace(/\D/g, '');
+            const priceMin = parseInt(rawPriceMin, 10);
+
+            if (!rawPriceMin) {
+                errorMessages.push('Fiyat alanı boş bırakılamaz!');
+                priceInputMin.style.border = '2px solid red';
+            } else if (isNaN(priceMin)) {
+                errorMessages.push('Geçersiz fiyat formatı!');
+                priceInputMin.style.border = '2px solid red';
+            } else if (priceMin < 1000 || priceMin > 500000000) {
+                errorMessages.push('Fiyat 1.000 TL ile 500.000.000 TL arasında olmalıdır!');
+                priceInputMin.style.border = '2px solid red';
+            }
+
+            const priceInputMax = document.getElementById('max-budget');
+            const rawPriceMax = priceInputMax.value.replace(/\./g, '').replace(/\D/g, '');
+            const priceMax = parseInt(rawPriceMax, 10);
+
+            if (!rawPriceMax) {
+                errorMessages.push('Fiyat alanı boş bırakılamaz!');
+                priceInputMax.style.border = '2px solid red';
+            } else if (isNaN(priceMax)) {
+                errorMessages.push('Geçersiz fiyat formatı!');
+                priceInputMax.style.border = '2px solid red';
+            } else if (priceMax < 1000 || priceMax > 500000000) {
+                errorMessages.push('Fiyat 1.000 TL ile 500.000.000 TL arasında olmalıdır!');
+                priceInputMax.style.border = '2px solid red';
+            }
+
+
+
+            // Hata varsa göster
+            if (errorMessages.length > 0) {
+                alert("Lütfen şu hataları düzeltin:\n\n" + errorMessages.join('\n'));
+                return;
+            }
+
+            // Hata yoksa devam et
+            nextStep(4);
+        }
+    </script>
+    <script>
+        function sanitizePrice(input) {
+            // Sadece rakamlara izin ver
+            input.value = input.value.replace(/[^\d]/g, '');
+        }
+
+        function formatPrice(input) {
+            // Noktalama ekle
+
+             
+
+            const value = input.value?.replace(/[^\d]/g, '');
+            if (value) {
+                input.value = new Intl.NumberFormat('tr-TR').format(value);
+            }
+        }
+
+        function unformatPrice(input) {
+            // Noktaları kaldır
+            input.value = input.value?.replace(/\./g, '');
+        }
+    </script>
+    <script>
+        // Fiyat alanının onblur'da çalışacak doğrulaması ve görsel formatlaması
+        function validatePrice(type) {
+            const priceField = document.getElementById(type);
+            // Nokta karakterlerini kaldırarak sayısal değeri elde et
+            const rawValue = priceField.value.replace(/\./g, '').trim();
+            const numericValue = Number(rawValue);
+
+            if (rawValue === '') return; // boşsa işlem yapma
+
+            // Belirlenen aralık kontrolü
+            if (numericValue < 1000 || numericValue > 500000000) {
+                alert("Fiyat 1.000 TL ile 500.000.000 TL arasında olmalıdır.");
+                priceField.style.border = '2px solid red';
+                return false;
+            } else {
+                // Sayısal değeri nokta ayracıyla formatla (örnek: 10000 -> 10.000)
+                priceField.value = numericValue.toLocaleString('tr-TR');
+                priceField.style.border = ''; // geçerli ise kenarlığı sıfırla
+                return true;
+            }
+        }
+
+        function validateStep3() {
+            let isValid = true;
+            const requiredFields = [
+                'ResidentialCity', 'ResidentialDistrict', 'ResidentialVillage',
+                'rooms', 'area', 'building-age', 'floor', 'bathrooms',
+                'heating-system', 'parking', 'price'
+            ];
+
+            // Zorunlu alanlar için kontrol
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field) return;
+
+                const value = field.value.trim();
+                if ((field.tagName === 'SELECT' && field.value === '') ||
+                    (field.tagName === 'INPUT' && value === '')) {
+                    isValid = false;
+                    field.style.border = '2px solid red';
+
+                    // Dinamik olarak event listener ekle
+                    const eventType = field.tagName === 'SELECT' ? 'change' : 'input';
+                    field.addEventListener(eventType, function handleValidation() {
+                        if (this.value.trim() !== '') {
+                            this.style.border = '';
+                            this.removeEventListener(eventType, handleValidation);
+                        }
+                    });
+                }
+            });
+
+            
+
+            if (isValid) {
+              
+                nextStep(4);
+            } else {
+                alert('Lütfen tüm zorunlu alanları eksiksiz doldurun.');
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // JSON dosyasını fetch ile çekiyoruz
+            fetch('/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json')
+                .then(response => response.json())
+                .then(data => {
+                    // Eğer JSON verisi dizi değilse, tek obje kabul edip diziye alalım
+                    let cities = Array.isArray(data) ? data : [data];
+
+                    // Konut ve arazi için şehir select alanlarını dolduralım
+                    const residentialCitySelect = document.getElementById('ResidentialCity');
+                    const landCitySelect = document.getElementById('LandCity');
+
+                    cities.forEach(city => {
+                        const optionRes = document.createElement('option');
+                        optionRes.value = city.Il;
+                        optionRes.textContent = city.Il;
+                        residentialCitySelect.appendChild(optionRes);
+
+                        const optionLand = document.createElement('option');
+                        optionLand.value = city.Il;
+                        optionLand.textContent = city.Il;
+                        landCitySelect.appendChild(optionLand);
+                    });
+
+                    // Konut: Şehir seçildiğinde ilçeleri doldur
+                    residentialCitySelect.addEventListener('change', function () {
+                        const selectedCity = this.value;
+                        const cityData = cities.find(c => c.Il === selectedCity);
+                        const districtSelect = document.getElementById('ResidentialDistrict');
+                        const villageSelect = document.getElementById('ResidentialVillage');
+
+                        // İlçe ve köy select alanlarını sıfırla
+                        districtSelect.innerHTML = '<option value="">Seçiniz</option>';
+                        villageSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+                        if (cityData && cityData.Ilce) {
+                            cityData.Ilce.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.Ilce;
+                                option.textContent = district.Ilce;
+                                districtSelect.appendChild(option);
+                            });
+                        }
+                    });
+
+                    // Konut: İlçe seçildiğinde mahalleleri (köy) doldur
+                    document.getElementById('ResidentialDistrict').addEventListener('change', function () {
+                        const selectedCity = residentialCitySelect.value;
+                        const selectedDistrict = this.value;
+                        const cityData = cities.find(c => c.Il === selectedCity);
+                        const villageSelect = document.getElementById('ResidentialVillage');
+
+                        // Köy select alanını sıfırla
+                        villageSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+                        if (cityData && cityData.Ilce) {
+                            const districtData = cityData.Ilce.find(d => d.Ilce === selectedDistrict);
+                            if (districtData && districtData.Semt) {
+                                // Birden fazla semt varsa tüm mahalleleri birleştirelim
+                                districtData.Semt.forEach(semt => {
+                                    if (semt.Mahalle) {
+                                        semt.Mahalle.forEach(neighborhood => {
+                                            const option = document.createElement('option');
+                                            option.value = neighborhood.Mahalle;
+                                            option.textContent = neighborhood.Mahalle;
+                                            villageSelect.appendChild(option);
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    // Arazi: Şehir seçildiğinde ilçeleri doldur
+                    landCitySelect.addEventListener('change', function () {
+                        const selectedCity = this.value;
+                        const cityData = cities.find(c => c.Il === selectedCity);
+                        const districtSelect = document.getElementById('LandDistrict');
+                        const villageSelect = document.getElementById('LandVillage');
+
+                        // İlçe ve köy select alanlarını sıfırla
+                        districtSelect.innerHTML = '<option value="">Seçiniz</option>';
+                        villageSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+                        if (cityData && cityData.Ilce) {
+                            cityData.Ilce.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.Ilce;
+                                option.textContent = district.Ilce;
+                                districtSelect.appendChild(option);
+                            });
+                        }
+                    });
+
+                    // Arazi: İlçe seçildiğinde mahalleleri (köy) doldur
+                    document.getElementById('LandDistrict').addEventListener('change', function () {
+                        const selectedCity = landCitySelect.value;
+                        const selectedDistrict = this.value;
+                        const cityData = cities.find(c => c.Il === selectedCity);
+                        const villageSelect = document.getElementById('LandVillage');
+
+                        // Köy select alanını sıfırla
+                        villageSelect.innerHTML = '<option value="">Seçiniz</option>';
+
+                        if (cityData && cityData.Ilce) {
+                            const districtData = cityData.Ilce.find(d => d.Ilce === selectedDistrict);
+                            if (districtData && districtData.Semt) {
+                                districtData.Semt.forEach(semt => {
+                                    if (semt.Mahalle) {
+                                        semt.Mahalle.forEach(neighborhood => {
+                                            const option = document.createElement('option');
+                                            option.value = neighborhood.Mahalle;
+                                            option.textContent = neighborhood.Mahalle;
+                                            villageSelect.appendChild(option);
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('JSON verisi yüklenirken hata oluştu:', error));
+        });
+
+    </script>
+    <script>
+        function validateNameLength(input) {
+            const trimmedValue = input.value.trim();
+            if (trimmedValue.length > 0 && trimmedValue.length < 3) {
+                input.value = '';
+            }
+        }
+    </script>
+
+    <script>
+        async function sendEmail(event) {
+            event.preventDefault(); // Sayfanın yenilenmesini engelle
+
+            const formData = new FormData(document.getElementById("investment-form"));
+            const formObject = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/Form/SendMailInvestment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formObject)
+                });
+
+
+                if (response.ok) {
+
+                    document.getElementById('success-modal').style.display = 'block';
+                } else {
+                    const errorText = await response.text(); // Hata detayını al
+                    console.error('Sunucudan dönen hata:', errorText);
+                    alert('Mail gönderilirken bir hata oluştu:\n\n' + errorText);
+                }
+            } catch (error) {
+               
+                alert('Bir hata oluştu:\n\n' + error.message);
+            }
+        }
+
+        function redirectToHome() {
+            window.location.href = '/'; // Ana sayfaya yönlendir
+        }
+    </script>
+
+
+    <script>
+        
+
+        // Durum seçme işlevi
+        function selectStatus(status) {
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.getElementById(status).classList.add('selected');
+            // Durum seçildiğinde 3. adım "Devam" butonunu aktifleştir
+            document.querySelector('#step-2-content .next-button').disabled = false;
+        }
+
+       
+
+    </script>
+
+    <script>
+        const phoneInput = document.getElementById('phone');
+
+        phoneInput.addEventListener('input', function () { // 'input' olayını kullanıyoruz
+            let phone = this.value.replace(/\D/g, '');
+            if (!phone.startsWith('0') && phone.length > 0) {
+                phone = '0' + phone;
+            }
+            const part1 = phone.substring(0, 4);
+            const part2 = phone.substring(4, 7);
+            const part3 = phone.substring(7, 9);
+            const part4 = phone.substring(9, 11);
+            let formattedPhone = part1;
+            if (part2) formattedPhone += ' ' + part2;
+            if (part3) formattedPhone += ' ' + part3;
+            if (part4) formattedPhone += ' ' + part4;
+            this.value = formattedPhone;
+        });
+    </script>
+
+
+
+
+    <script>
+
+
+        document.getElementById('min-budget').addEventListener('input', function (e) {
+            // Önceki formatlama mantığı aynı kalacak
+            let rawValue = this.value.replace(/\./g, '').replace(/\D/g, '');
+            if (rawValue === '') {
+                this.value = '';
+                return;
+            }
+
+            const numberValue = parseInt(rawValue, 10);
+            if (isNaN(numberValue)) {
+                this.value = '';
+                return;
+            }
+
+            this.value = numberValue.toLocaleString('de-DE');
+
+
+            document.getElementById("next-button-2").disabled = false;
+
+        });
+
+
+        document.getElementById('max-budget').addEventListener('input', function (e) {
+            // Önceki formatlama mantığı aynı kalacak
+            let rawValue = this.value.replace(/\./g, '').replace(/\D/g, '');
+            if (rawValue === '') {
+                this.value = '';
+                return;
+            }
+
+            const numberValue = parseInt(rawValue, 10);
+            if (isNaN(numberValue)) {
+                this.value = '';
+                return;
+            }
+
+            this.value = numberValue.toLocaleString('de-DE');
+            document.getElementById("next-button-2").disabled = false;
+
+        });
+
+
+         
+
+        // Kategori seçme işlevi
+        function selectCategory(category) {
+            document.querySelectorAll('.category-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.getElementById(category).classList.add('selected');
+
+            // 3. Kısımda hangi bilgiler gösterilecek
+            document.getElementById("residential-info").style.display = 'none';
+            document.getElementById("land-info").style.display = 'none';
+
+            // Kategoriye göre ilgili bilgiyi göster
+            if (category === 'Konut' || category === 'Turistik Tesis' || category === 'İş Yeri') {
+                document.getElementById("residential-info").style.display = 'block';
+            } else if (category === 'Arsa' || category === 'Tarla' || category === 'Bahçe') {
+                document.getElementById("land-info").style.display = 'block';
+            }
+
+            // Kategori seçildiğinde 2. adım "Devam" butonunu aktifleştir
+            document.querySelector('#step-1-content .next-button').disabled = false;
+        }
+
+        function nextStep(step) {
+
+
+            document.querySelectorAll('.form-step').forEach(stepContent => {
+                stepContent.style.display = 'none';
+            });
+            document.getElementById('step-' + step + '-content').style.display = 'block';
+            document.getElementById(`step-${step - 1}`).classList.add('completed');
+            document.getElementById(`step-${step}`).classList.add('active');
+
+
+
+            // 3. adımda Devam butonunu aktifleştir
+            if (step === 3) {
+                document.querySelector('#step-3-content .next-button').disabled = false;
+            }
+        }
+
+
+        function PassToBudget() {
+
+            nextStep(2);
+          
+            updateStepIndicator(2);
+        }
+
+
+        function PassToInvestmentChoice() {
+
+            var success = true;
+
+            const minBudget = document.getElementById('min-budget').value.replace(/\./g, '').replace(/\D/g, '');
+            const maxBudget = document.getElementById('max-budget').value.replace(/\./g, '').replace(/\D/g, '');
+
+            if (minBudget === '' || maxBudget === '') {
+                alert('Lütfen bütçe alanlarını doldurun!');
+                document.getElementById("next-button-2").disabled = true;
+                success = false;
+            }
+
+            if (parseInt(minBudget) > parseInt(maxBudget)) {
+                alert('Minimum bütçe maksimum bütçeden büyük olamaz!');
+                document.getElementById("next-button-2").disabled = true;
+                success = false;
+            }
+
+            if (validatePrice("min-budget") == false || validatePrice("max-budget") == false) {
+                success = false;
+            }
+
+           
+
+            // Bütçeyi gizli alana aktar
+            // document.getElementById('budget-input').value = `${minBudget}-${maxBudget}`;
+
+
+
+            if (success) {
+
+                nextStep(3);
+
+                updateStepIndicator(3);
+            }
+
+            
+
+          
+ 
+
+        }
+
+    </script>
+
+
+</body>
+</html>

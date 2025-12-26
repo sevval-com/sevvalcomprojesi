@@ -1,0 +1,7 @@
+﻿.ad-container {
+    position: absolute; /* Diğer öğelerin üstüne kalması için */
+    top: 20px; /* Üstten 20 piksel boşluk */
+    left: 20px; /* Soldan 20 piksel boşluk */
+    z-index: 1000; /* Diğer öğelerin üstünde görünmesi için yüksek z-index */
+    text-align: center; /* Reklam metninin ortalanması için */
+}

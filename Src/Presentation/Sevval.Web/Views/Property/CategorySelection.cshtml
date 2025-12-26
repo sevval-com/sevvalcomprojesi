@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Kategori Seçimi";
+}
+
+<h2 class="text-center">Kategori Seçimi</h2>
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-6">
+        <div class="border border-primary rounded p-3">
+            <h5 class="text-center">Lütfen Kategori Seçin</h5>
+            <select id="categorySelect" class="form-control">
+                <option value="">Seçiniz</option>
+                <option value="Konut">Konut</option>
+                <option value="Arsa">Arsa</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div id="optionsContainer" class="my-3"></div>
+
+<div id="resultMessage" class="alert alert-success" style="display:none;">
+    <strong>✓</strong> Kategori Seçimi Tamamlanmıştır.
+    <button class="btn btn-success" onclick="goToNextPage()">Devam</button>
+</div>
+
+<script>
+    document.getElementById("categorySelect").addEventListener("change", function() {
+        const selectedCategory = this.value;
+        const optionsContainer = document.getElementById("optionsContainer");
+        const resultMessage = document.getElementById("resultMessage");
+
+        if (selectedCategory === "Konut") {
+            optionsContainer.innerHTML = `
+                <h6>Tür Seçin</h6>
+                <select id="typeSelect" class="form-control">
+                    <option value="Satılık">Satılık</option>
+                    <option value="Kiralık">Kiralık</option>
+                </select>
+            `;
+        } else if (selectedCategory === "Arsa") {
+            optionsContainer.innerHTML = `
+                <h6>Tür Seçin</h6>
+                <select id="typeSelect" class="form-control">
+                    <option value="Kat Karşılığı">Kat Karşılığı</option>
+                    <option value="Satılık">Satılık</option>
+                    <option value="Kiralık">Kiralık</option>
+                </select>
+            `;
+        } else {
+            optionsContainer.innerHTML = '';
+            resultMessage.style.display = "none"; // Mesajı gizle
+

@@ -1,0 +1,15 @@
+﻿.gif-image {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    width: auto; /* Orijinal boyut */
+    height: auto; /* Orijinal boyut */
+}
+
+/* Telefon görünümü için stil */
+@media (max-width: 768px) {
+    .gif-image {
+        max-width: 80%; /* GIF'in genişliğini %80'e ayarlayın */
+        height: auto; /* Yüksekliği otomatik ayarlayın */
+    }
+}

@@ -1,0 +1,125 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Şevval Emlak</title>
+    <style>
+        /* Genel stil */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        /* Onay mesajının kutusu */
+        .confirmation-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            padding: 30px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+            .confirmation-container:hover {
+                transform: translateY(-10px);
+            }
+
+            /* Başlık */
+            .confirmation-container h1 {
+                font-size: 28px;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            /* Metinler */
+            .confirmation-container p {
+                font-size: 18px;
+                color: #555;
+                margin: 10px 0;
+                line-height: 1.6;
+            }
+
+                .confirmation-container p strong {
+                    font-weight: bold;
+                    color: #007bff;
+                }
+
+            /* Ana buton */
+            .confirmation-container a {
+                display: inline-block;
+                margin-top: 30px;
+                padding: 12px 30px;
+                font-size: 16px;
+                color: #fff;
+                background: linear-gradient(135deg, #007bff, #0056b3);
+                border-radius: 50px;
+                text-decoration: none;
+                transition: background 0.3s ease, transform 0.3s ease;
+            }
+
+                .confirmation-container a:hover {
+                    background: linear-gradient(135deg, #0056b3, #007bff);
+                    transform: scale(1.05);
+                }
+
+            /* Alt bilgi kısmı */
+            .confirmation-container .footer {
+                margin-top: 20px;
+                font-size: 16px;
+                color: #333;
+            }
+
+                .confirmation-container .footer a {
+                    color: #fff;
+                    font-size: 18px;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    background-color: #007bff;
+                    border-radius: 8px;
+                    transition: background-color 0.3s ease, color 0.3s ease;
+                    display: inline-block;
+                }
+
+                    .confirmation-container .footer a:hover {
+                        background-color: #0056b3;
+                        color: #fff;
+                    }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <h1>Giriş Yapılamadı</h1>
+        
+
+        <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
+
+       
+        <style>
+            .contact-link {
+                font-weight: bold; /* Kalın yazı */
+                text-decoration: underline; /* Altı çizili */
+                cursor: pointer; /* Fareyi üzerine getirdiğinde el simgesi görünür */
+                color: inherit; /* Renk miras alınır */
+            }
+
+                .contact-link:hover {
+                    color: #007bff; /* Hover efektiyle rengin maviye dönüşmesi */
+                }
+        </style>
+    </div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+﻿/* Genel ayarlar */
+body {
+    font-family: 'Arial', sans-serif; /* Modern font */
+    background-color: #f4f7fa; /* Açık arka plan */
+    margin: 0; /* Varsayılan margin'i sıfırlama */
+    padding: 20px; /* İçerik alanına boşluk ekleme */
+}
+
+/* Bilgi bölümü */
+.info-section {
+    margin-top: 20px;
+}
+
+/* Navbar stilleri */
+.navbar {
+    background-color: #007BFF; /* Mavi renk tonu */
+    padding: 10px 15px; /* Üst ve alt boşlukları ayarladık */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+}
+
+.navbar-brand {
+    display: flex; /* Logo ve yazıyı yan yana getirmek için flex kullan */
+    align-items: center; /* Dikey hizalama */
+}
+
+    .navbar-brand img {
+        width: 30px; /* Logo boyutunu azalt */
+        height: auto; /* Yüksekliği otomatik yap */
+        margin-right: 10px; /* Logo ile yazı arasına boşluk ekle */
+    }
+
+    .navbar-brand span {
+        font-size: 24px; /* Yazı boyutu mobil için küçült */
+        font-weight: bold; /* Yazıyı kalınlaştır */
+        color: #ffffff; /* Yazı rengi */
+        letter-spacing: 1px; /* Harfler arası boşluk */
+    }
+
+.navbar-nav .nav-link {
+    font-size: 14px; /* Bağlantı yazısının boyutunu mobil için küçült */
+    padding: 0 10px; /* Bağlantılar arasındaki boşluk */
+    color: #ffffff; /* Bağlantı rengi */
+}
+
+/* Step Çizgileri */
+.step-container {
+    display: flex; /* Yuvarlakların yan yana görünmesi için flexbox kullanıyoruz */
+    justify-content: space-between; /* Yuvarlakları eşit boşlukla yerleştir */
+    margin: 40px 0; /* Üstte ve altta daha fazla boşluk bırak */
+    position: relative; /* Çizgiler için pozisyonu ayarla */
+    flex-wrap: wrap; /* Taşma durumunda sar */
+}
+
+.step {
+    display: flex;
+    flex-direction: column; /* Aşama açıklamasını aşağıda konumlandır */
+    align-items: center; /* Aşama içeriklerini ortala */
+    position: relative; /* Çizgi pozisyonu için relative */
+    flex: 1; /* Eşit genişlikte yer kapla */
+    margin: 0 20px; /* Yuvarlaklar arasındaki boşluğu ayarlamak için */
+}
+
+.step-circle {
+    width: 50px; /* Yuvarlakların boyutu */
+    height: 50px; /* Yuvarlakların boyutu */
+    border-radius: 50%; /* Tam yuvarlak */
+    color: white;
+    display: flex;
+    justify-content: center; /* İçerik yatay ortalama */
+    align-items: center; /* İçerik dikey ortalama */
+    margin-bottom: 10px; /* Yuvarlak ile açıklama arasındaki boşluk */
+    font-size: 26px; /* Numara boyutu */
+    font-weight: bold; /* Numara kalınlığı */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge */
+    transition: background-color 0.3s, transform 0.3s; /* Renk ve boyut geçişi */
+}
+
+    /* Aktif aşama için yeşil, diğerleri için mavi renk */
+    .step-circle.active {
+        background-color: #28a745; /* Aktif yuvarlak yeşil */
+    }
+
+    .step-circle.inactive {
+        background-color: #007BFF; /* Diğer yuvarlaklar mavi */
+    }
+
+    /* Hover etkisi */
+    .step-circle:hover {
+        transform: scale(1.1); /* Hover durumunda biraz büyüme efekti */
+    }
+
+/* Bağlantı çizgileri */
+.step:not(:last-child):after {
+    content: '';
+    width: 250px; /* Çizgi uzunluğu */
+    height: 4px; /* Çizgi kalınlığı */
+    background-color: #007BFF; /* Çizgi rengi */
+    position: absolute; /* Pozisyonu ayarla */
+    left: 63%; /* Yuvarlağın sağında konumlandır */
+    top: 32%; /* Yükseklik ortalamak için */
+    transform: translateY(-50%); /* Dikey olarak ortala */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+}
+
+/* İlan detay ayarları */
+.ilan-detay {
+    display: flex; /* Flexbox kullanarak yan yana hizalama */
+    background-color: #ffffff; /* Beyaz arka plan */
+    border-radius: 10px; /* Yuvarlak köşeler */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+    overflow: hidden; /* Taşmaları gizleme */
+    margin-bottom: 20px; /* Alt boşluk */
+}
+
+.photo-container {
+    flex: 1; /* Esnek genişlik */
+    text-align: center;
+    padding: 15px; /* İçerik alanı için boşluk */
+}
+
+.ilan-photo {
+    max-width: 100%; /* Resim genişliğini sınırlama */
+    max-height: 300px; /* Maksimum yükseklik ayarı */
+    height: auto; /* Yükseklik otomatik */
+    border-radius: 8px; /* Yuvarlak köşeler */
+    margin-bottom: 10px; /* Alt boşluk */
+}
+
+.ilan-bilgileri {
+    flex: 1; /* Esnek genişlik */
+    padding: 20px; /* İç boşluk */
+    background-color: #fafafa; /* Açık gri arka plan */
+    display: flex;
+    flex-direction: column; /* Dikey düzen */
+    justify-content: space-between; /* Alanı eşit dağıtma */
+}
+
+/* Açıklama ve Konum için pencere ayarları */
+.aciklama-konusum-pane {
+    background-color: #ffffff; /* Beyaz arka plan */
+    padding: 20px; /* İç boşluk */
+    border-radius: 10px; /* Kenarları yuvarlat */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Modern gölge */
+    margin-top: 20px; /* Üst boşluk */
+}
+
+    /* Açıklama ve konum alanının yazı düzeni */
+    .aciklama-konusum-pane h2 {
+        color: #333; /* Başlık rengi */
+        margin-bottom: 10px; /* Alt boşluk */
+        font-weight: bold; /* Kalın yazı */
+    }
+
+    .aciklama-konusum-pane p {
+        font-size: 16px; /* Yazı boyutu */
+        line-height: 1.6; /* Satır yüksekliği */
+        color: #555; /* Yazı rengi */
+    }
+
+/* İlan Açıklaması Stili */
+.ilan-aciklamasi {
+    background-color: #f0f8ff; /* Açık mavi arka plan */
+    border-left: 5px solid #007bff; /* Sol kenarda mavi çerçeve */
+    padding: 15px; /* İç boşluk */
+    border-radius: 8px; /* Kenarları yuvarlat */
+    font-size: 16px; /* Yazı boyutu */
+    line-height: 1.5; /* Satır yüksekliği */
+    text-align: left; /* Metin düzeni soldan sağa */
+}
+
+/* Konum Stili */
+.konum-bilgisi {
+    background-color: #f0f8ff; /* Açık mavi arka plan */
+    border-left: 5px solid #007bff; /* Sol kenarda mavi çerçeve */
+    padding: 15px; /* İç boşluk */
+    border-radius: 8px; /* Kenarları yuvarlat */
+    font-size: 16px; /* Yazı boyutu */
+    line-height: 1.5; /* Satır yüksekliği */
+}
+
+/* Başlık Stilleri */
+h2, h3 {
+    color: #333; /* Koyu metin rengi */
+    margin: 0 0 10px; /* Alt boşluk */
+}
+
+/* Buton stilleri */
+.btn {
+    display: inline-block; /* Inline-block butonlar */
+    padding: 10px 20px; /* İç boşluk */
+    font-size: 16px; /* Yazı boyutu */
+    color: white; /* Yazı rengi */
+    background-color: #28a745; /* Yeşil arka plan */
+    border: none; /* Kenarlık yok */
+    border-radius: 5px; /* Yuvarlatılmış köşeler */
+    cursor: pointer; /* İmleci el simgesi yap */
+    transition: background-color 0.3s; /* Renk geçişi */
+}
+
+    .btn:hover {
+        background-color: #218838; /* Hover durumunda daha koyu yeşil */
+    }
+
+/* Responsive ayarlar */
+@media (max-width: 768px) {
+    .step-container {
+        flex-direction: column; /* Mobil görünümde dikey dizilim */
+        align-items: center; /* Ortalamak için */
+    }
+
+    .step {
+        margin: 10px 0; /* Dikey mesafeleri ayarla */
+    }
+
+    .ilan-detay {
+        flex-direction: column; /* Dikey hizalama */
+    }
+
+    .ilan-aciklamasi {
+        font-size: 14px; /* Mobil için yazı boyutunu küçült */
+    }
+
+    .btn {
+        width: 100%; /* Mobilde tam genişlik */
+    }
+}

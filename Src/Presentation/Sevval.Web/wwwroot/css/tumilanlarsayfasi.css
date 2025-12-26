@@ -1,0 +1,126 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Genel Sayfa Stili */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Filtreleme Formu */
+.filter-form .row {
+    margin-bottom: 20px;
+}
+
+.filter-form .form-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.filter-form .form-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.filter-form .action-column {
+    display: flex;
+    align-items: flex-end;
+}
+
+.filter-form .btn-filter {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .filter-form .btn-filter:hover {
+        background-color: #45a049;
+    }
+
+/* Arama Barı */
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Tablo Stili */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+    table th, table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background-color: #f4f7f6;
+    }
+
+    table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+/* Butonlar */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+    .btn-info:hover {
+        background-color: #138496;
+    }
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .filter-form .row {
+        flex-direction: column;
+    }
+
+    .filter-form .col {
+        margin-bottom: 15px;
+    }
+}

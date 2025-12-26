@@ -1,0 +1,309 @@
+﻿/* Genel sayfa stil */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: auto; /* Sayfa kaydırılabilir yapıldı */
+}
+
+/* Kapsayıcı */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 3px solid #0197f6;
+}
+
+/* Form kart */
+.form-card {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+
+/* Form içeriği */
+.form-content {
+    flex: 1.5;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #555;
+    
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+.text-danger {
+    font-size: 0.875rem;
+    color: #e74c3c;
+    margin-top: 5px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between; /* Input kutularını yan yana yerleştirmek için */
+}
+
+.form-group {
+    flex: 1; /* Her bir form alanının eşit genişlikte olmasını sağlamak için */
+    margin-right: 10px;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-input, .confirm-password-input {
+    width: 85%;
+    padding-right: 30px; /* Göz ikonunun input içinde sağda yer alması için padding ekliyoruz */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px; /* Göz ikonunun input içinde sağda yer alması için */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.text-danger {
+    display: block;
+    margin-top: 5px;
+}
+
+/* Butonlar */
+.btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    
+}
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+.btn-google {
+    background-color: #db4437;
+    margin-right: 10px;
+}
+
+.btn-facebook {
+    background-color: #4267b2;
+}
+
+.social-buttons {
+    text-align: center;
+}
+
+    .social-buttons a {
+        display: inline-block;
+        color: #fff;
+        border-radius: 5px;
+        padding: 10px 15px;
+        text-decoration: none;
+        margin: 5px;
+    }
+
+.extra-links {
+    text-align: center;
+    margin-top: 15px;
+}
+
+    .extra-links a {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-left: 0px;
+    }
+
+        .extra-links a:hover {
+            text-decoration: underline;
+        }
+
+/* Media Queries for Responsiveness */
+
+/* Tablet View */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        width: 100%;
+        max-width: none;
+    }
+
+    .image-section {
+        flex: none;
+        width: 100%;
+        min-width: 100%;
+        border-right: none;
+        border-bottom: 3px solid #0197f6; /* Fotoğraf alanı altına çerçeve eklemek */
+    }
+
+    .form-content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-control {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .social-buttons a {
+        padding: 8px 12px;
+    }
+
+    .extra-links a {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile View */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .image-section {
+        min-width: 100%;
+        padding: 10px;
+    }
+
+    .form-content {
+        padding: 15px;
+    }
+
+    .form-control {
+        font-size: 0.875rem;
+        padding: 8px;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    .social-buttons a {
+        padding: 8px 12px;
+    }
+
+    .extra-links a {
+        font-size: 0.75rem;
+    }
+}
+
+
+/* Modal Stili */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 109%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 620px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+    .close-button:hover {
+        color: red;
+    }
+
+/* Mobil Ekranlar İçin Uyarlama */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%; /* Mobil ekranlar için daha dar genişlik */
+        max-height: 85vh; /* Mobil ekran için maksimum yüksekliği biraz artırdık */
+        padding: 15px; /* Mobil cihazlarda iç boşluğu biraz küçülttük */
+    }
+
+    .close-button {
+        font-size: 20px; /* Mobil cihazlar için daha küçük buton */
+    }
+}

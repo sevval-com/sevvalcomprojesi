@@ -1,0 +1,422 @@
+﻿@model IEnumerable<Sevval.Domain.Entities.AfisTalep>
+
+@{
+    ViewData["Title"] = "Şevval Ofis - Afiş Talepleri";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Genel font ailesi */
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            border-color: #e9ecef;
+            color: #212529;
+        }
+
+            .btn-secondary:hover {
+                background-color: #d3d9df;
+                border-color: #d3d9df;
+            }
+
+        .thead-dark {
+            background-color: #003366 !important;
+            color: white !important;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f0f8ff;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #FFFFFF;
+        }
+
+        .modal-header {
+            background-color: #e0f7fa;
+        }
+
+        .modal-footer {
+            background-color: #e0f7fa;
+        }
+
+        .alert-info {
+            background-color: #e0f7fa !important;
+            border-color: #b2ebf2 !important;
+            color: #00868b !important;
+        }
+
+        /* Durum güncelleme modal stilleri */
+        #statusModal .modal-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #statusModal .modal-header {
+            background-color: #f0f8ff;
+            color: #003366;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        #statusModal .modal-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        #statusModal .modal-body {
+            padding: 1rem;
+        }
+
+        #statusModal .status-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        #statusModal .status-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 100px;
+            background-color: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            text-align: center;
+            color: #007bff; /* İkon rengi mavi */
+        }
+
+            #statusModal .status-option:hover {
+                background-color: #f0f8ff;
+                transform: translateY(-5px);
+                border-color: #007bff;
+            }
+
+            #statusModal .status-option i {
+                font-size: 48px; /* İkon boyutu */
+                margin-bottom: 0.5rem;
+            }
+
+            #statusModal .status-option span {
+                font-size: 0.9rem;
+                color: #333;
+                font-family: Arial, sans-serif; /* Modal içindeki span için font */
+            }
+
+        #statusModal .modal-footer {
+            background-color: #f0f8ff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #statusModal .btn-secondary {
+            background-color: #e0e0e0;
+            border-color: #e0e0e0;
+            color: #333;
+        }
+
+            #statusModal .btn-secondary:hover {
+                background-color: #d0d0d0;
+                border-color: #d0d0d0;
+            }
+
+        .status-icon {
+            font-size: 1.5rem; /* Durum ikon boyutu */
+            color: #007bff;
+            position: relative; /* Tooltip için pozisyonlandırma */
+            display: inline-block;
+            text-align: center; /* İkonu hücre içinde ortala */
+            width: 100%; /* Hücre genişliğini kapla */
+        }
+
+            .status-icon:hover::after {
+                content: attr(data-status-text); /* Durum metnini çek */
+                position: absolute;
+                bottom: 120%; /* İkonun üstünde konumlandır */
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #333;
+                color: #fff;
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                z-index: 1;
+                opacity: 1;
+                transition: opacity 0.3s ease;
+                font-family: Arial, sans-serif; /* Tooltip için font */
+            }
+
+            .status-icon::after {
+                opacity: 0; /* Başlangıçta gizle */
+                transition: opacity 0.3s ease;
+            }
+
+            .status-icon:hover::after {
+                opacity: 1; /* Hover olduğunda göster */
+            }
+
+        th, td {
+            font-family: Arial, sans-serif; /* Tablo hücreleri için font */
+            position: relative; /* İçindeki elemanlar için konumlandırma bağlamı */
+            text-align: center; /* Hücre içeriğini ortala */
+        }
+
+        .edit-button {
+            position: absolute;
+            right: 5px; /* Sağa yasla, biraz daha kenara çek */
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0; /* Başlangıçta gizli */
+            transition: opacity 0.3s ease; /* Efektli geçiş */
+            font-size: 0.9rem; /* İkon boyutunu küçült */
+        }
+
+        tr:hover .edit-button {
+            opacity: 1; /* Satıra gelince göster */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="display-4 text-center mb-4" style="color: #003366;"><i class="fas fa-scroll"></i> Afiş Talepleri</h1>
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i>  Toplam @Model.Count() adet afiş talebi bulunmaktadır.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover" style="width: 100%;">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-id-card"></i> ID</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-file-text"></i> İlan Türü</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-phone"></i> Telefon</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-user"></i> İsim Soyisim</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-building"></i> Firma</th>
+                        <th scope="col" class-nowrap"><i class="fas fa-envelope"></i> Email</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-calendar-alt"></i> Talep Tarihi</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-map-marked-alt"></i> Adres</th>
+                        <th scope="col" class="text-nowrap"><i class="fas fa-info-circle"></i> Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-nowrap">@item.Id</td>
+                            <td class="text-nowrap">@item.IlanTuru</td>
+                            <td class="text-nowrap">@item.Telefon</td>
+                            <td class="text-nowrap">@item.IsimSoyad</td>
+                            <td class="text-nowrap">@item.Firma</td>
+                            <td class="text-nowrap">@item.Email</td>
+                            <td class="text-nowrap">@item.TalepTarihi.ToString("dd/MM/yyyy")</td>
+                            <td class="text-nowrap">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="showAddressModal('@item.Email')">
+                                    <i class="fas fa-map-marked-alt"></i> Adres
+                                </button>
+                            </td>
+                            <td class="text-nowrap">
+                                <span id="durum-@item.Id">
+                                    @if (item.Durum == "BEKLEMEDE")
+                                    {
+                                        <i class="fas fa-clock status-icon" data-status-text="Beklemede"></i>
+                                    }
+                                    else if (item.Durum == "SIRAYA ALINDI")
+                                    {
+                                        <i class="fas fa-list-ol status-icon" data-status-text="Sırada Alındı"></i>
+                                    }
+                                    else if (item.Durum == "SİPARİŞ HAZIRLANIYOR")
+                                    {
+                                        <i class="fas fa-laptop status-icon" data-status-text="Hazırlanıyor"></i>
+                                    }
+                                    else if (item.Durum == "KARGOYA VERİLDİ")
+                                    {
+                                        <i class="fas fa-shipping-fast status-icon" data-status-text="Kargoya Verildi"></i>
+                                    }
+                                    else if (item.Durum == "TESLİM EDİLDİ")
+                                    {
+                                        <i class="fas fa-check-circle status-icon" data-status-text="Teslim Edildi"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-clock status-icon" data-status-text="Beklemede"></i>
+                                    }
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary ml-2 edit-button" onclick="showStatusModal('@item.Id', '@item.Durum')">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addressModalLabel" style="color: #003366;"><i class="fas fa-map-pin"></i> Kullanıcı Adresi</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="userAddress" class="lead"><i class="fas fa-spinner fa-spin" style="color: #007bff;"></i> Adres yükleniyor...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel" style="color: #003366;"><i class="fas fa-edit"></i> Durum Güncelle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="status-options">
+                        <div class="status-option" data-status="BEKLEMEDE">
+                            <i class="fas fa-clock"></i>
+                            <span>Beklemede</span>
+                        </div>
+                        <div class="status-option" data-status="SIRAYA ALINDI">
+                            <i class="fas fa-list-ol"></i>
+                            <span>Sırada Alındı</span>
+                        </div>
+                        <div class="status-option" data-status="SİPARİŞ HAZIRLANIYOR">
+                            <i class="fas fa-laptop"></i>
+                            <span>Hazırlanıyor</span>
+                        </div>
+                        <div class="status-option" data-status="KARGOYA VERİLDİ">
+                            <i class="fas fa-shipping-fast"></i>
+                            <span>Kargoya Verildi</span>
+                        </div>
+                        <div class="status-option" data-status="TESLİM EDİLDİ">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Teslim Edildi</span>
+                        </div>
+                    </div>
+                    <div id="statusMessage" class="alert alert-danger" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentAfisId = 0;
+
+        function showAddressModal(email) {
+            $.ajax({
+                url: '@Url.Action("GetUserAddress", "SevvalOfis")',
+                type: 'GET',
+                data: { email: email },
+                success: function (response) {
+                    $('#userAddress').html("<i class='fas fa-map-marked-alt' style='color: #007bff;'></i>  " + response.address);
+                    $('#addressModal').modal('show');
+                },
+                error: function () {
+                    $('#userAddress').html("<i class='fas fa-exclamation-triangle text-danger'></i> Adres bilgisi alınamadı.");
+                    $('#addressModal').modal('show');
+                }
+            });
+        }
+
+        function showStatusModal(id, currentStatus) {
+            currentAfisId = id;
+            $('#statusModal').modal('show');
+
+            // Seçenekleri güncel durumla eşleştir
+            $('#statusModal .status-option').removeClass('selected');
+            $('#statusModal .status-option[data-status="' + currentStatus + '"]').addClass('selected');
+        }
+
+        $('#statusModal .status-option').click(function () {
+            var selectedStatus = $(this).data('status');
+            $('#statusModal .status-option').removeClass('selected');
+            $(this).addClass('selected');
+            updateStatus(currentAfisId, selectedStatus);
+        });
+
+        function updateStatus(id, status) {
+            $.ajax({
+                url: '@Url.Action("UpdateDurum", "SevvalOfis")',
+                type: 'POST',
+                data: { id: id, durum: status },
+                success: function (response) {
+                    if (response.success) {
+                        var statusIcon = '';
+                        if (status == "BEKLEMEDE") {
+                            statusIcon = '<i class="fas fa-clock status-icon"  data-status-text="Beklemede"></i>';
+                        } else if (status == "SIRAYA ALINDI") {
+                            statusIcon = '<i class="fas fa-list-ol status-icon" data-status-text="Sırada Alındı"></i>';
+                        } else if (status == "SİPARİŞ HAZIRLANIYOR") {
+                            statusIcon = '<i class="fas fa-laptop status-icon" data-status-text="Hazırlanıyor"></i>';
+                        } else if (status == "KARGOYA VERİLDİ") {
+                            statusIcon = '<i class="fas fa-shipping-fast status-icon" data-status-text="Kargoya Verildi"></i>';
+                        } else if (status == "TESLİM EDİLDİ") {
+                            statusIcon = '<i class="fas fa-check-circle status-icon" data-status-text="Teslim Edildi"></i>';
+                        }
+                        $('#durum-' + id).html(statusIcon);
+                        $('#statusModal').modal('hide');
+                    } else {
+                        $('#statusMessage').text(response.message);
+                        $('#statusMessage').show();
+                    }
+                },
+                error: function () {
+                    $('#statusMessage').text("Durum güncellenemedi. Bir hata oluştu.");
+                    $('#statusMessage').show();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

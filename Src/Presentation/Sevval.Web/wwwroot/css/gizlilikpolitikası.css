@@ -1,0 +1,93 @@
+﻿/* Sayfa genel stilleri */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.container {
+    width: 85%;
+    margin: 0 auto;
+    padding-top: 50px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+h1 {
+    font-size: 40px;
+    color: #ffffff;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    padding: 20px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+h2, h3 {
+    color: #007BFF;
+    font-weight: bold;
+}
+
+p {
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 30px;
+}
+
+    ul li {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+/* Gizlilik politikası metni */
+.privacy-policy {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    line-height: 1.8;
+}
+
+footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 14px;
+    color: #777;
+}
+
+/* Ana Sayfaya Dön Butonu */
+.back-home {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.back-home-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 15px 40px;
+    font-size: 18px;
+    text-decoration: none;
+    border-radius: 50px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    .back-home-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-5px);
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-home-button:focus {
+        outline: none;
+    }

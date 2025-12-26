@@ -1,0 +1,241 @@
+﻿/* ======================================================
+   PARTNER 
+====================================================== */
+
+/* ====== GENEL SAYFA YAPISI ====== */
+
+.partner-dashboard-container { 
+    text-align: center;
+    padding: 0 20px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* ====== card  ====== */
+.partner-dashboard-card {
+    background: #f7f1e3; 
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(93, 64, 55, 0.2);
+    max-width: 600px;
+    width: 100%;
+}
+
+/* ====== Head ====== */
+.partner-welcome-title {
+    color: #8d6e63; 
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px #d7ccc8; 
+    margin-bottom: 15px;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+    .partner-welcome-title:hover {
+        color: #d4af37; 
+        text-shadow: 1px 1px 2px #5d4037;
+    }
+
+/* ====== BUTONLAR ====== */
+.btn-outline-secondary {
+    border-color: #6d4c41;
+    color: #6d4c41;
+    font-weight: 600;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #6d4c41;
+        color: #fff;
+    }
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+    .partner-dashboard-card {
+        padding: 30px 20px;
+        border-radius: 15px;
+    }
+
+    .partner-welcome-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .partner-welcome-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* ======================================================
+   GENEL  
+====================================================== */
+body.partner-layout {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #efebe9, #d7ccc8);
+    color: #3e2723;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ======================================================
+   HEADER / NAVBAR
+====================================================== */
+.partner-layout-header {
+    background: linear-gradient(90deg, #5d4037, #8d6e63);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+    .partner-layout-header .navbar-brand {
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+    }
+
+    .partner-layout-header .nav-link {
+        color: #f5f5f5;
+        font-weight: 500;
+        transition: all 0.25s ease-in-out;
+    }
+
+        .partner-layout-header .nav-link:hover {
+            color: #ffe0b2;
+            transform: translateY(-1px);
+        }
+
+/* ======================================================
+   Main
+====================================================== */
+.partner-layout-content {
+    padding: 40px 0;
+    flex: 1;
+    overflow-x: hidden;
+}
+
+.partner-layout-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ======================================================
+   FOOTER
+====================================================== */
+.partner-layout-footer {
+    background: linear-gradient(135deg, #4e342e, #3e2723);
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+    .partner-layout-footer small {
+        opacity: 0.85;
+    }
+
+/* ======================================================
+   BUTONLAR
+====================================================== */
+.partner-layout-btn {
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 8px 18px;
+    transition: all 0.25s ease-in-out;
+}
+
+.partner-layout-btn-brown {
+    background-color: #6d4c41;
+    color: #fff;
+    border: none;
+}
+
+    .partner-layout-btn-brown:hover {
+        background-color: #5d4037;
+        transform: scale(1.04);
+        color: #fff;
+    }
+
+.partner-layout-btn-outline {
+    border: 1.5px solid #6d4c41;
+    color: #6d4c41;
+    background: transparent;
+}
+
+    .partner-layout-btn-outline:hover {
+        background: #6d4c41;
+        color: #fff;
+    }
+
+/* ======================================================
+   RESPONSIVE 
+====================================================== */
+@media (max-width: 992px) {
+    .partner-layout-header .navbar-brand {
+        font-size: 1.15rem;
+    }
+
+    .partner-layout-content {
+        padding: 30px 10px;
+    }
+
+    .partner-layout-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .partner-layout-header {
+        text-align: center;
+        padding: 10px 0;
+    }
+
+        .partner-layout-header .nav-link {
+            display: block;
+            padding: 8px 0;
+        }
+
+    .partner-layout-section {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .partner-layout-btn {
+        padding: 7px 14px;
+        font-size: 0.9rem;
+    }
+
+    .partner-layout-footer {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    body.partner-layout {
+        font-size: 0.9rem;
+    }
+
+    .partner-layout-header .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .partner-layout-section {
+        padding: 15px;
+    }
+
+    .partner-layout-btn {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+
+    .partner-layout-footer {
+        font-size: 0.75rem;
+        padding: 12px 0;
+    }
+}

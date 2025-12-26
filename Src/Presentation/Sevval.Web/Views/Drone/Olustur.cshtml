@@ -1,0 +1,551 @@
+@{
+    ViewData["Title"] = "Drone Video Oluştur";
+}
+
+@section style {
+    <style>
+        :root {
+            --ink: #0f172a;
+            --muted: #6b7280;
+            --brand: #0ea5e9;
+            --brand-2: #2563eb;
+            --border: #e2e8f0;
+            --surface: #ffffff;
+            --bg: linear-gradient(135deg, #0c4da2, #0ea5e9);
+            --shell: #f8fafc;
+            --ring: rgba(14, 165, 233, 0.18);
+            --shadow: 0 18px 45px rgba(0, 9, 45, 0.16);
+            --font: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+        }
+
+        .drone-page {
+            background: var(--shell);
+            padding: 32px 0 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drone-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        @@media (min-width: 768px) {
+            .drone-grid { grid-template-columns: repeat(2, minmax(320px, 1fr)); }
+        }
+
+        @@media (min-width: 1200px) {
+            .drone-grid {
+                grid-template-columns: repeat(3, minmax(320px, 1fr));
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+        }
+
+        .drone-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            height: 100%;
+        }
+
+        .drone-summary {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .drone-summary .item {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .drone-summary .label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .drone-card h5 {
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .drone-card p {
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+
+        .form-control, .form-select, textarea {
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            min-height: 44px;
+        }
+
+        .form-control:focus, .form-select:focus, textarea:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px var(--ring);
+            outline: none;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 700;
+        }
+
+        .chip.active {
+            background: rgba(14, 165, 233, 0.15);
+            border-color: var(--brand);
+            color: var(--brand-2);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.18);
+        }
+
+        .upload-box {
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            display: grid;
+            gap: 6px;
+            background: #f8fafc;
+        }
+
+        .upload-box input { display: none; }
+
+        .upload-label {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #e0f2fe;
+            color: #075985;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary-drone {
+            background: linear-gradient(90deg, var(--brand), var(--brand-2));
+            color: #fff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.26);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .btn-primary-drone:hover { transform: translateY(-1px); }
+        .btn-primary-drone:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .btn-ghost {
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--ink);
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: right;
+        }
+
+        .description-readonly {
+            background: #f8fafc;
+            cursor: not-allowed;
+            resize: none;
+        }
+
+        .description {
+            width: 100%;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .drone-splash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(120% 120% at 10% 10%, rgba(14, 165, 233, 0.28), transparent 45%), radial-gradient(110% 120% at 90% 20%, rgba(37, 99, 235, 0.25), transparent 55%), var(--bg);
+            display: grid;
+            place-items: center;
+            z-index: 9999;
+            overflow: hidden;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            font-family: var(--font);
+        }
+
+        .drone-splash.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-logo {
+            position: absolute;
+            top: 98px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(320px, 70vw);
+            height: auto;
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .drone-splash .drone {
+            position: absolute;
+            width: var(--size, 42px);
+            height: var(--size, 42px);
+            left: var(--x, 50%);
+            bottom: -24%;
+            animation: splash-rise var(--dur, 3.2s) ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
+            filter: brightness(0) invert(1) drop-shadow(0 8px 14px rgba(8, 47, 73, 0.35));
+        }
+
+        @@keyframes splash-rise {
+            0% { transform: translateY(0) scale(0.92); opacity: 0; }
+            15% { opacity: 0.9; }
+            50% { transform: translateY(-55vh) scale(1); opacity: 1; }
+            100% { transform: translateY(-135vh) scale(1.02); opacity: 0; }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            .drone-splash .drone { animation: none; }
+            .drone-splash { transition: none; }
+        }
+
+        @@media (max-width: 576px) {
+            .drone-card { padding: 16px; }
+        }
+    </style>
+}
+
+<div class="drone-splash" id="drone-splash" aria-hidden="true">
+    <img class="splash-logo" src="/ssh/images/sevval_logo.webp" alt="Sevval">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 6%; --size: 30px; --dur: 3.6s; --delay: 0s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 12%; --size: 24px; --dur: 4s; --delay: 0.15s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 18%; --size: 36px; --dur: 3.4s; --delay: 0.05s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 24%; --size: 28px; --dur: 4.2s; --delay: 0.22s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 30%; --size: 40px; --dur: 3.3s; --delay: 0.1s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 36%; --size: 26px; --dur: 4.4s; --delay: 0.3s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 42%; --size: 34px; --dur: 3.8s; --delay: 0.18s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 48%; --size: 22px; --dur: 4.6s; --delay: 0.35s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 54%; --size: 38px; --dur: 3.5s; --delay: 0.08s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 60%; --size: 26px; --dur: 4.1s; --delay: 0.24s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 66%; --size: 32px; --dur: 3.7s; --delay: 0.12s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 72%; --size: 24px; --dur: 4.5s; --delay: 0.28s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 78%; --size: 36px; --dur: 3.2s; --delay: 0.06s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 84%; --size: 28px; --dur: 4.3s; --delay: 0.2s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 90%; --size: 34px; --dur: 3.9s; --delay: 0.16s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 22%; --size: 22px; --dur: 4.7s; --delay: 0.4s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 50%; --size: 30px; --dur: 3.6s; --delay: 0.02s;">
+    <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 74%; --size: 20px; --dur: 4.8s; --delay: 0.32s;">
+</div>
+
+<section class="drone-page">
+    <div class="container">
+        <div class="drone-summary">
+            <div class="item">
+                <span class="label">İl / İlçe</span>
+                <span id="meta-loc">—</span>
+            </div>
+            <div class="item">
+                <span class="label">Mahalle</span>
+                <span id="meta-mahalle">—</span>
+            </div>
+            <div class="item">
+                <span class="label">Ada / Parsel</span>
+                <span id="meta-ap">—</span>
+            </div>
+        </div>
+
+        <div class="drone-grid">
+            <div class="drone-card">
+                <h5>1) Dil ve Tapu durumu</h5>
+                <p>Seslendirme dilini ve tapu tipini seç.</p>
+                <div class="mb-3">
+                    <label class="form-label">Video Dili</label>
+                    <div class="chip-group" id="lang-group">
+                        <button type="button" class="chip active" data-value="tr">Türkçe</button>
+                        <button type="button" class="chip" data-value="ru">Русский</button>
+                        <button type="button" class="chip" data-value="ar">العربية</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tapu Durumu</label>
+                    <div class="chip-group" id="tapu-group">
+                        <button type="button" class="chip active" data-value="Tek Tapu">Tek Tapu</button>
+                        <button type="button" class="chip" data-value="Kooperatif">Kooperatif</button>
+                        <button type="button" class="chip" data-value="Hisseli">Hisseli</button>
+                        <button type="button" class="chip" data-value="Hobi Bahçesi">Hobi Bahçesi</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drone-card">
+                <h5>2) Logo & Avatar</h5>
+                <p>Marka kimliğini ekle, ön izlemeyi gör.</p>
+                <div class="upload-box mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="form-label mb-1">Firma Logosu</div>
+                            <div class="hint">PNG/JPG, 2MB altı</div>
+                        </div>
+                        <label class="upload-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Yükle
+                            <input type="file" id="logo-input" accept="image/*">
+                        </label>
+                    </div>
+                    <div id="logo-preview" class="hint">Henüz dosya seçilmedi.</div>
+                </div>
+                <div class="upload-box">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="form-label mb-1">Danışman Fotoğrafı</div>
+                            <div class="hint">PNG/JPG, 2MB altı</div>
+                        </div>
+                        <label class="upload-label">
+                            <i class="fa-solid fa-user"></i> Yükle
+                            <input type="file" id="avatar-input" accept="image/*">
+                        </label>
+                    </div>
+                    <div id="avatar-preview" class="hint">Henüz dosya seçilmedi.</div>
+                </div>
+            </div>
+
+            <div class="drone-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="mb-1">3) Seslendirme Metni</h5>
+                        <p class="mb-0">Metni düzenleyebilir veya varsayılanı kullanabilirsin.</p>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <textarea class="form-control w-100 description" id="description-input" rows="6" placeholder="Arsanın özelliklerini ve çevresini anlat..." ></textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span class="hint">Maks 700 karakter</span>
+                        <span class="char-count" id="desc-count">0/700</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-md-row align-items-start gap-2 mt-3">
+                    <button type="button" class="btn-primary-drone" id="generate-btn" disabled>
+                        <i class="fa-solid fa-video"></i> Video Oluştur
+                    </button>
+                    <div>
+                        <div class="hint">Logo, avatar ve açıklama dolu olmalı.</div>
+                        <div class="hint" id="generate-status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isAuthenticated = @User.Identity?.IsAuthenticated.ToString().ToLower();
+            const splash = document.getElementById('drone-splash');
+            if (splash) {
+                setTimeout(() => {
+                    splash.classList.add('is-hidden');
+                }, 1800);
+                splash.addEventListener('transitionend', () => {
+                    splash.remove();
+                });
+            }
+
+            const MAX_CHARS = 700;
+            const params = new URLSearchParams(window.location.search);
+            const meta = {
+                il: params.get('il') || '',
+                ilce: params.get('ilce') || '',
+                mahalle: params.get('mahalle') || '',
+                ada: params.get('ada') || '',
+                parsel: params.get('parsel') || ''
+            };
+            const state = {
+                lang: 'tr',
+                tapu: 'Tek Tapu',
+                logoReady: false,
+                avatarReady: false
+            };
+
+            const els = {
+                langChips: document.querySelectorAll('#lang-group .chip'),
+                tapuChips: document.querySelectorAll('#tapu-group .chip'),
+                logoInput: document.getElementById('logo-input'),
+                avatarInput: document.getElementById('avatar-input'),
+                logoPreview: document.getElementById('logo-preview'),
+                avatarPreview: document.getElementById('avatar-preview'),
+                descInput: document.getElementById('description-input'),
+                descCount: document.getElementById('desc-count'),
+                generateBtn: document.getElementById('generate-btn'),
+                generateStatus: document.getElementById('generate-status'),
+                metaLoc: document.getElementById('meta-loc'),
+                metaMahalle: document.getElementById('meta-mahalle'),
+                metaAp: document.getElementById('meta-ap')
+            };
+
+            const defaultDesc = () => {
+                return '';
+            };
+
+            const updateChips = (chips, value) => {
+                chips.forEach((chip) => chip.classList.toggle('active', chip.dataset.value === value));
+            };
+
+            const updateDescCount = () => {
+                const len = els.descInput.value.length;
+                els.descCount.textContent = `${len}/${MAX_CHARS}`;
+            };
+
+            const updateButtonState = () => {
+                const ready = state.logoReady && state.avatarReady && els.descInput.value.trim().length > 0;
+                els.generateBtn.disabled = !ready;
+            };
+
+            const updateMetaView = () => {
+                if (els.metaLoc) els.metaLoc.textContent = meta.il && meta.ilce ? `${meta.il} / ${meta.ilce}` : '—';
+                if (els.metaMahalle) els.metaMahalle.textContent = meta.mahalle || '—';
+                if (els.metaAp) els.metaAp.textContent = (meta.ada && meta.parsel) ? `${meta.ada} / ${meta.parsel}` : '—';
+            };
+
+            els.langChips.forEach((chip) => {
+                chip.addEventListener('click', () => {
+                    state.lang = chip.dataset.value || 'tr';
+                    updateChips(els.langChips, state.lang);
+                    updateDescCount();
+                    updateButtonState();
+                });
+            });
+
+            els.tapuChips.forEach((chip) => {
+                chip.addEventListener('click', () => {
+                    state.tapu = chip.dataset.value || 'Tek Tapu';
+                    updateChips(els.tapuChips, state.tapu);
+                    updateDescCount();
+                    updateButtonState();
+                });
+            });
+
+            const handleFile = (inputEl, previewEl, key) => {
+                inputEl.addEventListener('change', () => {
+                    const file = inputEl.files?.[0];
+                    if (!file) return;
+                    previewEl.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
+                    state[key] = true;
+                    updateButtonState();
+                });
+            };
+
+            handleFile(els.logoInput, els.logoPreview, 'logoReady');
+            handleFile(els.avatarInput, els.avatarPreview, 'avatarReady');
+
+            els.descInput.addEventListener('input', () => {
+                if (els.descInput.value.length > MAX_CHARS) {
+                    els.descInput.value = els.descInput.value.slice(0, MAX_CHARS);
+                }
+                updateDescCount();
+                updateButtonState();
+            });
+
+            els.generateBtn.addEventListener('click', () => {
+                if (els.generateBtn.disabled) return;
+                if (!isAuthenticated) {
+                    if (els.generateStatus) {
+                        els.generateStatus.textContent = 'Devam etmek icin giris yapmalisiniz. Yonlendiriliyorsunuz...';
+                    }
+                    const currentPath = window.location.pathname + window.location.search;
+                    const returnUrl = encodeURIComponent(currentPath);
+                    window.location.href = `/Account/Login?returnUrl=${returnUrl}`;
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('il', meta.il || '');
+                formData.append('ilce', meta.ilce || '');
+                formData.append('mahalle', meta.mahalle || '');
+                formData.append('ada', meta.ada || '');
+                formData.append('parsel', meta.parsel || '');
+                formData.append('lang', state.lang);
+                formData.append('tapu', state.tapu);
+                formData.append('description', els.descInput.value.trim());
+
+                const logoFile = els.logoInput.files?.[0];
+                const avatarFile = els.avatarInput.files?.[0];
+                if (logoFile) formData.append('logo', logoFile);
+                if (avatarFile) formData.append('avatar', avatarFile);
+
+                els.generateBtn.disabled = true;
+                if (els.generateStatus) els.generateStatus.textContent = 'Video isteği gönderiliyor...';
+
+                fetch('/api/drone/create', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error('İstek başarısız.');
+                        return res.json().catch(() => ({}));
+                    })
+                    .then(() => {
+                        if (els.generateStatus) els.generateStatus.textContent = 'İstek alındı. Video oluşturma başlatıldı.';
+                    })
+                    .catch((err) => {
+                        console.error('Drone video isteği başarısız', err);
+                        if (els.generateStatus) els.generateStatus.textContent = 'İstek gönderilemedi. Lütfen tekrar deneyin.';
+                    })
+                    .finally(() => {
+                        updateButtonState();
+                    });
+            });
+
+            // init
+            updateMetaView();
+            updateDescCount();
+            updateButtonState();
+        });
+    </script>
+}

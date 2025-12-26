@@ -1,0 +1,14 @@
+@using Sevval.Application.Features.Announcement.Queries.GetCompanyAnnouncementCountByProvince
+@model IEnumerable<GetCompanyAnnouncementCountByProvinceQueryResponse>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        <button class="city-button" onclick="filterListingsByCity('@item.Province', this);">
+            <i class="fas fa-map-marker-alt"></i>
+            @item.Province
+            <span class="city-count">@item.Count</span>
+        </button>
+    }
+}

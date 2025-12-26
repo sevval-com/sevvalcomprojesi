@@ -1,0 +1,24 @@
+﻿#music-toggle {
+    position: fixed;
+    top: 142x; /* Yukarıdan mesafe */
+    left: 22px; /* Soldan mesafe */
+    background-color: white; /* Arka plan rengi */
+    border: none;
+    height: 80px; /* Arka plan yüksekliği */
+    width: 80px; /* Arka plan genişliği */
+    border-radius: 50%; /* Yuvarlak görünüm */
+    padding: 0; /* İç boşluk sıfır, yüksekliği ve genişliği belirle */
+    cursor: pointer;
+    font-size: 40px;
+    animation: blink 5s infinite; /* Yanıp sönme animasyonu */
+    z-index: 1000; /* Diğer içeriklerin üstünde görünmesi için yüksek z-index değeri */
+}
+@keyframes blink {
+    0%, 100% {
+        opacity: 1; /* Tam görünür */
+    }
+
+    50% {
+        opacity: 0.0; /* Yarı görünür */
+    }
+}

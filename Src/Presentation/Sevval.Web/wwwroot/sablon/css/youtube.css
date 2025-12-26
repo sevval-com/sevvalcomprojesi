@@ -1,0 +1,32 @@
+﻿.video-container {
+    position: relative; /* Konumlandırma için gerekli */
+}
+
+iframe {
+    transition: transform 0.3s ease-in-out;
+}
+
+    iframe:hover {
+        transform: scale(1.1); /* Hover etkisi */
+    }
+
+.modal {
+    display: none; /* Başlangıçta gizli */
+    position: fixed;
+    z-index: 999; /* Diğer elementlerin üzerine gelsin */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Arka planı karartır */
+    display: flex; /* Modal içeriğini ortalamak için */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    max-width:   80%;
+}

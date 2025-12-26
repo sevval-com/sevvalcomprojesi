@@ -1,0 +1,223 @@
+﻿html, body {
+    height: 100%; /* Sayfanın tam yüksekliğini kullan */
+    margin: 0; /* Varsayılan margin'i sıfırla */
+    font-family: Arial, sans-serif; /* Yazı tipi ayarı */
+}
+
+body {
+    display: flex; /* Flexbox kullan */
+    flex-direction: column; /* Dikey yönde hizala */
+}
+
+ 
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+    .logo img {
+        width: 50px;
+        height: auto;
+        margin-right: 10px;
+    }
+
+    .logo span {
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+ 
+
+.line {
+    height: 4px;
+    width: 25px;
+    background-color: white;
+    margin: 3px 0;
+}
+
+ 
+ 
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    background-color: white;
+    border-radius: 8px; /* Kenarları yuvarlat */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Daha yumuşak gölge */
+    z-index: 1000;
+    min-width: 180px; /* Biraz daha geniş */
+    opacity: 0;
+    transform: translateY(20px); /* Yumuşak animasyon için */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* Fare olaylarını devre dışı bırak */
+}
+
+    .dropdown-content li {
+        padding: 10px 15px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+        .dropdown-content li a {
+            color: #009cfb;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+        }
+
+            .dropdown-content li a:hover {
+                background-color: rgba(0, 156, 251, 0.1); /* Hafif mavi arka plan */
+                color: #0056b3; /* Yazı rengi koyulaşsın */
+            }
+
+/* Dropdown Menü Hover */
+.dropdown:hover .dropdown-content {
+    opacity: 1;
+    transform: translateY(0); /* Yumuşak şekilde yukarı gelsin */
+    pointer-events: auto; /* Fare olaylarını geri aç */
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center; /* Öğeleri hizalar */
+    margin-right: 15px;
+}
+
+    .auth-buttons a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .auth-buttons .login {
+        border: 1px solid white;
+    }
+
+    .auth-buttons .post-ad {
+        background-color: white;
+        color: #009cfb;
+        font-weight: bold;
+        padding: 8px 15px;
+        border-radius: 4px;
+    }
+
+    .auth-buttons a:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+        transform: scale(1.05);
+    }
+
+/* Username Tasarımı */
+.user-name {
+    background-color: transparent; /* Şeffaf arka plan */
+    color: white; /* Username yazı rengi */
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: bold; /* Kalın yazı */
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    border: 2px solid white; /* Beyaz çerçeve */
+}
+
+    .user-name:hover {
+        background-color: white; /* Üzerine gelince arka plan beyaz olsun */
+        color: #009cfb; /* Yazı rengi değişsin */
+        transform: scale(1.05);
+    }
+
+
+/* Mobil cihazlar için genel ayarlar */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        margin-top: 10px;
+        text-align: left;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+        .auth-buttons a {
+            width: 100%;
+            text-align: center;
+        }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .dropdown-content {
+        min-width: 100%;
+    }
+
+    .logo img {
+        width: 60px !important;
+    }
+
+    .logo span {
+        font-size: 14px !important;
+        display: flex !important;
+
+    }
+
+    .nav-links a {
+        font-size: 16px;
+    }
+
+    .user-name {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+
+/* Daha küçük cihazlar için ayarlar (telefonlar) */
+@media (max-width: 480px) {
+    .logo img {
+        width: 35px;
+    }
+
+    .logo span {
+        font-size: 16px;
+        
+    }
+
+    .auth-buttons a {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .user-name {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .user-list {
+
+    }
+}
+
+
+
+
