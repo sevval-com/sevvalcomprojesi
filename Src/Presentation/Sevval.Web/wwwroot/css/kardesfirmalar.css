@@ -221,3 +221,398 @@ body {
 
 
 
+/* İlan Ver butonu container ve ücretsiz etiketi */
+.post-ad-container {
+    position: relative;
+    display: inline-block;
+}
+
+.free-tag {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background-color: #28a745 !important;
+    color: white !important;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transform: rotate(-15deg);
+    z-index: 10;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+/* İlan Ver butonu özel stili */
+.auth-buttons .post-ad {
+    background-color: white !important;
+    color: #009cfb !important;
+    font-weight: bold !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    border: 1px solid #009cfb !important;
+    transition: all 0.3s ease !important;
+}
+
+.auth-buttons .post-ad:hover {
+    background-color: #009cfb !important;
+    color: white !important;
+    transform: scale(1.05) !important;
+}/* Kap
+samlı mobil responsive tasarım - Kardeş Firmalar */
+
+/* Çok küçük mobil (320px - 374px) */
+@media (max-width: 374px) {
+    .auth-buttons {
+        flex-direction: column !important;
+        gap: 5px !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-right: 5px !important;
+    }
+    
+    .auth-buttons .post-ad {
+        padding: 4px 8px !important;
+        font-size: 9px !important;
+        min-width: 60px !important;
+        text-align: center !important;
+    }
+    
+    .free-tag {
+        font-size: 6px !important;
+        padding: 1px 2px !important;
+        top: -3px !important;
+        left: -3px !important;
+    }
+    
+    .logo img {
+        width: 35px !important;
+    }
+    
+    .logo span {
+        font-size: 12px !important;
+    }
+}
+
+/* Küçük mobil (375px - 424px) */
+@media (min-width: 375px) and (max-width: 424px) {
+    .auth-buttons {
+        gap: 6px !important;
+        margin-right: 8px !important;
+    }
+    
+    .auth-buttons .post-ad {
+        padding: 5px 10px !important;
+        font-size: 10px !important;
+        min-width: 65px !important;
+    }
+    
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -4px !important;
+        left: -4px !important;
+    }
+    
+    .logo img {
+        width: 40px !important;
+    }
+}
+
+/* Orta mobil (425px - 767px) */
+@media (min-width: 425px) and (max-width: 767px) {
+    .auth-buttons {
+        gap: 8px !important;
+        margin-right: 10px !important;
+    }
+    
+    .auth-buttons .post-ad {
+        padding: 6px 12px !important;
+        font-size: 11px !important;
+        min-width: 70px !important;
+    }
+    
+    .free-tag {
+        font-size: 8px !important;
+        padding: 2px 4px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+    
+    .logo img {
+        width: 45px !important;
+    }
+}
+
+/* Tablet portrait (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .auth-buttons .post-ad {
+        padding: 7px 14px !important;
+        font-size: 12px !important;
+    }
+    
+    .free-tag {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+    }
+    
+    .logo img {
+        width: 50px !important;
+    }
+}
+
+/* Navbar container responsive */
+.navbar-container {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    padding: 10px 15px !important;
+}
+
+/* Mobil hamburger menu için */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+    }
+    
+    .nav-links {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        flex-direction: column !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        z-index: 1000 !important;
+    }
+    
+    .nav-links.active {
+        display: flex !important;
+    }
+    
+    .nav-links a {
+        color: #333 !important;
+        padding: 12px !important;
+        border-bottom: 1px solid #eee !important;
+        text-align: center !important;
+        font-size: 14px !important;
+    }
+    
+    .hamburger {
+        display: flex !important;
+        flex-direction: column !important;
+        cursor: pointer !important;
+        order: 3 !important;
+    }
+    
+    .auth-buttons {
+        order: 2 !important;
+        margin-left: auto !important;
+        margin-right: 10px !important;
+    }
+    
+    .logo {
+        order: 1 !important;
+    }
+}
+
+/* Landscape orientation */
+@media (max-width: 767px) and (orientation: landscape) {
+    .auth-buttons .post-ad {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+    }
+    
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 2px !important;
+    }
+    
+    .navbar-container {
+        padding: 5px 8px !important;
+    }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .auth-buttons .post-ad {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        touch-action: manipulation !important;
+    }
+    
+    .post-ad-container {
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+}
+
+/* Dropdown menu responsive */
+@media (max-width: 768px) {
+    .dropdown-content {
+        position: fixed !important;
+        top: 60px !important;
+        right: 10px !important;
+        left: auto !important;
+        min-width: 200px !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+}
+
+/* User name responsive */
+@media (max-width: 480px) {
+    .user-name {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+    }
+}
+
+/* Çok geniş ekranlar */
+@media (min-width: 1920px) {
+    .auth-buttons .post-ad {
+        padding: 10px 20px !important;
+        font-size: 16px !important;
+    }
+    
+    .free-tag {
+        font-size: 12px !important;
+        padding: 3px 8px !important;
+        top: -10px !important;
+        left: -10px !important;
+    }
+}
+
+/* Yükseklik bazlı responsive */
+@media (max-height: 600px) {
+    .auth-buttons .post-ad {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+    }
+}/* Mobil
+ düzenleme - Hamburger menü İlan Ver yanında */
+@media (max-width: 768px) {
+    .navbar-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        padding: 10px 15px !important;
+    }
+    
+    .logo {
+        order: 1 !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .auth-buttons {
+        order: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+        margin-right: 8px !important;
+    }
+    
+    .hamburger {
+        order: 3 !important;
+        display: flex !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Giriş Yap ve İlan Ver butonları aynı boyut */
+    .auth-buttons .login,
+    .auth-buttons .post-ad {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        min-width: 70px !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Giriş Yap butonu */
+    .auth-buttons .login {
+        background-color: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+    
+    /* İlan Ver butonu */
+    .auth-buttons .post-ad {
+        background-color: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+    
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+    
+    /* Navbar menüsü */
+    .nav-links {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        flex-direction: column !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        z-index: 1000 !important;
+    }
+    
+    .nav-links.active {
+        display: flex !important;
+    }
+    
+    .nav-links a {
+        color: #333 !important;
+        padding: 12px !important;
+        border-bottom: 1px solid #eee !important;
+        text-align: center !important;
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-buttons .login,
+    .auth-buttons .post-ad {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        min-width: 60px !important;
+    }
+    
+    .free-tag {
+        font-size: 6px !important;
+        padding: 1px 2px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-buttons .login,
+    .auth-buttons .post-ad {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        min-width: 55px !important;
+    }
+}

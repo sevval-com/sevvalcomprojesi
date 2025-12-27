@@ -490,3 +490,9 @@ $RECYCLE.BIN/
 obj/
 
 bin/
+
+
+# Local Development - Mock Data & Notes
+mock_*.sql
+seed_mock_data.ps1
+LOCAL_DEV_NOTES.md

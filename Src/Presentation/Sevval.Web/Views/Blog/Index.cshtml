@@ -1,26 +1,13 @@
 ﻿@using System.Text.RegularExpressions
 @model YourProjectName.Controllers.BlogIndexViewModel
 @{
-    // SEO dostu sekme başlığı güncellendi
     ViewData["Title"] = "Şevval Emlak Blog - Gayrimenkul Dünyası";
-    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Layout kullanıyoruz
     // Admin olarak görünecek ek e-posta adresleri
     var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
     var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
 }
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- SEO için meta açıklaması -->
-    <meta name="description" content="Şevval Emlak Blog'da gayrimenkul, emlak sektörü ve emlakçılık üzerine ilham veren yazılar. Modern tasarım ve animasyonlarla zenginleştirilmiş keyifli bir okuma deneyimi." />
-    <!-- SEO için anahtar kelimeler -->
-    <meta name="keywords" content="Şevval Blog, emlak blogu, gayrimenkul, emlakçılık, güncel, ilham, makaleler, Türkçe, yeni nesil" />
-    <!-- Yazar bilgisi -->
-    <meta name="author" content="Şevval" />
-    <!-- Sayfa başlığı -->
-    <title>@ViewData["Title"]</title>
+@section style {
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
@@ -29,40 +16,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!-- blog.css dosyasını buraya bağlıyoruz -->
     <link rel="stylesheet" href="~/css/blog.css">
-    <!-- Google Tag Manager -->
-    <script>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-WSQR6TXV');</script>
-    <!-- End Google Tag Manager -->
-</head>
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSQR6TXV"
-                height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <!-- Header Bölümü -->
-    <header class="header-bg py-4">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div>
-                <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
-                <!-- sevval.com'a geri dön butonu güncellendi, artık yeni sekmede açılmayacak -->
-                <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
-            </div>
-            @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
-            {
-                <nav>
-                    <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
-                        <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
-                    </a>
-                </nav>
-            }
+}
+
+<!-- Header Bölümü -->
+<header class="header-bg py-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <a href="" class="text-white text-decoration-none h3 mb-0 fw-bold">Şevval Blog</a>
+            <!-- sevval.com'a geri dön butonu güncellendi, artık yeni sekmede açılmayacak -->
+            <a href="/" class="btn btn-outline-light btn-sm ms-3 rounded-pill">sevval.com'a Geri Dön</a>
         </div>
-    </header>
+        @if (isAdminOrAdditionalAdmin) // Admin kontrolü güncellendi
+        {
+            <nav>
+                <a href="@Url.Action("Create", "Blog")" class="btn btn-success admin-btn rounded-pill px-4 py-2 shadow-sm">
+                    <i class="bi bi-plus-circle me-2"></i> Yeni Yazı Ekle
+                </a>
+            </nav>
+        }
+    </div>
+</header>
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="container">
@@ -123,7 +96,7 @@
                                         <p class="card-text text-secondary mb-3">@item.ShortDescription</p>
                                     </div>
                                     <div>
-                                        <p class="blog-meta">
+                                        <p class="blog-meta author-info" style="opacity: 0; transition: opacity 0.3s ease;">
                                             Yazar: <span class="fw-semibold">@item.Author</span> | Yayın Tarihi: <span class="fw-semibold">@item.PublishDate.ToShortDateString()</span>
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
@@ -194,13 +167,8 @@
             </div>
         }
     </main>
-    <!-- Footer Bölümü -->
-    <footer class="footer-bg text-center">
-        <div class="container">
-            <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
-            <p class="small mt-1">Modern ve İlham Veren Blog Deneyimi.</p>
-        </div>
-    </footer>
+
+@section Scripts {
     <!-- Bootstrap JS ve bağımlılıkları -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -208,6 +176,36 @@
             const categoryButtons = document.querySelectorAll('.category-btn');
             const categorySections = document.querySelectorAll('.category-section');
             const latestBlogSection = document.getElementById('latest-blog-posts');
+
+            // Blog kartlarına hover efekti ekle
+            const blogCards = document.querySelectorAll('.blog-card');
+            blogCards.forEach(card => {
+                const authorInfo = card.querySelector('.author-info');
+                
+                card.addEventListener('mouseenter', function() {
+                    if (authorInfo) {
+                        authorInfo.style.opacity = '1';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    if (authorInfo) {
+                        authorInfo.style.opacity = '0';
+                    }
+                });
+            });
+
+            // Tüm kategori bölümlerini başlangıçta gizle
+            categorySections.forEach(section => {
+                section.classList.add('d-none');
+            });
+
+            let activeCategorySlug = null; // Şu anda aktif olan kategoriyi takip etmek için
+
+            // Sayfa yüklendiğinde varsayılan olarak "En Son Blog Yazıları"nı göster
+            if (latestBlogSection) {
+                latestBlogSection.classList.remove('d-none');
+            }
 
             // Tüm kategori bölümlerini başlangıçta gizle
             categorySections.forEach(section => {
@@ -296,7 +294,7 @@
 
                                     // URL'yi "/Blog/slug-değeri" formatında oluştur
                                     colDiv.innerHTML = `
-                                        <div class="card blog-card h-100">
+                                                        <div class="card blog-card h-100">
                                             ${blog.imageUrl ? `<img src="${blog.imageUrl}" alt="${blog.title}" class="card-img-top">` : `<img src="https://placehold.co/600x250/E0E7FF/007BFF?text=G%C3%B6rsel+Yok" alt="Görsel Yok" class="card-img-top">`}
                                             <div class="card-body blog-card-body">
                                                 <div>
@@ -304,7 +302,7 @@
                                                     <p class="card-text text-secondary mb-3">${blog.shortDescription}</p>
                                                 </div>
                                                 <div>
-                                                    <p class="blog-meta">
+                                                    <p class="blog-meta author-info" style="opacity: 0; transition: opacity 0.3s ease;">
                                                         Yazar: <span class="fw-semibold">${blog.author}</span> | Yayın Tarihi: <span class="fw-semibold">${new Date(blog.publishDate).toLocaleDateString('tr-TR')}</span>
                                                     </p>
                                                     <div class="d-flex justify-content-between align-items-center">
@@ -329,6 +327,24 @@
                                     `;
                                     blogList.appendChild(colDiv);
                                 });
+                                
+                                // Yeni eklenen kartlara da hover efekti ekle
+                                const newCards = blogList.querySelectorAll('.blog-card');
+                                newCards.forEach(card => {
+                                    const authorInfo = card.querySelector('.author-info');
+                                    
+                                    card.addEventListener('mouseenter', function() {
+                                        if (authorInfo) {
+                                            authorInfo.style.opacity = '1';
+                                        }
+                                    });
+                                    
+                                    card.addEventListener('mouseleave', function() {
+                                        if (authorInfo) {
+                                            authorInfo.style.opacity = '0';
+                                        }
+                                    });
+                                });
                             }
                         }
 
@@ -341,5 +357,4 @@
             });
         });
     </script>
-</body>
-</html>
+}

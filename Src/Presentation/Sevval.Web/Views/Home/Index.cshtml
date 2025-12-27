@@ -17,22 +17,6 @@
     <link rel="stylesheet" type="text/css" href="~/css/yorumlar.css" />
 
     <style>
-        /* Yorum onay butonu için stil */
-        .comment-approve-btn {
-            background-color: #28a745; /* Yeşil renk */
-            color: white;
-            border: none;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 5px;
-        }
-
-            .comment-approve-btn:hover {
-                background-color: #218838;
-            }
-
         /* Onaysız yorumları adminin ayırt etmesi için */
         .comment-unapproved {
             border-left: 4px solid #ffc107; /* Sarı kenarlık */
@@ -847,8 +831,14 @@
     /* MOBİL EKRAN İÇİN ÖZEL "TEKTE GÖSTERME" AYARLARI */
     @@media (max-width: 768px) {
         .modal-lg-custom {
-            max-width: 98% !important;
-            margin: 5px auto !important;
+            max-width: 92% !important;
+            margin: 15px auto !important;
+            max-height: 90vh !important;
+        }
+
+        .daily-offer-modal-custom .modal-content {
+            max-height: 85vh !important;
+            overflow-y: auto !important;
         }
         /* Scroll kısıtlamasını kaldır, içerik kadar uzasın */
         .daily-offer-left-col {
@@ -964,6 +954,51 @@
             top: 10px !important;
             right: 10px !important;
             font-size: 14px !important;
+        }
+    }
+
+    /* ÇOK KÜÇÜK EKRANLAR İÇİN (iPhone SE, vb.) */
+    @@media (max-width: 375px) {
+        .modal-lg-custom {
+            max-width: 90% !important;
+            margin: 20px auto !important;
+            max-height: 85vh !important;
+        }
+
+        .daily-offer-modal-custom .modal-content {
+            max-height: 80vh !important;
+        }
+
+        .daily-offer-slider-wrap {
+            height: 150px !important;
+        }
+
+        .daily-offer-price-val {
+            font-size: 18px !important;
+        }
+
+        .daily-offer-title-text {
+            font-size: 14px !important;
+        }
+
+        .daily-offer-feat-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 3px !important;
+        }
+
+        .daily-offer-feat-item {
+            padding: 4px !important;
+            font-size: 9px !important;
+        }
+
+        .daily-offer-action-btn {
+            padding: 6px !important;
+            font-size: 10px !important;
+        }
+
+        .daily-offer-contact-btn {
+            padding: 5px 8px !important;
+            font-size: 10px !important;
         }
     }
 
@@ -1355,7 +1390,7 @@
 </a>
 
 <div class="tagline-container1" style="display: flex;">
-    <h2 class="tagline">VARSA BİZDEN İYİSİ, O DA BİZDEN BİRİSİ</h2>
+    <h2 class="tagline">YENİ NESİL İLAN SİTESİ</h2>
 </div>
 
 <!-- Arama Formu ve Filtreler -->
@@ -1799,23 +1834,28 @@
                         <p class="comment-user">
                             <strong>@comment.UserFullName</strong>
                             <span class="comment-date">(@comment.CreatedAt.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR")))</span>
-
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                @if (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com")
-                                {
-                                    <button class="comment-delete-btn" data-comment-id="@comment.Id">&#10005;</button>
-                                }
-
-                                @if (User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
-                                {
-                                    <button class="comment-approve-btn" data-comment-id="@comment.Id" title="Yorumu Onayla">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                }
-                            }
                         </p>
                         <p class="comment-content">@Html.Raw(comment.Content)</p>
+                        @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                        {
+                            <div class="comment-admin-actions">
+                                @if (User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
+                                {
+                                    <button class="comment-approve-btn" onclick="approveComment(@comment.Id)" type="button">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Onayla
+                                    </button>
+                                }
+                                <button class="comment-delete-btn" onclick="deleteComment(@comment.Id)" type="button">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Sil
+                                </button>
+                            </div>
+                        }
                     </div>
                 }
             }

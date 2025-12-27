@@ -1,0 +1,32 @@
+/* Temiz navbar CSS - Sadece gerekli kurallar */
+
+/* Basit mobil responsive */
+@media (max-width: 768px) {
+    .auth-buttons .post-ad,
+    .auth-buttoons .post-ad {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    .free-tag {
+        font-size: 8px !important;
+        padding: 2px 4px !important;
+        top: -6px !important;
+        left: -6px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-buttons .post-ad,
+    .auth-buttoons .post-ad {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+}

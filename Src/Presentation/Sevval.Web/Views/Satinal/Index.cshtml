@@ -21,9 +21,91 @@
 
     <!-- Navbar için özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
     <style>
+        /* MOBİL NAVBAR - INLINE STİL */
+        @@media (max-width: 991px) {
+            .navbaar-container {
+                display: flex !important;
+                align-items: center !important;
+                position: relative !important;
+                padding: 10px 15px !important;
+            }
+            
+            .auth-buttoons {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 10px !important;
+                margin-right: 50px !important;
+            }
+            
+            .auth-buttoons .login,
+            .auth-buttoons .post-ad {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 32px !important;
+                padding: 0 12px !important;
+                font-size: 11px !important;
+                border-radius: 4px !important;
+                font-weight: bold !important;
+                white-space: nowrap !important;
+            }
+            
+            .auth-buttoons .login {
+                background: transparent !important;
+                color: white !important;
+                border: 1px solid white !important;
+            }
+            
+            .auth-buttoons .post-ad {
+                background: white !important;
+                color: #009cfb !important;
+                border: 1px solid #009cfb !important;
+            }
+            
+            .post-ad-container {
+                display: inline-flex !important;
+                align-items: center !important;
+                position: relative !important;
+            }
+            
+            .free-tag {
+                position: absolute !important;
+                top: -8px !important;
+                left: -8px !important;
+                font-size: 7px !important;
+                padding: 2px 4px !important;
+                background-color: #28a745 !important;
+                color: white !important;
+                border-radius: 3px !important;
+                transform: rotate(-15deg) !important;
+                z-index: 200 !important;
+            }
+            
+            .hamburger {
+                display: flex !important;
+                flex-direction: column !important;
+                position: absolute !important;
+                right: 10px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                cursor: pointer !important;
+                z-index: 1001 !important;
+            }
+            
+            .hamburger .line {
+                display: block !important;
+                width: 25px !important;
+                height: 3px !important;
+                background-color: white !important;
+                margin: 3px 0 !important;
+            }
+        }
+        
         body {
             background-color: #f0f2f5;
         }
@@ -237,17 +319,14 @@
     @Html.AntiForgeryToken()
     <!-- Navbar -->
     <nav class="navbaar">
-        <div class="navbaar-container">
+        <div class="navbaar-container" style="position: relative;">
             <div class="logo">
                 <a href="/">
                     <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
                 </a>
-                <span>Şevval Emlak</span>
-            </div>
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
+                <div class="visitor-counts-navbar">
+                    <span><i class="fas fa-eye icon"></i> Anlık: <span id="active-visitors-navbar">0</span></span>
+                </div>
             </div>
             <ul class="naav-linkss" id="nav-links">
                 <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
@@ -284,7 +363,7 @@
                 }
                 <div class="post-ad-container">
                     <span class="free-tag">Ücretsiz</span>
-                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">+ İlan Ver</a>
+                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">İlan Ver</a>
                 </div>
             </div>
         </div>
@@ -403,11 +482,6 @@
             var hamburgerMenu = document.getElementById("hamburger-menu");
             var navLinks = document.getElementById("nav-links");
             if (hamburgerMenu) {
-                hamburgerMenu.addEventListener("click", (e) => { navLinks.classList.toggle("active"); e.stopPropagation(); });
-            }
-            document.addEventListener("click", (e) => {
-                if (navLinks && !navLinks.contains(e.target) && !hamburgerMenu.contains(e.target)) navLinks.classList.remove("active");
-            });
             const girisButon = document.getElementById('giris-buton'), popupGiris = document.getElementById('popup-giris'), pencereKapat = document.getElementById('pencere-kapat');
             if (girisButon) girisButon.addEventListener('click', (e) => { e.preventDefault(); popupGiris.style.display = 'flex'; });
             if (popupGiris) popupGiris.addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
