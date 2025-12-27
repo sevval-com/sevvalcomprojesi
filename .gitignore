@@ -487,6 +487,34 @@ $RECYCLE.BIN/
 
 *.db
 
+*.db-shm
+*.db-wal
+
 obj/
 
 bin/
+# Additional Local Development Files
+test_ilan_seed.sql
+mock_admin_user_seed.sql
+mock_gunun_ilani_seed.sql
+seed_mock_data.ps1
+
+# Database WAL files
+*.db-shm
+*.db-wal
+
+# Configuration files with sensitive data
+Src/Presentation/Sevval.Web/appsettings.json
+
+# Context files
+Src/Infrastructure/Sevval.Persistence/Context/AppContextInitializer.cs
+Src/Infrastructure/Sevval.Persistence/Context/ApplicationDbContext.cs
+
+# Controller files with local changes
+Src/Presentation/Sevval.Web/Controllers/IlanYonetimController.cs
+
+# Constants with local changes
+Src/Core/Sevval.Application/Constants/GeneralConstants.cs# Dat
+abase files
+sevvalemlak2.db-shm
+sevvalemlak2.db-wal
