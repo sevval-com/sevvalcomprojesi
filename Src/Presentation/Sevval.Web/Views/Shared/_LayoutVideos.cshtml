@@ -63,21 +63,13 @@
         :root {
             --plyr-color-main: #2563eb;
         }
-        .naav-linkss {
-            margin-top: 0px;
-            list-style: none;
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-        }
-          
     </style>
 </head>
 <body class="antialiased">
 
     <!-- Orijinal Navbar -->
     <nav class="navbaar">
-        <div class="navbaar-container">
+        <div class="navbaar-container" style="position: relative;">
             <div class="logo">
                 <img src="~/images/LOGO mavi.webp" alt="Firma Logosu" onclick="window.location.href='/'">
                 <!-- Sevval.com yazısı yerine ziyaretçi sayıları -->
@@ -147,38 +139,22 @@
                 }
                 else
                 {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
+                    <a href="#" class="login" id="giris-buton" style="margin-right: 15px;">Giriş Yap</a>
                 }
-                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                <!-- İlan Ver butonu container ile -->
+                <div class="post-ad-container" style="position: relative; display: inline-block;">
+                    <span class="free-tag" style="position: absolute; top: -10px; left: -10px; background-color: #28a745; color: white; font-size: 8px; font-weight: bold; padding: 2px 5px; border-radius: 3px; transform: rotate(-15deg); z-index: 100;">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">İlan Ver</a>
                 </div>
             </div>
 
-            <!-- Hamburger Menu Icon -->
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
-                    var hamburgerMenu = document.getElementById("hamburger-menu");
                     var navLinks = document.getElementById("nav-links");
 
                     // Hamburger menüye tıklanınca menüyü aç/kapat
                     hamburgerMenu.addEventListener("click", function (event) {
                         navLinks.classList.toggle("active");
-                        event.stopPropagation(); // Hamburger menüye tıklanınca kapanmayı engelle
-                    });
-
-                    // Sayfanın herhangi bir yerine tıklanınca menüyü kapat
-                    document.addEventListener("click", function (event) {
-                        if (!navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
-                            navLinks.classList.remove("active");
-                        }
-                    });
                 });
                  document.getElementById('giris-buton').addEventListener('click', function (event) {
              event.preventDefault();

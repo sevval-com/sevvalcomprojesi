@@ -113,15 +113,15 @@ img {
     }
 }
 
-/* Mobil görünüm için stil ayarları */
+/* Mobil görünüm için stil ayarları - % tabanlı responsive */
 @media (max-width: 768px) {
     body {
-        max-width: 430px;
-        /* Mobil cihazlar için maksimum genişlik */
+        max-width: 100%;
+        /* Mobil cihazlar için tam genişlik */
         margin: 0 auto;
         /* Merkeze hizalama */
-        padding: 0 5px;
-        /* Kenar boşlukları */
+        padding: 0 1.5%;
+        /* Kenar boşlukları % olarak */
         overflow-x: hidden;
     }
 
@@ -131,83 +131,88 @@ img {
     }
 
     .custom-search-container {
-        top: -155px !important;
+        top: -40% !important;
         width: 95% !important;
     }
 
     .whatsapp-float {
-        bottom: 10px;
-        /* Alt boşluk */
-        right: 10px;
-        /* Sağ boşluk */
+        bottom: 3%;
+        /* Alt boşluk % olarak */
+        right: 3%;
+        /* Sağ boşluk % olarak */
     }
 
     .whatsapp-image {
-        width: 60px;
-        /* Mobil görünümde daha küçük resim */
+        width: 15vw;
+        max-width: 60px;
+        /* Mobil görünümde viewport bazlı */
     }
 
     .hero-section {
-        padding: 100px 0;
+        padding: 25% 0;
     }
 
     .input-group {
-        max-width: 600px;
+        max-width: 95%;
     }
 
     .visitor-counts-navbar {
         /* scale: 0.2 !important; */
-        gap: 5px !important;
+        gap: 1.5% !important;
         display: flow !important;
         scale: 0.9 !important;
-        margin-left: -5px !important;
+        margin-left: -1.5% !important;
         /* font-size: 10px; */
     }
 
     .sevvaldrone-popup {
-        min-width: 96px;
+        min-width: 25vw;
         height: 32vw;
         justify-content: start !important;
         padding: 0 !important;
     }
 
     .sevvaldrone-popup p {
-        font-size: 8px !important;
+        font-size: 2vw !important;
         line-height: 1.5 !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 5% !important;
     }
 
     .sevvaldrone-popup h3 {
-        font-size: 10px !important;
-        margin-top: 15px !important;
-        margin-bottom: 4px !important;
+        font-size: 2.5vw !important;
+        margin-top: 4% !important;
+        margin-bottom: 1% !important;
         font-weight: bold !important;
     }
 
     .drone-icon {
-        width: 36px !important;
-        height: 36px !important;
+        width: 10vw !important;
+        height: 10vw !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
         position: relative;
         margin-top: 0;
-        padding: .25rem;
+        padding: 1%;
         overflow: visible !important;
     }
 
     .drone-icon img {
-        width: 28px;
-        height: 28px;
-        padding: .25rem;
+        width: 8vw;
+        height: 8vw;
+        max-width: 32px;
+        max-height: 32px;
+        padding: 1%;
         object-fit: cover;
     }
 
     .option-tab {
-        padding: 0px 6px !important;
+        padding: 0 2% !important;
         background-color: #007bff;
         border: 1px solid #ddd;
         border-radius: 5px;
         cursor: pointer;
         transition: all 0.3s;
-        left: -10px;
+        left: -3%;
     }
 }
 
@@ -436,18 +441,18 @@ img {
 
 
 
-/* Mobil CSS */
+/* Mobil CSS - % tabanlı responsive */
 @media (max-width: 768px) {
     .nav-links {
         display: none;
         flex-direction: column;
         width: 100%;
         position: absolute;
-        top: 80px;
+        top: 20%;
         left: 0;
         background-color: white;
-        padding: 10px 0;
-        /* Padding'i biraz azaltarak daha kompakt bir görünüm sağlayabilirsiniz */
+        padding: 3% 0;
+        /* Padding % olarak */
         z-index: 1000;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         /* Gölgeyi artırarak derinlik hissi verildi */
@@ -467,13 +472,14 @@ img {
 
     .nav-links a {
         text-align: center;
-        padding: 15px;
+        padding: 4%;
         border-bottom: 1px solid #eee;
         color: black;
         text-decoration: none;
         /* Alt çizgiyi kaldırmak için */
         transition: background-color 0.3s ease;
         /* Geçiş efekti eklendi */
+        font-size: 3.5vw;
     }
 
     .nav-links a:hover {
@@ -494,14 +500,14 @@ img {
         position: relative;
         z-index: 1000;
         /* Diğer öğelerin üzerinde görünmesi için yüksek bir değer */
-        margin-right: 1rem;
+        margin-right: 3%;
     }
 
 
     .auth-buttons {
         display: flex;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 3%;
+        margin-top: 3%;
         justify-content: center;
         width: 100%;
     }
@@ -510,10 +516,10 @@ img {
         background-color: #009cfb;
         color: white;
         border: none;
-        padding: 8px 12px;
+        padding: 2% 3%;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 3.5vw;
     }
 
     .auth-button:hover {
@@ -839,13 +845,13 @@ img {
 }
 
 
-/* Mobil görünüm için */
+/* Mobil görünüm için - % tabanlı */
 @media (max-width: 768px) {
     .tagline {
-        font-size: 200%;
-        /* Yazı boyutunu küçültme */
-        padding: 8px 15px;
-        /* İçerideki boşlukları ayarlama */
+        font-size: 5vw;
+        /* Yazı boyutunu viewport bazlı */
+        padding: 2% 4%;
+        /* İçerideki boşlukları % olarak */
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
         /* ışıma efektini ayarlama */
         white-space: nowrap;
@@ -859,10 +865,10 @@ img {
 
 @media (max-width: 480px) {
     .tagline {
-        font-size: 111%;
-        /* Yazı boyutunu daha da küçültme */
-        padding: 6px 10px;
-        /* İçerideki boşlukları ayarlama */
+        font-size: 4vw;
+        /* Yazı boyutunu viewport bazlı */
+        padding: 1.5% 3%;
+        /* İçerideki boşlukları % olarak */
         box-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 255, 255, 0.5);
         /* ışıma efektini ayarlama */
         white-space: nowrap;
@@ -878,16 +884,16 @@ img {
 .label {
     position: absolute;
     /* Etiketin konumunu ayarlamak için */
-    right: 1px;
-    /* Sağdan konum, 0 ile daha sağda ayarlanabilir */
-    top: 10px;
-    /* Üstten konum, 0 ile daha yukarıda ayarlanabilir */
+    right: 0.5%;
+    /* Sağdan konum % olarak */
+    top: 3%;
+    /* Üstten konum % olarak */
     background-color: rgba(255, 0, 0, 0.8);
     /* Kırmızı arka plan (belirgin olması için) */
     color: white;
     /* Yazı rengi beyaz */
-    padding: 5px 10px;
-    /* İçerik için boşluk */
+    padding: 1.5% 3%;
+    /* İçerik için boşluk % olarak */
     border-radius: 5px;
     /* Kenar yuvarlama */
     font-weight: bold;
@@ -908,17 +914,17 @@ img {
 }
 
 .service-popup h3 {
-    margin: 10px 0;
-    font-size: 18px;
+    margin: 3% 0;
+    font-size: 4.5vw;
     font-weight: bold;
     text-align: center;
 }
 
 .service-popup p {
-    margin-top: 5px;
+    margin-top: 1.5%;
     /* Açıklama için üstten boşluk */
-    font-size: 14px;
-    /* Açıklama yazı boyutu */
+    font-size: 3.5vw;
+    /* Açıklama yazı boyutu viewport bazlı */
     text-align: center;
     /* Açıklamayı ortalamak için */
 }
@@ -932,35 +938,35 @@ img {
     }
 
     .service-popup h3 {
-        font-size: 10px;
-        /* Başlık yazı boyutunu küçültün */
+        font-size: 2.5vw;
+        /* Başlık yazı boyutunu viewport bazlı */
     }
 
     .service-popup p {
-        font-size: 8px;
-        /* Açıklama yazı boyutunu küçültün */
+        font-size: 2vw;
+        /* Açıklama yazı boyutunu viewport bazlı */
     }
 
     .label {
-        right: 5px;
-        /* Sağdan konumu biraz daha sağa kaydırın */
-        top: 5px;
-        /* Üstten konumu biraz daha yukarı kaydırın */
-        padding: 4px 8px;
-        /* Boşluğu azaltın */
-        font-size: 7px;
-        /* Yazı boyutunu küçültün */
+        right: 1.5%;
+        /* Sağdan konumu % olarak */
+        top: 1.5%;
+        /* Üstten konumu % olarak */
+        padding: 1% 2%;
+        /* Boşluğu % olarak */
+        font-size: 1.8vw;
+        /* Yazı boyutunu viewport bazlı */
     }
 }
 
 
 .label-2 {
     position: absolute;
-    right: 1px;
-    top: 10px;
+    right: 0.5%;
+    top: 3%;
     background-color: rgba(255, 0, 0, 0.8);
     color: white;
-    padding: 5px 10px;
+    padding: 1.5% 3%;
     border-radius: 5px;
     font-weight: bold;
     transform: rotate(45deg) translate(20%, -20%);
@@ -974,15 +980,15 @@ img {
 }
 
 .service-popup-2 h3 {
-    margin: 10px 0;
-    font-size: 17px !important;
+    margin: 3% 0;
+    font-size: 4.2vw !important;
     font-weight: bold;
     text-align: center;
 }
 
 .service-popup-2 p {
-    margin-top: 5px;
-    font-size: 16px;
+    margin-top: 1.5%;
+    font-size: 4vw;
     text-align: center;
 }
 
@@ -994,83 +1000,82 @@ img {
     }
 
     .service-popup-2 h3 {
-        font-size: 10px;
+        font-size: 2.5vw;
     }
 
     .service-popup-2 p {
-        font-size: 8px;
+        font-size: 2vw;
     }
 
     .label-2 {
-        right: 5px;
-        top: 5px;
-        padding: 4px 8px;
-        font-size: 7px;
+        right: 1.5%;
+        top: 1.5%;
+        padding: 1% 2%;
+        font-size: 1.8vw;
     }
 }
 
 .contact-left {
     flex: 1;
-    min-width: 150px;
-    /* Minimum genişlik ayarı */
+    min-width: 40%;
+    /* Minimum genişlik % olarak */
 }
 
 
-/* Medya sorguları */
+/* Medya sorguları - % tabanlı */
 @media (max-width: 768px) {
     .contact-popup {
         flex-direction: column;
         /* Yığın halinde düzenle */
         align-items: flex-start;
-        padding: 15px;
+        padding: 4%;
     }
 
     .contact-right {
         padding-left: 0;
-        margin-top: 15px;
+        margin-top: 4%;
     }
 
     .contact-right h2 {
-        font-size: 20px;
-        /* Daha küçük başlık boyutu */
+        font-size: 5vw;
+        /* Başlık boyutu viewport bazlı */
     }
 
     .contact-right p {
-        font-size: 14px;
-        /* Daha küçük metin boyutu */
+        font-size: 3.5vw;
+        /* Metin boyutu viewport bazlı */
     }
 }
 
 @media (max-width: 480px) {
     .contact-popup {
-        padding: 10px;
+        padding: 3%;
         width: 100%;
     }
 
     .contact-right h2 {
-        font-size: 18px;
-        /* Daha da küçük başlık boyutu */
+        font-size: 4.5vw;
+        /* Başlık boyutu viewport bazlı */
     }
 
     .contact-right p {
-        font-size: 13px;
-        /* Daha da küçük metin boyutu */
+        font-size: 3.2vw;
+        /* Metin boyutu viewport bazlı */
     }
 
     .whatsapp-button {
-        font-size: 14px;
-        /* Daha küçük buton yazı boyutu */
-        padding: 8px 15px;
-        /* Daha az yastıklama */
+        font-size: 3.5vw;
+        /* Buton yazı boyutu viewport bazlı */
+        padding: 2% 4%;
+        /* Padding % olarak */
     }
 
     .whatsapp-icon {
-        width: 18px;
-        /* Daha küçük ikon boyutu */
-        height: 18px;
+        width: 5vw;
+        /* İkon boyutu viewport bazlı */
+        height: 5vw;
     }
 }
-
 
 
 /* İlanlarımız Penceresi */
@@ -1370,8 +1375,6 @@ img {
     z-index: 9999;
     width: 100%;
     overflow-y: auto;
-}
-
 }
 
 /* Medya Sorguları: Ekran genişliği 480 pikselden küçük olduğunda */
@@ -3917,17 +3920,22 @@ body {
     /* Yazı rengi siyah */
     font-size: 2.5vw;
     /* Yazı boyutunu viewport genişliğine göre ayarlayın */
-    font-weight: bold;
-    /* Kalın yazı */
-    padding: 10px 20px 0;
-    /* İçerideki boşluk */
+    font-weight: 400;
+    /* Orta kalınlık */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Daha modern font ailesi */
+    padding: 5px 20px 0;
+    /* İçerideki boşluk - üst padding azaltıldı */
     border-radius: 8px;
     /* Kenar yuvarlama */
     white-space: nowrap;
     /* Satır atlamasını engelle */
     pointer-events: auto;
     /* Yazının tıklanabilir olmasını sağla */
-    margin-bottom: 0;
+    margin-bottom: 20px;
+    /* Arama alanı ile arasına boşluk */
+    margin-top: -10px;
+    /* Yukarı almak için negatif margin */
 }
 
 /* Mobil görünüm için */
@@ -3935,10 +3943,10 @@ body {
     .tagline {
         font-size: 150%;
         /* Yazı boyutunu küçültme */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Mobilde de aynı font ailesi */
         padding: 8px 15px;
         /* İçerideki boşlukları ayarlama */
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
-        /* ışıma efektini ayarlama */
         white-space: nowrap;
         /* Satır atlamalarını önleme */
         overflow: hidden;
@@ -3946,6 +3954,8 @@ body {
         text-overflow: ellipsis;
         /* Taşan yazıyı üç nokta ile gösterme */
         padding-top: 8px;
+        margin-bottom: 15px;
+        /* Mobilde arama alanı ile arasına boşluk */
     }
 
     .custom-options-container {
@@ -3964,6 +3974,8 @@ body {
         left: 1%;
         font-size: 110%;
         /* Yazı boyutunu daha da küçültme */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Küçük mobilde de aynı font ailesi */
         padding: 6px 10px;
         /* İçerideki boşlukları ayarlama */
         white-space: nowrap;
@@ -3972,6 +3984,8 @@ body {
         /* Taşan yazıyı gizleme */
         text-overflow: ellipsis;
         /* Taşan yazıyı üç nokta ile gösterme */
+        margin-bottom: 10px;
+        /* Küçük mobilde arama alanı ile arasına boşluk */
     }
 }
 
@@ -4619,6 +4633,8 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
 }
 
 .label-2 {
@@ -4651,6 +4667,12 @@ body {
     margin-top: 5px;
     font-size: 16px;
     text-align: center;
+}
+
+.service-popup-2:hover {
+    transform: translateY(-5%);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
 }
 
 @media (max-width: 768px) {
@@ -6768,8 +6790,6 @@ button:hover {
     color: #0056b3 !important;
 }
 
-    {}
-
 .comment-form input {
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -7402,6 +7422,7 @@ button:hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin-bottom: 10px;
     /* Alt satıra geçişler arasında boşluk */
+    cursor: pointer;
 }
 
 .kategori:hover {
@@ -8022,7 +8043,7 @@ button:focus {
 /* Navbar */
 .navbaar {
     background: linear-gradient(90deg, #009cfb, #0056b3);
-    padding: 10px 20px;
+    padding: 10px 40px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -8030,7 +8051,8 @@ button:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 97%;
+    max-width: 100%;
+    margin-left: -15px;
 }
 
 .logo {
@@ -9461,5 +9483,1277 @@ img[loading="lazy"] {
         font-size: 16px;
         /* Prevent iOS zoom */
         padding: 12px;
+    }
+}
+
+/*
+ İlan Ver butonu özel stili - Mağazam gibi */
+.auth-buttons .post-ad {
+    background-color: white !important;
+    color: #009cfb !important;
+    font-weight: bold !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    border: 1px solid #009cfb !important;
+    transition: all 0.3s ease !important;
+}
+
+.auth-buttons .post-ad:hover {
+    background-color: #009cfb !important;
+    color: white !important;
+    transform: scale(1.05) !important;
+}
+
+.auth-buttoons .post-ad {
+    background-color: white !important;
+    color: #009cfb !important;
+    font-weight: bold !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    border: 1px solid #009cfb !important;
+    transition: all 0.3s ease !important;
+}
+
+.auth-buttoons .post-ad:hover {
+    background-color: #009cfb !important;
+    color: white !important;
+    transform: scale(1.05) !important;
+}
+
+/* İl
+an Ver butonu container ve ücretsiz etiketi */
+.post-ad-container {
+    position: relative;
+    display: inline-block;
+}
+
+.free-tag {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background-color: #28a745;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transform: rotate(-15deg);
+    z-index: 10;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+/* Responsive tasarım - Tüm ekran boyutları için */
+@media (min-width: 1920px) {
+
+    /* 4K ve büyük ekranlar */
+    .auth-buttoons {
+        gap: 20px;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 10px 18px !important;
+        font-size: 16px !important;
+    }
+
+    .free-tag {
+        font-size: 11px;
+        padding: 3px 7px;
+    }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) {
+
+    /* Büyük masaüstü ekranlar */
+    .auth-buttoons {
+        gap: 18px;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 9px 16px !important;
+        font-size: 15px !important;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+
+    /* Orta büyüklükte masaüstü */
+    .auth-buttoons {
+        gap: 16px;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 8px 15px !important;
+        font-size: 14px !important;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+    /* Küçük masaüstü */
+    .auth-buttoons {
+        gap: 14px;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 8px 14px !important;
+        font-size: 14px !important;
+    }
+
+    .free-tag {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+    /* Tablet */
+    .auth-buttoons {
+        gap: 12px;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 7px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .free-tag {
+        font-size: 8px;
+        padding: 2px 4px;
+        top: -6px;
+        left: -6px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    /* Mobil */
+    .auth-buttoons {
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .free-tag {
+        font-size: 8px;
+        padding: 1px 3px;
+        top: -5px;
+        left: -5px;
+    }
+
+    .post-ad-container {
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Küçük mobil */
+    .auth-buttoons .post-ad {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+    }
+
+    .free-tag {
+        font-size: 7px;
+        padding: 1px 2px;
+    }
+}
+
+/* Navbar genişlik kontrolü */
+.navbaar-container {
+    max-width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+    .navbaar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+/* Auth buttons flex ayarları */
+.auth-buttoons {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+/* Basit mobil responsive - Sadece gerekli olanlar */
+@media (max-width: 768px) {
+    .auth-buttoons .post-ad {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+
+    .free-tag {
+        font-size: 8px !important;
+        padding: 2px 4px !important;
+        top: -6px !important;
+        left: -6px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-buttoons .post-ad {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+    }
+
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+}
+
+/* Küçük mobil cihazlar (375px - 424px) */
+@media (min-width: 375px) and (max-width: 424px) {
+    .auth-buttoons {
+        flex-direction: row !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+        min-width: 75px !important;
+    }
+
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+}
+
+/* Orta mobil cihazlar (425px - 767px) */
+@media (min-width: 425px) and (max-width: 767px) {
+    .auth-buttoons {
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-end !important;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        min-width: 80px !important;
+    }
+
+    .free-tag {
+        font-size: 8px !important;
+        padding: 2px 4px !important;
+        top: -6px !important;
+        left: -6px !important;
+    }
+}
+
+/* Tablet portrait (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .auth-buttoons .post-ad {
+        padding: 7px 14px !important;
+        font-size: 13px !important;
+    }
+
+    .free-tag {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+    }
+}
+
+/* Tablet landscape ve küçük laptop (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .auth-buttoons .post-ad {
+        padding: 8px 15px !important;
+        font-size: 14px !important;
+    }
+
+    .free-tag {
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+    }
+}
+
+/* Navbar mobil uyumluluk */
+@media (max-width: 991px) {
+    .navbaar-container {
+        flex-wrap: wrap !important;
+        padding: 0 10px !important;
+    }
+
+    .naav-linkss {
+        order: 3 !important;
+        width: 100% !important;
+        margin-top: 10px !important;
+        justify-content: center !important;
+        gap: 15px !important;
+    }
+
+    .auth-buttoons {
+        order: 2 !important;
+        margin-left: auto !important;
+        margin-right: 15px !important;
+    }
+
+    .logo {
+        order: 1 !important;
+    }
+}
+
+/* Hamburger menu aktif olduğunda */
+@media (max-width: 768px) {
+    .naav-linkss {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        flex-direction: column !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        border-radius: 0 0 10px 10px !important;
+        z-index: 1000 !important;
+    }
+
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss a {
+        color: #333 !important;
+        padding: 10px !important;
+        border-bottom: 1px solid #eee !important;
+        text-align: center !important;
+    }
+
+    .hamburger {
+        display: flex !important;
+        order: 3 !important;
+        margin-left: 10px !important;
+    }
+
+    .auth-buttoons {
+        order: 2 !important;
+        gap: 8px !important;
+        margin-right: 15px !important;
+    }
+}
+
+/* Çok geniş ekranlar için (1920px+) */
+@media (min-width: 1920px) {
+    .auth-buttoons .post-ad {
+        padding: 10px 20px !important;
+        font-size: 16px !important;
+    }
+
+    .free-tag {
+        font-size: 12px !important;
+        padding: 3px 8px !important;
+        top: -10px !important;
+        left: -10px !important;
+    }
+}
+
+/* Yükseklik bazlı responsive (kısa ekranlar) */
+@media (max-height: 600px) {
+    .auth-buttoons .post-ad {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+
+    .free-tag {
+        font-size: 8px !important;
+        padding: 1px 3px !important;
+    }
+
+    .navbaar {
+        padding: 8px 15px !important;
+    }
+}
+
+/* Landscape orientation mobil */
+@media (max-width: 767px) and (orientation: landscape) {
+    .auth-buttoons {
+        gap: 5px !important;
+    }
+
+    .auth-buttoons .post-ad {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 2px !important;
+    }
+
+    .navbaar {
+        padding: 5px 10px !important;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .auth-buttoons .post-ad {
+        min-height: 44px !important;
+        /* Apple'ın önerdiği minimum touch target */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .post-ad-container {
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+}
+
+/* High DPI ekranlar için */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    .free-tag {
+        border: 0.5px solid rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .auth-buttoons .post-ad {
+        border-width: 1.5px !important;
+    }
+}
+
+/* Mobil düz
+enleme - Hamburger menü İlan Ver yanında */
+@media (max-width: 768px) {
+    .navbaar-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .logo {
+        order: 1 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .auth-buttoons {
+        order: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+    }
+
+    .hamburger {
+        order: 3 !important;
+        display: flex !important;
+        margin-left: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Giriş Yap ve İlan Ver butonları aynı boyut */
+    .auth-buttoons .login,
+    .auth-buttoons .post-ad {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        min-width: 70px !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Giriş Yap butonu */
+    .auth-buttoons .login {
+        background-color: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    .auth-buttoons .login:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+    }
+
+    /* İlan Ver butonu */
+    .auth-buttoons .post-ad {
+        background-color: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+
+    .auth-buttoons .post-ad:hover {
+        background-color: #009cfb !important;
+        color: white !important;
+    }
+
+    /* Ücretsiz etiketi mobilde */
+    .free-tag {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+
+    /* Navbar menüsü gizli */
+    .naav-linkss {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        flex-direction: column !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        border-radius: 0 0 10px 10px !important;
+        z-index: 1000 !important;
+    }
+
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss a {
+        color: #333 !important;
+        padding: 12px !important;
+        border-bottom: 1px solid #eee !important;
+        text-align: center !important;
+        font-size: 14px !important;
+        text-decoration: none !important;
+    }
+
+    .naav-linkss a:hover {
+        background-color: #f8f9fa !important;
+        color: #009cfb !important;
+    }
+}
+
+/* Küçük mobil cihazlar için */
+@media (max-width: 480px) {
+
+    .auth-buttoons .login,
+    .auth-buttoons .post-ad {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        min-width: 60px !important;
+    }
+
+    .free-tag {
+        font-size: 6px !important;
+        padding: 1px 2px !important;
+        top: -4px !important;
+        left: -4px !important;
+    }
+
+    .auth-buttoons {
+        gap: 6px !important;
+    }
+
+    .hamburger {
+        margin-left: 6px !important;
+    }
+}
+
+/* Çok küçük mobil cihazlar için */
+@media (max-width: 360px) {
+
+    .auth-buttoons .login,
+    .auth-buttoons .post-ad {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        min-width: 55px !important;
+    }
+
+    .auth-buttoons {
+        gap: 4px !important;
+    }
+
+    .hamburger {
+        margin-left: 4px !important;
+        transform: scale(0.9) !important;
+    }
+}
+
+/* Hamburger menü stilleri */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.hamburger:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.line {
+    width: 20px;
+    height: 2px;
+    background-color: white;
+    margin: 2px 0;
+    transition: 0.3s;
+    border-radius: 1px;
+}
+
+/* Hamburger animasyonu */
+.hamburger.active .line:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.active .line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active .line:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+/* 
+DÜZELTME - Mobil tasarım kompakt ve düzgün */
+@media (max-width: 768px) {
+    .navbaar {
+        padding: 8px 12px !important;
+    }
+
+    .navbaar-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+    }
+
+    /* Logo küçük */
+    .logo img {
+        width: 55px !important;
+    }
+
+    .visitor-counts-navbar {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+        margin-left: 5px !important;
+        transform: scale(0.9) !important;
+    }
+
+    /* Auth butonları kompakt */
+    .auth-buttoons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important;
+        margin-left: auto !important;
+        margin-right: 5px !important;
+    }
+
+    /* Butonlar küçük ve aynı boyut */
+    .auth-buttoons .login,
+    .auth-buttoons .post-ad {
+        padding: 0 !important;
+        font-size: 10px !important;
+        border-radius: 3px !important;
+        font-weight: 600 !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+        text-align: center !important;
+        height: 28px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Giriş Yap */
+    .auth-buttoons .login {
+        background: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    /* İlan Ver */
+    .auth-buttoons .post-ad {
+        background: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+
+    /* Küçük ücretsiz etiketi */
+    .free-tag {
+        font-size: 5px !important;
+        padding: 1px 2px !important;
+        top: -3px !important;
+        left: -3px !important;
+        border-radius: 2px !important;
+        background-color: #28a745 !important;
+    }
+
+    /* Hamburger menü kompakt */
+    .hamburger {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 28px !important;
+        height: 28px !important;
+        cursor: pointer !important;
+        border-radius: 3px !important;
+        padding: 4px !important;
+    }
+
+    .line {
+        width: 14px !important;
+        height: 1.5px !important;
+        background-color: white !important;
+        margin: 1px 0 !important;
+        border-radius: 1px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbaar {
+        padding: 6px 10px !important;
+    }
+
+    .logo img {
+        width: 50px !important;
+    }
+
+    .auth-buttoons .login,
+    .auth-buttoons .post-ad {
+        padding: 0 !important;
+        font-size: 9px !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 26px !important;
+    }
+
+    .hamburger {
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    .line {
+        width: 12px !important;
+    }
+
+    .free-tag {
+        font-size: 4px !important;
+        padding: 0.5px 1px !important;
+    }
+}
+
+/* MOBİL NAVBAR FINAL DÜZELTMESİ */
+@media (max-width: 991px) {
+
+    /* Navbar container düzeni - Logo sola yapışık */
+    .navbaar-container {
+        display: flex !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+        gap: 0 !important;
+    }
+
+    /* Logo en solda */
+    .logo {
+        flex-shrink: 0 !important;
+        margin-right: 0 !important;
+        order: 1 !important;
+        margin-left: 0 !important;
+    }
+
+    /* Visitor counts logo yanında */
+    .visitor-counts-navbar {
+        order: 1 !important;
+        margin-left: 5px !important;
+        margin-right: auto !important;
+    }
+
+    /* Auth butonları sağda */
+    .auth-buttoons,
+    .auth-buttons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 150px;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        order: 2 !important;
+    }
+
+    /* Hamburger en sağda */
+    .hamburger {
+        order: 3 !important;
+        margin-left: 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Post-ad container */
+    .post-ad-container {
+        position: relative !important;
+        display: inline-flex !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* TÜM BUTONLAR AYNI BOYUT */
+    .auth-buttoons .login,
+    .auth-buttons .login {
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        background: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        background: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+
+    /* Ücretsiz etiketi - yeşil, çapraz, sol üst köşede */
+    .free-tag {
+        position: absolute !important;
+        background-color: #28a745 !important;
+        color: white !important;
+        font-size: 6px !important;
+        font-weight: bold !important;
+        padding: 1px 3px !important;
+        top: -6px !important;
+        left: -6px !important;
+        border-radius: 2px !important;
+        transform: rotate(-12deg) !important;
+        z-index: 100 !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        white-space: nowrap !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .auth-buttoons .login,
+    .auth-buttons .login,
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        height: 26px !important;
+        min-height: 26px !important;
+        max-height: 26px !important;
+        font-size: 9px !important;
+    }
+
+    .free-tag {
+        font-size: 5px !important;
+        padding: 1px 2px !important;
+        top: -5px !important;
+        left: -5px !important;
+    }
+}
+
+/* ===
+========================================== */
+/* MOBİL NAVBAR FİNAL OVERRIDE - EN SON YAZILAN */
+/* ============================================= */
+@media (max-width: 991px) {
+
+    .auth-buttoons,
+    .auth-buttons,
+    nav .auth-buttoons,
+    nav .auth-buttons,
+    .navbaar .auth-buttoons,
+    .navbaar .auth-buttons {
+        gap: 15px !important;
+    }
+
+    .hamburger,
+    nav .hamburger,
+    .navbaar .hamburger {
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+
+    .navbaar-container {
+        position: relative !important;
+    }
+
+    .post-ad-container {
+        position: relative !important;
+    }
+
+    .free-tag {
+        position: absolute !important;
+        top: -10px !important;
+        left: -10px !important;
+        transform: rotate(-15deg) !important;
+        background-color: #28a745 !important;
+        z-index: 200 !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .auth-buttoons,
+    .auth-buttons,
+    nav .auth-buttoons,
+    nav .auth-buttons,
+    .navbaar .auth-buttoons,
+    .navbaar .auth-buttons {
+        gap: 20px !important;
+    }
+}
+
+/* ===
+========================================== */
+/* MOBİL NAVBAR - HAMBURGER VE BUTON DÜZELTMESİ */
+/* ============================================= */
+@media (max-width: 991px) {
+
+    /* Navbar container */
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        position: relative !important;
+        padding-right: 50px !important;
+    }
+
+    /* Auth butonları yan yana ve aynı hizada */
+    .auth-buttoons,
+    .auth-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-right: 15px !important;
+    }
+
+    /* Giriş Yap ve İlan Ver butonları aynı boyut ve hizada */
+    .auth-buttoons .login,
+    .auth-buttons .login,
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 32px !important;
+        padding: 0 12px !important;
+        font-size: 11px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    .auth-buttoons .login,
+    .auth-buttons .login {
+        background: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        background: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+
+    /* Post-ad container */
+    .post-ad-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        position: relative !important;
+    }
+
+    /* Ücretsiz etiketi */
+    .free-tag {
+        position: absolute !important;
+        top: -8px !important;
+        left: -8px !important;
+        font-size: 7px !important;
+        padding: 2px 4px !important;
+        background-color: #28a745 !important;
+        color: white !important;
+        border-radius: 3px !important;
+        transform: rotate(-15deg) !important;
+        z-index: 200 !important;
+    }
+
+    /* HAMBURGER MENÜ - GÖRÜNÜR VE EN SAĞDA */
+    .hamburger {
+        display: flex !important;
+        flex-direction: column !important;
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        cursor: pointer !important;
+        z-index: 1001 !important;
+        padding: 5px !important;
+    }
+
+    /* Hamburger çizgileri */
+    .hamburger .line,
+    .line {
+        display: block !important;
+        width: 25px !important;
+        height: 3px !important;
+        background-color: white !important;
+        margin: 3px 0 !important;
+        transition: 0.3s !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .auth-buttoons,
+    .auth-buttons {
+        gap: 8px !important;
+        margin-right: 30px !important;
+    }
+
+    .auth-buttoons .login,
+    .auth-buttons .login,
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        height: 28px !important;
+        padding: 0 8px !important;
+        font-size: 9px !important;
+    }
+
+    .hamburger .line,
+    .line {
+        width: 22px !important;
+        height: 2px !important;
+        margin: 2px 0 !important;
+    }
+}
+
+
+/* ============================================= */
+/* MOBİL NAVBAR - SON DÜZELTİLMİŞ VERSİYON */
+/* ============================================= */
+@media (max-width: 991px) {
+
+    /* Navbar container */
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        position: relative !important;
+        padding: 10px 15px !important;
+    }
+
+    /* Auth butonları - yan yana ve hizalı */
+    .auth-buttoons,
+    .auth-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-right: 32px !important;
+    }
+
+    /* Butonlar aynı boyut ve hizada */
+    .auth-buttoons .login,
+    .auth-buttons .login,
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 32px !important;
+        padding: 0 12px !important;
+        font-size: 11px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+        white-space: nowrap !important;
+        box-sizing: border-box !important;
+        vertical-align: middle !important;
+    }
+
+    .auth-buttoons .login,
+    .auth-buttons .login {
+        background: transparent !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        background: white !important;
+        color: #009cfb !important;
+        border: 1px solid #009cfb !important;
+    }
+
+    /* Post-ad container */
+    .post-ad-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        position: relative !important;
+    }
+
+    /* Ücretsiz etiketi */
+    .free-tag {
+        position: absolute !important;
+        top: -8px !important;
+        left: -8px !important;
+        font-size: 7px !important;
+        padding: 2px 4px !important;
+        background-color: #28a745 !important;
+        color: white !important;
+        border-radius: 3px !important;
+        transform: rotate(-15deg) !important;
+        z-index: 200 !important;
+    }
+
+    /* HAMBURGER MENÜ - GÖRÜNÜR VE EN SAĞDA */
+    .hamburger {
+        display: flex !important;
+        flex-direction: column !important;
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        cursor: pointer !important;
+        z-index: 1001 !important;
+        padding: 5px !important;
+    }
+
+    /* Hamburger çizgileri */
+    .hamburger .line,
+    .line {
+        display: block !important;
+        width: 25px !important;
+        height: 3px !important;
+        background-color: white !important;
+        margin: 3px 0 !important;
+        transition: 0.3s !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .auth-buttoons,
+    .auth-buttons {
+        gap: 8px !important;
+        margin-right: 30px !important;
+    }
+
+    .auth-buttoons .login,
+    .auth-buttons .login,
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        height: 28px !important;
+        padding: 0 8px !important;
+        font-size: 9px !important;
+    }
+
+    .hamburger .line,
+    .line {
+        width: 22px !important;
+        height: 2px !important;
+        margin: 2px 0 !important;
+    }
+}
+
+
+/* ============================================
+   MOBİL NAVBAR - EN YÜKSEK ÖNCELİKLİ STİLLER
+   Butonları sağa kaydırmak için translateX kullanıyoruz
+   ============================================ */
+@media (max-width: 991px) {
+
+    nav.navbaar .auth-buttoons,
+    nav.navbaar .auth-buttons,
+    .navbaar .auth-buttoons,
+    .navbaar .auth-buttons,
+    .navbaar-container .auth-buttoons,
+    .navbaar-container .auth-buttons,
+    .auth-buttoons,
+    .auth-buttons {
+        margin-right: 5px !important;
+        transform: translateX(25px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    nav.navbaar .auth-buttoons,
+    nav.navbaar .auth-buttons,
+    .navbaar .auth-buttoons,
+    .navbaar .auth-buttons,
+    .navbaar-container .auth-buttoons,
+    .navbaar-container .auth-buttons,
+    .auth-buttoons,
+    .auth-buttons {
+        margin-right: 5px !important;
+        transform: translateX(20px) !important;
+    }
+}
+
+@media (max-width: 375px) {
+
+    nav.navbaar .auth-buttoons,
+    nav.navbaar .auth-buttons,
+    .navbaar .auth-buttoons,
+    .navbaar .auth-buttons,
+    .navbaar-container .auth-buttoons,
+    .navbaar-container .auth-buttons,
+    .auth-buttoons,
+    .auth-buttons {
+        margin-right: 5px !important;
+        transform: translateX(10px) !important;
     }
 }

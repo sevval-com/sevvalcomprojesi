@@ -140,6 +140,39 @@
             background-color: var(--primary-color);
             color: white;
         }
+
+        /* Price Edit Styles */
+        .price-container {
+            position: relative;
+        }
+
+        .price-display {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .price-display:hover {
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            padding: 2px 4px;
+        }
+
+        .edit-price-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .price-display:hover .edit-price-btn {
+            opacity: 1;
+        }
+
+        .price-edit .input-group {
+            min-width: 180px;
+        }
+
+        .price-input {
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -311,7 +344,25 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="fw-bold text-dark">@item.Ilan.Price.ToString("N0") ₺</div>
+                                                <div class="price-container">
+                                                    <div class="price-display fw-bold text-dark" data-ilan-id="@item.Ilan.Id" data-current-price="@item.Ilan.Price">
+                                                        @item.Ilan.Price.ToString("N0") ₺
+                                                        <button class="btn btn-sm btn-link p-0 ms-1 edit-price-btn" title="Fiyatı Düzenle">
+                                                            <i class="fa-solid fa-pencil text-primary"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="price-edit d-none">
+                                                        <div class="input-group input-group-sm">
+                                                            <input type="number" class="form-control price-input" value="@item.Ilan.Price" min="0" step="1000">
+                                                            <button class="btn btn-success save-price-btn" type="button" title="Kaydet">
+                                                                <i class="fa-solid fa-check"></i>
+                                                            </button>
+                                                            <button class="btn btn-secondary cancel-price-btn" type="button" title="İptal">
+                                                                <i class="fa-solid fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div class="small text-muted">@item.Ilan.Area m²</div>
                                             </td>
                                             <td>
@@ -695,6 +746,130 @@
                     showInfo(res.message);
                     if(res.success) setTimeout(() => location.reload(), 1500);
                 });
+            });
+
+            // --- FİYAT HIZLI DÜZENLEME ---
+            
+            // Fiyat düzenleme butonuna tıklama
+            $(document).on('click', '.edit-price-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                
+                // Diğer açık düzenleme alanlarını kapat
+                $('.price-edit').addClass('d-none');
+                $('.price-display').removeClass('d-none');
+                
+                // Bu alanı aç
+                priceDisplay.addClass('d-none');
+                priceEdit.removeClass('d-none');
+                
+                // Input'a focus ver
+                priceEdit.find('.price-input').focus().select();
+            });
+
+            // Fiyat kaydetme
+            $(document).on('click', '.save-price-btn', function() {
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                const priceInput = priceEdit.find('.price-input');
+                
+                const ilanId = priceDisplay.data('ilan-id');
+                const newPrice = parseFloat(priceInput.val());
+                const currentPrice = parseFloat(priceDisplay.data('current-price'));
+                
+                if (!newPrice || newPrice <= 0) {
+                    alert('Geçerli bir fiyat giriniz.');
+                    return;
+                }
+                
+                if (newPrice === currentPrice) {
+                    // Değişiklik yok, sadece kapat
+                    priceEdit.addClass('d-none');
+                    priceDisplay.removeClass('d-none');
+                    return;
+                }
+                
+                // Loading state
+                $(this).prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '@Url.Action("UpdatePrice")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        IlanId: ilanId,
+                        NewPrice: newPrice
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            // Fiyatı güncelle
+                            priceDisplay.html(newPrice.toLocaleString('tr-TR') + ' ₺ <button class="btn btn-sm btn-link p-0 ms-1 edit-price-btn" title="Fiyatı Düzenle"><i class="fa-solid fa-pencil text-primary"></i></button>');
+                            priceDisplay.data('current-price', newPrice);
+                            
+                            // Başarı mesajı göster - daha görünür hale getir
+                            const successMsg = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;"><i class="fa-solid fa-check-circle me-2"></i>İlanın fiyatı değiştirildi<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+                            $('body').append(successMsg);
+                            
+                            // 4 saniye sonra otomatik kapat
+                            setTimeout(() => {
+                                successMsg.alert('close');
+                            }, 4000);
+                            
+                            // Edit modunu kapat
+                            priceEdit.addClass('d-none');
+                            priceDisplay.removeClass('d-none');
+                        } else {
+                            alert(response.message || 'Fiyat güncellenirken bir hata oluştu.');
+                        }
+                    },
+                    error: function() {
+                        alert('Fiyat güncellenirken bir hata oluştu.');
+                    },
+                    complete: function() {
+                        // Loading state'i kaldır
+                        priceContainer.find('.save-price-btn').prop('disabled', false).html('<i class="fa-solid fa-check"></i>');
+                    }
+                });
+            });
+
+            // Fiyat düzenleme iptal
+            $(document).on('click', '.cancel-price-btn', function() {
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                const priceInput = priceEdit.find('.price-input');
+                
+                // Orijinal değeri geri yükle
+                const originalPrice = priceDisplay.data('current-price');
+                priceInput.val(originalPrice);
+                
+                // Edit modunu kapat
+                priceEdit.addClass('d-none');
+                priceDisplay.removeClass('d-none');
+            });
+
+            // Enter tuşu ile kaydet, Escape ile iptal
+            $(document).on('keydown', '.price-input', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $(this).closest('.price-edit').find('.save-price-btn').click();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    $(this).closest('.price-edit').find('.cancel-price-btn').click();
+                }
+            });
+
+            // Sayfa tıklamasında açık düzenleme alanlarını kapat
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.price-container').length) {
+                    $('.price-edit').addClass('d-none');
+                    $('.price-display').removeClass('d-none');
+                }
             });
         });
     </script>
