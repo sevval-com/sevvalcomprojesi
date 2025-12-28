@@ -707,7 +707,6 @@
                 }
                 <!-- İlan Ver butonu -->
                 <div class="post-ad-container">
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-a
                     <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
                 </div>
             </div>

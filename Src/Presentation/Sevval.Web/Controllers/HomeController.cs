@@ -441,6 +441,41 @@ public class HomeController : Controller
         });
     }
 
+    [HttpPost]
+    public async Task<IActionResult> CreateTestGununIlani()
+    {
+        // Test için basit bir günün ilanı oluştur
+        var testIlan = new GununIlanModel
+        {
+            Title = "Test Günün İlanı - Satılık Daire",
+            Description = "Bu test amaçlı oluşturulmuş bir günün ilanıdır.",
+            Category = "Konut (Yaşam Alanı)",
+            KonutDurumu = "Satılık",
+            MulkTipi = "Daire",
+            Price = 500000,
+            Area = 120,
+            OdaSayisi = "3+1",
+            BinaYasi = "5",
+            sehir = "İstanbul",
+            semt = "Kadıköy",
+            mahalleKoy = "Fenerbahçe",
+            FirstName = "Test",
+            LastName = "Kullanıcı",
+            PhoneNumber = "0555 123 45 67",
+            Email = "test@example.com",
+            YayinlanmaTarihi = DateTime.Today,
+            GirisTarihi = DateTime.Now,
+            Status = "active",
+            GoruntulenmeSayisi = 0,
+            GoruntulenmeTarihi = DateTime.Now
+        };
+
+        _context.GununIlanlari.Add(testIlan);
+        await _context.SaveChangesAsync();
+
+        return Json(new { success = true, message = "Test günün ilanı oluşturuldu", ilanId = testIlan.Id });
+    }
+
     private async Task UpdateVisitorCountsAsync()
     {
         var activeVisitorCount = await _context.Visitors.AsNoTracking().Where(v => v.VisitTime > DateTime.Now.AddMinutes(-10)).CountAsync();
