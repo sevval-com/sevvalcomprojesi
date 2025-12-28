@@ -454,6 +454,22 @@
                 if (els.metaAp) els.metaAp.textContent = (meta.ada && meta.parsel) ? `${meta.ada} / ${meta.parsel}` : '—';
             };
 
+            const areRequiredElsReady = () => {
+                return Boolean(
+                    els.langChips.length &&
+                    els.tapuChips.length &&
+                    els.logoInput &&
+                    els.avatarInput &&
+                    els.descInput &&
+                    els.generateBtn
+                );
+            };
+
+            if (!areRequiredElsReady()) {
+                console.warn('Drone form elemanlari eksik. Sayfa tam yuklenmedi.');
+                return;
+            }
+
             els.langChips.forEach((chip) => {
                 chip.addEventListener('click', () => {
                     state.lang = chip.dataset.value || 'tr';
@@ -473,6 +489,7 @@
             });
 
             const handleFile = (inputEl, previewEl, key) => {
+                if (!inputEl || !previewEl) return;
                 inputEl.addEventListener('change', () => {
                     const file = inputEl.files?.[0];
                     if (!file) return;
