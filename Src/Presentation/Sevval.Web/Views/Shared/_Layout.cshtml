@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 @using Microsoft.AspNetCore.Identity
@@ -59,7 +59,157 @@
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        /* MASAÜSTÜ VE MOBİL NAVBAR DÜZELTMELERİ */
         
+        /* Masaüstü - butonlar arası mesafe */
+        .auth-buttoons, .auth-buttons {
+            gap: 15px !important;
+        }
+        
+        /* Ücretsiz etiketi - masaüstü */
+        .post-ad-container {
+            position: relative !important;
+            display: inline-block !important;
+        }
+        
+        .free-tag {
+            position: absolute !important;
+            top: -8px !important;
+            left: -8px !important;
+            background-color: #28a745 !important;
+            color: white !important;
+            font-size: 9px !important;
+            font-weight: bold !important;
+            padding: 2px 5px !important;
+            border-radius: 3px !important;
+            transform: rotate(-12deg) !important;
+            z-index: 100 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        }
+        
+        /* MOBİL - 991px ve altı */
+        @@media (max-width: 991px) {
+            .navbaar-container {
+                display: flex !important;
+                align-items: center !important;
+                position: relative !important;
+                padding: 8px 12px !important;
+            }
+            
+            .auth-buttoons,
+            .auth-buttons {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 10px !important;
+                margin-right: 15px !important;
+            }
+            
+            .post-ad-container {
+                display: inline-flex !important;
+                align-items: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .auth-buttoons .login,
+            .auth-buttons .login {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 65px !important;
+                height: 32px !important;
+                padding: 0 !important;
+                font-size: 11px !important;
+                border-radius: 4px !important;
+                font-weight: bold !important;
+                white-space: nowrap !important;
+                box-sizing: border-box !important;
+                background: transparent !important;
+                color: white !important;
+                border: 1px solid white !important;
+                margin: 0 !important;
+            }
+            
+            .auth-buttoons .post-ad,
+            .auth-buttons .post-ad {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 65px !important;
+                height: 32px !important;
+                padding: 0 !important;
+                font-size: 11px !important;
+                border-radius: 4px !important;
+                font-weight: bold !important;
+                white-space: nowrap !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                color: #009cfb !important;
+                border: 1px solid #009cfb !important;
+                margin: 0 !important;
+            }
+            
+            /* Ücretsiz etiketi */
+            .free-tag {
+                position: absolute !important;
+                top: -6px !important;
+                left: -6px !important;
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+        }
+        
+        /* Küçük mobil - 480px ve altı */
+        @@media (max-width: 480px) {
+            .auth-buttoons,
+            .auth-buttons {
+                gap: 8px !important;
+                margin-right: 12px !important;
+            }
+            
+            .auth-buttoons .login,
+            .auth-buttoons .post-ad,
+            .auth-buttons .login,
+            .auth-buttons .post-ad {
+                width: 58px !important;
+                height: 28px !important;
+                font-size: 10px !important;
+            }
+            
+            .free-tag {
+                font-size: 7px !important;
+                top: -5px !important;
+                left: -5px !important;
+                padding: 1px 3px !important;
+            }
+        }
+        
+        /* Çok küçük mobil - 375px ve altı */
+        @@media (max-width: 375px) {
+            .auth-buttoons,
+            .auth-buttons {
+                gap: 6px !important;
+                margin-right: 10px !important;
+            }
+            
+            .auth-buttoons .login,
+            .auth-buttoons .post-ad,
+            .auth-buttons .login,
+            .auth-buttons .post-ad {
+                width: 52px !important;
+                height: 26px !important;
+                font-size: 9px !important;
+            }
+            
+            .free-tag {
+                font-size: 6px !important;
+                top: -4px !important;
+                left: -4px !important;
+                padding: 1px 2px !important;
+            }
+        }
     </style>
     <style>
         /* Navbar'daki ziyaretçi sayıları için stil */
@@ -70,7 +220,7 @@
             font-size: 13px;
             font-weight: 600;
             color: #fff;
-            margin-left: -10px;
+            margin-left: 0;
             transform: scale(.95);
             background: rgba(255,255,255,.18);
             border: 1px solid rgba(255,255,255,.35);
@@ -375,24 +525,28 @@
             }
         }
 
-        /* Responsive tasarım */
+        /* Responsive tasarım - % tabanlı */
         @@media (max-width: 768px) {
             .pencere {
-                padding: 20px;
+                padding: 5%;
                 align-items: flex-start;
                 padding-top: 10vh;
             }
             
             .pencere-icerik {
-                max-width: 400px;
+                max-width: 90%;
                 min-height: auto;
                 max-height: 100% !important;
                 overflow-y: auto;
                 height: 100% !important;
             }
             .kapat-buton{
-                width: 30px !important;
-                right: 10px !important;
+                width: 8vw !important;
+                max-width: 35px !important;
+                height: 8vw !important;
+                max-height: 35px !important;
+                right: 3% !important;
+                font-size: 4vw !important;
             }
             .pencere-icerik{
                 width: 100%;
@@ -404,21 +558,21 @@
                 transform: scale(1) !important;
             }
             .sol-bolum, .sag-bolum {
-                padding: 25px 20px;
+                padding: 6% 5%;
             }
             
             .sol-bolum h2, .sag-bolum h2 {
-                font-size: 20px;
-                margin-bottom: 15px;
+                font-size: 5vw;
+                margin-bottom: 4%;
             }
 
             .icon-container i {
-                font-size: 40px;
+                font-size: 10vw;
             }
 
             .section-description {
-                font-size: 13px;
-                margin-bottom: 20px;
+                font-size: 3.5vw;
+                margin-bottom: 5%;
             }
             .tagline-container{
                 display: none;
@@ -427,7 +581,7 @@
 
         @@media (max-width: 480px) {
             .pencere {
-                padding: 15px;
+                padding: 4%;
                 align-items: flex-start;
                 padding-top: 5vh;
             }
@@ -446,28 +600,28 @@
             }
             
             .sol-bolum, .sag-bolum {
-                padding: 20px 15px;
+                padding: 5% 4%;
                 min-height: auto;
             }
 
             .icon-container i {
-                font-size: 32px;
+                font-size: 8vw;
             }
 
             .sol-bolum h2, .sag-bolum h2 {
-                font-size: 18px;
-                margin-bottom: 10px;
+                font-size: 4.5vw;
+                margin-bottom: 3%;
             }
 
             .section-description {
-                font-size: 12px;
-                margin-bottom: 15px;
+                font-size: 3vw;
+                margin-bottom: 4%;
             }
 
             .baglanti {
-                padding: 12px 20px;
-                font-size: 14px;
-                margin: 8px 0;
+                padding: 3% 5%;
+                font-size: 3.5vw;
+                margin: 2% 0;
             }
         }
     </style>
@@ -492,15 +646,16 @@
     <style>
         .whatsapp-float {
             position: fixed;
-            bottom: 20px; /* Ekranın altından 20px yukarıda */
-            right: 20px; /* Ekranın sağından 20px içeride */
+            bottom: 5%; /* Ekranın altından % olarak */
+            right: 5%; /* Ekranın sağından % olarak */
             z-index: 1001; /* Üstte görünmesini sağlamak için yüksek bir z-index */
         }
 
         .whatsapp-image {
-            width: 90px; /* Resmin genişliği */
-            height: auto; /* Yüksekliği orantılı olarak ayarla
-                                                                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
+            width: 20vw; /* Resmin genişliği viewport bazlı */
+            max-width: 90px; /* Maksimum genişlik */
+            height: auto; /* Yüksekliği orantılı olarak ayarla */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
             transition: transform 0.3s; /* Hover efekti için geçiş süresi */
         }
 
@@ -512,15 +667,15 @@
         /* Yüzen Dil Seç Butonu */
         #floating_button {
             position: absolute;
-            top: 15px;
+            top: 4%;
             left: 23%;
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 2.5% 5%;
             border-radius: 50px;
             cursor: pointer;
             z-index: 9999;
-            font-size: 16px;
+            font-size: 4vw;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease;
@@ -535,7 +690,7 @@
     <style>
         .visitor-counts-navbar {
             display: flex;
-            gap: 15px;
+            gap: 4%;
             align-items: start;
             font-size: 14px;
             flex-direction: column;
@@ -545,7 +700,7 @@
             .visitor-counts-navbar span {
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 2%;
                 white-space: nowrap;
             }
 
@@ -554,35 +709,35 @@
                  
             }
 
-        /* Mobil düzenleme - 480px altında */
+        /* Mobil düzenleme - 480px altında - % tabanlı */
         @@media (max-width: 480px) {
             .visitor-counts-navbar {
                 flex-direction: column;
-                gap: 2px;
-                font-size: 12px;
+                gap: 1%;
+                font-size: 3vw;
             }
 
                 .visitor-counts-navbar .icon {
-                    font-size: 12px;
+                    font-size: 3vw;
                 }
 
                 .visitor-counts-navbar span {
-                    font-size: 12px;
+                    font-size: 3vw;
                 }
         }
 
-        /* Çok küçük ekranlar için - 320px altında */
+        /* Çok küçük ekranlar için - 320px altında - % tabanlı */
         @@media (max-width: 320px) {
             .visitor-counts-navbar {
-                font-size: 11px;
+                font-size: 3.5vw;
             }
 
                 .visitor-counts-navbar .icon {
-                    font-size: 12px;
+                    font-size: 3.5vw;
                 }
 
                 .visitor-counts-navbar span {
-                    font-size: 10px;
+                    font-size: 3.2vw;
                 }
         }
     </style>
@@ -633,7 +788,7 @@
     <!-- End Google Tag Manager (noscript) -->
     <!-- Navbar -->
     <nav class="navbaar">
-        <div class="navbaar-container">
+        <div class="navbaar-container" style="position: relative;">
             <div class="logo">
                 <img src="~/images/LOGO mavi.webp" alt="Firma Logosu" onclick="window.location.href='/'">
                 <!-- Sevval.com yazısı yerine ziyaretçi sayıları -->
@@ -663,7 +818,7 @@
                 <li><a href="@Url.Action("Index", "Blog")">Blog</a></li>
                 
             </ul>
-            <div class="auth-buttoons">
+            <div class="auth-buttoons" style="margin-right: -15px !important;">
                 @if (User.Identity.IsAuthenticated)
                 {
                     var currentUser = await UserManager.GetUserAsync(User);
@@ -703,38 +858,75 @@
                 }
                 else
                 {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
+                    <a href="#" class="login" id="giris-buton" style="margin-right: 15px;">Giriş Yap</a>
                 }
-                <!-- İlan Ver butonu -->
-                <div class="post-ad-container">
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-a
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                <!-- İlan Ver butonu container ile -->
+                <div class="post-ad-container" style="position: relative; display: inline-block;">
+                    <span class="free-tag" style="position: absolute; top: -8px; left: -5px; background-color: #28a745; color: white; font-size: 10px; font-weight: bold; padding: 3px 6px; border-radius: 4px; transform: rotate(-18deg); z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">İlan Ver</a>
+                </div>
+                
+                <!-- MOBİL MENÜ BUTONU - Sadece mobilde görünür -->
+                <div class="mobile-menu-btn" id="mobile-menu-btn" style="display: none; flex-direction: column; margin-left: 8px; margin-top: -10px; cursor: pointer; padding: 8px; background: rgba(255,255,255,0.2); border-radius: 4px;">
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
                 </div>
             </div>
-
-            <!-- Hamburger Menu Icon -->
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
+            
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
-                    var hamburgerMenu = document.getElementById("hamburger-menu");
                     var navLinks = document.getElementById("nav-links");
-
-                    // Hamburger menüye tıklanınca menüyü aç/kapat
-                    hamburgerMenu.addEventListener("click", function (event) {
-                        navLinks.classList.toggle("active");
-                        event.stopPropagation(); // Hamburger menüye tıklanınca kapanmayı engelle
-                    });
-
-                    // Sayfanın herhangi bir yerine tıklanınca menüyü kapat
-                    document.addEventListener("click", function (event) {
-                        if (!navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
-                            navLinks.classList.remove("active");
+                    var mobileMenuBtn = document.getElementById("mobile-menu-btn");
+                    
+                    // Mobilde menü butonunu göster
+                    function handleMobileMenu() {
+                        if (window.innerWidth <= 991) {
+                            if (mobileMenuBtn) {
+                                mobileMenuBtn.style.display = 'flex';
+                                mobileMenuBtn.style.flexDirection = 'column';
+                            }
+                        } else {
+                            if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+                            if (navLinks) navLinks.classList.remove('active');
+                        }
+                    }
+                    
+                    // Menü butonuna tıklayınca
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (navLinks) navLinks.classList.toggle('active');
+                        });
+                    }
+                    
+                    // Sayfa dışına tıklayınca menüyü kapat
+                    document.addEventListener('click', function(e) {
+                        if (navLinks && mobileMenuBtn && !navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                            navLinks.classList.remove('active');
                         }
                     });
+                    
+                    handleMobileMenu();
+                    window.addEventListener('resize', handleMobileMenu);
+                    
+                    // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
+                    function fixMobileNavbar() {
+                        if (window.innerWidth <= 991) {
+                            // Auth butonları - gap 20px ve hizalı
+                            var authButtons = document.querySelector('.auth-buttoons');
+                            if (authButtons) {
+                                authButtons.style.display = 'flex';
+                                authButtons.style.alignItems = 'center';
+                                authButtons.style.gap = '20px';
+                                authButtons.style.marginRight = '10px';
+                            }
+                        }
+                    }
+                    
+                    // Sayfa yüklendiğinde ve resize olduğunda çalıştır
+                    fixMobileNavbar();
+                    window.addEventListener('resize', fixMobileNavbar);
                 });
             </script>
         </div>

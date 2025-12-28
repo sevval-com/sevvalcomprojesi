@@ -204,6 +204,19 @@ body {
         display: none; /* Chrome, Safari, Opera*/
     }
 
+/* Yazar Bilgisi Hover Efekti */
+.author-info {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.blog-card:hover .author-info {
+    opacity: 1;
+}
+
 /* Daha Fazlasını Göster Butonu */
 .show-more-btn {
     font-weight: 500;

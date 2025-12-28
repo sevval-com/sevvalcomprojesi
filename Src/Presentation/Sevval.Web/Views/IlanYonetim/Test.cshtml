@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fiyat Düzenleme Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        .price-container {
+            position: relative;
+        }
+        .price-display {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .price-display:hover {
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            padding: 2px 4px;
+        }
+        .edit-price-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .price-display:hover .edit-price-btn {
+            opacity: 1;
+        }
+        .price-edit .input-group {
+            min-width: 180px;
+        }
+        .price-success-message {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 8px;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            z-index: 1000;
+            animation: fadeInOut 3s ease-in-out;
+        }
+        @@keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Fiyat Hızlı Düzenleme Test</h2>
+        <div class="alert alert-info">
+            <strong>Test Talimatları:</strong>
+            <ul>
+                <li>Fiyat üzerine hover yapın, kalem ikonu görünecek</li>
+                <li>Kalem ikonuna tıklayın, düzenleme modu açılacak</li>
+                <li>Yeni fiyatı girin ve yeşil tik butonuna basın</li>
+                <li>Veya Enter tuşuna basın</li>
+                <li>İptal etmek için kırmızı X butonuna basın veya Escape tuşuna basın</li>
+            </ul>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>İlan</th>
+                    <th>Fiyat</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Test İlan 1</td>
+                    <td>
+                        <div class="price-container">
+                            <div class="price-display fw-bold text-dark" data-ilan-id="1" data-current-price="850000">
+                                850.000 ₺
+                                <button class="btn btn-sm btn-link p-0 ms-1 edit-price-btn" title="Fiyatı Düzenle">
+                                    <i class="fa-solid fa-pencil text-primary"></i>
+                                </button>
+                            </div>
+                            <div class="price-edit d-none">
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control price-input" value="850000" min="0" step="1000">
+                                    <button class="btn btn-success save-price-btn" type="button" title="Kaydet">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-secondary cancel-price-btn" type="button" title="İptal">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-success">Aktif</span></td>
+                </tr>
+                <tr>
+                    <td>Test İlan 2</td>
+                    <td>
+                        <div class="price-container">
+                            <div class="price-display fw-bold text-dark" data-ilan-id="2" data-current-price="2500000">
+                                2.500.000 ₺
+                                <button class="btn btn-sm btn-link p-0 ms-1 edit-price-btn" title="Fiyatı Düzenle">
+                                    <i class="fa-solid fa-pencil text-primary"></i>
+                                </button>
+                            </div>
+                            <div class="price-edit d-none">
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control price-input" value="2500000" min="0" step="1000">
+                                    <button class="btn btn-success save-price-btn" type="button" title="Kaydet">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-secondary cancel-price-btn" type="button" title="İptal">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-success">Aktif</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fiyat düzenleme butonuna tıklama
+            $(document).on('click', '.edit-price-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                
+                // Diğer açık düzenleme alanlarını kapat
+                $('.price-edit').addClass('d-none');
+                $('.price-display').removeClass('d-none');
+                
+                // Bu alanı aç
+                priceDisplay.addClass('d-none');
+                priceEdit.removeClass('d-none');
+                
+                // Input'a focus ver
+                priceEdit.find('.price-input').focus().select();
+            });
+
+            // Fiyat kaydetme
+            $(document).on('click', '.save-price-btn', function() {
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                const priceInput = priceEdit.find('.price-input');
+                
+                const ilanId = priceDisplay.data('ilan-id');
+                const newPrice = parseFloat(priceInput.val());
+                const currentPrice = parseFloat(priceDisplay.data('current-price'));
+                
+                if (!newPrice || newPrice <= 0) {
+                    alert('Geçerli bir fiyat giriniz.');
+                    return;
+                }
+                
+                if (newPrice === currentPrice) {
+                    // Değişiklik yok, sadece kapat
+                    priceEdit.addClass('d-none');
+                    priceDisplay.removeClass('d-none');
+                    return;
+                }
+                
+                // Loading state
+                $(this).prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                
+                // Simüle edilmiş AJAX çağrısı
+                setTimeout(() => {
+                    // Fiyatı güncelle
+                    priceDisplay.html(newPrice.toLocaleString('tr-TR') + ' ₺ <button class="btn btn-sm btn-link p-0 ms-1 edit-price-btn" title="Fiyatı Düzenle"><i class="fa-solid fa-pencil text-primary"></i></button>');
+                    priceDisplay.data('current-price', newPrice);
+                    
+                    // Başarı mesajı göster
+                    const successMsg = $('<div class="price-success-message">İlanın fiyatı değiştirildi</div>');
+                    priceContainer.append(successMsg);
+                    setTimeout(() => successMsg.remove(), 3000);
+                    
+                    // Edit modunu kapat
+                    priceEdit.addClass('d-none');
+                    priceDisplay.removeClass('d-none');
+                    
+                    // Loading state'i kaldır
+                    $(this).prop('disabled', false).html('<i class="fa-solid fa-check"></i>');
+                }, 1000);
+            });
+
+            // Fiyat düzenleme iptal
+            $(document).on('click', '.cancel-price-btn', function() {
+                const priceContainer = $(this).closest('.price-container');
+                const priceDisplay = priceContainer.find('.price-display');
+                const priceEdit = priceContainer.find('.price-edit');
+                const priceInput = priceEdit.find('.price-input');
+                
+                // Orijinal değeri geri yükle
+                const originalPrice = priceDisplay.data('current-price');
+                priceInput.val(originalPrice);
+                
+                // Edit modunu kapat
+                priceEdit.addClass('d-none');
+                priceDisplay.removeClass('d-none');
+            });
+
+            // Enter tuşu ile kaydet, Escape ile iptal
+            $(document).on('keydown', '.price-input', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $(this).closest('.price-edit').find('.save-price-btn').click();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    $(this).closest('.price-edit').find('.cancel-price-btn').click();
+                }
+            });
+
+            // Sayfa tıklamasında açık düzenleme alanlarını kapat
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.price-container').length) {
+                    $('.price-edit').addClass('d-none');
+                    $('.price-display').removeClass('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
