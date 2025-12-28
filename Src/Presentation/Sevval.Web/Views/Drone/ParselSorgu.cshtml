@@ -675,14 +675,11 @@
                     resetSelect(els.il, 'İl seçiniz');
                     data.forEach((item) => {
                         const props = item.properties || item;
-                        const rawId = pickProp(props, ['ilKodu', 'ilId', 'id', 'Id', 'IlKodu', 'Il', 'kod', 'Kod', 'text', 'Text']);
-                        const rawKod = pickProp(props, ['kod', 'Kod', 'ilKodu', 'IlKodu']);
-                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
-                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
-                        const name = pickProp(props, ['ilAdi', 'ad', 'IlAdi', 'Il', 'name', 'Ad', 'text', 'Text']);
-                        if (!name) return;
+                        const id = pickProp(props, ['id', 'Id', 'ilId', 'IlId', 'ilKodu', 'IlKodu', 'kod', 'Kod']);
+                        const name = pickProp(props, ['ad', 'Adi', 'ilAdi', 'IlAdi', 'name', 'Name', 'text', 'Text']);
+                        if (!id || !name) return;
                         const opt = document.createElement('option');
-                        opt.value = cleanedKod || cleanedId || name;
+                        opt.value = id;
                         opt.textContent = name;
                         els.il.appendChild(opt);
                     });
@@ -697,25 +694,22 @@
                 }
             };
 
-            const loadIlceler = async (ilKodu) => {
+            const loadIlceler = async (ilId) => {
                 try {
                     setSelectLoading(els.ilce, 'İlçe seçiniz');
                     els.ilce.disabled = true;
                     els.mahalle.disabled = true;
                     setStatus('İlçeler yükleniyor...', 'info');
-                    const raw = await fetchJson(`${baseUrl}/ilce/${ilKodu}`);
+                    const raw = await fetchJson(`${baseUrl}/ilce/${encodeURIComponent(ilId)}`);
                     const data = normalizeList(raw);
                     resetSelect(els.ilce, 'İlçe seçiniz');
                     data.forEach((item) => {
                         const props = item.properties || item;
-                        const rawId = pickProp(props, ['ilceKodu', 'ilceId', 'id', 'Id', 'IlceKodu', 'Ilce', 'kod', 'Kod']);
-                        const rawKod = pickProp(props, ['kod', 'Kod', 'ilceKodu', 'IlceKodu']);
-                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
-                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
-                        const name = pickProp(props, ['ilceAdi', 'ad', 'IlceAdi', 'Ilce', 'name', 'Ad', 'text', 'Text']);
-                        if (!name) return;
+                        const id = pickProp(props, ['id', 'Id', 'ilceId', 'IlceId', 'ilceKodu', 'IlceKodu', 'kod', 'Kod']);
+                        const name = pickProp(props, ['ad', 'Adi', 'ilceAdi', 'IlceAdi', 'name', 'Name', 'text', 'Text']);
+                        if (!id || !name) return;
                         const opt = document.createElement('option');
-                        opt.value = cleanedKod || cleanedId || name;
+                        opt.value = id;
                         opt.textContent = name;
                         els.ilce.appendChild(opt);
                     });
@@ -727,25 +721,21 @@
                 }
             };
 
-            const loadMahalleler = async (ilKodu, ilceKodu) => {
+            const loadMahalleler = async (ilceId) => {
                 try {
                     setSelectLoading(els.mahalle, 'Mahalle seçiniz');
                     els.mahalle.disabled = true;
                     setStatus('Mahalleler yükleniyor...', 'info');
-                    const raw = await fetchJson(`${baseUrl}/mahalle/${ilKodu}/${ilceKodu}`);
+                    const raw = await fetchJson(`${baseUrl}/mahalle/${encodeURIComponent(ilceId)}`);
                     const data = normalizeList(raw);
                     resetSelect(els.mahalle, 'Mahalle seçiniz');
                     data.forEach((item) => {
                         const props = item.properties || item;
-                        const rawId = pickProp(props, ['mahalleKodu', 'mahalleId', 'id', 'Id', 'MahalleKodu', 'Mahalle', 'kod', 'Kod']);
-                        const rawKod = pickProp(props, ['kod', 'Kod', 'mahalleKodu', 'MahalleKodu']);
-                        const cleanedId = rawId ? rawId.toString().replace(/[{}]/g, '') : rawId;
-                        const cleanedKod = rawKod ? rawKod.toString().replace(/[{}]/g, '') : rawKod;
-                        const name = pickProp(props, ['mahalleAdi', 'ad', 'MahalleAdi', 'Mahalle', 'name', 'Ad', 'text', 'Text']);
-                        if (!name) return;
+                        const id = pickProp(props, ['id', 'Id', 'mahalleId', 'MahalleId', 'mahalleKodu', 'MahalleKodu', 'kod', 'Kod']);
+                        const name = pickProp(props, ['ad', 'Adi', 'mahalleAdi', 'MahalleAdi', 'name', 'Name', 'text', 'Text']);
+                        if (!id || !name) return;
                         const opt = document.createElement('option');
-                        opt.value = cleanedKod || cleanedId || name;
-                        opt.dataset.mahalleId = cleanedKod || cleanedId || pickProp(props, ['mahalleId', 'mahalleKodu', 'id', 'Id', 'MahalleId', 'MahalleKodu']);
+                        opt.value = id;
                         opt.textContent = name;
                         els.mahalle.appendChild(opt);
                     });
@@ -781,23 +771,33 @@
                 setSummary();
                 resetSelect(els.mahalle, 'Mahalle seçiniz');
                 els.mahalle.disabled = true;
-                if (state.selection.il?.code && state.selection.ilce?.code) {
-                    loadMahalleler(state.selection.il.code, state.selection.ilce.code);
+                if (state.selection.ilce?.code) {
+                    loadMahalleler(state.selection.ilce.code);
                 }
             });
 
             els.mahalle.addEventListener('change', () => {
                 const selected = els.mahalle.options[els.mahalle.selectedIndex];
-                const id = selected?.dataset?.mahalleId || '';
+                const id = selected?.value || '';
                 els.mahalleId.value = id;
                 state.selection.mahalle = { code: selected?.value, id, name: selected?.textContent };
                 setSummary();
             });
 
-            const renderPolygon = async (geometry) => {
+            const renderPolygon = async (payload) => {
                 try {
                     await ensureMap();
-                    const coords = geometry?.coordinates?.[0];
+                    const geometry = (() => {
+                        if (!payload) return null;
+                        if (payload.type === 'FeatureCollection') return payload.features?.[0]?.geometry;
+                        if (payload.type === 'Feature') return payload.geometry;
+                        if (payload.geometry) return payload.geometry;
+                        return payload;
+                    })();
+
+                    const coords = geometry?.type === 'MultiPolygon'
+                        ? geometry?.coordinates?.[0]?.[0]
+                        : geometry?.coordinates?.[0];
                     if (!coords?.length) {
                         setStatus('Polygon verisi bulunamadı.', 'error');
                         setText(els.polygonState, 'Polygon alınamadı');
@@ -868,12 +868,12 @@
                 setButtonLoading(true);
 
                 try {
-                    const data = await fetchJson(`/api/tkgm/parsel-geo?mahalleId=${encodeURIComponent(mahalleId)}&ada=${encodeURIComponent(ada)}&parsel=${encodeURIComponent(parsel)}`);
+                    const data = await fetchJson(`${baseUrl}/parsel-geo?mahalleId=${encodeURIComponent(mahalleId)}&ada=${encodeURIComponent(ada)}&parsel=${encodeURIComponent(parsel)}`);
                     els.result.textContent = JSON.stringify(data, null, 2);
                     state.queryCount += 1;
                     setText(els.queryCount, state.queryCount.toString());
                     setText(els.lastQuery, `${ada} / ${parsel}`);
-                    await renderPolygon(data?.geometry);
+                    await renderPolygon(data);
                     if (els.videoBtn) els.videoBtn.style.display = 'inline-flex';
                 } catch (err) {
                     console.error('Polygon alınamadı', err);

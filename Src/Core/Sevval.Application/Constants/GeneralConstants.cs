@@ -14,7 +14,7 @@
         public const string WwwRootPath = "/Users/murat/Desktop/sevvalEmlak/sevko/Src/Presentation/Sevval.Web/wwwroot";
         public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
         public const string BaseClientUrl = "http://94.73.131.202:8090"; // Production API
-        public const string ConnectionString = "Data Source=/Users/murat/Desktop/sevvalEmlak/sevko/Src/Presentation/Sevval.Api/sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
+        public const string ConnectionString = "Data Source=/Users/berksubasi/Desktop/sevval/Src/Presentation/Sevval.Api/sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
 
         //test
         //public const string BaseUrl = "http://94.73.131.202:8092";
