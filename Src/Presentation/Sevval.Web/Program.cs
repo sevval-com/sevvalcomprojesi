@@ -86,8 +86,14 @@ builder.Services.AddDataProtection()
     .PersistKeysToDbContext<ApplicationDbContext>() // Store keys in database
     .SetApplicationName("SevvalApp");
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("DefaultConnection is not configured.");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(GeneralConstants.ConnectionString));
+    options.UseSqlite(connectionString));
 
 
 
@@ -283,5 +289,4 @@ app.MapControllers();
 
 // Uygulama çalýþtýrýlýyor
 app.Run();
-
 
