@@ -14,7 +14,8 @@
         public const string WwwRootPath = "C:\\Users\\emreg\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Web\\wwwroot";
         public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
         public const string BaseClientUrl = "http://94.73.131.202:8090"; // API URL
-        public const string ConnectionString = "Data Source=C:\\Users\\emreg\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Api\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
+        // Deprecated: use appsettings.json -> ConnectionStrings:DefaultConnection
+        public const string ConnectionString = "";
 
         //dev-mac
         //public const string BaseUrl = "http://localhost:5096";
