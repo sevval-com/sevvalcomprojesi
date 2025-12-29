@@ -10756,4 +10756,28 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         margin-right: 5px !important;
         transform: translateX(10px) !important;
     }
+}/* SABİT B
+OYUTLU ETİKETLER MOBİLDE */
+@media (max-width: 768px) {
+    .popups-container .label,
+    .popups-container .label-2 {
+        position: absolute !important;
+        right: -12px !important;
+        top: -8px !important;
+        width: 50px !important;
+        height: 16px !important;
+        padding: 0 !important;
+        font-size: 6px !important;
+        transform: rotate(45deg) !important;
+        background-color: #ff0000 !important;
+        color: white !important;
+        border-radius: 2px !important;
+        font-weight: bold !important;
+        z-index: 999 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        line-height: 1 !important;
+    }
 }

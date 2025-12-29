@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @model sevvalemlak.Dto.TumIlanlarDTO
 
@@ -220,17 +220,31 @@
         height: 60px !important;
     }
 
-    /* Genel Etiketler */
+    /* Genel Etiketler - Sağ Üste Konumlandır */
     .popups-container .label,
     .popups-container .label-2 {
         font-size: 13px !important;
         padding: 5px 10px !important;
+        position: absolute !important;
+        top: 10px !important;
+        right: 10px !important;
+        background-color: #dc3545 !important; /* Kırmızı renk */
+        color: white !important;
+        border-radius: 4px !important;
+        z-index: 10 !important;
     }
 
     .popups-container .sevvaldrone-popup .label {
         font-size: 18px !important;
         font-weight: 800 !important;
         padding: 6px 12px !important;
+        position: absolute !important;
+        top: 10px !important;
+        right: 10px !important;
+        background-color: #dc3545 !important; /* Kırmızı renk */
+        color: white !important;
+        border-radius: 4px !important;
+        z-index: 10 !important;
     }
 
     /* --- POPUPS CONTAINER RESPONSIVE AYARLARI (MOBİL YAN YANA) --- */
@@ -304,15 +318,16 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        /* Mobilde Etiketleri Küçült (DÜZELTİLDİ) */
+        /* Mobilde Etiketleri Küçült ve Sağ Üste Taşı (DÜZELTİLDİ) */
         .popups-container .label,
         .popups-container .label-2 {
             font-size: 7px !important; /* Küçültüldü */
             padding: 2px 3px !important;
             position: absolute !important;
             top: 0 !important;
-            left: 0 !important;
-            border-radius: 4px 0 4px 0 !important;
+            right: 0 !important; /* Sağ üste taşındı */
+            left: auto !important; /* Left auto yapıldı */
+            border-radius: 0 4px 0 4px !important; /* Border radius güncellendi */
         }
 
         .popups-container .sevvaldrone-popup .label {
@@ -1566,10 +1581,10 @@
 
     <!-- Ücretsiz Hizmet Penceresi -->
     <div class="service-popup" id="service-popup" onclick="window.location.href='@Url.Action("MulkumuSatmakIstiyorum", "Form")'">
-        <span class="label">Ücretsiz Hizmet</span>
         <img src="~/images/tl_ikon.webp" alt="Mülk Resmi" class="property-image" loading="lazy" width="200" height="150">
         <h3>MÜLKÜMÜ SATMAK İSTİYORUM</h3>
         <p>Mülk bilgilerini girin. Değerlendirip, o bölgedeki profesyonel üyelerimizden en az 20 emlakçıya&nbsp;yönlendirelim</p>
+        <span class="label">Ücretsiz Hizmet</span>
         <!-- Bilgilendirme Simgesi -->
         <div class="info-icon" data-tooltip="Bu form, mülkünüzü satma sürecinizi kolaylaştırmak için tasarlandı. Mülk bilgilerinizi girdikten sonra, hızlı bir değerlendirme yapılacak ve en kısa sürede sizinle iletişime geçilecektir. Doğrulama sonrası çokça telefon alabilirsiniz. Mülkünüzü satması için 20 emlakçı sizi arayabilir. Dilediğiniz emlakçıya teslim edebilirsiniz.
                  Umarım&nbsp;beğenirsiniz!">
@@ -1578,14 +1593,13 @@
     </div>
     <!-- Ücretsiz Hizmet Penceresi -->
     <div class="service-popup-2" id="servicePopup" onclick="window.location.href='@Url.Action("YatirimYapmakIstiyorum", "Form")'">
-        <span class="label-2">Ücretsiz Hizmet</span>
         <img src="~/images/banabul.webp" alt="Mülk Resmi" class="property-image-2" loading="lazy" width="200" height="150">
         <h3>YATIRIM YAPMAK <br />İSTİYORUM</h3>
         <p>Aradığınız mülkün özelliklerini girin. <br />Size en uygun mülkü bulalım</p>
+        <span class="label-2">Ücretsiz Hizmet</span>
     </div>
     <!-- ŞevvalDrone Hizmet Penceresi -->
     <div class="sevvaldrone-popup" id="sevvaldrone-popup">
-        <span class="label">300₺</span>
         <div class="drone-icon">
             <!-- Güncellenmiş Drone İkonu (PNG) -->
             <img src="https://cdn-icons-png.flaticon.com/128/7504/7504454.png"
@@ -1597,6 +1611,7 @@
         </div>
         <h3>ŞEVVALDRONE</h3>
         <p>Mülkünüzü ŞevvalDrone ile hızlıca videolandırın</p>
+        <span class="label">300₺</span>
     </div>
 
 </div>
