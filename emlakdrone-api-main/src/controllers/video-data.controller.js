@@ -1,4 +1,6 @@
 const VideoData = require('../models/VideoData');
+const PropertyRequest = require('../models/PropertyRequest');
+const User = require('../models/User');
 
 exports.createVideoData = async (req, res) => {
   try {
@@ -72,16 +74,66 @@ exports.getVideoData = async (req, res) => {
       });
     }
 
+    const propertyQuery = {
+      userId: data.userId,
+      il: data.propertyDetails?.il,
+      ilce: data.propertyDetails?.ilce,
+      mahalle: data.propertyDetails?.mahalle,
+      adaNo: data.propertyDetails?.adaNo
+    };
+    if (data.propertyDetails?.parselNo) {
+      propertyQuery['parseller.parselNo'] = data.propertyDetails.parselNo;
+    }
+
+    const [propertyRequest, user] = await Promise.all([
+      PropertyRequest.findOne(propertyQuery),
+      User.findById(data.userId).select('name surname phone').lean()
+    ]);
+
+    const property = propertyRequest
+      ? {
+          il: propertyRequest.il,
+          ilce: propertyRequest.ilce,
+          mahalle: propertyRequest.mahalle,
+          adaNo: propertyRequest.adaNo,
+          parselNo: data.propertyDetails?.parselNo || propertyRequest.parseller?.[0]?.parselNo || '',
+          location: propertyRequest.location || {
+            lat: propertyRequest.parseller?.[0]?.coordinates?.lat,
+            lng: propertyRequest.parseller?.[0]?.coordinates?.lng
+          },
+          parseller: propertyRequest.parseller || []
+        }
+      : {
+          il: data.propertyDetails?.il || '',
+          ilce: data.propertyDetails?.ilce || '',
+          mahalle: data.propertyDetails?.mahalle || '',
+          adaNo: data.propertyDetails?.adaNo || '',
+          parselNo: data.propertyDetails?.parselNo || '',
+          location: null,
+          parseller: []
+        };
+
+    const title = data.propertyDetails?.il && data.propertyDetails?.ilce
+      ? `${data.propertyDetails.il}, ${data.propertyDetails.ilce}`
+      : '';
+
     return res.json({
       success: true,
-      data: {
-        videoId: data.videoId,
-        userId: data.userId,
-        description: data.description,
-        language: data.language,
-        propertyDetails: data.propertyDetails,
-        createdAt: data.createdAt
-      }
+      property,
+      propertyDetails: {
+        title,
+        tapuDurumu: data.propertyDetails?.tapu || '',
+        description: data.description || '',
+        features: [],
+        price: ''
+      },
+      userData: {
+        name: user?.name || '',
+        surname: user?.surname || '',
+        phone: user?.phone || ''
+      },
+      logo: null,
+      avatar: null
     });
   } catch (error) {
     console.error('❌ Video data getirme hatası:', error);
