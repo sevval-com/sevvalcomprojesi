@@ -1,4 +1,4 @@
-﻿@using Sevval.Web.Models
+@using Sevval.Web.Models
 @using System.Text.RegularExpressions
 @inject Microsoft.AspNetCore.Identity.UserManager<Sevval.Domain.Entities.ApplicationUser> UserManager
 @model VideoPlayViewModel
@@ -30,6 +30,69 @@
     .edit-btn, .delete-btn{
         max-width: 90px !important;
     }
+    }
+    
+    /* Önerilen videolar başlık stili - max 14px, 2 satır, ellipsis */
+    .suggested-video-title {
+        font-size: 14px !important;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.8em; /* 2 satır * 1.4 line-height */
+        word-break: break-word;
+    }
+    
+    /* Özel Play Butonu - Mavi Daire Beyaz Play İşareti */
+    .plyr__control--overlaid {
+        background: #3b82f6 !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
+        aspect-ratio: 1/1 !important;
+        opacity: 0.95 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+    }
+    
+    .plyr__control--overlaid:hover {
+        background: #2563eb !important;
+        opacity: 1 !important;
+        transform: translate(-50%, -50%) scale(1.05) !important;
+    }
+    
+    .plyr__control--overlaid svg {
+        width: 24px !important;
+        height: 24px !important;
+        fill: #ffffff !important;
+        margin-left: 2px !important;
+    }
+    
+    .plyr__control--overlaid:hover svg {
+        fill: #ffffff !important;
+    }
+    
+    /* Kalite menüsü stilleri */
+    .plyr__menu__container [data-plyr="quality"] {
+        font-weight: 600;
+    }
+    
+    .plyr__menu__container .plyr__control[data-plyr="quality"][aria-checked="true"]::before {
+        background: #3b82f6;
+    }
+    
+    /* Ayarlar menüsü genişliği */
+    .plyr__menu__container {
+        min-width: 200px !important;
+    }
+    
+    .plyr__menu__container .plyr__control {
+        padding: 8px 12px !important;
     }
 </style>
 <div class="bg-slate-100 font-sans">
@@ -106,6 +169,17 @@
                                         <span id="dislikeCount" class="font-semibold text-xs">@Model.Video.DislikeSayisi</span>
                                     </button>
                                 </div>
+                                <!-- Video İndirme Butonu -->
+                                @if (!Model.Video.IsYouTube && !string.IsNullOrEmpty(Model.Video.VideoYolu))
+                                {
+                                    <a href="@Url.Content(Model.Video.VideoYolu)" 
+                                       download="@(Model.Video.VideoAdi.Replace(" ", "_") + ".mp4")"
+                                       class="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200 transition text-xs sm:text-sm"
+                                       title="Videoyu İndir">
+                                        <i class="fas fa-download text-sm"></i>
+                                        <span class="hidden sm:inline">İndir</span>
+                                    </a>
+                                }
                             @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com")
                                 {
                                     <a href="@Url.Action("Edit","VideolarSayfasi", new { id = Model.Video.Id })" class="bg-yellow-600 w-full h-[50px] flex items-center justify-center px-8 hover:bg-yellow-700 text-white font-semibold py-1 px-3 rounded-full shadow-sm text-sm edit-btn">Düzenle</a>
@@ -539,14 +613,17 @@
         @@media (max-width: 480px) {
             /* Çok küçük ekranlar - mobil */
             .plyr__control--overlaid {
-                width: 60px !important;
-                height: 60px !important;
+                width: 50px !important;
+                height: 50px !important;
+                min-width: 50px !important;
+                min-height: 50px !important;
+                aspect-ratio: 1/1 !important;
                 padding: 0 !important;
             }
             
             .plyr__control--overlaid svg {
-                width: 40px !important;
-                height: 40px !important;
+                width: 20px !important;
+                height: 20px !important;
             }
             
             .plyr__controls {
@@ -576,14 +653,17 @@
         @@media (min-width: 481px) and (max-width: 640px) {
             /* Küçük mobil */
             .plyr__control--overlaid {
-                width: 70px !important;
-                height: 70px !important;
+                width: 55px !important;
+                height: 55px !important;
+                min-width: 55px !important;
+                min-height: 55px !important;
+                aspect-ratio: 1/1 !important;
                 padding: 0 !important;
             }
             
             .plyr__control--overlaid svg {
-                width: 48px !important;
-                height: 48px !important;
+                width: 22px !important;
+                height: 22px !important;
             }
             
             .plyr__controls {
@@ -606,14 +686,17 @@
         @@media (min-width: 641px) and (max-width: 768px) {
             /* Tablet */
             .plyr__control--overlaid {
-                width: 80px !important;
-                height: 80px !important;
+                width: 60px !important;
+                height: 60px !important;
+                min-width: 60px !important;
+                min-height: 60px !important;
+                aspect-ratio: 1/1 !important;
                 padding: 0 !important;
             }
             
             .plyr__control--overlaid svg {
-                width: 56px !important;
-                height: 56px !important;
+                width: 24px !important;
+                height: 24px !important;
             }
             
             .plyr__controls {
@@ -637,14 +720,17 @@
         @@media (min-width: 769px) {
             /* Desktop */
             .plyr__control--overlaid {
-                width: 90px !important;
-                height: 90px !important;
+                width: 70px !important;
+                height: 70px !important;
+                min-width: 70px !important;
+                min-height: 70px !important;
+                aspect-ratio: 1/1 !important;
                 padding: 0 !important;
             }
             
             .plyr__control--overlaid svg {
-                width: 64px !important;
-                height: 64px !important;
+                width: 28px !important;
+                height: 28px !important;
             }
             
             .plyr__controls {
@@ -672,7 +758,19 @@
                 clickToPlay: true,
                 muted: false,
                 autoplay: false,
-                hideControls: true, // Kontrolleri otomatik gizle
+                hideControls: true,
+                // Kalite seçenekleri
+                quality: {
+                    default: 720,
+                    options: [1080, 720, 480, 360],
+                    forced: false,
+                    onChange: (quality) => console.log('Kalite değişti:', quality)
+                },
+                // Hız seçenekleri
+                speed: {
+                    selected: 1,
+                    options: [0.5, 0.75, 1, 1.25, 1.5, 2]
+                },
                 youtube: {
                     rel: 0,
                     modestbranding: 1,
@@ -703,7 +801,13 @@
                     speed: 'Hız',
                     normal: 'Normal',
                     quality: 'Kalite',
-                    loop: 'Döngü'
+                    loop: 'Döngü',
+                    qualityLabel: {
+                        1080: '1080p (Full HD)',
+                        720: '720p (HD)',
+                        480: '480p',
+                        360: '360p'
+                    }
                 }
             });
 
@@ -969,6 +1073,22 @@
                     e.target.closest('.comment-form').querySelector('.comment-buttons').style.display = 'block';
                 }
             });
+            // Enter tuşu ile yorum gönderme (Task 15)
+            document.addEventListener('keydown', function(e) {
+                if (e.target.matches('.comment-form textarea') && e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const form = e.target.closest('.comment-form');
+                    const textarea = form.querySelector('textarea');
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (textarea.value.trim() && submitBtn && !submitBtn.disabled) {
+                        if (!IS_AUTH) {
+                            window.location.href = LOGIN_URL;
+                            return;
+                        }
+                        handleCommentSubmit(form);
+                    }
+                }
+            });
             document.addEventListener('click', function(e) {
                 if (e.target.matches('.cancel-comment')) {
                     const form = e.target.closest('.comment-form');
@@ -1190,24 +1310,35 @@
                 const currentVideoId = @Model.Video.Id;
                 const currentCategory = @Html.Raw(Json.Serialize(Model.Video.Kategori));
                 
-                console.log('API Base:', window.API_BASE);
                 console.log('Current Video ID:', currentVideoId);
                 console.log('Current Category:', currentCategory);
                 
-                const url = `${window.API_BASE}/videos/suggested?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory)}&limit=6`;
-                console.log('Request URL:', url);
+                // Önce local endpoint'i dene
+                let url = `/VideolarSayfasi/GetSuggestedVideos?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory || '')}&limit=6`;
+                console.log('Trying local URL:', url);
                 
-                const response = await fetch(url);
-                console.log('Response status:', response.status);
+                let response = await fetch(url);
+                let data = null;
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (response.ok) {
+                    data = await response.json();
+                    console.log('Local API Response:', data);
                 }
                 
-                const data = await response.json();
-                console.log('API Response:', data);
+                // Local başarısız olursa proxy'yi dene
+                if (!data || !data.success) {
+                    console.log('Local failed, trying proxy...');
+                    const proxyUrl = `${window.API_BASE}/videos/suggested?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory || '')}&limit=6`;
+                    console.log('Proxy URL:', proxyUrl);
+                    
+                    response = await fetch(proxyUrl);
+                    if (response.ok) {
+                        data = await response.json();
+                        console.log('Proxy API Response:', data);
+                    }
+                }
                 
-                if (data.success && data.videos.length > 0) {
+                if (data && data.success && data.videos && data.videos.length > 0) {
                     renderSuggestedVideos(data.videos);
                 } else {
                     showNoVideosMessage();
@@ -1268,8 +1399,8 @@
                     <!-- Video Bilgileri -->
                     <div class="p-4 flex items-start gap-4 w-full">
                         <div class="flex flex-col w-full">
-                            <h3 class="font-bold text-2xl text-start text-blue-900 group-hover:text-blue-600 transition-colors whitespace-nowrap" title="${video.videoAdi.trim()}">
-                                ${video.videoAdi.trim().length > 47 ? video.videoAdi.trim().substring(0, 47) + "..." : video.videoAdi.trim()}
+                            <h3 class="suggested-video-title font-semibold text-blue-900 group-hover:text-blue-600 transition-colors" title="${video.videoAdi.trim()}">
+                                ${video.videoAdi.trim()}
                             </h3>
                             <div class="flex items-center gap-2">
                                 <img src="${video.yukleyenKullanici.profilePicturePath || `https://ui-avatars.com/api/?name=${encodeURIComponent(video.yukleyenKullanici.firstName)}+${encodeURIComponent(video.yukleyenKullanici.lastName)}&background=1E3A8A&color=fff&font-size=0.33`}" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="${video.yukleyenKullanici.firstName} profili" />

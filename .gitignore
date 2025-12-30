@@ -496,3 +496,18 @@ bin/
 mock_*.sql
 seed_mock_data.ps1
 LOCAL_DEV_NOTES.md
+
+# Kiro IDE files
+.kiro/
+
+# Development tools & scripts
+ApplyMigration/
+ImageConverterTool/
+check_video.cs
+temp_validator.cs
+
+# One-time migration SQL files
+add_deleted_accounts_table.sql
+add_document_fields.sql
+add_recovery_token.sql
+apply_video_approval_migration.sql
