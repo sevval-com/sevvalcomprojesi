@@ -331,7 +331,7 @@ public class HomeController : Controller
             ArsaIlanlariCount = 0,
             BahceIlanlariCount = 0,
             TarlaIlanlariCount = 0,
-            TotalIlanlar = 0,
+            TotalIlanlar = await _context.IlanBilgileri.AsNoTracking().CountAsync(i => i.Status == "active"),
             AllIlanlar = new List<IlanModel>(),
             SehirIlanSayilari = new List<TumIlanlarDTO.SehirIlanSayisiDTO>()
         };

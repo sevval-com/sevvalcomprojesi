@@ -15,8 +15,7 @@ namespace Sevval.Web.Models
         public string VideoAciklamasi { get; set; }
 
         [StringLength(100)]
-        [Required(ErrorMessage = "Kategori zorunludur.")]
-        public string Kategori { get; set; }
+        public string? Kategori { get; set; }
 
         // Lokal dosya yükleme için
         public IFormFile? VideoDosyasi { get; set; }

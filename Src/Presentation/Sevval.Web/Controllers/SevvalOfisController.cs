@@ -2345,5 +2345,128 @@ namespace YourProjectNamespace.Controllers
             }
         }
 
+        #region Video Onay Yönetimi
+
+        /// <summary>
+        /// Bekleyen videoları listeler (Super Admin only)
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> BekleyenVideolar()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !string.Equals(user.Email, "sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+
+            var pendingVideos = await _context.VideolarSayfasi
+                .Include(v => v.YukleyenKullanici)
+                .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Pending)
+                .OrderByDescending(v => v.YuklenmeTarihi)
+                .Select(v => new Sevval.Domain.Entities.PendingVideoViewModel
+                {
+                    Id = v.Id,
+                    VideoAdi = v.VideoAdi,
+                    KapakFotografiYolu = v.KapakFotografiYolu,
+                    UploaderName = v.YukleyenKullanici != null 
+                        ? $"{v.YukleyenKullanici.FirstName} {v.YukleyenKullanici.LastName}" 
+                        : "Bilinmiyor",
+                    UploaderEmail = v.YukleyenKullanici != null ? v.YukleyenKullanici.Email : "",
+                    YuklenmeTarihi = v.YuklenmeTarihi,
+                    Kategori = v.Kategori ?? ""
+                })
+                .ToListAsync();
+
+            ViewBag.PendingCount = pendingVideos.Count;
+            return View(pendingVideos);
+        }
+
+        /// <summary>
+        /// Bekleyen video sayısını JSON olarak döndürür (badge için)
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetPendingVideoCount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !string.Equals(user.Email, "sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { count = 0 });
+            }
+
+            var count = await _context.VideolarSayfasi
+                .CountAsync(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Pending);
+
+            return Json(new { count });
+        }
+
+        /// <summary>
+        /// Videoyu onaylar
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveVideo(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !string.Equals(user.Email, "sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Yetkiniz yok." });
+            }
+
+            var video = await _context.VideolarSayfasi.FindAsync(id);
+            if (video == null)
+            {
+                return Json(new { success = false, message = "Video bulunamadı." });
+            }
+
+            if (video.ApprovalStatus != Sevval.Domain.Enums.VideoApprovalStatus.Pending)
+            {
+                return Json(new { success = false, message = "Bu video zaten işlenmiş." });
+            }
+
+            video.ApprovalStatus = Sevval.Domain.Enums.VideoApprovalStatus.Approved;
+            video.ApprovalDate = DateTime.UtcNow;
+            video.ApprovedByUserId = user.Id;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Video onaylandı ve yayına alındı." });
+        }
+
+        /// <summary>
+        /// Videoyu reddeder
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectVideo(int id, string? reason)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || !string.Equals(user.Email, "sftumen41@gmail.com", StringComparison.OrdinalIgnoreCase))
+            {
+                return Json(new { success = false, message = "Yetkiniz yok." });
+            }
+
+            var video = await _context.VideolarSayfasi.FindAsync(id);
+            if (video == null)
+            {
+                return Json(new { success = false, message = "Video bulunamadı." });
+            }
+
+            if (video.ApprovalStatus != Sevval.Domain.Enums.VideoApprovalStatus.Pending)
+            {
+                return Json(new { success = false, message = "Bu video zaten işlenmiş." });
+            }
+
+            video.ApprovalStatus = Sevval.Domain.Enums.VideoApprovalStatus.Rejected;
+            video.ApprovalDate = DateTime.UtcNow;
+            video.ApprovedByUserId = user.Id;
+            video.RejectionReason = reason;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Video reddedildi." });
+        }
+
+        #endregion
+
     }
 }

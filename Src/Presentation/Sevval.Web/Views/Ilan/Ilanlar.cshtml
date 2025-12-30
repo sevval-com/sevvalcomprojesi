@@ -364,7 +364,10 @@
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action active" aria-current="true">İlanlar</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
-
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
+                                }
                                 <a href="@Url.Action("Settings", "Account")" class="list-group-item list-group-item-action">Ayarlar</a>
                                 <a href="@Url.Action("Index", "Satinal")" class="list-group-item list-group-item-action">Satın Al</a>
 

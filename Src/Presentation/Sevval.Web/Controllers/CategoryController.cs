@@ -61,13 +61,9 @@ namespace Sevval.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCategories()
         {
-            if (User.Identity?.Name != "sftumen41@gmail.com")
-            {
-                return Forbid();
-            }
-
             try
             {
                 // Categories tablosundan kategorileri al

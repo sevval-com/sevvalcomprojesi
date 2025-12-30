@@ -948,6 +948,12 @@
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("BekleyenVideolar", "SevvalOfis")">
+                            <i class="bi bi-camera-video-fill me-2"></i> Bekleyen Videolar
+                            <span class="badge bg-danger ms-1 pending-video-badge" style="display:none;"></span>
+                        </a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
@@ -1036,6 +1042,21 @@
                 subscriptionChart.resize();
             });
         });
+
+        // Bekleyen video sayısını yükle
+        (function loadPendingVideoCount() {
+            fetch('@Url.Action("GetPendingVideoCount", "SevvalOfis")')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.count > 0) {
+                        document.querySelectorAll('.pending-video-badge').forEach(badge => {
+                            badge.textContent = data.count;
+                            badge.style.display = 'inline';
+                        });
+                    }
+                })
+                .catch(err => console.log('Pending video count yüklenemedi:', err));
+        })();
     </script>
 </body>
 </html>
