@@ -1,4 +1,5 @@
 ﻿using Sevval.Domain.Entities;
+using Sevval.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -42,6 +43,28 @@ namespace Sevval.Web.Models
 
         [ForeignKey("YukleyenKullaniciId")]
         public virtual ApplicationUser YukleyenKullanici { get; set; }
+
+        // Approval System Properties
+        /// <summary>
+        /// Video onay durumu (Pending, Approved, Rejected)
+        /// </summary>
+        public VideoApprovalStatus ApprovalStatus { get; set; } = VideoApprovalStatus.Pending;
+
+        /// <summary>
+        /// Onay/Red tarihi
+        /// </summary>
+        public DateTime? ApprovalDate { get; set; }
+
+        /// <summary>
+        /// Onaylayan/Reddeden kullanıcı ID'si
+        /// </summary>
+        public string? ApprovedByUserId { get; set; }
+
+        /// <summary>
+        /// Red nedeni (sadece reddedilen videolar için)
+        /// </summary>
+        [StringLength(500)]
+        public string? RejectionReason { get; set; }
 
         // Navigation Properties
         public virtual ICollection<VideoLike> LikesDislikes { get; set; } = new List<VideoLike>();

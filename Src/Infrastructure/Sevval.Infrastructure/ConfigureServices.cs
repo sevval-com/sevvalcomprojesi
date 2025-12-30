@@ -68,6 +68,8 @@ public static class ConfigureServices
         services.AddScoped<IConsultantService, ConsultantService>();
         services.AddScoped<IAboutUsService, AboutUsService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
+        services.AddScoped<IYouTubeUrlParser, YouTubeUrlParser>();
+        services.AddScoped<IVideoApprovalService, VideoApprovalService>();
 
         services.AddScoped<SmtpClient>(serviceProvider =>
 
