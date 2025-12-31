@@ -174,6 +174,7 @@
                                 {
                                     <a href="@Url.Content(Model.Video.VideoYolu)" 
                                        download="@(Model.Video.VideoAdi.Replace(" ", "_") + ".mp4")"
+                                       id="downloadVideoBtn"
                                        class="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200 transition text-xs sm:text-sm"
                                        title="Videoyu İndir">
                                         <i class="fas fa-download text-sm"></i>
@@ -1402,26 +1403,27 @@
                             <h3 class="suggested-video-title font-semibold text-blue-900 group-hover:text-blue-600 transition-colors" title="${video.videoAdi.trim()}">
                                 ${video.videoAdi.trim()}
                             </h3>
-                            <div class="flex items-center gap-2">
-                                <img src="${video.yukleyenKullanici.profilePicturePath || `https://ui-avatars.com/api/?name=${encodeURIComponent(video.yukleyenKullanici.firstName)}+${encodeURIComponent(video.yukleyenKullanici.lastName)}&background=1E3A8A&color=fff&font-size=0.33`}" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="${video.yukleyenKullanici.firstName} profili" />
-                                <p class="text-sm text-gray-600 mt-1 truncate" title="${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}">
-                                    ${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}
-                                </p>
+                            <div class="flex items-center justify-between mt-1">
+                                <div class="flex items-center gap-2">
+                                    <img src="${video.yukleyenKullanici.profilePicturePath || `https://ui-avatars.com/api/?name=${encodeURIComponent(video.yukleyenKullanici.firstName)}+${encodeURIComponent(video.yukleyenKullanici.lastName)}&background=1E3A8A&color=fff&font-size=0.33`}" class="w-6 h-6 rounded-full flex-shrink-0 object-cover border border-white shadow-sm" alt="${video.yukleyenKullanici.firstName} profili" />
+                                    <p class="text-xs text-gray-600 truncate" title="${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}">
+                                        ${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}
+                                    </p>
+                                </div>
+                                <span class="text-xs text-gray-500">${formatNumber(video.goruntulenmeSayisi)} Görüntülenme</span>
                             </div>
-                            <span class="video-meta-chip upload-date">${formatDate(video.yuklenmeTarihi)}</span>
-                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-1.5 relative">
-                                <span class="video-meta-chip">${formatNumber(video.goruntulenmeSayisi)} Görüntülenme</span>
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-1.5">
+                                <span class="video-meta-chip upload-date">${formatDate(video.yuklenmeTarihi)}</span>
                                 <div class="ml-auto flex items-center gap-2">
                                     <span class="video-meta-chip" title="Beğeni">
-                                        <i class="fas fa-thumbs-up" style="margin-right:6px"></i>
+                                        <i class="fas fa-thumbs-up" style="margin-right:4px"></i>
                                         ${formatNumber(video.begeniSayisi)}
                                     </span>
                                     <span class="video-meta-chip" title="Beğenilmeme">
-                                        <i class="fas fa-thumbs-down" style="margin-right:6px"></i>
+                                        <i class="fas fa-thumbs-down" style="margin-right:4px"></i>
                                         ${formatNumber(video.dislikeSayisi)}
                                     </span>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
@@ -1547,5 +1549,62 @@
             box-shadow: 0 0 0 2px rgb(239 68 68 / 40%) !important;
             outline: none !important;
         }
+        
+        /* Video indirme toast */
+        .download-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e40af;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .download-toast i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @@keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        @@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
+    
+    <script>
+        // Video indirme butonu tıklama
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('downloadVideoBtn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    // Toast oluştur
+                    const toast = document.createElement('div');
+                    toast.className = 'download-toast';
+                    toast.innerHTML = '<i class="fas fa-spinner"></i> Video indiriliyor...';
+                    document.body.appendChild(toast);
+                    
+                    // 4 saniye sonra kaldır
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.3s ease';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 4000);
+                });
+            }
+        });
+    </script>
 }

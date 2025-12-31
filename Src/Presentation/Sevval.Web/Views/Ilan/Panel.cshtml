@@ -56,6 +56,10 @@
                 }
             </ul>
             <div class="auth-buttoons">
+                <div class="post-ad-container">
+                    <span class="free-tag">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account", new { Type = "GENEL" }) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+                </div>
                 @if (User.Identity.IsAuthenticated)
                 {
                     var currentUser = await UserManager.GetUserAsync(User);
@@ -68,6 +72,7 @@
                                 <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                                 
                                 <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                                <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
                                 <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                                 <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                                 
@@ -92,10 +97,6 @@
                 {
                     <a href="#" class="login" id="giris-buton">Giriş Yap</a>
                 }
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account", new { Type = "GENEL" }) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-                </div>
             </div>
         </div>
     </nav>
@@ -323,6 +324,7 @@
                             <div class="list-group list-group-flush">
                                 <a href="@Url.Action("Panel", "Ilan")" class="list-group-item list-group-item-action active" aria-current="true">Raporlar</a>
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action">İlanlar</a>
+                                <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
                                 
