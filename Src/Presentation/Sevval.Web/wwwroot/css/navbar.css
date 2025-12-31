@@ -300,19 +300,21 @@
         white-space: nowrap !important;
     }
     
-    /* Menü linkleri */
+    /* Menü linkleri - MAVİ TEMA */
     .naav-linkss {
         display: none !important;
         position: absolute !important;
         top: 100% !important;
-        left: 0 !important;
+        left: auto !important;
         right: 0 !important;
-        background: white !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         flex-direction: column !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        border-radius: 0 0 10px 10px !important;
-        z-index: 1000 !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
     
     .naav-linkss.active {
@@ -321,16 +323,24 @@
     
     .naav-linkss li {
         width: 100% !important;
-        text-align: center !important;
-        margin: 5px 0 !important;
+        text-align: left !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .naav-linkss a {
-        color: #333 !important;
-        padding: 12px !important;
+        color: white !important;
+        padding: 10px 16px !important;
         display: block !important;
-        border-bottom: 1px solid #eee !important;
+        border-bottom: none !important;
         font-size: 14px !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        transition: background 0.2s !important;
+    }
+    
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
     }
 }
 
