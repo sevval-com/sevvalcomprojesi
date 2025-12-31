@@ -1,4 +1,4 @@
-﻿ @using Sevval.Web.Models
+ @using Sevval.Web.Models
  @using Sevval.Domain.Entities
  @using System.Security.Claims
 @model IEnumerable<Sevval.Web.Models.VideolarSayfasi>
@@ -22,8 +22,6 @@
         .video-card:hover .video-thumb .shine { opacity: .55; }
         .video-meta-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #eef6ff; color: #1e3a8a; border: 1px solid #cfe5ff; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(13,110,253,.12); }
         @@keyframes borderFlow { to { transform: rotate(360deg); } }
-        .video-upload-button {margin-top: 120px; right:20px; }
-        
         /* Skeleton Loader Styles */
         @@keyframes skeletonShimmer {
             0% { background-position: -200% 0; }
@@ -42,34 +40,53 @@
         .skeleton-container.loading { display: grid; }
         .video-grid-container { display: grid; }
         .video-grid-container.loading { display: none; }
-        
-        @@media (max-width: 768px) {
-            .video-upload-button {margin-top: 100px; right:10px; }
-        }
     </style>
     <!-- Ana İçerik -->
     <main class="flex-1 p-6 sm:p-8">
         <div class="max-w-7xl mx-auto">
             @{ var claim = User.FindFirst(ClaimTypes.Email); var emailClaim = claim != null ? claim.Value : null; var canUpload = User.Identity.IsAuthenticated; }
-            @if (User.Identity.IsAuthenticated)
-            {
-                <a asp-action="Upload" class="video-upload-button inline-flex absolute right-0 top-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-1 px-2 sm:py-2 sm:px-4 rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-1.5 sm:gap-2 text-xs sm:text-sm z-20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                    <span>Video Yükle</span>
-                </a>
-            }
-            else
-            {
-                <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Upload", "VideolarSayfasi") })" class="video-upload-button inline-flex absolute right-0 top-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-1 px-2 sm:py-2 sm:px-4 rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-1.5 sm:gap-2 text-xs sm:text-sm z-20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                    <span>Video Yükle</span>
-                </a>
-            }
             <!-- Üst Başlık ve Buton Alanı -->
             <header class="relative flex flex-col gap-4 sm:gap-6 mb-8 items-center text-center">
                 
-                <div class="flex flex-col items-center">
-                    <h1 class="text-5xl font-extrabold text-blue-900">Videolar</h1>
+                <div class="flex flex-col items-center w-full">
+                    <!-- Başlık ve Video Yükle Butonu -->
+                    <div class="w-full relative flex justify-center items-center px-4 mb-4">
+                        <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-900 text-center">Videolar</h1>
+                        <!-- Video Yükle Butonu - Masaüstünde sağda, mobilde gizli -->
+                        <div class="hidden sm:block absolute right-4">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="Upload" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                    <span>Video Yükle</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Upload", "VideolarSayfasi") })" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                    <span>Video Yükle</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <!-- Video Yükle Butonu - Mobilde başlığın altında görünür -->
+                    <div class="sm:hidden mt-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-action="Upload" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                <span>Video Yükle</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Upload", "VideolarSayfasi") })" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                <span>Video Yükle</span>
+                            </a>
+                        }
+                    </div>
                     <!-- Toplam İzlenme Sayacı -->
                     @{
                         var totalViews = ViewBag.ToplamIzlenme ?? Model.Sum(v => v.GoruntulenmeSayisi);
@@ -112,14 +129,6 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <button type="button" 
-                                id="clearSearchBtn" 
-                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"
-                                title="Aramayı Temizle">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
                     </div>
                     <p id="searchResultCount" class="text-sm text-blue-600 mt-2 text-center hidden"></p>
                     <p id="noSearchResults" class="text-sm text-red-500 mt-2 text-center hidden">Aramanızla eşleşen video bulunamadı.</p>
@@ -227,7 +236,7 @@
                 <div class="video-grid-container loading grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="videoGridContainer">
                     @foreach (var video in Model)
                     {
-                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col video-card" data-video-id="@video.Id">
+                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col video-card" data-video-id="@video.Id" data-description="@(video.VideoAciklamasi ?? "")">
                             <!-- Video Thumbnail -->
                             <div class="relative w-full video-thumb">
                                 <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
@@ -267,7 +276,7 @@
                             <div class="p-4 flex items-start gap-4 w-full">
                                 
                                 <div class="flex flex-col w-full">
-                                    <h3 class="font-bold text-2xl text-start text-blue-900 group-hover:text-blue-600 transition-colors title-ellipsis" title="@video.VideoAdi.Trim()">
+                                    <h3 class="font-bold text-base text-start text-blue-900 group-hover:text-blue-600 transition-colors title-ellipsis" title="@video.VideoAdi.Trim()">
                                         <span class="title-text">@video.VideoAdi.Trim()</span>
                                     </h3>
                                     <div class="flex items-center gap-2">
@@ -410,56 +419,55 @@
                 </div>
             }
              <script>
-                 // Upload butonu: sadece belirlenen email için izin ver, diğerlerine popup
-                 document.addEventListener('click', function (e) {
-                     const anchor = e.target.closest('a.video-upload-button');
-                     if (!anchor) return;
-                     const allowed = anchor.getAttribute('data-allowed') === 'true';
-                     if (!allowed) {
-                         e.preventDefault();
-                         alert('Çok yakında');
-                     }
-                 });
 
                  // Video Arama Motoru
-                 (function() {
+                 document.addEventListener('DOMContentLoaded', function() {
                      const searchInput = document.getElementById('videoSearchInput');
-                     const clearBtn = document.getElementById('clearSearchBtn');
                      const resultCount = document.getElementById('searchResultCount');
                      const noResults = document.getElementById('noSearchResults');
                      const videoGrid = document.getElementById('videoGridContainer');
                      
-                     if (!searchInput || !videoGrid) return;
+                     if (!searchInput || !videoGrid) {
+                         console.log('Video arama: Elementler bulunamadı', {searchInput, videoGrid});
+                         return;
+                     }
+                     
+                     console.log('Video arama motoru başlatıldı');
                      
                      let searchTimeout;
                      
-                     searchInput.addEventListener('input', function() {
-                         clearTimeout(searchTimeout);
-                         searchTimeout = setTimeout(performSearch, 300);
-                         
-                         // Clear button visibility
-                         if (this.value.trim()) {
-                             clearBtn.classList.remove('hidden');
-                         } else {
-                             clearBtn.classList.add('hidden');
-                         }
-                     });
-                     
-                     clearBtn.addEventListener('click', function() {
-                         searchInput.value = '';
-                         clearBtn.classList.add('hidden');
-                         performSearch();
-                         searchInput.focus();
-                     });
+                     // Türkçe karakter normalize fonksiyonu - tüm varyasyonları tek forma çevir
+                     function normalizeText(str) {
+                         if (!str) return '';
+                         return str
+                             .toUpperCase()
+                             .replace(/İ/g, 'I')
+                             .replace(/Ş/g, 'S')
+                             .replace(/Ğ/g, 'G')
+                             .replace(/Ü/g, 'U')
+                             .replace(/Ö/g, 'O')
+                             .replace(/Ç/g, 'C')
+                             .replace(/ı/g, 'I')
+                             .replace(/ş/g, 'S')
+                             .replace(/ğ/g, 'G')
+                             .replace(/ü/g, 'U')
+                             .replace(/ö/g, 'O')
+                             .replace(/ç/g, 'C')
+                             .replace(/i/g, 'I')
+                             .replace(/\s+/g, ' '); // Birden fazla boşluğu tek boşluğa çevir
+                     }
                      
                      function performSearch() {
-                         const query = searchInput.value.trim().toLowerCase();
+                         const query = normalizeText(searchInput.value.trim());
                          const videoCards = videoGrid.querySelectorAll('[data-video-id]');
                          let visibleCount = 0;
                          
+                         console.log('Arama yapılıyor:', query);
+                         
                          videoCards.forEach(function(card) {
-                             const title = card.querySelector('.title-text')?.textContent?.toLowerCase() || '';
-                             const matches = !query || title.includes(query);
+                             const title = normalizeText(card.querySelector('.title-text')?.textContent || '');
+                             const description = normalizeText(card.getAttribute('data-description') || '');
+                             const matches = !query || title.includes(query) || description.includes(query);
                              
                              if (matches) {
                                  card.style.display = '';
@@ -468,6 +476,8 @@
                                  card.style.display = 'none';
                              }
                          });
+                         
+                         console.log('Bulunan:', visibleCount);
                          
                          // Update result messages
                          if (query) {
@@ -484,7 +494,12 @@
                              noResults.classList.add('hidden');
                          }
                      }
-                 })();
+                     
+                     searchInput.addEventListener('input', function() {
+                         clearTimeout(searchTimeout);
+                         searchTimeout = setTimeout(performSearch, 300);
+                     });
+                 });
 
                  // Bekleyen video sayısını güncelle (Super Admin için)
                  @if (User.Identity != null && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "emremcem066@gmail.com"))

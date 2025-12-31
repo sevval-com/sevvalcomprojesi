@@ -4467,60 +4467,48 @@ body {
 @media (max-width: 1193px) {
     .naav-linkss {
         display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
-        z-index: 100000000;
     }
 
-    .naav-linkss.active {
-        display: flex !important;
-        z-index: 100000000;
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .naav-linkss a {
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+        border-bottom: none !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
     }
 
     .kategori {
         width: 48% !important;
-    }
-
-    .naav-linkss {
-        display: none;
-        /* Menü öğeleri mobilde gizlensin */
-        position: absolute;
-        top: 70px;
-        right: 0;
-        background-color: #0277bd;
-        /* Menü arka planı mavi */
-        flex-direction: column;
-        /* Dikey açılacak şekilde düzenlendi */
-        width: 100%;
-        justify-content: flex-start;
-        /* Dikeyde başlangıç hizası */
-        gap: 10px;
-        padding: 10px 0;
-        /* Dikey boşluk */
-        border-radius: 8px;
-        /* Yuvarlatılmış köşeler */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        /* Hafif gölge efekti */
-        width: 50%;
-    }
-
-    .naav-linkss a {
-        padding: 12px 20px !important;
-        font-size: 12px;
-        text-align: center;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .naav-linkss a:hover {
-        background-color: #01579b;
-        /* Hoverda daha koyu mavi */
-        transform: scale(1.05);
-        /* Hover sırasında biraz büyümesini sağlıyoruz */
     }
 
 
@@ -8265,50 +8253,47 @@ button:focus {
         padding: 8px 10px !important;
     }
 
-    /* Hamburger menü açıkken, menu öğeleri görünür olmalı */
-    .naav-linkss.active {
-        display: flex !important;
-        z-index: 100000000;
+    /* Hamburger menü açıkken - MAVİ TEMA */
+    .naav-linkss {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
-    .naav-linkss {
-        display: none;
-        /* Menü öğeleri mobilde gizlensin */
-        position: absolute;
-        top: 80px;
-        right: 0;
-        background-color: #0277bd;
-        /* Menü arka planı mavi */
-        flex-direction: column;
-        /* Dikey açılacak şekilde düzenlendi */
-        width: 100%;
-        justify-content: flex-start;
-        /* Dikeyde başlangıç hizası */
-        gap: 10px;
-        padding: 10px 0;
-        /* Dikey boşluk */
-        border-radius: 8px;
-        /* Yuvarlatılmış köşeler */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        /* Hafif gölge efekti */
-        width: 50%;
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     .naav-linkss a {
-        padding: 12px 20px;
-        font-size: 12px;
-        text-align: center;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+        border-bottom: none !important;
     }
 
     .naav-linkss a:hover {
-        background-color: #01579b;
-        /* Hoverda daha koyu mavi */
-        transform: scale(1.05);
-        /* Hover sırasında biraz büyümesini sağlıyoruz */
+        background: rgba(255,255,255,0.15) !important;
     }
 
 
@@ -9796,11 +9781,47 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 
     .naav-linkss {
-        order: 3 !important;
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
+        width: auto !important;
+        order: unset !important;
+        margin-top: 0 !important;
+    }
+
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss li {
         width: 100% !important;
-        margin-top: 10px !important;
-        justify-content: center !important;
-        gap: 15px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .naav-linkss a {
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
     }
 
     .auth-buttoons {
@@ -9814,31 +9835,54 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 }
 
-/* Hamburger menu aktif olduğunda */
+/* Hamburger menu aktif olduğunda - MAVİ TEMA */
 @media (max-width: 768px) {
     .naav-linkss {
         display: none !important;
         position: absolute !important;
         top: 100% !important;
-        left: 0 !important;
+        left: auto !important;
         right: 0 !important;
-        background: white !important;
+        width: auto !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         flex-direction: column !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 0 0 10px 10px !important;
-        z-index: 1000 !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
     }
 
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .naav-linkss a {
-        color: #333 !important;
-        padding: 10px !important;
-        border-bottom: 1px solid #eee !important;
-        text-align: center !important;
+        color: white !important;
+        padding: 10px 16px !important;
+        border-bottom: none !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
+    }
+
+    .naav-linkss li:last-child a {
+        border-bottom: none !important;
     }
 
     .hamburger {
@@ -10011,37 +10055,53 @@ enleme - Hamburger menü İlan Ver yanında */
         left: -5px !important;
     }
 
-    /* Navbar menüsü gizli */
+    /* Navbar menüsü - MAVİ TEMA */
     .naav-linkss {
         display: none !important;
         position: absolute !important;
         top: 100% !important;
-        left: 0 !important;
+        left: auto !important;
         right: 0 !important;
-        background: white !important;
+        width: auto !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         flex-direction: column !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 0 0 10px 10px !important;
-        z-index: 1000 !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
     }
 
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .naav-linkss a {
-        color: #333 !important;
-        padding: 12px !important;
-        border-bottom: 1px solid #eee !important;
-        text-align: center !important;
+        color: white !important;
+        padding: 10px 16px !important;
+        border-bottom: none !important;
+        text-align: left !important;
         font-size: 14px !important;
+        font-weight: 500 !important;
         text-decoration: none !important;
+        white-space: nowrap !important;
+        display: block !important;
+        transition: background 0.2s !important;
     }
 
     .naav-linkss a:hover {
-        background-color: #f8f9fa !important;
-        color: #009cfb !important;
+        background: rgba(255,255,255,0.15) !important;
+    }
+
+    .naav-linkss li:last-child a {
+        border-bottom: none !important;
     }
 }
 

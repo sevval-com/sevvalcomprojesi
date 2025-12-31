@@ -129,6 +129,9 @@
                             <span class="pending-badge">
                                 <i class="fas fa-hourglass-half mr-1"></i> Bekliyor
                             </span>
+                            <span class="watched-badge hidden" data-watched-id="@video.Id" style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4); z-index: 10;">
+                                <i class="fas fa-check-circle mr-1"></i> İzlendi
+                            </span>
                             
                             <!-- Thumbnail - Tıklanabilir -->
                             <div class="relative aspect-video bg-gray-100 cursor-pointer group video-thumbnail" data-video-id="@video.Id">
@@ -256,6 +259,44 @@
 @section Scripts {
 <script>
     let currentRejectVideoId = null;
+    const WATCHED_STORAGE_KEY = 'sevval_watched_pending_videos';
+    
+    // İzlenen videoları localStorage'dan yükle
+    function getWatchedVideos() {
+        try {
+            return JSON.parse(localStorage.getItem(WATCHED_STORAGE_KEY) || '[]');
+        } catch {
+            return [];
+        }
+    }
+    
+    // Video izlendi olarak işaretle
+    function markAsWatched(videoId) {
+        const watched = getWatchedVideos();
+        if (!watched.includes(videoId)) {
+            watched.push(videoId);
+            localStorage.setItem(WATCHED_STORAGE_KEY, JSON.stringify(watched));
+        }
+        // Badge'i göster
+        const badge = document.querySelector(`[data-watched-id="${videoId}"]`);
+        if (badge) {
+            badge.classList.remove('hidden');
+        }
+    }
+    
+    // Sayfa yüklendiğinde izlenen videoların badge'lerini göster
+    function showWatchedBadges() {
+        const watched = getWatchedVideos();
+        watched.forEach(videoId => {
+            const badge = document.querySelector(`[data-watched-id="${videoId}"]`);
+            if (badge) {
+                badge.classList.remove('hidden');
+            }
+        });
+    }
+    
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener('DOMContentLoaded', showWatchedBadges);
 
     // Video Modal Functions
     function openVideoModal(videoId) {
@@ -264,6 +305,9 @@
             console.error('Card not found for videoId:', videoId);
             return;
         }
+        
+        // Video izlendi olarak işaretle
+        markAsWatched(videoId);
         
         const videoUrl = card.getAttribute('data-video-url') || '';
         const isYouTube = card.getAttribute('data-is-youtube') === 'true';

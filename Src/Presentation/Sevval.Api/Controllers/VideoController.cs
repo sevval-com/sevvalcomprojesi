@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sevval.Application.Features.Video.Queries.GetVideos;
 using Sevval.Domain.Entities;
+using Sevval.Domain.Enums;
 using Sevval.Persistence.Context;
 using Sevval.Web.Models;
 using System;
@@ -45,7 +46,8 @@ namespace Sevval.Api.Controllers
         public async Task<IActionResult> GetVideos([FromQuery] string? category = null)
         {
             // Videoları doğrudan VideolarSayfasi tablosundan oku ve basit DTO'ya dönüştür
-            var query = _context.VideolarSayfasi.AsQueryable();
+            // Sadece onaylanmış videoları getir
+            var query = _context.VideolarSayfasi.Where(v => v.ApprovalStatus == VideoApprovalStatus.Approved).AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
             {
                 query = query.Where(v => v.Kategori == category);
@@ -115,14 +117,20 @@ namespace Sevval.Api.Controllers
                 return NotFound(new { message = "Video bulunamadı" });
             }
 
+            // Onaylanmamış videoya erişimi engelle (video sahibi veya admin hariç)
+            if (video.ApprovalStatus != VideoApprovalStatus.Approved)
+            {
+                return NotFound(new { message = "Video bulunamadı veya henüz onaylanmamış" });
+            }
+
             // Görüntülenme sayısını artır
             video.GoruntulenmeSayisi++;
             _context.Update(video);
             await _context.SaveChangesAsync();
 
-            // Öneri videoları
+            // Öneri videoları - sadece onaylanmış olanlar
             var oneriVideolar = await _context.VideolarSayfasi
-                .Where(v => v.Kategori == video.Kategori && v.Id != id)
+                .Where(v => v.Kategori == video.Kategori && v.Id != id && v.ApprovalStatus == VideoApprovalStatus.Approved)
                 .Include(v => v.YukleyenKullanici)
                 .OrderByDescending(v => v.YuklenmeTarihi)
                 .Take(10)
@@ -331,7 +339,7 @@ namespace Sevval.Api.Controllers
                 Console.WriteLine($"Gelen kategori: '{category}'");
                 var query = _context.VideolarSayfasi
                     .Include(v => v.YukleyenKullanici)
-                    .Where(v => v.Id != currentVideoId) // Mevcut videoyu hariç tut
+                    .Where(v => v.Id != currentVideoId && v.ApprovalStatus == VideoApprovalStatus.Approved) // Mevcut videoyu hariç tut ve sadece onaylı videoları getir
                     .AsQueryable();
 
                 // Not: Kategori belirtilse bile hard filter yapmayalım; böylece aynı kategori yoksa

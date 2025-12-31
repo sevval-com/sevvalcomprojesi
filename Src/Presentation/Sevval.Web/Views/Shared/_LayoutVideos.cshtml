@@ -64,6 +64,29 @@
             --plyr-color-main: #2563eb;
         }
         
+        /* Navbar'daki ziyaretçi sayıları için stil - Masaüstü */
+        .visitor-counts-navbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 4%;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .visitor-counts-navbar span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+        }
+        
+        .visitor-counts-navbar .icon {
+            font-size: 14px;
+            color: white;
+        }
+        
         /* MOBİL NAVBAR - Tüm mobil cihazlarda aynı görünüm */
         @@media (max-width: 991px) {
             .navbaar {
@@ -97,14 +120,69 @@
             
             /* Anlık ziyaretçi sayacı */
             .visitor-counts-navbar {
+                display: inline-flex !important;
                 padding: 4px 8px !important;
                 font-size: 11px !important;
                 flex-shrink: 0 !important;
+                background: rgba(255,255,255,0.15);
+                border-radius: 6px;
+                color: white;
             }
             
-            /* Nav linkler gizle */
+            .visitor-counts-navbar span {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 4px !important;
+                color: white !important;
+            }
+            
+            .visitor-counts-navbar .icon {
+                font-size: 12px !important;
+                color: white !important;
+            }
+            
+            /* Nav linkler gizle - ama active olunca göster */
             .naav-linkss {
                 display: none !important;
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+                min-width: 160px !important;
+                max-width: 200px !important;
+                border-radius: 8px !important;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
+                padding: 8px 0 !important;
+                z-index: 10000 !important;
+                flex-direction: column !important;
+            }
+            
+            .naav-linkss.active {
+                display: flex !important;
+            }
+            
+            .naav-linkss li {
+                list-style: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .naav-linkss li a {
+                display: block !important;
+                padding: 10px 16px !important;
+                color: white !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                transition: background 0.2s !important;
+                border-bottom: none !important;
+                text-align: left !important;
+                white-space: nowrap !important;
+            }
+            
+            .naav-linkss li a:hover {
+                background: rgba(255,255,255,0.15) !important;
             }
             
             /* Auth butonları */
@@ -234,7 +312,7 @@
 </head>
 <body class="antialiased">
 
-    <!-- Orijinal Navbar -->
+    <!-- Navbar -->
     <nav class="navbaar">
         <div class="navbaar-container" style="position: relative;">
             <div class="logo">
@@ -259,14 +337,20 @@
                 <li>
                     <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
                 </li>
-                
+            
                 <li class="dropdoawn">
                     <a href="@Url.Action("About", "Home")">Hakkımızda</a>
                 </li>
                 <li><a href="@Url.Action("Index", "Blog")">Blog</a></li>
                 
             </ul>
-            <div class="auth-buttoons">
+            <div class="auth-buttoons" style="margin-right: -15px !important;">
+                <!-- İlan Ver butonu container ile - ÖNCELİKLİ -->
+                <div class="post-ad-container" style="position: relative; display: inline-block;">
+                    <span class="free-tag" style="position: absolute; top: -8px; left: -5px; background-color: #28a745; color: white; font-size: 10px; font-weight: bold; padding: 3px 6px; border-radius: 4px; transform: rotate(-18deg); z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ücretsiz</span>
+                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">İlan Ver</a>
+                </div>
+                
                 @if (User.Identity.IsAuthenticated)
                 {
                     var currentUser = await UserManager.GetUserAsync(User);
@@ -309,37 +393,96 @@
                 {
                     <a href="#" class="login" id="giris-buton" style="margin-right: 15px;">Giriş Yap</a>
                 }
-                <!-- İlan Ver butonu container ile -->
-                <div class="post-ad-container" style="position: relative; display: inline-block;">
-                    <span class="free-tag" style="position: absolute; top: -10px; left: -10px; background-color: #28a745; color: white; font-size: 8px; font-weight: bold; padding: 2px 5px; border-radius: 3px; transform: rotate(-15deg); z-index: 100;">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">İlan Ver</a>
+                
+                <!-- MOBİL MENÜ BUTONU - Sadece mobilde görünür -->
+                <div class="mobile-menu-btn" id="mobile-menu-btn" style="display: none; flex-direction: column; margin-left: 8px; margin-top: -10px; cursor: pointer; padding: 8px; background: rgba(255,255,255,0.2); border-radius: 4px;">
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
+                    <div style="width: 22px; height: 3px; background: white; margin: 3px 0;"></div>
                 </div>
             </div>
-
+            
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
                     var navLinks = document.getElementById("nav-links");
-
-                    // Hamburger menüye tıklanınca menüyü aç/kapat
-                    hamburgerMenu.addEventListener("click", function (event) {
-                        navLinks.classList.toggle("active");
+                    var mobileMenuBtn = document.getElementById("mobile-menu-btn");
+                    
+                    // Mobilde menü butonunu göster
+                    function handleMobileMenu() {
+                        if (window.innerWidth <= 991) {
+                            if (mobileMenuBtn) {
+                                mobileMenuBtn.style.display = 'flex';
+                                mobileMenuBtn.style.flexDirection = 'column';
+                            }
+                        } else {
+                            if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+                            if (navLinks) navLinks.classList.remove('active');
+                        }
+                    }
+                    
+                    // Menü butonuna tıklayınca
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (navLinks) navLinks.classList.toggle('active');
+                        });
+                    }
+                    
+                    // Sayfa dışına tıklayınca menüyü kapat
+                    document.addEventListener('click', function(e) {
+                        if (navLinks && mobileMenuBtn && !navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                            navLinks.classList.remove('active');
+                        }
+                    });
+                    
+                    handleMobileMenu();
+                    window.addEventListener('resize', handleMobileMenu);
+                    
+                    // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
+                    function fixMobileNavbar() {
+                        if (window.innerWidth <= 991) {
+                            // Auth butonları - gap 20px ve hizalı
+                            var authButtons = document.querySelector('.auth-buttoons');
+                            if (authButtons) {
+                                authButtons.style.display = 'flex';
+                                authButtons.style.alignItems = 'center';
+                                authButtons.style.gap = '20px';
+                                authButtons.style.marginRight = '10px';
+                            }
+                        }
+                    }
+                    
+                    // Sayfa yüklendiğinde ve resize olduğunda çalıştır
+                    fixMobileNavbar();
+                    window.addEventListener('resize', fixMobileNavbar);
+                    
+                    // Giriş popup
+                    var girisButon = document.getElementById('giris-buton');
+                    if (girisButon) {
+                        girisButon.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            document.getElementById('popup-giris').style.display = 'flex';
+                        });
+                    }
+    
+                    // Pop-up penceresinin dışında bir yere tıklandığında kapat
+                    var popupGiris = document.getElementById('popup-giris');
+                    if (popupGiris) {
+                        popupGiris.addEventListener('click', function (event) {
+                            if (event.target === this) {
+                                this.style.display = 'none';
+                            }
+                        });
+                    }
+    
+                    // Kapatma butonuna tıklandığında pop-up penceresini kapat
+                    var pencereKapat = document.getElementById('pencere-kapat');
+                    if (pencereKapat) {
+                        pencereKapat.addEventListener('click', function () {
+                            document.getElementById('popup-giris').style.display = 'none';
+                        });
+                    }
                 });
-                 document.getElementById('giris-buton').addEventListener('click', function (event) {
-             event.preventDefault();
-             document.getElementById('popup-giris').style.display = 'flex';
-         });
-    
-         // Pop-up penceresinin dışında bir yere tıklandığında kapat
-         document.getElementById('popup-giris').addEventListener('click', function (event) {
-             if (event.target === this) {
-                 this.style.display = 'none';
-             }
-         });
-    
-         // Kapatma butonuna tıklandığında pop-up penceresini kapat
-         document.getElementById('pencere-kapat').addEventListener('click', function () {
-             document.getElementById('popup-giris').style.display = 'none';
-         });
             </script>
         </div>
     </nav>

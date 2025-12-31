@@ -451,12 +451,19 @@ public class VideolarSayfasiController : Controller
         }
         _context.VideolarSayfasi.Add(yeniVideo);
         await _context.SaveChangesAsync();
+        
+        // Onay durumuna göre mesaj belirle
+        var successMessage = isSuperAdmin 
+            ? "Video başarıyla yüklendi ve yayına alındı." 
+            : "Video başarıyla yüklendi. Videonuz onaylandığı zaman yayına girecektir.";
+        
         // AJAX ise JSON redirect dön, değilse klasik redirect
         if (Request.Headers.ContainsKey("X-Requested-With") &&
             string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase))
         {
-            return Ok(new { success = true, redirectUrl = Url.Action("Index") });
+            return Ok(new { success = true, message = successMessage, redirectUrl = Url.Action("Index") });
         }
+        TempData["SuccessMessage"] = successMessage;
         return RedirectToAction("Index");
     }
 

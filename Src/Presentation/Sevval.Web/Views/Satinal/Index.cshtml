@@ -339,6 +339,10 @@
                 }
             </ul>
             <div class="auth-buttoons">
+                <div class="post-ad-container">
+                    <span class="free-tag">Ücretsiz</span>
+                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">İlan Ver</a>
+                </div>
                 @if (User.Identity.IsAuthenticated)
                 {
                     var currentUser = await UserManager.GetUserAsync(User);
@@ -361,10 +365,6 @@
                 {
                     <a href="#" class="login" id="giris-buton">Giriş Yap</a>
                 }
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">İlan Ver</a>
-                </div>
             </div>
         </div>
     </nav>
