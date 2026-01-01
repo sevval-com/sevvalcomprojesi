@@ -32,6 +32,14 @@
     }
     }
     
+    /* Önerilen videolar kartları */
+    .video-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(13,110,253,.08); overflow: hidden; transition: box-shadow .2s, transform .2s; }
+    .video-card:hover { box-shadow: 0 8px 32px rgba(13,110,253,.16); transform: translateY(-2px); }
+    .video-thumb { position: relative; border-radius: 12px 12px 0 0; overflow: hidden; }
+    .video-thumb .shine { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient( circle at 30% 20%, rgba(59,130,246,.20), transparent 35% ), radial-gradient( circle at 80% 0%, rgba(33,150,243,.18), transparent 35% ); opacity: .35; pointer-events: none; transition: opacity .3s ease; }
+    .video-card:hover .video-thumb .shine { opacity: .55; }
+    .video-meta-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; background: #eef6ff; color: #1e3a8a; border: 1px solid #cfe5ff; font-weight: 600; font-size: 11px; box-shadow: 0 1px 4px rgba(13,110,253,.10); }
+    
     /* Önerilen videolar başlık stili - max 14px, 2 satır, ellipsis */
     .suggested-video-title {
         font-size: 14px !important;
@@ -195,11 +203,29 @@
                     <div class="border-t border-slate-200 my-3 sm:my-4"></div>
                     <!-- Yükleyen Bilgisi -->
                     <div class="flex items-center gap-3 sm:gap-4">
-                            <img src="@Url.Content("~/images/LOGO mavi.webp")"
-                                 class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
-                                 alt="Sevval.com" />
+                        @{
+                            var uploaderName = "Anonim";
+                            var uploaderPhoto = "/images/common/camera-placeholder.svg";
+                            if (Model.Video.YukleyenKullanici != null)
+                            {
+                                var fullName = $"{Model.Video.YukleyenKullanici.FirstName} {Model.Video.YukleyenKullanici.LastName}".Trim();
+                                if (!string.IsNullOrWhiteSpace(fullName))
+                                {
+                                    uploaderName = fullName;
+                                }
+                                var picPath = Model.Video.YukleyenKullanici.ProfilePicturePath ?? "";
+                                if (!string.IsNullOrWhiteSpace(picPath) && (picPath.EndsWith(".webp") || picPath.EndsWith(".jpg") || picPath.EndsWith(".jpeg") || picPath.EndsWith(".png") || picPath.EndsWith(".gif")))
+                                {
+                                    uploaderPhoto = picPath;
+                                }
+                            }
+                        }
+                        <img src="@Url.Content(uploaderPhoto)"
+                             class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
+                             alt="@uploaderName"
+                             onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg'" />
                         <div class="w-full">
-                            <p class="font-bold text-slate-800 text-sm sm:text-base">Sevval.com</p>
+                            <p class="font-bold text-slate-800 text-sm sm:text-base">@uploaderName</p>
                         </div>
                     </div>
                 </div>
@@ -1310,11 +1336,13 @@
             try {
                 const currentVideoId = @Model.Video.Id;
                 const currentCategory = @Html.Raw(Json.Serialize(Model.Video.Kategori));
+                // İzlenen video ID'leri
+                const watchedIds = new Set(@Html.Raw(Json.Serialize(ViewBag.WatchedIds ?? new HashSet<int>())));
                 
                 console.log('Current Video ID:', currentVideoId);
                 console.log('Current Category:', currentCategory);
                 
-                // Önce local endpoint'i dene
+                // Sadece local endpoint'i kullan - API'ye düşme
                 let url = `/VideolarSayfasi/GetSuggestedVideos?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory || '')}&limit=6`;
                 console.log('Trying local URL:', url);
                 
@@ -1324,23 +1352,15 @@
                 if (response.ok) {
                     data = await response.json();
                     console.log('Local API Response:', data);
-                }
-                
-                // Local başarısız olursa proxy'yi dene
-                if (!data || !data.success) {
-                    console.log('Local failed, trying proxy...');
-                    const proxyUrl = `${window.API_BASE}/videos/suggested?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory || '')}&limit=6`;
-                    console.log('Proxy URL:', proxyUrl);
-                    
-                    response = await fetch(proxyUrl);
-                    if (response.ok) {
-                        data = await response.json();
-                        console.log('Proxy API Response:', data);
-                    }
+                    console.log('Videos with user info:', data.videos?.map(v => ({
+                        id: v.id,
+                        title: v.videoAdi,
+                        uploader: v.yukleyenKullanici ? `${v.yukleyenKullanici.firstName} ${v.yukleyenKullanici.lastName}` : 'null'
+                    })));
                 }
                 
                 if (data && data.success && data.videos && data.videos.length > 0) {
-                    renderSuggestedVideos(data.videos);
+                    renderSuggestedVideos(data.videos, watchedIds);
                 } else {
                     showNoVideosMessage();
                 }
@@ -1376,11 +1396,25 @@
         }
 
         // Önerilen videoları render et
-        function renderSuggestedVideos(videos) {
+        function renderSuggestedVideos(videos, watchedIds = new Set()) {
             const container = document.getElementById('suggestedVideosContainer');
             if (!container) return;
 
-            const videosHtml = videos.map(video => `
+            const videosHtml = videos.map(video => {
+                const uploaderFirstName = video.yukleyenKullanici?.firstName || 'Anonim';
+                const uploaderLastName = video.yukleyenKullanici?.lastName || '';
+                const uploaderFullName = `${uploaderFirstName} ${uploaderLastName}`.trim() || 'Anonim';
+                
+                // Profil fotoğrafı kontrolü - geçerli resim uzantısı olmalı
+                let uploaderPhoto = '/images/common/camera-placeholder.svg';
+                const picPath = video.yukleyenKullanici?.profilePicturePath || '';
+                if (picPath && (picPath.endsWith('.webp') || picPath.endsWith('.jpg') || picPath.endsWith('.jpeg') || picPath.endsWith('.png') || picPath.endsWith('.gif'))) {
+                    uploaderPhoto = picPath;
+                }
+                
+                const isWatched = watchedIds.has(video.id);
+                
+                return `
                 <a href="/VideolarSayfasi/Play/${video.id}" class="group flex flex-col video-card" data-video-id="${video.id}">
                     <!-- Video Thumbnail -->
                     <div class="relative w-full video-thumb">
@@ -1388,6 +1422,16 @@
                             ${getVideoThumbnail(video)}
                         </div>
                         <div class="shine"></div>
+                        ${isWatched ? `
+                        <div class="absolute top-2 right-2 z-10">
+                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold bg-green-500 text-white shadow-md">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                İzlendi
+                            </span>
+                        </div>
+                        ` : ''}
                         <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-blue-700/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                             <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
                                 <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -1400,35 +1444,28 @@
                     <!-- Video Bilgileri -->
                     <div class="p-4 flex items-start gap-4 w-full">
                         <div class="flex flex-col w-full">
+                            <!-- 1. satır: Video başlığı -->
                             <h3 class="suggested-video-title font-semibold text-blue-900 group-hover:text-blue-600 transition-colors" title="${video.videoAdi.trim()}">
                                 ${video.videoAdi.trim()}
                             </h3>
-                            <div class="flex items-center justify-between mt-1">
+                            <!-- 2. satır: Kullanıcı adı (solda) + Görüntülenme + Beğeniler (sağda) -->
+                            <div class="flex items-center mt-2">
                                 <div class="flex items-center gap-2">
-                                    <img src="${video.yukleyenKullanici.profilePicturePath || `https://ui-avatars.com/api/?name=${encodeURIComponent(video.yukleyenKullanici.firstName)}+${encodeURIComponent(video.yukleyenKullanici.lastName)}&background=1E3A8A&color=fff&font-size=0.33`}" class="w-6 h-6 rounded-full flex-shrink-0 object-cover border border-white shadow-sm" alt="${video.yukleyenKullanici.firstName} profili" />
-                                    <p class="text-xs text-gray-600 truncate" title="${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}">
-                                        ${video.yukleyenKullanici.firstName} ${video.yukleyenKullanici.lastName}
+                                    <img src="${uploaderPhoto}" class="w-5 h-5 rounded-full flex-shrink-0 object-cover border border-white shadow-sm" alt="${uploaderFullName} profili" onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg'" />
+                                    <p class="text-xs text-gray-600 truncate" title="${uploaderFullName}">
+                                        ${uploaderFullName}
                                     </p>
                                 </div>
-                                <span class="text-xs text-gray-500">${formatNumber(video.goruntulenmeSayisi)} Görüntülenme</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-1.5">
-                                <span class="video-meta-chip upload-date">${formatDate(video.yuklenmeTarihi)}</span>
-                                <div class="ml-auto flex items-center gap-2">
-                                    <span class="video-meta-chip" title="Beğeni">
-                                        <i class="fas fa-thumbs-up" style="margin-right:4px"></i>
-                                        ${formatNumber(video.begeniSayisi)}
-                                    </span>
-                                    <span class="video-meta-chip" title="Beğenilmeme">
-                                        <i class="fas fa-thumbs-down" style="margin-right:4px"></i>
-                                        ${formatNumber(video.dislikeSayisi)}
-                                    </span>
+                                <div class="flex items-center gap-3 ml-auto">
+                                    <span class="text-xs text-gray-500">${formatNumber(video.goruntulenmeSayisi)}👁️</span>
+                                    <span class="text-xs text-gray-600">👍${formatNumber(video.begeniSayisi)}</span>
+                                    <span class="text-xs text-gray-600" style="margin-left: 4px;">👎${formatNumber(video.dislikeSayisi)}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </a>
-            `).join('');
+            `}).join('');
 
             container.innerHTML = `
                 <div class="grid grid-cols-1 gap-4">

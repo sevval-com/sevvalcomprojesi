@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
     <link rel="stylesheet" href="~/css/navbar.css" />
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
+    <script src="~/js/site.js" defer></script>
 
     <style>
         /* MOBİL NAVBAR - INLINE STİL */
@@ -318,73 +319,7 @@
 <body>
     @Html.AntiForgeryToken()
     <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container" style="position: relative;">
-            <div class="logo">
-                <a href="/">
-                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <div class="visitor-counts-navbar">
-                    <span><i class="fas fa-eye icon"></i> Anlık: <span id="active-visitors-navbar">0</span></span>
-                </div>
-            </div>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-                <li><a href="@Url.Action("About", "Home")">Hakkımızda</a></li>
-                <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <li><a href="@Url.Action("Panel", "Ilan")">Mağazam</a></li>
-                }
-            </ul>
-            <div class="auth-buttoons">
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(User.Identity.IsAuthenticated? Url.Action("KategoriSecim", "Ilan") : Url.Action("Login", "Account"))" class="post-ad">İlan Ver</a>
-                </div>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("Panel", "Ilan")">Panele Git</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
-                }
-            </div>
-        </div>
-    </nav>
-
-    <!-- Giriş Yap Pop-up -->
-    <div id="popup-giris" class="pencere" style="display:none;">
-        <div class="pencere-icerik">
-            <button class="kapat-buton" id="pencere-kapat">&times;</button>
-            <div class="sol-bolum">
-                <h2>Bireysel</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-            <div class="sag-bolum">
-                <h2>Kurumsal</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-        </div>
-    </div>
+    <partial name="_Navbar" />
 
     <main class="container-fluid my-4">
         <div class="row g-lg-4 g-3">

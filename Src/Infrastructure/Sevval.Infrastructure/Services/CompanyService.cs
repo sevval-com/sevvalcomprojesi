@@ -232,23 +232,45 @@ namespace Sevval.Infrastructure.Services
 
             var mapped = _mapper.Map<List<GetCompaniesQueryResponse>>(pagedList);
 
-            // Recalculate counts for the current page using the exact same logic as detail/AboutUs (active only)
+            // Batch olarak tüm firmaların ilan sayılarını hesapla (N+1 problemi çözümü)
+            var pagedCompanyIds = pagedList.Select(c => c.Id.ToString()).ToList();
+            var pagedCompanyEmails = pagedList.Select(c => c.Email).ToList();
+            
+            // Tüm davetli e-postaları topla
+            var allInvitedEmails = allInvitations
+                .Where(inv => pagedCompanyIds.Contains(inv.InvitedBy))
+                .ToList();
+            
+            // Tüm ilgili e-postaları tek seferde al
+            var allRelevantEmails = pagedCompanyEmails
+                .Concat(allInvitedEmails.Select(i => i.Email))
+                .Distinct()
+                .ToList();
+            
+            // Tek sorguda tüm ilan sayılarını al
+            var announcementCountsByEmail = await _readAnnouncementRepository.Queryable()
+                .Where(a => a.Status == "active" && allRelevantEmails.Contains(a.Email))
+                .GroupBy(a => a.Email)
+                .Select(g => new { Email = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Email, x => x.Count, cancellationToken);
+
+            // Her firma için ilan sayısını hesapla (bellekte)
             for (int i = 0; i < mapped.Count; i++)
             {
                 var company = pagedList[i];
 
                 // Owner + invited consultant emails for this company
-                var invitedEmailsForCompany = allInvitations
+                var invitedEmailsForCompany = allInvitedEmails
                     .Where(inv => inv.InvitedBy == company.Id.ToString())
                     .Select(inv => inv.Email)
                     .ToList();
 
                 invitedEmailsForCompany.Add(company.Email);
 
-                // Count active announcements for those emails
-                var activeCountForCompany = await _readAnnouncementRepository.Queryable()
-                    .Where(a => a.Status == "active" && invitedEmailsForCompany.Contains(a.Email))
-                    .CountAsync(cancellationToken);
+                // Bellekteki sözlükten ilan sayılarını topla
+                var activeCountForCompany = invitedEmailsForCompany
+                    .Where(email => announcementCountsByEmail.ContainsKey(email))
+                    .Sum(email => announcementCountsByEmail[email]);
 
                 mapped[i].TotalAnnouncement = activeCountForCompany;
                 mapped[i].CompanyMembershipDuration = (int)((DateTime.Now - mapped[i].RegistrationDate)?.TotalDays / 30);

@@ -280,8 +280,27 @@
                                         <span class="title-text">@video.VideoAdi.Trim()</span>
                                     </h3>
                                     <div class="flex items-center gap-2">
-                                        <img src="@Url.Content("~/images/LOGO mavi.webp")" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="Sevval.com" loading="lazy" />
-                                        <p class="text-sm text-gray-600 mt-1 truncate" title="Sevval.com">Sevval.com</p>
+                                        @{
+                                            var userInfo = ViewBag.VideoUserInfo as Dictionary<int, (string Name, string Photo)>;
+                                            var uploaderName = "Sevval.com";
+                                            var uploaderPhoto = "/images/common/camera-placeholder.svg";
+                                            if (userInfo != null && userInfo.ContainsKey(video.Id))
+                                            {
+                                                var info = userInfo[video.Id];
+                                                uploaderName = info.Name;
+                                                if (!string.IsNullOrWhiteSpace(info.Photo) && 
+                                                    (info.Photo.ToLower().EndsWith(".webp") || 
+                                                     info.Photo.ToLower().EndsWith(".jpg") || 
+                                                     info.Photo.ToLower().EndsWith(".jpeg") || 
+                                                     info.Photo.ToLower().EndsWith(".png") || 
+                                                     info.Photo.ToLower().EndsWith(".gif")))
+                                                {
+                                                    uploaderPhoto = info.Photo;
+                                                }
+                                            }
+                                        }
+                                        <img src="@Url.Content(uploaderPhoto)" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="@uploaderName" loading="lazy" onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg'" />
+                                        <p class="text-sm text-gray-600 mt-1 truncate" title="@uploaderName">@uploaderName</p>
                                     </div>
                                     
                                     
