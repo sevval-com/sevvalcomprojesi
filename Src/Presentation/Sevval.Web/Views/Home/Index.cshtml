@@ -845,26 +845,34 @@
 
     /* MOBİL EKRAN İÇİN ÖZEL "TEKTE GÖSTERME" AYARLARI */
     @@media (max-width: 768px) {
+        .daily-offer-modal-custom {
+            padding-top: 80px !important;
+        }
+        
+        .daily-offer-modal-custom .modal-dialog {
+            margin-top: 0 !important;
+        }
+        
         .modal-lg-custom {
-            max-width: 95% !important;
+            max-width: 90% !important;
             margin: 10px auto !important;
             max-height: 95vh !important;
         }
 
         .daily-offer-modal-custom .modal-content {
-            max-height: 92vh !important;
+            max-height: 85vh !important;
             overflow-y: auto !important;
         }
         /* Scroll kısıtlamasını kaldır, içerik kadar uzasın */
         .daily-offer-left-col {
-            padding: 10px !important;
+            padding: 14px !important;
             overflow-y: visible !important;
             max-height: none !important;
             gap: 6px !important; /* Araları sıkılaştır */
         }
 
         .daily-offer-right-col {
-            padding: 5px 10px !important;
+            padding: 10px 14px !important;
             gap: 5px !important;
         }
         /* Slider yüksekliğini küçült */
@@ -927,10 +935,20 @@
         .daily-offer-feat-icon {
             font-size: 12px !important;
         }
-        /* İletişim Kutusu */
+        /* İletişim Kutusu - Mobil: Yan yana düzen */
         .daily-offer-contact-box {
             padding: 6px !important;
             margin-top: 0 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+        }
+
+        .daily-offer-contact-info {
+            flex: 1 !important;
+            margin-bottom: 0 !important;
         }
 
         .daily-offer-contact-row {
@@ -938,13 +956,17 @@
             margin-bottom: 3px !important;
         }
 
-        .daily-offer-contact-btn {
-            padding: 6px 10px !important;
-            font-size: 11px !important;
+        .daily-offer-contact-btns {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+            flex-shrink: 0 !important;
         }
 
-        .daily-offer-contact-btns {
-            gap: 5px !important;
+        .daily-offer-contact-btn {
+            padding: 6px 10px !important;
+            font-size: 10px !important;
+            white-space: nowrap !important;
         }
         /* Butonlar */
         .daily-offer-action-box {
@@ -975,7 +997,7 @@
     /* ÇOK KÜÇÜK EKRANLAR İÇİN (iPhone SE, vb.) */
     @@media (max-width: 375px) {
         .modal-lg-custom {
-            max-width: 95% !important;
+            max-width: 88% !important;
             margin: 10px auto !important;
             max-height: 95vh !important;
         }
@@ -985,8 +1007,12 @@
         }
 
         .daily-offer-left-col {
-            padding: 8px !important;
+            padding: 12px !important;
             gap: 5px !important;
+        }
+
+        .daily-offer-right-col {
+            padding: 8px 12px !important;
         }
 
         .daily-offer-slider-wrap {
@@ -1038,6 +1064,16 @@
 
         .daily-offer-contact-box {
             padding: 6px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 6px !important;
+        }
+
+        .daily-offer-contact-info {
+            flex: 1 !important;
+            margin-bottom: 0 !important;
         }
 
         .daily-offer-contact-row {
@@ -1046,12 +1082,16 @@
         }
 
         .daily-offer-contact-btns {
-            gap: 4px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 3px !important;
+            flex-shrink: 0 !important;
         }
 
         .daily-offer-contact-btn {
             padding: 5px 8px !important;
-            font-size: 10px !important;
+            font-size: 9px !important;
+            white-space: nowrap !important;
         }
 
         .daily-offer-action-box {
@@ -2154,7 +2194,7 @@
                 $(this).text(btnText);
             });
 
-            // Yorum Silme
+            // Yorum Silme (class ile)
             $(".comment-delete-btn").click(function () {
                 var commentId = $(this).data("comment-id");
                 if(confirm("Yorumu silmek istediğinize emin misiniz?")) {
@@ -2182,6 +2222,40 @@
                 });
             });
         });
+
+        // deleteComment fonksiyonu (onclick için)
+        function deleteComment(commentId) {
+            if(confirm("Yorumu silmek istediğinize emin misiniz?")) {
+                $.ajax({
+                    url: '/Home/DeleteComment',
+                    type: 'POST',
+                    data: { commentId: commentId },
+                    success: function () {
+                        $("#comment-" + commentId).remove();
+                    },
+                    error: function () {
+                        alert("Yorum silinirken hata oluştu.");
+                    }
+                });
+            }
+        }
+
+        // approveComment fonksiyonu (onclick için)
+        function approveComment(commentId) {
+            $.ajax({
+                url: '/Home/ApproveComment',
+                type: 'POST',
+                data: { commentId: commentId },
+                success: function () {
+                    $("#comment-" + commentId).removeClass("comment-unapproved");
+                    $("#comment-" + commentId + " .comment-approve-btn").parent().remove();
+                    alert("Yorum onaylandı.");
+                },
+                error: function () {
+                    alert("Yorum onaylanırken hata oluştu.");
+                }
+            });
+        }
 
         // Options ve Filtreleme JS
         function showOption(optionId) {

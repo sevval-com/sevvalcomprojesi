@@ -39,7 +39,6 @@
 
 <!-- Dış CSS dosyaları -->
 <link rel="stylesheet" href="~/css/kardesfirmalar.css">
-<link rel="stylesheet" href="~/css/anasayfa.css">
 <link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 <!--
@@ -48,53 +47,6 @@
     ve daha fazla animasyon (başlıkta shimmer, kartta glow) eklendi.
 -->
 <style>
-    /* === DROPDOWN MENÜ - HOVER İLE AÇILSIN === */
-    .dropdown {
-        position: relative !important;
-    }
-
-    .dropdown-content {
-        position: absolute !important;
-        top: 100% !important;
-        background-color: white !important;
-        border-radius: 8px !important;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
-        z-index: 10000 !important;
-        min-width: 180px !important;
-        opacity: 0 !important;
-        transform: translateY(20px) !important;
-        transition: opacity 0.3s ease, transform 0.3s ease !important;
-        pointer-events: none !important;
-        display: block !important;
-        list-style: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .dropdown:hover .dropdown-content {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-        pointer-events: auto !important;
-    }
-
-    .dropdown-content li {
-        padding: 10px 15px !important;
-        transition: background-color 0.3s, color 0.3s !important;
-    }
-
-    .dropdown-content li a {
-        color: #009cfb !important;
-        font-weight: bold !important;
-        text-decoration: none !important;
-        font-size: 16px !important;
-        display: block !important;
-    }
-
-    .dropdown-content li a:hover {
-        background-color: rgba(0, 156, 251, 0.1) !important;
-        color: #0056b3 !important;
-    }
-
     /* === KÖK DEĞİŞKENLER (YENİ TEMA - MAVİ/BEYAZ) === */
     :root {
         --brand-primary: #3B82F6; /* Tailwind Blue 500 */
@@ -199,30 +151,34 @@
         animation-fill-mode: backwards;
     }
     
-    /* Filtreler (ÜST SIRA) */
+    /* Filtreler (ÜST SIRA - AYNI SATIRDA) */
     .filter-row {
-        display: grid;
-        grid-template-columns: 1fr; /* Mobil: Tek sütun */
-        gap: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
         margin-bottom: 20px;
+        align-items: flex-end;
     }
 
     .filter-group {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 4px;
+        flex: 1;
+        min-width: 180px;
+        max-width: 300px;
     }
 
     .filter-group label {
         font-weight: 600;
         color: var(--text-dark);
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .filter-select {
-        height: 44px;
+        height: 36px;
         padding: 0 12px;
-        font-size: 16px;
+        font-size: 13px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         background-color: var(--bg-white);
@@ -240,6 +196,21 @@
         outline: none;
         border-color: var(--brand-primary);
         box-shadow: 0 0 0 3px var(--brand-primary-glow);
+    }
+    
+    /* Buton Grubu Inline (Filtrele/Temizle aynı satırda) */
+    .button-group-inline {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+        align-self: flex-end;
+        margin-bottom: 12px;
+    }
+    
+    .button-group-inline .btn {
+        height: 48px;
+        padding: 0 24px;
+        font-size: 16px;
     }
 
     /* Arama Çubuğu (ORTA SIRA) */
@@ -563,6 +534,39 @@
 
     /* === RESPONSIVE TASARIM === */
 
+    /* Mobil (768px altı) */
+    @@media (max-width: 767px) {
+        .filter-row {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1 1 30%;
+            min-width: 100px;
+            max-width: none;
+        }
+        
+        .filter-group label {
+            font-size: 11px;
+        }
+        
+        .filter-select {
+            font-size: 12px;
+            height: 36px;
+        }
+        
+        .button-group-inline {
+            width: 100%;
+            margin-left: 0;
+            margin-top: 12px;
+        }
+        
+        .button-group-inline .btn {
+            flex: 1;
+        }
+    }
+
     /* Tablet (768px ve üstü) */
     @@media (min-width: 768px) {
         .page-title {
@@ -571,7 +575,11 @@
         }
 
         .filter-row {
-            grid-template-columns: 1fr 1fr; /* 2 sütun */
+            flex-wrap: nowrap;
+        }
+        
+        .filter-group {
+            max-width: 280px;
         }
         
         .button-group {
@@ -582,8 +590,8 @@
     
     /* Küçük Masaüstü (1024px ve üstü) */
     @@media (min-width: 1024px) {
-        .filter-row {
-             grid-template-columns: 1fr 1fr 1fr; /* Filtreler 3 sütun */
+        .filter-group {
+            max-width: 300px;
         }
     }
 
@@ -631,6 +639,15 @@
                     <option value="date_desc">Üyelik Tarihi (Yeni-Eski)</option>
                 </select>
             </div>
+            
+            <!-- Butonlar (Aynı satırda) -->
+            <div class="button-group-inline">
+                <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
+                   class="btn btn-secondary press-feedback">
+                    Temizle
+                </a>
+                <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
+            </div>
         </div>
         
         <!-- Arama Çubuğu (ORTA SIRA) -->
@@ -642,21 +659,6 @@
                    class="search-input"
                    id="searchInput" />
             <button type="submit" class="search-btn press-feedback">Ara</button>
-        </div>
-
-        <!-- Buton Grubu (ALT SIRA) -->
-        <div class="button-group">
-            @if (!string.IsNullOrEmpty(currentSearch) ||
-            !string.IsNullOrEmpty(currentProvince) ||
-            !string.IsNullOrEmpty(currentDistrict) ||
-            !string.IsNullOrEmpty(currentSortBy))
-            {
-                <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
-                   class="btn btn-secondary press-feedback">
-                    Temizle
-                </a>
-            }
-            <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
         </div>
 
         <!-- Gizli Alanlar (Form gönderimi için gerekli) -->

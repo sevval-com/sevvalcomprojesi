@@ -19,9 +19,14 @@ setInterval(() => {
         .then(data => {
             // API response formatı: { Data: { ActiveVisitorCount: number } }
             const visitorCount = data?.Data?.ActiveVisitorCount || data?.data?.activeVisitorCount || data?.ActiveVisitorCount || data || 0;
+            // Her iki ID'yi de güncelle (eski ve yeni navbar için)
             const activeVisitorsElement = document.getElementById('activeVisitors');
+            const activeVisitorsNavbar = document.getElementById('active-visitors-navbar');
             if (activeVisitorsElement) {
                 activeVisitorsElement.innerText = visitorCount;
+            }
+            if (activeVisitorsNavbar) {
+                activeVisitorsNavbar.innerText = visitorCount;
             }
         })
         .catch(error => console.error('Hata:', error));

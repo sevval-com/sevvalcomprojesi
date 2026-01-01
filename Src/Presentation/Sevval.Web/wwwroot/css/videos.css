@@ -1,4 +1,14 @@
 ﻿
+/* Genel taşma önleme */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 @keyframes gradientAnimation {
     0% {
         background-position: 0% 50%;
@@ -456,4 +466,66 @@ button:hover{color:#fff !important;}
     .break-anywhere {
         overflow-wrap: anywhere;
         word-break: break-word;
+    }
+
+
+    /* MOBİL RESPONSIVE - VİDEOLAR SAYFASI */
+    @media (max-width: 991px) {
+        .container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .video-card {
+            margin-bottom: 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        
+        .video-card {
+            border-radius: 12px;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .video-meta-chip {
+            font-size: 10px;
+            padding: 3px 6px;
+        }
+        
+        .suggested-video-title {
+            font-size: 13px !important;
+        }
+        
+        /* Önerilen videolar sidebar mobilde */
+        aside {
+            margin-top: 20px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .container {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        
+        .video-card {
+            border-radius: 8px;
+        }
+        
+        .video-meta-chip {
+            font-size: 9px;
+            padding: 2px 5px;
+        }
+        
+        .suggested-video-title {
+            font-size: 12px !important;
+        }
     }

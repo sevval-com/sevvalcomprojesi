@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NuGetAudit>false</NuGetAudit>
     <NuGetAuditMode>direct</NuGetAuditMode>
+    <Features>experimental-data-section-string-literals</Features>
   </PropertyGroup>
 
   <ItemGroup>
