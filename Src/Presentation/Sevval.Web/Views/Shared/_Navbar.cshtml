@@ -56,11 +56,6 @@
                             <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                             <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                             <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                            <li>
-                                <a href="@Url.Action("ParselSorgu", "Drone")">
-                                    Sevval Drone <span class="nav-badge">Yeni</span>
-                                </a>
-                            </li>
                             <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
                             @if (User.Identity.IsAuthenticated &&
                            (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
