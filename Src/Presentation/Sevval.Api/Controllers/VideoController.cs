@@ -101,7 +101,7 @@ namespace Sevval.Api.Controllers
         }
 
         /// <summary>
-        /// Video detaylarını getirir ve görüntülenme sayısını artırır
+        /// Video detaylarını getirir (görüntülenme sayısını artırmaz)
         /// </summary>
         /// <param name="id">Video ID</param>
         /// <returns>Video detayları, yorumlar ve öneri videoları</returns>
@@ -123,10 +123,8 @@ namespace Sevval.Api.Controllers
                 return NotFound(new { message = "Video bulunamadı veya henüz onaylanmamış" });
             }
 
-            // Görüntülenme sayısını artır
-            video.GoruntulenmeSayisi++;
-            _context.Update(video);
-            await _context.SaveChangesAsync();
+            // NOT: Görüntülenme sayısı burada artırılmaz!
+            // Görüntülenme sadece /api/v1/videos/{id}/view endpoint'i ile artırılır
 
             // Öneri videoları - sadece onaylanmış olanlar
             var oneriVideolar = await _context.VideolarSayfasi
@@ -196,14 +194,6 @@ namespace Sevval.Api.Controllers
                 var userId = _userManager.GetUserId(User);
                 var vote = await _context.VideoLikes.FirstOrDefaultAsync(l => l.VideoId == id && l.UserId == userId);
                 currentUserVote = vote?.IsLike;
-
-                // İzlenen video olarak işaretle
-                var existingWatch = await _context.VideoWatches.FirstOrDefaultAsync(w => w.VideoId == id && w.UserId == userId);
-                if (existingWatch == null)
-                {
-                    _context.VideoWatches.Add(new VideoWatch { VideoId = id, UserId = userId, WatchedAtUtc = DateTime.UtcNow });
-                    await _context.SaveChangesAsync();
-                }
             }
 
             var result = new
@@ -235,6 +225,40 @@ namespace Sevval.Api.Controllers
             };
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Video görüntülenme sayısını artırır (Play sayfası açıldığında çağrılır)
+        /// </summary>
+        /// <param name="id">Video ID</param>
+        /// <returns>Güncellenmiş görüntülenme sayısı</returns>
+        [HttpPost("{id}/view")]
+        public async Task<IActionResult> IncrementViewCount(int id)
+        {
+            var video = await _context.VideolarSayfasi.FindAsync(id);
+            if (video == null)
+            {
+                return NotFound(new { message = "Video bulunamadı" });
+            }
+
+            // Görüntülenme sayısını artır
+            video.GoruntulenmeSayisi++;
+            _context.Update(video);
+            await _context.SaveChangesAsync();
+
+            // İzlenen video olarak işaretle (giriş yapmış kullanıcılar için)
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = _userManager.GetUserId(User);
+                var existingWatch = await _context.VideoWatches.FirstOrDefaultAsync(w => w.VideoId == id && w.UserId == userId);
+                if (existingWatch == null)
+                {
+                    _context.VideoWatches.Add(new VideoWatch { VideoId = id, UserId = userId, WatchedAtUtc = DateTime.UtcNow });
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return Ok(new { success = true, viewCount = video.GoruntulenmeSayisi });
         }
 
         /// <summary>
@@ -354,22 +378,22 @@ namespace Sevval.Api.Controllers
                     .Take(limit)
                     .Select(v => new
                     {
-                        v.Id,
-                        v.VideoAdi,
-                        v.KapakFotografiYolu,
-                        v.VideoYolu,
-                        v.IsYouTube,
-                        v.Kategori,
-                        v.GoruntulenmeSayisi,
-                        v.BegeniSayisi,
-                        v.DislikeSayisi,
-                        v.YuklenmeTarihi,
-                        YukleyenKullanici = new
+                        id = v.Id,
+                        videoAdi = v.VideoAdi,
+                        kapakFotografiYolu = v.KapakFotografiYolu,
+                        videoYolu = v.VideoYolu,
+                        isYouTube = v.IsYouTube,
+                        kategori = v.Kategori,
+                        goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                        begeniSayisi = v.BegeniSayisi,
+                        dislikeSayisi = v.DislikeSayisi,
+                        yuklenmeTarihi = v.YuklenmeTarihi,
+                        yukleyenKullanici = new
                         {
-                            v.YukleyenKullanici.Id,
-                            v.YukleyenKullanici.FirstName,
-                            v.YukleyenKullanici.LastName,
-                            v.YukleyenKullanici.ProfilePicturePath
+                            id = v.YukleyenKullanici.Id,
+                            firstName = v.YukleyenKullanici.FirstName,
+                            lastName = v.YukleyenKullanici.LastName,
+                            profilePicturePath = v.YukleyenKullanici.ProfilePicturePath
                         }
                     })
                     .ToListAsync();

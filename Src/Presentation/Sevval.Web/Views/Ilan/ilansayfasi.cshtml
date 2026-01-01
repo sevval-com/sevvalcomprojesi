@@ -1,4 +1,4 @@
-﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@model sevvalemlak.Dto.TumIlanlarDTO
 @using DocumentFormat.OpenXml.Office2010.PowerPoint
 @using Microsoft.AspNetCore.Identity
 @using sevvalemlak.Models
@@ -112,6 +112,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
+    <script src="~/js/site.js" defer></script>
     @if (isNotActive)
     {
         <style>
@@ -198,7 +199,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </script>
             <ul class="naav-linkss" id="nav-links">
                 <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
+                <li><a href="@Url.Action("Firmalar", "Home")">Firmalar</a></li>
                 <li class="dropdoawn">
                     <a href="@Url.Action("About", "Home")">Hakkımızda</a>
                 </li>
