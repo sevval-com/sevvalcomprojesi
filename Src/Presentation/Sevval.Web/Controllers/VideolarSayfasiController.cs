@@ -636,17 +636,17 @@ public class VideolarSayfasiController : Controller
             return NotFound();
         }
 
-        // Görüntüleme sayısını artır (30 dk içinde aynı kişi 1 kez - cookie kontrolü)
+        // Görüntüleme sayısını artır (24 saat içinde aynı kişi 1 kez - cookie kontrolü)
         var cookieKey = $"video_view_{id}";
         if (!Request.Cookies.ContainsKey(cookieKey))
         {
             video.GoruntulenmeSayisi++;
             await _context.SaveChangesAsync();
             
-            // 30 dakikalık cookie set et
+            // 24 saatlik cookie set et
             Response.Cookies.Append(cookieKey, "1", new CookieOptions
             {
-                Expires = DateTimeOffset.UtcNow.AddMinutes(30),
+                Expires = DateTimeOffset.UtcNow.AddHours(24),
                 HttpOnly = true,
                 Secure = false,
                 SameSite = SameSiteMode.Lax
@@ -709,7 +709,7 @@ public class VideolarSayfasiController : Controller
 
     /// <summary>
     /// Video görüntülenme sayısını artırır (sayfa açıldığında çağrılır)
-    /// 30 dakika içinde aynı kişi sadece 1 kez görüntüleme artırabilir (cookie ile kontrol)
+    /// 24 saat içinde aynı kişi sadece 1 kez görüntüleme artırabilir (cookie ile kontrol)
     /// </summary>
     [HttpGet]
     [IgnoreAntiforgeryToken]
@@ -721,7 +721,7 @@ public class VideolarSayfasiController : Controller
             // Cookie key: video_view_{id}
             var cookieKey = $"video_view_{id}";
             
-            // Cookie var mı kontrol et (30 dk içinde izlemiş mi?)
+            // Cookie var mı kontrol et (24 saat içinde izlemiş mi?)
             if (Request.Cookies.ContainsKey(cookieKey))
             {
                 // Zaten izlemiş, artırma - 200 OK döndür (UI güncellemesi yapılmasın)
@@ -734,10 +734,10 @@ public class VideolarSayfasiController : Controller
                 video.GoruntulenmeSayisi++;
                 await _context.SaveChangesAsync();
                 
-                // 30 dakikalık cookie set et
+                // 24 saatlik cookie set et
                 Response.Cookies.Append(cookieKey, "1", new CookieOptions
                 {
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30),
+                    Expires = DateTimeOffset.UtcNow.AddHours(24),
                     HttpOnly = true,
                     Secure = false, // localhost için false
                     SameSite = SameSiteMode.Lax
