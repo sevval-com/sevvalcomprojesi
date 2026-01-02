@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "Kayıtlı Parseller";
+    ViewData["DroneTab"] = "KayitliParseller";
+}
+
+@section style {
+    <link rel="stylesheet" href="~/css/drone.css" />
+}
+
+<section class="drone-shell">
+    <div class="drone-container">
+        <div class="drone-header-row">
+            <div class="drone-header">
+                <div class="drone-title">Kayıtlı Parseller</div>
+                <div class="drone-subtitle">Kaydettiğiniz parselleri görüntüleyin, video üretimini başlatın.</div>
+            </div>
+            @await Html.PartialAsync("_DroneTabs")
+        </div>
+
+        <div id="parsel-grid" class="drone-grid"></div>
+    </div>
+</section>
+
+<template id="parsel-card-template">
+    <div class="drone-card">
+        <div class="drone-card-row">
+            <div class="drone-card-title" data-title></div>
+            <div class="drone-tag" data-area></div>
+        </div>
+        <div class="drone-meta" data-mahalle></div>
+        <div class="drone-meta" data-mevkii></div>
+        <div class="drone-meta" data-ada-parsel></div>
+        <div class="drone-card-row">
+            <div class="drone-meta" data-nitelik></div>
+            <button class="drone-button" type="button" data-action>Video Oluştur</button>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        const parselGrid = document.getElementById('parsel-grid');
+        const template = document.getElementById('parsel-card-template');
+
+        const emptyState = {
+            title: 'Kayıtlı parsel bulunamadı',
+            description: 'Parsel sorgulama sonrası kaydettiğiniz kayıtlar burada listelenecek.'
+        };
+
+        const buildCard = (item) => {
+            const parcel = item.parcel || item;
+            const node = template.content.firstElementChild.cloneNode(true);
+            const areaValue = parcel.alan ? `${parcel.alan} m²` : '—';
+            node.querySelector('[data-title]').textContent = `${parcel.il ?? '-'} / ${parcel.ilce ?? '-'}`;
+            node.querySelector('[data-area]').textContent = areaValue;
+            node.querySelector('[data-mahalle]').textContent = `Mahalle: ${parcel.mahalle ?? '-'}`;
+            node.querySelector('[data-mevkii]').textContent = `Mevkii: ${parcel.mevkii ?? '-'}`;
+            node.querySelector('[data-ada-parsel]').textContent = `Ada / Parsel: ${parcel.ada ?? '-'} / ${parcel.parsel ?? '-'}`;
+            node.querySelector('[data-nitelik]').textContent = `Nitelik: ${parcel.nitelik ?? '-'}`;
+            const actionBtn = node.querySelector('[data-action]');
+            actionBtn?.addEventListener('click', () => {
+                const params = new URLSearchParams();
+                if (parcel.il) params.set('il', parcel.il);
+                if (parcel.ilce) params.set('ilce', parcel.ilce);
+                if (parcel.mahalle) params.set('mahalle', parcel.mahalle);
+                if (parcel.ada) params.set('ada', parcel.ada);
+                if (parcel.parsel) params.set('parsel', parcel.parsel);
+                const query = params.toString();
+                window.location.href = query ? `/Drone/Olustur?${query}` : '/Drone/Olustur';
+            });
+            return node;
+        };
+
+        const render = (items) => {
+            parselGrid.innerHTML = '';
+            if (!items.length) {
+                const empty = document.createElement('div');
+                empty.className = 'drone-empty';
+                empty.innerHTML = `<strong>${emptyState.title}</strong><p>${emptyState.description}</p>`;
+                parselGrid.appendChild(empty);
+                return;
+            }
+            items.forEach(item => parselGrid.appendChild(buildCard(item)));
+        };
+
+        const loadParseller = async () => {
+            try {
+                const response = await fetch('/api/drone/saved-parcels');
+                if (!response.ok) throw new Error('Fetch failed');
+                const data = await response.json();
+                const items = (data?.items || data || []).map(entry => {
+                    if (entry?.parcel) {
+                        return { ...entry.parcel, savedParcelId: entry.id };
+                    }
+                    return entry;
+                });
+                render(items);
+            } catch (error) {
+                render([]);
+            }
+        };
+
+        loadParseller();
+    </script>
+}

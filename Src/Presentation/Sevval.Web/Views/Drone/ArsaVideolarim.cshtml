@@ -1,0 +1,130 @@
+@{
+    ViewData["Title"] = "Arsa Videolarım";
+    ViewData["DroneTab"] = "ArsaVideolarim";
+}
+
+@section style {
+    <link rel="stylesheet" href="~/css/drone.css" />
+}
+
+<section class="drone-shell">
+    <div class="drone-container">
+        <div class="drone-header-row">
+            <div class="drone-header">
+                <div class="drone-title">Arsa Videolarım</div>
+                <div class="drone-subtitle">Üretilen videolarınızı takip edin ve indirin.</div>
+            </div>
+            @await Html.PartialAsync("_DroneTabs")
+        </div>
+
+        <div id="video-grid" class="drone-grid"></div>
+    </div>
+</section>
+
+<template id="video-card-template">
+    <div class="drone-card">
+        <div class="drone-card-row">
+            <div class="drone-card-title" data-location></div>
+            <div class="drone-tag" data-status></div>
+        </div>
+        <div class="drone-meta" data-date></div>
+        <div class="drone-card-row">
+            <div class="drone-meta" data-meta></div>
+            <a class="drone-button" data-download href="#" target="_blank" rel="noreferrer">İndir</a>
+        </div>
+        <div class="drone-muted-note">Video 7 gün boyunca saklanacaktır.</div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        const videoGrid = document.getElementById('video-grid');
+        const template = document.getElementById('video-card-template');
+        const highlightId = new URLSearchParams(window.location.search).get('videoId');
+        let refreshTimer = null;
+
+        const emptyState = {
+            title: 'Henüz video bulunamadı',
+            description: 'Video üretimi tamamlandığında bu listede görünecek.'
+        };
+
+        const statusClass = (status) => {
+            if (status.toLowerCase().includes('tamam')) return 'drone-tag success';
+            if (status.toLowerCase().includes('iptal')) return 'drone-tag error';
+            return 'drone-tag pending';
+        };
+
+        const buildCard = (item) => {
+            const node = template.content.firstElementChild.cloneNode(true);
+            if (highlightId && item.videoId === highlightId) {
+                node.classList.add('is-highlight');
+            }
+            node.querySelector('[data-location]').textContent = item.location;
+            const statusEl = node.querySelector('[data-status]');
+            statusEl.textContent = item.status;
+            statusEl.className = statusClass(item.status);
+            node.querySelector('[data-date]').textContent = `Üretim: ${item.date}`;
+            node.querySelector('[data-meta]').textContent = item.meta || '';
+            const download = node.querySelector('[data-download]');
+            download.href = item.downloadUrl || '#';
+            if (!item.downloadUrl) {
+                download.classList.add('is-disabled');
+                download.textContent = 'Hazır değil';
+            }
+            return node;
+        };
+
+        const render = (items) => {
+            videoGrid.innerHTML = '';
+            if (!items.length) {
+                const empty = document.createElement('div');
+                empty.className = 'drone-empty';
+                empty.innerHTML = `<strong>${emptyState.title}</strong><p>${emptyState.description}</p>`;
+                videoGrid.appendChild(empty);
+                return;
+            }
+            items.forEach(item => videoGrid.appendChild(buildCard(item)));
+        };
+
+        const loadVideos = async () => {
+            try {
+                const response = await fetch('/api/drone/videos');
+                if (!response.ok) throw new Error('Fetch failed');
+                const data = await response.json();
+                const items = (data?.items || data || []).map((entry) => {
+                    const parcel = entry?.parcel || {};
+                    const status = entry?.status || 'pending';
+                    const statusText = status === 'completed'
+                        ? 'Tamamlandı'
+                        : status === 'failed'
+                            ? 'İptal Edildi'
+                            : 'İşleniyor';
+                    const timestamp = entry?.completedAt || entry?.createdAt;
+                    const date = timestamp ? new Date(timestamp).toLocaleString('tr-TR') : '—';
+                    return {
+                        id: entry?.id,
+                        videoId: entry?.videoId,
+                        location: `${parcel.il ?? '-'} / ${parcel.ilce ?? '-'}`,
+                        date,
+                        status: statusText,
+                        downloadUrl: status === 'completed' ? entry?.downloadUrl : '',
+                        meta: `Ada ${parcel.ada ?? '-'} / Parsel ${parcel.parsel ?? '-'}`
+                    };
+                });
+                render(items);
+                const hasProcessing = items.some(item => item.status === 'İşleniyor');
+                if (hasProcessing && !refreshTimer) {
+                    refreshTimer = setInterval(loadVideos, 5000);
+                }
+                if (!hasProcessing && refreshTimer) {
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+            } catch (error) {
+                render([]);
+            }
+        };
+
+        loadVideos();
+    </script>
+}

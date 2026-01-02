@@ -1,0 +1,11 @@
+@using System
+@{
+    var activeTab = (ViewData["DroneTab"] as string) ?? "Index";
+    string IsActive(string tab) => activeTab.Equals(tab, StringComparison.OrdinalIgnoreCase) ? "drone-tab active" : "drone-tab";
+}
+
+<div class="drone-tabs">
+    <a class="@IsActive("ParselSorgu")" href="@Url.Action("ParselSorgu", "Drone")">Parsel Sorgula</a>
+    <a class="@IsActive("KayitliParseller")" href="@Url.Action("KayitliParseller", "Drone")">Kayıtlı Parseller</a>
+    <a class="@IsActive("ArsaVideolarim")" href="@Url.Action("ArsaVideolarim", "Drone")">Arsa Videolarım</a>
+</div>
