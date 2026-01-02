@@ -1502,14 +1502,12 @@ public class IlanController : Controller
         }, CancellationToken.None);
 
         // DTO oluştur
-        // RandomIlanlar fotoğraflarını mevcut fotoğraflara ekle
-        var allPhotos = ilanData.Photos.ToList();
-        allPhotos.AddRange(randomIlanPhotos);
-        
+        // NOT: RandomIlanlar fotoğrafları ayrı tutulmalı, ana ilanın fotoğraflarına eklenmemeli
         var model = new TumIlanlarDTO
         {
             _Ilanlar = new List<IlanModel> { ilanData.Ilan },
-            _Fotograflar = allPhotos,
+            _Fotograflar = ilanData.Photos.ToList(),
+            RandomIlanFotograflari = randomIlanPhotos,
             _Videolar = ilanData.Videos,
             User = ilanData.User,
             ProfilePicturePath = ilanData.User?.ProfilePicturePath,
