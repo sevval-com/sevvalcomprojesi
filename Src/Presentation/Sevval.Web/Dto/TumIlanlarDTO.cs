@@ -176,7 +176,8 @@ namespace sevvalemlak.Dto
             // Yeni eklenen alanları burada başlat
             WeeklySearches = new List<int>();
             WeekDaysLabels = new List<string>();
-            
+            RandomIlanlar = new List<IlanModel>();
+            RandomIlanFotograflari = new List<PhotoModel>();
         }
     }
 }
