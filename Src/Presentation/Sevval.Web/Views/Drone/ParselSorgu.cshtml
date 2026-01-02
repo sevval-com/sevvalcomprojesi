@@ -845,6 +845,42 @@
                 };
             };
 
+            const normalizeGeometryPayload = (payload) => {
+                if (!payload) return payload;
+                const candidate = payload.data || payload.Data || payload.result || payload.Result || payload.response || payload.payload;
+                if (candidate && (candidate.type || candidate.features || candidate.geometry)) {
+                    return candidate;
+                }
+                return payload;
+            };
+
+            const findCoordRing = (value) => {
+                if (!value) return [];
+                if (Array.isArray(value)) {
+                    if (value.length > 0 && Array.isArray(value[0]) && value[0].length >= 2) {
+                        const looksLikeRing = value.every((pair) =>
+                            Array.isArray(pair)
+                            && pair.length >= 2
+                            && Number.isFinite(Number(pair[0]))
+                            && Number.isFinite(Number(pair[1]))
+                        );
+                        if (looksLikeRing) return value;
+                    }
+                    for (const item of value) {
+                        const found = findCoordRing(item);
+                        if (found.length) return found;
+                    }
+                    return [];
+                }
+                if (typeof value === 'object') {
+                    for (const key of Object.keys(value)) {
+                        const found = findCoordRing(value[key]);
+                        if (found.length) return found;
+                    }
+                }
+                return [];
+            };
+
             const setSelectLoading = (selectEl, placeholder) => {
                 resetSelect(selectEl, placeholder);
                 const opt = document.createElement('option');
@@ -975,17 +1011,18 @@
             const renderPolygon = async (payload) => {
                 try {
                     await ensureMap();
+                    const normalized = normalizeGeometryPayload(payload);
                     const geometry = (() => {
-                        if (!payload) return null;
-                        if (payload.type === 'FeatureCollection') return payload.features?.[0]?.geometry;
-                        if (payload.type === 'Feature') return payload.geometry;
-                        if (payload.geometry) return payload.geometry;
-                        return payload;
+                        if (!normalized) return null;
+                        if (normalized.type === 'FeatureCollection') return normalized.features?.[0]?.geometry;
+                        if (normalized.type === 'Feature') return normalized.geometry;
+                        if (normalized.geometry) return normalized.geometry;
+                        return normalized;
                     })();
 
                     const coords = geometry?.type === 'MultiPolygon'
                         ? geometry?.coordinates?.[0]?.[0]
-                        : geometry?.coordinates?.[0];
+                        : geometry?.coordinates?.[0] || findCoordRing(geometry || normalized);
                     if (!coords?.length) {
                         setStatus('Polygon verisi bulunamadı.', 'error');
                         setText(els.polygonState, 'Polygon alınamadı');
