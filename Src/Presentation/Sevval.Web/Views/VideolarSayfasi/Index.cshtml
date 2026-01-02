@@ -1,4 +1,4 @@
-﻿ @using Sevval.Web.Models
+ @using Sevval.Web.Models
  @using Sevval.Domain.Entities
  @using System.Security.Claims
 @model IEnumerable<Sevval.Web.Models.VideolarSayfasi>
@@ -22,37 +22,116 @@
         .video-card:hover .video-thumb .shine { opacity: .55; }
         .video-meta-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #eef6ff; color: #1e3a8a; border: 1px solid #cfe5ff; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(13,110,253,.12); }
         @@keyframes borderFlow { to { transform: rotate(360deg); } }
-        .video-upload-button {margin-top: 120px; right:20px; }
-        @@media (max-width: 768px) {
-            .video-upload-button {margin-top: 100px; right:10px; }
+        /* Skeleton Loader Styles */
+        @@keyframes skeletonShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
+        .skeleton-card { background: #ffffff; border-radius: 18px; border: 1px solid rgba(59,130,246,.15); box-shadow: 0 4px 12px rgba(13,110,253,.06); overflow: hidden; }
+        .skeleton-thumbnail { width: 100%; aspect-ratio: 16/9; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; }
+        .skeleton-content { padding: 16px; }
+        .skeleton-title { height: 24px; width: 85%; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; border-radius: 6px; margin-bottom: 12px; }
+        .skeleton-channel { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; }
+        .skeleton-channel-name { height: 14px; width: 100px; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; border-radius: 4px; }
+        .skeleton-meta { display: flex; gap: 8px; }
+        .skeleton-chip { height: 28px; width: 80px; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; border-radius: 999px; }
+        .skeleton-container { display: none; }
+        .skeleton-container.loading { display: grid; }
+        .video-grid-container { display: grid; }
+        .video-grid-container.loading { display: none; }
     </style>
     <!-- Ana İçerik -->
     <main class="flex-1 p-6 sm:p-8">
         <div class="max-w-7xl mx-auto">
-            @{ var claim = User.FindFirst(ClaimTypes.Email); var emailClaim = claim != null ? claim.Value : null; var canUpload = User.Identity.IsAuthenticated && string.Equals(emailClaim, "sftumen41@gmail.com", System.StringComparison.OrdinalIgnoreCase); }
-            @if (User.Identity.IsAuthenticated)
-                {
-                    <a asp-action="Upload" class="video-upload-button inline-flex absolute right-0 top-0 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-1 px-2 sm:py-2 sm:px-4 rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-1.5 sm:gap-2 text-xs sm:text-sm z-20" data-allowed="@canUpload.ToString().ToLower()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                        <span>Video Yükle</span>
-                    </a>
-                }
+            @{ var claim = User.FindFirst(ClaimTypes.Email); var emailClaim = claim != null ? claim.Value : null; var canUpload = User.Identity.IsAuthenticated; }
             <!-- Üst Başlık ve Buton Alanı -->
             <header class="relative flex flex-col gap-4 sm:gap-6 mb-8 items-center text-center">
                 
-                <div class="flex flex-col items-center">
-                    <h1 class="text-5xl font-extrabold text-blue-900">Videolar</h1>
+                <div class="flex flex-col items-center w-full">
+                    <!-- Başlık ve Video Yükle Butonu -->
+                    <div class="w-full relative flex justify-center items-center px-4 mb-4">
+                        <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-900 text-center">Videolar</h1>
+                        <!-- Video Yükle Butonu - Masaüstünde sağda, mobilde gizli -->
+                        <div class="hidden sm:block absolute right-4">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="Upload" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                    <span>Video Yükle</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Upload", "VideolarSayfasi") })" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                    <span>Video Yükle</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <!-- Video Yükle Butonu - Mobilde başlığın altında görünür -->
+                    <div class="sm:hidden mt-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-action="Upload" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                <span>Video Yükle</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Upload", "VideolarSayfasi") })" class="inline-flex bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 items-center gap-2 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                <span>Video Yükle</span>
+                            </a>
+                        }
+                    </div>
+                    <!-- Toplam İzlenme Sayacı -->
+                    @{
+                        var totalViews = ViewBag.ToplamIzlenme ?? Model.Sum(v => v.GoruntulenmeSayisi);
+                    }
+                    <div class="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-blue-100 shadow-sm group cursor-default" title="Tüm videoların toplam görüntülenme sayısı">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span class="text-sm font-semibold text-blue-700">@(((int)totalViews).ToString("N0"))</span>
+                        <span class="text-xs text-blue-500">toplam izlenme</span>
+                    </div>
                     @if (User.Identity != null && User.Identity.Name == "sftumen41@gmail.com")
                     {
-                        <div class="mt-4">
+                        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
                             <a href="@Url.Action("Index", "Category")" 
                                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors">
                                 <i class="fas fa-cog"></i>
                                 Kategori Yönetimi
                             </a>
+                            <a href="@Url.Action("PendingVideos", "VideolarSayfasi")" 
+                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 hover:text-amber-700 transition-colors relative">
+                                <i class="fas fa-clock"></i>
+                                Bekleyen Videolar
+                                <span id="pendingVideoBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                            </a>
                         </div>
                     }
+                </div>
+
+                <!-- Video Arama Motoru -->
+                <div class="w-full max-w-2xl mx-auto mt-4">
+                    <div class="relative">
+                        <input type="text" 
+                               id="videoSearchInput" 
+                               placeholder="Video ara..." 
+                               class="w-full px-5 py-3 text-base bg-white border-2 border-blue-200 rounded-full shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                               style="padding-left: 45px;"
+                               autocomplete="off">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <p id="searchResultCount" class="text-sm text-blue-600 mt-2 text-center hidden"></p>
+                    <p id="noSearchResults" class="text-sm text-red-500 mt-2 text-center hidden">Aramanızla eşleşen video bulunamadı.</p>
                 </div>
 
                 <!-- Kategori Chip'leri -->
@@ -131,20 +210,43 @@
             <!-- Video Listesi -->
             @if (Model.Any())
             {
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Skeleton Loaders (sayfa yüklenirken gösterilir) -->
+                <div class="skeleton-container loading grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="skeletonContainer">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div class="skeleton-card">
+                            <div class="skeleton-thumbnail"></div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-title"></div>
+                                <div class="skeleton-channel">
+                                    <div class="skeleton-avatar"></div>
+                                    <div class="skeleton-channel-name"></div>
+                                </div>
+                                <div class="skeleton-meta">
+                                    <div class="skeleton-chip"></div>
+                                    <div class="skeleton-chip"></div>
+                                    <div class="skeleton-chip"></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <!-- Gerçek Video Grid -->
+                <div class="video-grid-container loading grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="videoGridContainer">
                     @foreach (var video in Model)
                     {
-                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col video-card" data-video-id="@video.Id">
+                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col video-card" data-video-id="@video.Id" data-description="@(video.VideoAciklamasi ?? "")">
                             <!-- Video Thumbnail -->
                             <div class="relative w-full video-thumb">
                                 <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
                                     @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
                                     {
-                                        <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
+                                        <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
                                     }
                                     else if (video.IsYouTube)
                                     {
-                                        <img src="@("https://img.youtube.com/vi/" + video.VideoYolu + "/hqdefault.webp")" alt="@video.VideoAdi" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                        <img src="@("https://img.youtube.com/vi/" + video.VideoYolu + "/hqdefault.webp")" alt="@video.VideoAdi" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
                                     }
                                     else
                                     {
@@ -174,12 +276,31 @@
                             <div class="p-4 flex items-start gap-4 w-full">
                                 
                                 <div class="flex flex-col w-full">
-                                    <h3 class="font-bold text-2xl text-start text-blue-900 group-hover:text-blue-600 transition-colors title-ellipsis" title="@video.VideoAdi.Trim()">
+                                    <h3 class="font-bold text-base text-start text-blue-900 group-hover:text-blue-600 transition-colors title-ellipsis" title="@video.VideoAdi.Trim()">
                                         <span class="title-text">@video.VideoAdi.Trim()</span>
                                     </h3>
                                     <div class="flex items-center gap-2">
-                                        <img src="@Url.Content("~/images/LOGO mavi.webp")" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="Sevval.com" />
-                                        <p class="text-sm text-gray-600 mt-1 truncate" title="Sevval.com">Sevval.com</p>
+                                        @{
+                                            var userInfo = ViewBag.VideoUserInfo as Dictionary<int, (string Name, string Photo)>;
+                                            var uploaderName = "Sevval.com";
+                                            var uploaderPhoto = "/images/common/camera-placeholder.svg";
+                                            if (userInfo != null && userInfo.ContainsKey(video.Id))
+                                            {
+                                                var info = userInfo[video.Id];
+                                                uploaderName = info.Name;
+                                                if (!string.IsNullOrWhiteSpace(info.Photo) && 
+                                                    (info.Photo.ToLower().EndsWith(".webp") || 
+                                                     info.Photo.ToLower().EndsWith(".jpg") || 
+                                                     info.Photo.ToLower().EndsWith(".jpeg") || 
+                                                     info.Photo.ToLower().EndsWith(".png") || 
+                                                     info.Photo.ToLower().EndsWith(".gif")))
+                                                {
+                                                    uploaderPhoto = info.Photo;
+                                                }
+                                            }
+                                        }
+                                        <img src="@Url.Content(uploaderPhoto)" class="w-9 h-9 rounded-full flex-shrink-0 object-cover border-2 border-white shadow-sm" alt="@uploaderName" loading="lazy" onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg'" />
+                                        <p class="text-sm text-gray-600 mt-1 truncate" title="@uploaderName">@uploaderName</p>
                                     </div>
                                     
                                     
@@ -234,6 +355,31 @@
                     <a class="px-3 py-2 rounded-md border text-sm @(page >= totalPages ? "pointer-events-none opacity-50" : "hover:bg-blue-50")" href="@Url.Action("Index", new { kategori = currentCategory, page = Math.Min(totalPages, page+1), size = size })">Sonraki</a>
                 </nav>
                 <script>
+                    // Skeleton loader yönetimi - içerik yüklendiğinde gizle
+                    (function() {
+                        const skeletonContainer = document.getElementById('skeletonContainer');
+                        const videoGridContainer = document.getElementById('videoGridContainer');
+                        
+                        function showContent() {
+                            if (skeletonContainer) {
+                                skeletonContainer.classList.remove('loading');
+                            }
+                            if (videoGridContainer) {
+                                videoGridContainer.classList.remove('loading');
+                            }
+                        }
+                        
+                        // Sayfa yüklendiğinde içeriği göster
+                        if (document.readyState === 'complete') {
+                            showContent();
+                        } else {
+                            window.addEventListener('load', showContent);
+                        }
+                        
+                        // Fallback: 2 saniye sonra mutlaka göster
+                        setTimeout(showContent, 2000);
+                    })();
+                    
                     // Dim only watched items; "Yeni" etiketi görseli etkilemez
                     document.addEventListener('DOMContentLoaded', function(){
                         document.querySelectorAll('[data-video-id]').forEach(function(card){
@@ -292,16 +438,183 @@
                 </div>
             }
              <script>
-                 // Upload butonu: sadece belirlenen email için izin ver, diğerlerine popup
-                 document.addEventListener('click', function (e) {
-                     const anchor = e.target.closest('a.video-upload-button');
-                     if (!anchor) return;
-                     const allowed = anchor.getAttribute('data-allowed') === 'true';
-                     if (!allowed) {
-                         e.preventDefault();
-                         alert('Çok yakında');
+
+                 // Video Arama Motoru - Tüm kategorilerde anlık arama yapar
+                 document.addEventListener('DOMContentLoaded', function() {
+                     const searchInput = document.getElementById('videoSearchInput');
+                     const resultCount = document.getElementById('searchResultCount');
+                     const noResults = document.getElementById('noSearchResults');
+                     const videoGrid = document.getElementById('videoGridContainer');
+                     
+                     if (!searchInput || !videoGrid) {
+                         console.log('Video arama: Elementler bulunamadı', {searchInput, videoGrid});
+                         return;
                      }
+                     
+                     console.log('Video arama motoru başlatıldı');
+                     
+                     let allVideos = null; // Tüm videoları cache'le
+                     let originalCards = videoGrid.innerHTML; // Orijinal kartları sakla
+                     let isLoading = false;
+                     
+                     // Türkçe karakter normalize fonksiyonu
+                     function normalizeText(str) {
+                         if (!str) return '';
+                         return str
+                             .toUpperCase()
+                             .replace(/İ/g, 'I')
+                             .replace(/Ş/g, 'S')
+                             .replace(/Ğ/g, 'G')
+                             .replace(/Ü/g, 'U')
+                             .replace(/Ö/g, 'O')
+                             .replace(/Ç/g, 'C')
+                             .replace(/ı/g, 'I')
+                             .replace(/ş/g, 'S')
+                             .replace(/ğ/g, 'G')
+                             .replace(/ü/g, 'U')
+                             .replace(/ö/g, 'O')
+                             .replace(/ç/g, 'C')
+                             .replace(/i/g, 'I')
+                             .replace(/\s+/g, ' ');
+                     }
+                     
+                     // Tüm videoları önceden yükle
+                     async function loadAllVideos() {
+                         if (allVideos || isLoading) return;
+                         isLoading = true;
+                         try {
+                             const response = await fetch('/VideolarSayfasi/GetAllVideosForSearch');
+                             const data = await response.json();
+                             if (data.success && data.videos) {
+                                 allVideos = data.videos;
+                                 console.log('Tüm videolar yüklendi:', allVideos.length);
+                             }
+                         } catch (error) {
+                             console.error('Video yükleme hatası:', error);
+                         }
+                         isLoading = false;
+                     }
+                     
+                     // Sayfa yüklendiğinde videoları önceden yükle
+                     loadAllVideos();
+                     
+                     // Video kartı HTML'i oluştur
+                     function createVideoCard(video) {
+                         const thumbnailUrl = video.thumbnailUrl || video.kapakFotografiYolu || 
+                             (video.isYouTube ? `https://img.youtube.com/vi/${video.videoYolu}/hqdefault.webp` : 'https://placehold.co/600x400/3b82f6/ffffff?text=Video');
+                         
+                         return `
+                         <a href="/VideolarSayfasi/Play/${video.id}" class="group flex flex-col video-card" data-video-id="${video.id}" data-description="${video.videoAciklamasi || ''}">
+                             <div class="relative w-full video-thumb">
+                                 <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
+                                     <img src="${thumbnailUrl}" alt="${video.videoAdi || video.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                 </div>
+                                 <div class="shine"></div>
+                             </div>
+                             <div class="p-4 flex flex-col gap-3 flex-1">
+                                 <h3 class="text-lg font-bold text-blue-900 line-clamp-2 group-hover:text-blue-600 transition-colors title-text">${video.videoAdi || video.title}</h3>
+                                 <div class="flex items-center gap-3">
+                                     <img src="${video.userProfilePicture || '/images/common/camera-placeholder.svg'}" alt="Profil" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg';" />
+                                     <span class="text-sm font-medium text-blue-700">${video.uploaderName || 'Anonim'}</span>
+                                 </div>
+                                 <div class="flex flex-wrap gap-2 mt-auto">
+                                     <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                         ${video.goruntulenmeSayisi || video.viewCount || 0}
+                                     </span>
+                                     <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-100">
+                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                                         ${video.begeniSayisi || video.likeCount || 0}
+                                     </span>
+                                     ${video.kategori || video.category ? `<span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-100">${video.kategori || video.category}</span>` : ''}
+                                 </div>
+                             </div>
+                         </a>`;
+                     }
+                     
+                     // Anlık arama yap
+                     function performSearch() {
+                         const query = searchInput.value.trim();
+                         
+                         // Boş sorgu - orijinal kartları göster
+                         if (!query) {
+                             videoGrid.innerHTML = originalCards;
+                             resultCount.classList.add('hidden');
+                             noResults.classList.add('hidden');
+                             return;
+                         }
+                         
+                         const normalizedQuery = normalizeText(query);
+                         
+                         // Eğer tüm videolar yüklendiyse, onlarda ara
+                         if (allVideos && allVideos.length > 0) {
+                             const filtered = allVideos.filter(function(video) {
+                                 const title = normalizeText(video.videoAdi || video.title || '');
+                                 const description = normalizeText(video.videoAciklamasi || video.description || '');
+                                 const category = normalizeText(video.kategori || video.category || '');
+                                 return title.includes(normalizedQuery) || description.includes(normalizedQuery) || category.includes(normalizedQuery);
+                             });
+                             
+                             if (filtered.length > 0) {
+                                 videoGrid.innerHTML = filtered.map(createVideoCard).join('');
+                                 resultCount.textContent = `${filtered.length} video bulundu`;
+                                 resultCount.classList.remove('hidden');
+                                 noResults.classList.add('hidden');
+                             } else {
+                                 videoGrid.innerHTML = '';
+                                 resultCount.classList.add('hidden');
+                                 noResults.classList.remove('hidden');
+                             }
+                         } else {
+                             // Fallback: Mevcut kartlarda ara
+                             const tempDiv = document.createElement('div');
+                             tempDiv.innerHTML = originalCards;
+                             const videoCards = tempDiv.querySelectorAll('[data-video-id]');
+                             let visibleCount = 0;
+                             let html = '';
+                             
+                             videoCards.forEach(function(card) {
+                                 const title = normalizeText(card.querySelector('.title-text')?.textContent || '');
+                                 const description = normalizeText(card.getAttribute('data-description') || '');
+                                 if (title.includes(normalizedQuery) || description.includes(normalizedQuery)) {
+                                     html += card.outerHTML;
+                                     visibleCount++;
+                                 }
+                             });
+                             
+                             if (visibleCount > 0) {
+                                 videoGrid.innerHTML = html;
+                                 resultCount.textContent = `${visibleCount} video bulundu`;
+                                 resultCount.classList.remove('hidden');
+                                 noResults.classList.add('hidden');
+                             } else {
+                                 videoGrid.innerHTML = '';
+                                 resultCount.classList.add('hidden');
+                                 noResults.classList.remove('hidden');
+                             }
+                         }
+                     }
+                     
+                     // Her tuş vuruşunda anlık arama
+                     searchInput.addEventListener('input', performSearch);
                  });
+
+                 // Bekleyen video sayısını güncelle (Super Admin için)
+                 @if (User.Identity != null && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "emremcem066@gmail.com"))
+                 {
+                     <text>
+                     fetch('@Url.Action("GetPendingVideoCount", "VideolarSayfasi")')
+                         .then(response => response.json())
+                         .then(data => {
+                             const badge = document.getElementById('pendingVideoBadge');
+                             if (badge && data.count > 0) {
+                                 badge.textContent = data.count;
+                                 badge.classList.remove('hidden');
+                             }
+                         })
+                         .catch(error => console.log('Pending count fetch error:', error));
+                     </text>
+                 }
              </script>
         </div>
     </main>

@@ -404,6 +404,21 @@ public class IlanController : Controller
             .Select(kategori => ilanlar.Count(i => i.Category == kategori))
             .ToList();
 
+        // Kategori bazlı sayımlar
+        var konutCount = ilanlar.Count(i => i.Category == "Konut (Yaşam Alanı)");
+        var isYeriCount = ilanlar.Count(i => i.Category == "İş Yeri");
+        var arsaCount = ilanlar.Count(i => i.Category == "Arsa");
+        var tarlaCount = ilanlar.Count(i => i.Category == "Tarla");
+        var bahceCount = ilanlar.Count(i => i.Category == "Bahçe");
+
+        // Aktif/Pasif sayımları - tüm ilanları al (sadece active değil)
+        var tumIlanlar = await _context.IlanBilgileri
+            .AsNoTracking()
+            .Where(i => i.Email == userEmail)
+            .ToListAsync();
+        var activeCount = tumIlanlar.Count(i => i.Status == "active");
+        var inactiveCount = tumIlanlar.Count(i => i.Status != "active");
+
         // Kullanıcının şehrini al
         string userCity = user?.City;
         int talepCount = 0;
@@ -440,6 +455,14 @@ public class IlanController : Controller
             ToplamArama = userWeeklySearch.Toplam,
             EnCokGoruntulenenIlanlar = ilanlar.OrderByDescending(i => i.GoruntulenmeSayisi).Take(3).ToList(),
             IlanSayisi = ilanlar.Count,
+            TotalIlanCount = tumIlanlar.Count,
+            ActiveCount = activeCount,
+            InactiveCount = inactiveCount,
+            KonutIlanlariCount = konutCount,
+            IsYeriIlanlariCount = isYeriCount,
+            ArsaIlanlariCount = arsaCount,
+            TarlaIlanlariCount = tarlaCount,
+            BahceIlanlariCount = bahceCount,
             KonutDurumlari = konutDurumlari,
             // WeeklySearchData ve WeekDaysLabels doğrudan HaftalikAramalar'dan gelen verilerle eşleşecek
             WeeklySearchData = new List<int> {
@@ -1409,6 +1432,14 @@ public class IlanController : Controller
             .Take(5)
             .ToList();
 
+        // RandomIlanlar için fotoğrafları çek
+        var randomIlanIds = randomIlanlar.Select(i => i.Id).ToList();
+        var randomIlanPhotos = await _context.Photos.AsNoTracking()
+            .Where(p => randomIlanIds.Contains(p.IlanId))
+            .GroupBy(p => p.IlanId)
+            .Select(g => g.First())
+            .ToListAsync();
+
         string companyName = null;
         int companyTotalIlanCount = 0;
         string companyOwnerId = null;
@@ -1471,10 +1502,14 @@ public class IlanController : Controller
         }, CancellationToken.None);
 
         // DTO oluştur
+        // RandomIlanlar fotoğraflarını mevcut fotoğraflara ekle
+        var allPhotos = ilanData.Photos.ToList();
+        allPhotos.AddRange(randomIlanPhotos);
+        
         var model = new TumIlanlarDTO
         {
             _Ilanlar = new List<IlanModel> { ilanData.Ilan },
-            _Fotograflar = ilanData.Photos,
+            _Fotograflar = allPhotos,
             _Videolar = ilanData.Videos,
             User = ilanData.User,
             ProfilePicturePath = ilanData.User?.ProfilePicturePath,

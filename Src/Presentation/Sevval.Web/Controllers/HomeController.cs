@@ -206,37 +206,37 @@ public class HomeController : Controller
     {
         if (User.Identity.Name != AdminEmail && User.Identity.Name != "exdel.txt@gmail.com")
         {
-            return Unauthorized();
+            return Json(new { success = false, message = "Yetkisiz" });
         }
 
         var comment = await _context.Comments.FindAsync(commentId);
         if (comment == null)
         {
-            return NotFound();
+            return Json(new { success = false, message = "Yorum bulunamadı" });
         }
         _context.Comments.Remove(comment);
         await _context.SaveChangesAsync();
-        return Ok();
+        return Json(new { success = true });
     }
 
     // Yorum Onaylama
     [HttpPost]
     public async Task<IActionResult> ApproveComment(int commentId)
     {
-        if (User.Identity.Name != AdminEmail)
+        if (User.Identity.Name != AdminEmail && User.Identity.Name != "exdel.txt@gmail.com")
         {
-            return Unauthorized();
+            return Json(new { success = false, message = "Yetkisiz" });
         }
 
         var comment = await _context.Comments.FindAsync(commentId);
         if (comment == null)
         {
-            return NotFound();
+            return Json(new { success = false, message = "Yorum bulunamadı" });
         }
 
         comment.IsApproved = true;
         await _context.SaveChangesAsync();
-        return Ok();
+        return Json(new { success = true });
     }
 
     public async Task<IActionResult> TumYorumlar()
@@ -331,7 +331,7 @@ public class HomeController : Controller
             ArsaIlanlariCount = 0,
             BahceIlanlariCount = 0,
             TarlaIlanlariCount = 0,
-            TotalIlanlar = 0,
+            TotalIlanlar = await _context.IlanBilgileri.AsNoTracking().CountAsync(i => i.Status == "active"),
             AllIlanlar = new List<IlanModel>(),
             SehirIlanSayilari = new List<TumIlanlarDTO.SehirIlanSayisiDTO>()
         };

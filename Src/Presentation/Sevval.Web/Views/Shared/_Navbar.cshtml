@@ -1,0 +1,279 @@
+@using Microsoft.AspNetCore.Identity
+@using Sevval.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+<nav class="navbaar">
+    <div class="navbaar-container" style="position: relative;">
+        <!-- LOGO -->
+        <div class="logo">
+            <img src="~/images/LOGO mavi.webp" alt="Firma Logosu" onclick="window.location.href='/'">
+            <!-- Sevval.com yazısı yerine ziyaretçi sayıları -->
+            <div class="visitor-counts-navbar">
+                <span><i class="fas fa-eye icon"></i> Anlık: <span id="active-visitors-navbar">0</span></span>
+            </div>
+        </div>
+        
+        <!-- MENÜ LİNKLERİ -->
+        <ul class="naav-linkss" id="nav-links">
+            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                </li>
+            }
+            <li><a href="@Url.Action("Firmalar", "Home")">Firmalar</a></li>
+            <li>
+                <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
+            </li>
+            <li class="dropdoawn">
+                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
+            </li>
+            <li><a href="@Url.Action("Index", "Blog")">Blog</a></li>
+        </ul>
+        
+        <!-- AUTH BUTONLARI -->
+        <div class="auth-buttoons">
+            <!-- İlan Ver Butonu -->
+            <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account", new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="ilan-ver-btn">
+                <i class="fas fa-plus-circle"></i>
+                <span class="btn-text">İlan Ver</span>
+                <span class="btn-text-hover">Ücretsiz</span>
+            </a>
+            
+            @if (User.Identity.IsAuthenticated)
+            {
+                var currentUser = await UserManager.GetUserAsync(User);
+                if (currentUser != null)
+                {
+                    <div class="user-dropdown">
+                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                        <ul class="user-dropdown-content">
+                            <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
+                            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
+                            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                            <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
+                            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
+                            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
+                            <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
+                            <li>
+                                <a href="@Url.Action("ParselSorgu", "Drone")">
+                                    Sevval Drone <span class="nav-badge">Yeni</span>
+                                </a>
+                            </li>
+                            <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
+                            @if (User.Identity.IsAuthenticated &&
+                           (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                            {
+                                <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
+                            }
+                            <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
+                            <li>
+                                <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>Kullanıcı bilgileri alınamadı.</p>
+                }
+            }
+            else
+            {
+                <a href="#" class="login" id="giris-buton" style="margin-right: 15px;">Giriş Yap</a>
+            }
+            
+            <!-- MOBİL MENÜ BUTONU - Sadece mobilde görünür -->
+            <div class="mobile-menu-btn" id="mobile-menu-btn">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var navLinks = document.getElementById("nav-links");
+                var mobileMenuBtn = document.getElementById("mobile-menu-btn");
+                
+                // Mobil mi yoksa masaüstü görünümü mü kontrol et
+                // CSS ile uyumlu: yükseklik 1000px ve üstünde masaüstü görünümü
+                function isMobileView() {
+                    return window.innerWidth <= 991 && window.innerHeight < 1000;
+                }
+                
+                // Mobilde menü butonunu göster
+                function handleMobileMenu() {
+                    if (isMobileView()) {
+                        if (mobileMenuBtn) {
+                            mobileMenuBtn.style.display = 'flex';
+                            mobileMenuBtn.style.flexDirection = 'column';
+                        }
+                    } else {
+                        // Masaüstü görünümü - hamburger gizle, navlinks göster
+                        if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+                        if (navLinks) navLinks.classList.remove('active');
+                    }
+                }
+                
+                // Menü butonuna tıklayınca
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (navLinks) navLinks.classList.toggle('active');
+                    });
+                }
+                
+                // Sayfa dışına tıklayınca menüyü kapat
+                document.addEventListener('click', function(e) {
+                    if (navLinks && mobileMenuBtn && !navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                        navLinks.classList.remove('active');
+                    }
+                });
+                
+                handleMobileMenu();
+                window.addEventListener('resize', handleMobileMenu);
+                
+                // DROPDOWN MENÜ - Tıklama ile aç/kapat (Tüm dropdown'lar için)
+                var dropdowns = document.querySelectorAll('.user-dropdown');
+                
+                dropdowns.forEach(function(dropdown) {
+                    var dropdownContent = dropdown.querySelector('.user-dropdown-content');
+                    var userName = dropdown.querySelector('.user-name');
+                    
+                    if (userName && dropdownContent) {
+                        userName.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Diğer tüm dropdown'ları kapat
+                            document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
+                                if (content !== dropdownContent) {
+                                    content.classList.remove('show');
+                                }
+                            });
+                            
+                            // Bu dropdown'ı aç/kapat
+                            dropdownContent.classList.toggle('show');
+                        });
+                    }
+                });
+                
+                // Sayfa dışına tıklayınca tüm dropdown'ları kapat
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.user-dropdown')) {
+                        document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
+                            content.classList.remove('show');
+                        });
+                    }
+                });
+                
+                // Dropdown içindeki linklere tıklayınca menüyü kapat
+                document.querySelectorAll('.user-dropdown-content a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        var dropdownContent = link.closest('.user-dropdown-content');
+                        if (dropdownContent) {
+                            dropdownContent.classList.remove('show');
+                        }
+                    });
+                });
+                
+                // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
+                function fixMobileNavbar() {
+                    if (isMobileView()) {
+                        // Auth butonları - gap 20px ve hizalı
+                        var authButtons = document.querySelector('.auth-buttoons');
+                        if (authButtons) {
+                            authButtons.style.display = 'flex';
+                            authButtons.style.alignItems = 'center';
+                            authButtons.style.gap = '20px';
+                            authButtons.style.marginRight = '10px';
+                        }
+                    }
+                }
+                
+                // Sayfa yüklendiğinde ve resize olduğunda çalıştır
+                fixMobileNavbar();
+                window.addEventListener('resize', fixMobileNavbar);
+            });
+        </script>
+    </div>
+</nav>
+
+<!-- Giriş Popup -->
+<div id="popup-giris" class="pencere" style="display:none;">
+    <div class="pencere-icerik">
+        <button class="kapat-buton" id="pencere-kapat">&times;</button>
+        <div class="sol-bolum">
+            <div class="icon-container">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h2>Bireysel</h2>
+            <p class="section-description">Kişisel emlak ihtiyaçlarınız için</p>
+            <a href="@Url.Action("Login", "Account")" class="baglanti">
+                <i class="fas fa-sign-in-alt"></i>
+                Giriş Yap
+            </a>
+            <a href="@Url.Action("Register", "Account")" class="baglanti">
+                <i class="fas fa-user-plus"></i>
+                Üye Ol
+            </a>
+        </div>
+        <div class="sag-bolum">
+            <div class="icon-container">
+                <i class="fas fa-building"></i>
+            </div>
+            <h2>Kurumsal</h2>
+            <p class="section-description">Emlak profesyonelleri için</p>
+            <a href="@Url.Action("CorporateLogin","Account")" class="baglanti">
+                <i class="fas fa-sign-in-alt"></i>
+                Giriş Yap
+            </a>
+            <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">
+                <i class="fas fa-user-plus"></i>
+                Üye Ol
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Giriş Popup JavaScript
+(function() {
+    function initGirisPopup() {
+        var girisButon = document.getElementById('giris-buton');
+        var popupGiris = document.getElementById('popup-giris');
+        var pencereKapat = document.getElementById('pencere-kapat');
+        
+        if (girisButon && popupGiris) {
+            girisButon.addEventListener('click', function(e) {
+                e.preventDefault();
+                popupGiris.style.display = 'flex';
+            });
+        }
+        
+        if (pencereKapat && popupGiris) {
+            pencereKapat.addEventListener('click', function() {
+                popupGiris.style.display = 'none';
+            });
+        }
+        
+        if (popupGiris) {
+            popupGiris.addEventListener('click', function(e) {
+                if (e.target === popupGiris) {
+                    popupGiris.style.display = 'none';
+                }
+            });
+        }
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGirisPopup);
+    } else {
+        initGirisPopup();
+    }
+})();
+</script>

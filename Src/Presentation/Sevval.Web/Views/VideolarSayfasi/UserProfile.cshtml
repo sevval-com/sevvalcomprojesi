@@ -29,46 +29,124 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
                     @foreach (var video in Model.Videos)
                     {
-                        <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-300 overflow-hidden border border-blue-100/50">
-                            <!-- Video Thumbnail -->
-                            <div class="relative w-full">
-                                <div class="aspect-w-16 aspect-h-9 bg-blue-100">
-                                    @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                        var isClickable = video.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved;
+                        
+                        if (isClickable)
+                        {
+                            <a asp-action="Play" asp-route-id="@video.Id" class="group flex flex-col bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-300 overflow-hidden border border-blue-100/50">
+                                <!-- Video Thumbnail -->
+                                <div class="relative w-full">
+                                    <div class="aspect-w-16 aspect-h-9 bg-blue-100">
+                                        @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                        {
+                                            <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
+                                        }
+                                        else if (video.IsYouTube)
+                                        {
+                                            <img src="@($"https://img.youtube.com/vi/{video.VideoYolu}/hqdefault.webp")" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                        }
+                                        else
+                                        {
+                                            <video preload="metadata" muted class="w-full h-full object-cover">
+                                                <source src="@Url.Content(video.VideoYolu)#t=1" type="video/mp4">
+                                            </video>
+                                        }
+                                    </div>
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                                        <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
+                                            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Video Durum Badge (Kendi profili ise göster) -->
+                                    @if (ViewBag.IsOwnProfile == true)
                                     {
-                                        <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
-                                    }
-                                    else if (video.IsYouTube)
-                                    {
-                                        <img src="@($"https://img.youtube.com/vi/{video.VideoYolu}/hqdefault.webp")" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
-                                    }
-                                    else
-                                    {
-                                        <video preload="metadata" muted class="w-full h-full object-cover">
-                                            <source src="@Url.Content(video.VideoYolu)#t=1" type="video/mp4">
-                                        </video>
+                                        <div class="absolute top-2 right-2">
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-500 text-white shadow">
+                                                ✓ Yayında
+                                            </span>
+                                        </div>
                                     }
                                 </div>
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                                    <div class="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
-                                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                                        </svg>
+
+                                <!-- Video Bilgileri -->
+                                <div class="p-4">
+                                    <h3 class="font-bold text-base text-blue-900 group-hover:text-blue-600 transition-colors line-clamp-2" title="@video.VideoAdi">
+                                        @video.VideoAdi
+                                    </h3>
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                                        <span>@video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
+                                        <span>•</span>
+                                        <span>@video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="group flex flex-col bg-white rounded-xl shadow-sm transition-all duration-300 overflow-hidden border border-blue-100/50 opacity-75">
+                                <!-- Video Thumbnail -->
+                                <div class="relative w-full">
+                                    <div class="aspect-w-16 aspect-h-9 bg-blue-100">
+                                        @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                        {
+                                            <img src="@Url.Content(video.KapakFotografiYolu)" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video+Yüklenemedi'" />
+                                        }
+                                        else if (video.IsYouTube)
+                                        {
+                                            <img src="@($"https://img.youtube.com/vi/{video.VideoYolu}/hqdefault.webp")" alt="@video.VideoAdi" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                        }
+                                        else
+                                        {
+                                            <video preload="metadata" muted class="w-full h-full object-cover">
+                                                <source src="@Url.Content(video.VideoYolu)#t=1" type="video/mp4">
+                                            </video>
+                                        }
+                                    </div>
+                                    
+                                    <!-- Video Durum Badge (Kendi profili ise göster) -->
+                                    @if (ViewBag.IsOwnProfile == true)
+                                    {
+                                        <div class="absolute top-2 right-2">
+                                            @if (video.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Pending)
+                                            {
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-500 text-white shadow">
+                                                    ⏳ Onay Bekliyor
+                                                </span>
+                                            }
+                                            else if (video.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Rejected)
+                                            {
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-500 text-white shadow" title="@(video.RejectionReason ?? "Sebep belirtilmedi")">
+                                                    ✗ Reddedildi
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
 
-                            <!-- Video Bilgileri -->
-                            <div class="p-4">
-                                <h3 class="font-bold text-base text-blue-900 group-hover:text-blue-600 transition-colors line-clamp-2" title="@video.VideoAdi">
-                                    @video.VideoAdi
-                                </h3>
-                                <div class="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                                    <span>@video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
-                                    <span>•</span>
-                                    <span>@video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
+                                <!-- Video Bilgileri -->
+                                <div class="p-4">
+                                    <h3 class="font-bold text-base text-blue-900 transition-colors line-clamp-2" title="@video.VideoAdi">
+                                        @video.VideoAdi
+                                    </h3>
+                                    <div class="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                                        <span>@video.GoruntulenmeSayisi.ToString("N0") Görüntülenme</span>
+                                        <span>•</span>
+                                        <span>@video.YuklenmeTarihi.ToString("d MMMM yyyy")</span>
+                                    </div>
+                                    
+                                    <!-- Reddedilme sebebi (varsa) -->
+                                    @if (ViewBag.IsOwnProfile == true && video.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Rejected && !string.IsNullOrEmpty(video.RejectionReason))
+                                    {
+                                        <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                                            <strong>Red Sebebi:</strong> @video.RejectionReason
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                        </a>
+                        }
                     }
                 </div>
             }

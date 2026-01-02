@@ -28,99 +28,60 @@
 
     <!-- Navbar için gerekli olan özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <script src="~/js/site.js" defer></script>
 
     <!-- AntiForgery Token için -->
     @Html.AntiForgeryToken()
+    
+    <style>
+        /* MASAÜSTÜ VE MOBİL NAVBAR DÜZELTMELERİ */
+        .auth-buttoons, .auth-buttons { gap: 15px !important; }
+        .post-ad-container { position: relative !important; display: inline-block !important; }
+        .free-tag { position: absolute !important; top: -8px !important; left: -8px !important; background-color: #28a745 !important; color: white !important; font-size: 9px !important; font-weight: bold !important; padding: 2px 5px !important; border-radius: 3px !important; transform: rotate(-12deg) !important; z-index: 100 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important; }
+        .visitor-counts-navbar { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #fff; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); padding: 6px 10px; border-radius: 999px; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+        .visitor-counts-navbar span { display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
+        .visitor-counts-navbar .icon { font-size: 16px; color: #01e11b; text-shadow: 0 0 6px rgba(1,225,27,.25); }
+        
+        @@media (max-width: 991px) {
+            .navbaar { padding: 0 !important; }
+            .navbaar-container { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 10px 8px !important; width: 100% !important; box-sizing: border-box !important; flex-wrap: nowrap !important; }
+            .navbaar-container .logo { display: flex !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important; }
+            .navbaar-container .logo img { width: 40px !important; height: 40px !important; object-fit: contain !important; }
+            .visitor-counts-navbar { padding: 4px 8px !important; font-size: 11px !important; flex-shrink: 0 !important; }
+            .naav-linkss { display: none !important; position: absolute !important; top: 100% !important; right: 0 !important; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; min-width: 160px !important; max-width: 200px !important; border-radius: 8px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important; padding: 8px 0 !important; z-index: 10000 !important; flex-direction: column !important; }
+            .naav-linkss.active { display: flex !important; }
+            .naav-linkss li { list-style: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .naav-linkss li a { display: block !important; padding: 10px 16px !important; color: white !important; text-decoration: none !important; font-size: 14px !important; font-weight: 500 !important; }
+            .naav-linkss li a:hover { background: rgba(255,255,255,0.15) !important; }
+            .auth-buttoons, .auth-buttons { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 6px !important; margin: 0 !important; flex-shrink: 0 !important; }
+            .auth-buttoons .user-name, .auth-buttons .user-name { display: inline-flex !important; align-items: center !important; justify-content: center !important; min-width: 80px !important; max-width: 120px !important; height: 32px !important; padding: 0 10px !important; font-size: 11px !important; font-weight: 600 !important; background: transparent !important; color: white !important; border: 1.5px solid white !important; border-radius: 6px !important; }
+            .auth-buttoons .login, .auth-buttons .login { display: inline-flex !important; align-items: center !important; justify-content: center !important; min-width: 70px !important; height: 32px !important; padding: 0 10px !important; font-size: 11px !important; font-weight: 600 !important; background: transparent !important; color: white !important; border: 1.5px solid white !important; border-radius: 6px !important; }
+            .mobile-menu-btn { display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; width: 36px !important; height: 36px !important; padding: 6px !important; background: rgba(255,255,255,0.15) !important; border-radius: 6px !important; cursor: pointer !important; flex-shrink: 0 !important; margin-left: 6px !important; }
+            .mobile-menu-btn div { width: 20px !important; height: 2px !important; background: white !important; margin: 2px 0 !important; border-radius: 1px !important; }
+        }
+        
+        /* Popup stilleri */
+        .pencere { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1100; }
+        .pencere-icerik { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); width: 500px; min-height: 400px; display: flex; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 123, 255, 0.3); overflow: hidden; position: relative; margin: auto; }
+        .sol-bolum, .sag-bolum { flex: 1; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .sol-bolum { background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%); }
+        .sag-bolum { background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%); border-left: 1px solid rgba(255, 255, 255, 0.2); }
+        .icon-container { margin-bottom: 20px; }
+        .icon-container i { font-size: 48px; color: rgba(255, 255, 255, 0.9); }
+        .sol-bolum h2, .sag-bolum h2 { margin-bottom: 10px; font-size: 24px; color: #fff; font-weight: 600; }
+        .section-description { margin-bottom: 25px; font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+        .baglanti { margin: 8px 0; padding: 12px 20px; background: #fff; color: #1e88e5; text-decoration: none; border-radius: 10px; font-size: 16px; width: 80%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .baglanti:hover { background: #f1f1f1; }
+        .kapat-buton { position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; font-size: 20px; color: rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .kapat-buton:hover { color: #fff; background: rgba(255, 255, 255, 0.2); }
+        @@media (max-width: 768px) { .pencere-icerik { width: 90%; flex-direction: column; min-height: auto; } .sag-bolum { border-left: none; border-top: 1px solid rgba(255, 255, 255, 0.2); } .sol-bolum, .sag-bolum { padding: 30px 20px; } }
+    </style>
 </head>
 <body>
 
     <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container">
-            <div class="logo">
-                <a href="/">
-                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <span>Şevval Emlak</span>
-            </div>
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-                <li class="dropdoawn">
-                    <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-                </li>
-                <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
-
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <li>
-                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                    </li>
-                }
-            </ul>
-            <div class="auth-buttoons">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                                <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                                <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                                <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                                <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-
-                                <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                                <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                                @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-                                {
-                                    <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                                }
-                                <li><a href="@Url.Action("KategoriSecim", "Ilan")">İlan Ver</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
-                }
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account", new { Type = "GENEL" }) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div id="popup-giris" class="pencere" style="display:none;">
-        <div class="pencere-icerik">
-            <button class="kapat-buton" id="pencere-kapat">&times;</button>
-            <div class="sol-bolum">
-                <h2>Bireysel</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-            <div class="sag-bolum">
-                <h2>Kurumsal</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-        </div>
-    </div>
+    <partial name="_Navbar" />
 
     <style>
         body {
@@ -362,9 +323,13 @@
                             <div class="list-group list-group-flush">
                                 <a href="@Url.Action("Panel", "Ilan")" class="list-group-item list-group-item-action">Raporlar</a>
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action active" aria-current="true">İlanlar</a>
+                                <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
-
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
+                                }
                                 <a href="@Url.Action("Settings", "Account")" class="list-group-item list-group-item-action">Ayarlar</a>
                                 <a href="@Url.Action("Index", "Satinal")" class="list-group-item list-group-item-action">Satın Al</a>
 

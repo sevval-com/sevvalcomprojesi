@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="~/css/hizmetler.css">
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/site.js" defer></script>
 </head>
 <body>
 
@@ -91,6 +92,7 @@
                                 <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                                 
                                 <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                                <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
                                 <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                                 <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                                 
@@ -128,50 +130,6 @@
                     <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
                 </div>
             </div>
-
-            <!-- Yüzen Dil Seç Butonu -->
-            <div id="floating_button">
-                TR/EN
-                <div id="google_translate_element"></div>
-            </div>
-
-            <!-- Google Translate API Script -->
-            <script type="text/javascript">
-                function googleTranslateElementInit() {
-                    new google.translate.TranslateElement({pageLanguage: 'tr'}, 'google_translate_element');
-                }
-            </script>
-            <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-            <!-- Butonun Aktifliği için JavaScript -->
-            <script type="text/javascript">
-                document.addEventListener('DOMContentLoaded', function () {
-                    const floatingButton = document.getElementById('floating_button');
-                    const translateElement = document.getElementById('google_translate_element');
-                    let clickCount = 0; // Tıklama sayacı
-
-                    // Çeviri elementini başlangıçta gizli yap
-                    translateElement.style.display = "none";
-
-                    floatingButton.addEventListener('click', function () {
-                        clickCount++;
-
-                        if (clickCount === 1) {
-                            // İlk tıklamada çeviri elementini göster
-                            translateElement.style.display = "block";
-                        } else if (clickCount === 3) {
-                            // Üçüncü tıklamada her şeyi gizle ve sayacı sıfırla
-                            translateElement.style.display = "none";
-                            clickCount = 0;
-                        }
-                    });
-
-                    // Çeviri elementindeki dil seçme işlemi (içerikteki bir tıklama simülasyonu)
-                    translateElement.addEventListener('click', function () {
-                        console.log("Dil seçimi yapıldı!"); // İsteğe bağlı olarak işlev ekleyin
-                    });
-                });
-            </script>
 
         </div>
     </nav>

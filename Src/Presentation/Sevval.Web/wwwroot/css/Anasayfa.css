@@ -3916,17 +3916,17 @@ body {
 
 .tagline {
     text-align: center;
-    color: black;
-    /* Yazı rengi siyah */
+    color: #1a1a1a;
+    /* Yazı rengi koyu siyah */
     font-size: 2.5vw;
     /* Yazı boyutunu viewport genişliğine göre ayarlayın */
-    font-weight: 400;
-    /* Orta kalınlık */
+    font-weight: 600;
+    /* Daha kalın */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* Daha modern font ailesi */
-    padding: 5px 20px 0;
-    /* İçerideki boşluk - üst padding azaltıldı */
-    border-radius: 8px;
+    padding: 8px 25px;
+    /* İçerideki boşluk */
+    border-radius: 12px;
     /* Kenar yuvarlama */
     white-space: nowrap;
     /* Satır atlamasını engelle */
@@ -3936,9 +3936,7 @@ body {
     /* Arama alanı ile arasına boşluk */
     margin-top: -10px;
     /* Yukarı almak için negatif margin */
-}
-
-/* Mobil görünüm için */
+}/* Mobil görünüm için */
 @media (max-width: 768px) {
     .tagline {
         font-size: 150%;
@@ -4467,60 +4465,48 @@ body {
 @media (max-width: 1193px) {
     .naav-linkss {
         display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
-        z-index: 100000000;
     }
 
-    .naav-linkss.active {
-        display: flex !important;
-        z-index: 100000000;
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .naav-linkss a {
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+        border-bottom: none !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
     }
 
     .kategori {
         width: 48% !important;
-    }
-
-    .naav-linkss {
-        display: none;
-        /* Menü öğeleri mobilde gizlensin */
-        position: absolute;
-        top: 70px;
-        right: 0;
-        background-color: #0277bd;
-        /* Menü arka planı mavi */
-        flex-direction: column;
-        /* Dikey açılacak şekilde düzenlendi */
-        width: 100%;
-        justify-content: flex-start;
-        /* Dikeyde başlangıç hizası */
-        gap: 10px;
-        padding: 10px 0;
-        /* Dikey boşluk */
-        border-radius: 8px;
-        /* Yuvarlatılmış köşeler */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        /* Hafif gölge efekti */
-        width: 50%;
-    }
-
-    .naav-linkss a {
-        padding: 12px 20px !important;
-        font-size: 12px;
-        text-align: center;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .naav-linkss a:hover {
-        background-color: #01579b;
-        /* Hoverda daha koyu mavi */
-        transform: scale(1.05);
-        /* Hover sırasında biraz büyümesini sağlıyoruz */
     }
 
 
@@ -4821,6 +4807,8 @@ body {
 
     .background-murat {
         height: 496px;
+        background-position: center 30% !important;
+    
     }
 
     .sehir-kart {
@@ -8265,50 +8253,47 @@ button:focus {
         padding: 8px 10px !important;
     }
 
-    /* Hamburger menü açıkken, menu öğeleri görünür olmalı */
-    .naav-linkss.active {
-        display: flex !important;
-        z-index: 100000000;
+    /* Hamburger menü açıkken - MAVİ TEMA */
+    .naav-linkss {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
-    .naav-linkss {
-        display: none;
-        /* Menü öğeleri mobilde gizlensin */
-        position: absolute;
-        top: 80px;
-        right: 0;
-        background-color: #0277bd;
-        /* Menü arka planı mavi */
-        flex-direction: column;
-        /* Dikey açılacak şekilde düzenlendi */
-        width: 100%;
-        justify-content: flex-start;
-        /* Dikeyde başlangıç hizası */
-        gap: 10px;
-        padding: 10px 0;
-        /* Dikey boşluk */
-        border-radius: 8px;
-        /* Yuvarlatılmış köşeler */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        /* Hafif gölge efekti */
-        width: 50%;
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     .naav-linkss a {
-        padding: 12px 20px;
-        font-size: 12px;
-        text-align: center;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+        border-bottom: none !important;
     }
 
     .naav-linkss a:hover {
-        background-color: #01579b;
-        /* Hoverda daha koyu mavi */
-        transform: scale(1.05);
-        /* Hover sırasında biraz büyümesini sağlıyoruz */
+        background: rgba(255,255,255,0.15) !important;
     }
 
 
@@ -9796,11 +9781,47 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 
     .naav-linkss {
-        order: 3 !important;
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: auto !important;
+        right: 0 !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        flex-direction: column !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
+        width: auto !important;
+        order: unset !important;
+        margin-top: 0 !important;
+    }
+
+    .naav-linkss.active {
+        display: flex !important;
+    }
+
+    .naav-linkss li {
         width: 100% !important;
-        margin-top: 10px !important;
-        justify-content: center !important;
-        gap: 15px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .naav-linkss a {
+        color: white !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
     }
 
     .auth-buttoons {
@@ -9814,31 +9835,54 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 }
 
-/* Hamburger menu aktif olduğunda */
+/* Hamburger menu aktif olduğunda - MAVİ TEMA */
 @media (max-width: 768px) {
     .naav-linkss {
         display: none !important;
         position: absolute !important;
         top: 100% !important;
-        left: 0 !important;
+        left: auto !important;
         right: 0 !important;
-        background: white !important;
+        width: auto !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         flex-direction: column !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 0 0 10px 10px !important;
-        z-index: 1000 !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
     }
 
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .naav-linkss a {
-        color: #333 !important;
-        padding: 10px !important;
-        border-bottom: 1px solid #eee !important;
-        text-align: center !important;
+        color: white !important;
+        padding: 10px 16px !important;
+        border-bottom: none !important;
+        text-align: left !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: background 0.2s !important;
+    }
+
+    .naav-linkss a:hover {
+        background: rgba(255,255,255,0.15) !important;
+    }
+
+    .naav-linkss li:last-child a {
+        border-bottom: none !important;
     }
 
     .hamburger {
@@ -10011,37 +10055,53 @@ enleme - Hamburger menü İlan Ver yanında */
         left: -5px !important;
     }
 
-    /* Navbar menüsü gizli */
+    /* Navbar menüsü - MAVİ TEMA */
     .naav-linkss {
         display: none !important;
         position: absolute !important;
         top: 100% !important;
-        left: 0 !important;
+        left: auto !important;
         right: 0 !important;
-        background: white !important;
+        width: auto !important;
+        min-width: 160px !important;
+        max-width: 200px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         flex-direction: column !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        border-radius: 0 0 10px 10px !important;
-        z-index: 1000 !important;
+        padding: 8px 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 8px !important;
+        z-index: 10000 !important;
     }
 
     .naav-linkss.active {
         display: flex !important;
     }
 
+    .naav-linkss li {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .naav-linkss a {
-        color: #333 !important;
-        padding: 12px !important;
-        border-bottom: 1px solid #eee !important;
-        text-align: center !important;
+        color: white !important;
+        padding: 10px 16px !important;
+        border-bottom: none !important;
+        text-align: left !important;
         font-size: 14px !important;
+        font-weight: 500 !important;
         text-decoration: none !important;
+        white-space: nowrap !important;
+        display: block !important;
+        transition: background 0.2s !important;
     }
 
     .naav-linkss a:hover {
-        background-color: #f8f9fa !important;
-        color: #009cfb !important;
+        background: rgba(255,255,255,0.15) !important;
+    }
+
+    .naav-linkss li:last-child a {
+        border-bottom: none !important;
     }
 }
 
@@ -10400,384 +10460,229 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
     }
 }
 
-/* ===
-========================================== */
-/* MOBİL NAVBAR FİNAL OVERRIDE - EN SON YAZILAN */
-/* ============================================= */
-@media (max-width: 991px) {
 
-    .auth-buttoons,
-    .auth-buttons,
-    nav .auth-buttoons,
-    nav .auth-buttons,
-    .navbaar .auth-buttoons,
-    .navbaar .auth-buttons {
-        gap: 15px !important;
-    }
+/* MOB�L NAVBAR ST�LLER� navbar.css'e ta��nd� */
 
-    .hamburger,
-    nav .hamburger,
-    .navbaar .hamburger {
-        position: absolute !important;
-        right: 10px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-    }
 
-    .navbaar-container {
-        position: relative !important;
-    }
+/* ============================================
+   MOBİL NAVBAR DÜZELTMELERİ - LOGO VE MENÜ BUTONU
+   ============================================ */
 
-    .post-ad-container {
-        position: relative !important;
-    }
-
-    .free-tag {
-        position: absolute !important;
-        top: -10px !important;
-        left: -10px !important;
-        transform: rotate(-15deg) !important;
-        background-color: #28a745 !important;
-        z-index: 200 !important;
-    }
+/* Mobil menü butonu - varsayılan olarak gizli */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 8px;
 }
 
-@media (max-width: 480px) {
-
-    .auth-buttoons,
-    .auth-buttons,
-    nav .auth-buttoons,
-    nav .auth-buttons,
-    .navbaar .auth-buttoons,
-    .navbaar .auth-buttons {
-        gap: 20px !important;
-    }
+.mobile-menu-btn div {
+    width: 24px;
+    height: 3px;
+    background: white;
+    margin: 3px 0;
+    border-radius: 2px;
+    transition: 0.3s;
 }
 
-/* ===
-========================================== */
-/* MOBİL NAVBAR - HAMBURGER VE BUTON DÜZELTMESİ */
-/* ============================================= */
+/* Mobil - 991px ve altı */
 @media (max-width: 991px) {
-
-    /* Navbar container */
-    .navbaar-container {
+    /* Mobil menü butonunu göster */
+    .mobile-menu-btn {
         display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
         align-items: center !important;
-        position: relative !important;
-        padding-right: 50px !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 8px !important;
+        background: rgba(255,255,255,0.25) !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        margin-left: 10px !important;
     }
-
-    /* Auth butonları yan yana ve aynı hizada */
-    .auth-buttoons,
-    .auth-buttons {
+    
+    .mobile-menu-btn div {
+        display: block !important;
+        width: 24px !important;
+        height: 3px !important;
+        background: white !important;
+        margin: 3px 0 !important;
+        border-radius: 2px !important;
+    }
+    
+    /* Logo her zaman görünür */
+    .navbaar .logo,
+    .navbaar-container .logo {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .navbaar .logo img,
+    .navbaar-container .logo img {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 55px !important;
+        height: auto !important;
+    }
+    
+    /* Ziyaretçi sayacı görünür */
+    .visitor-counts-navbar {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Navbar container düzeni */
+    .navbaar-container {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
-        margin-right: 15px !important;
-    }
-
-    /* Giriş Yap ve İlan Ver butonları aynı boyut ve hizada */
-    .auth-buttoons .login,
-    .auth-buttons .login,
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        height: 32px !important;
-        padding: 0 12px !important;
-        font-size: 11px !important;
-        border-radius: 4px !important;
-        font-weight: bold !important;
-        box-sizing: border-box !important;
-        white-space: nowrap !important;
-        vertical-align: middle !important;
-    }
-
-    .auth-buttoons .login,
-    .auth-buttons .login {
-        background: transparent !important;
-        color: white !important;
-        border: 1px solid white !important;
-    }
-
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        background: white !important;
-        color: #009cfb !important;
-        border: 1px solid #009cfb !important;
-    }
-
-    /* Post-ad container */
-    .post-ad-container {
-        display: inline-flex !important;
-        align-items: center !important;
-        position: relative !important;
-    }
-
-    /* Ücretsiz etiketi */
-    .free-tag {
-        position: absolute !important;
-        top: -8px !important;
-        left: -8px !important;
-        font-size: 7px !important;
-        padding: 2px 4px !important;
-        background-color: #28a745 !important;
-        color: white !important;
-        border-radius: 3px !important;
-        transform: rotate(-15deg) !important;
-        z-index: 200 !important;
-    }
-
-    /* HAMBURGER MENÜ - GÖRÜNÜR VE EN SAĞDA */
-    .hamburger {
-        display: flex !important;
-        flex-direction: column !important;
-        position: absolute !important;
-        right: 10px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        cursor: pointer !important;
-        z-index: 1001 !important;
-        padding: 5px !important;
-    }
-
-    /* Hamburger çizgileri */
-    .hamburger .line,
-    .line {
-        display: block !important;
-        width: 25px !important;
-        height: 3px !important;
-        background-color: white !important;
-        margin: 3px 0 !important;
-        transition: 0.3s !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .auth-buttoons,
-    .auth-buttons {
-        gap: 8px !important;
-        margin-right: 30px !important;
-    }
-
-    .auth-buttoons .login,
-    .auth-buttons .login,
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        height: 28px !important;
-        padding: 0 8px !important;
-        font-size: 9px !important;
-    }
-
-    .hamburger .line,
-    .line {
-        width: 22px !important;
-        height: 2px !important;
-        margin: 2px 0 !important;
-    }
-}
-
-
-/* ============================================= */
-/* MOBİL NAVBAR - SON DÜZELTİLMİŞ VERSİYON */
-/* ============================================= */
-@media (max-width: 991px) {
-
-    /* Navbar container */
-    .navbaar-container {
-        display: flex !important;
-        align-items: center !important;
-        position: relative !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
         padding: 10px 15px !important;
     }
-
-    /* Auth butonları - yan yana ve hizalı */
-    .auth-buttoons,
-    .auth-buttons {
+    
+    /* Nav linkler - mobilde gizli, active olunca göster */
+    .naav-linkss {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+        flex-direction: column !important;
+        min-width: 200px !important;
+        padding: 10px 0 !important;
+        border-radius: 0 0 10px 10px !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+        z-index: 9999 !important;
+    }
+    
+    .naav-linkss.active {
+        display: flex !important;
+    }
+    
+    /* Auth butonları */
+    .auth-buttoons {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
-        margin-right: 32px !important;
-    }
-
-    /* Butonlar aynı boyut ve hizada */
-    .auth-buttoons .login,
-    .auth-buttons .login,
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        height: 32px !important;
-        padding: 0 12px !important;
-        font-size: 11px !important;
-        border-radius: 4px !important;
-        font-weight: bold !important;
-        white-space: nowrap !important;
-        box-sizing: border-box !important;
-        vertical-align: middle !important;
-    }
-
-    .auth-buttoons .login,
-    .auth-buttons .login {
-        background: transparent !important;
-        color: white !important;
-        border: 1px solid white !important;
-    }
-
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        background: white !important;
-        color: #009cfb !important;
-        border: 1px solid #009cfb !important;
-    }
-
-    /* Post-ad container */
-    .post-ad-container {
-        display: inline-flex !important;
-        align-items: center !important;
-        position: relative !important;
-    }
-
-    /* Ücretsiz etiketi */
-    .free-tag {
-        position: absolute !important;
-        top: -8px !important;
-        left: -8px !important;
-        font-size: 7px !important;
-        padding: 2px 4px !important;
-        background-color: #28a745 !important;
-        color: white !important;
-        border-radius: 3px !important;
-        transform: rotate(-15deg) !important;
-        z-index: 200 !important;
-    }
-
-    /* HAMBURGER MENÜ - GÖRÜNÜR VE EN SAĞDA */
-    .hamburger {
-        display: flex !important;
-        flex-direction: column !important;
-        position: absolute !important;
-        right: 10px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        cursor: pointer !important;
-        z-index: 1001 !important;
-        padding: 5px !important;
-    }
-
-    /* Hamburger çizgileri */
-    .hamburger .line,
-    .line {
-        display: block !important;
-        width: 25px !important;
-        height: 3px !important;
-        background-color: white !important;
-        margin: 3px 0 !important;
-        transition: 0.3s !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+        flex-shrink: 0 !important;
     }
 }
 
+/* Küçük mobil - 480px ve altı */
 @media (max-width: 480px) {
-
-    .auth-buttoons,
-    .auth-buttons {
-        gap: 8px !important;
-        margin-right: 30px !important;
+    .mobile-menu-btn {
+        width: 40px !important;
+        height: 40px !important;
+        padding: 6px !important;
     }
-
-    .auth-buttoons .login,
-    .auth-buttons .login,
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        height: 28px !important;
-        padding: 0 8px !important;
-        font-size: 9px !important;
-    }
-
-    .hamburger .line,
-    .line {
+    
+    .mobile-menu-btn div {
         width: 22px !important;
         height: 2px !important;
         margin: 2px 0 !important;
+    }
+    
+    .navbaar .logo img,
+    .navbaar-container .logo img {
+        width: 48px !important;
     }
 }
 
 
 /* ============================================
-   MOBİL NAVBAR - EN YÜKSEK ÖNCELİKLİ STİLLER
-   Butonları sağa kaydırmak için translateX kullanıyoruz
+   YENİ İLAN VER BUTONU
    ============================================ */
+
+.ilan-ver-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.ilan-ver-btn .btn-text {
+    display: inline;
+}
+
+.ilan-ver-btn .btn-text-hover {
+    display: none;
+}
+
+.ilan-ver-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    text-decoration: none;
+}
+
+.ilan-ver-btn:hover .btn-text {
+    display: none;
+}
+
+.ilan-ver-btn:hover .btn-text-hover {
+    display: inline;
+    color: #28a745;
+    font-weight: 700;
+}
+
+.ilan-ver-btn:hover i {
+    color: #28a745;
+}
+
+.ilan-ver-btn i {
+    font-size: 16px;
+}
+
+/* Mobil - 991px ve altı */
 @media (max-width: 991px) {
-
-    nav.navbaar .auth-buttoons,
-    nav.navbaar .auth-buttons,
-    .navbaar .auth-buttoons,
-    .navbaar .auth-buttons,
-    .navbaar-container .auth-buttoons,
-    .navbaar-container .auth-buttons,
-    .auth-buttoons,
-    .auth-buttons {
-        margin-right: 5px !important;
-        transform: translateX(25px) !important;
+    .ilan-ver-btn {
+        padding: 10px 18px;
+        font-size: 13px;
+        gap: 6px;
+    }
+    
+    .ilan-ver-btn i {
+        font-size: 14px;
     }
 }
 
+/* Küçük mobil - 480px ve altı */
 @media (max-width: 480px) {
-
-    nav.navbaar .auth-buttoons,
-    nav.navbaar .auth-buttons,
-    .navbaar .auth-buttoons,
-    .navbaar .auth-buttons,
-    .navbaar-container .auth-buttoons,
-    .navbaar-container .auth-buttons,
-    .auth-buttoons,
-    .auth-buttons {
-        margin-right: 5px !important;
-        transform: translateX(20px) !important;
+    .ilan-ver-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        gap: 5px;
     }
-}
-
-@media (max-width: 375px) {
-
-    nav.navbaar .auth-buttoons,
-    nav.navbaar .auth-buttons,
-    .navbaar .auth-buttoons,
-    .navbaar .auth-buttons,
-    .navbaar-container .auth-buttoons,
-    .navbaar-container .auth-buttons,
-    .auth-buttoons,
-    .auth-buttons {
-        margin-right: 5px !important;
-        transform: translateX(10px) !important;
-    }
-}/* SABİT B
-OYUTLU ETİKETLER MOBİLDE */
-@media (max-width: 768px) {
-    .popups-container .label,
-    .popups-container .label-2 {
-        position: absolute !important;
-        right: -12px !important;
-        top: -8px !important;
-        width: 50px !important;
-        height: 16px !important;
-        padding: 0 !important;
-        font-size: 6px !important;
-        transform: rotate(45deg) !important;
-        background-color: #ff0000 !important;
-        color: white !important;
-        border-radius: 2px !important;
-        font-weight: bold !important;
-        z-index: 999 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        line-height: 1 !important;
+    
+    .ilan-ver-btn i {
+        display: none;
     }
 }

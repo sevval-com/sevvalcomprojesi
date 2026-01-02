@@ -845,51 +845,66 @@
 
     /* MOBİL EKRAN İÇİN ÖZEL "TEKTE GÖSTERME" AYARLARI */
     @@media (max-width: 768px) {
+        .daily-offer-modal-custom {
+            padding-top: 60px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+        
+        .daily-offer-modal-custom .modal-dialog {
+            margin-top: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            max-width: calc(100% - 20px) !important;
+        }
+        
         .modal-lg-custom {
-            max-width: 92% !important;
-            margin: 15px auto !important;
-            max-height: 90vh !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px auto !important;
+            max-height: 95vh !important;
         }
 
         .daily-offer-modal-custom .modal-content {
             max-height: 85vh !important;
-            overflow-y: auto !important;
+            overflow: hidden !important;
+            width: 100% !important;
         }
-        /* Scroll kısıtlamasını kaldır, içerik kadar uzasın */
+        /* İçerikler sığsın */
         .daily-offer-left-col {
             padding: 10px !important;
-            overflow-y: visible !important;
+            overflow: hidden !important;
             max-height: none !important;
-            gap: 8px !important; /* Araları sıkılaştır */
+            gap: 4px !important;
         }
 
         .daily-offer-right-col {
-            padding: 5px 10px !important;
-            gap: 5px !important;
+            padding: 8px 10px !important;
+            gap: 4px !important;
+            overflow: hidden !important;
         }
         /* Slider yüksekliğini küçült */
         .daily-offer-slider-wrap {
-            height: 200px !important; /* Mobilde daha küçük slider */
+            height: 140px !important;
             border-radius: 10px !important;
         }
         /* Fiyat */
         .daily-offer-price-val {
-            font-size: 22px !important; /* Daha küçük fiyat */
+            font-size: 18px !important;
         }
 
         .daily-offer-price-lbl {
-            font-size: 10px !important;
-            margin-bottom: 2px !important;
+            font-size: 9px !important;
+            margin-bottom: 1px !important;
         }
 
         .daily-offer-price-box {
-            padding: 8px !important;
-            margin-bottom: 8px !important;
+            padding: 5px !important;
+            margin-bottom: 4px !important;
         }
         /* Başlık */
         .daily-offer-title-text {
-            font-size: 16px !important;
-            margin-bottom: 5px !important;
+            font-size: 13px !important;
+            margin-bottom: 3px !important;
             line-height: 1.2 !important;
         }
 
@@ -898,68 +913,82 @@
         }
         /* Konum */
         .daily-offer-loc-box {
-            font-size: 11px !important;
-            margin-bottom: 8px !important;
+            font-size: 9px !important;
+            margin-bottom: 4px !important;
         }
         /* Etiketler */
         .daily-offer-tags-wrapper {
-            margin-bottom: 8px !important;
-            gap: 4px !important;
+            margin-bottom: 4px !important;
+            gap: 3px !important;
         }
 
         .daily-offer-tag {
-            padding: 4px 8px !important;
-            font-size: 9px !important;
+            padding: 2px 5px !important;
+            font-size: 8px !important;
         }
         /* Özellikler Grid */
         .daily-offer-feat-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr) !important; /* 2 sütun yap */
-            gap: 5px !important;
-            margin-bottom: 8px !important;
-        }
-
-        .daily-offer-feat-item {
-            padding: 5px !important;
-            font-size: 10px !important;
-        }
-
-        .daily-offer-feat-icon {
-            font-size: 14px !important;
-        }
-        /* İletişim Kutusu */
-        .daily-offer-contact-box {
-            padding: 8px !important;
-            margin-top: 0 !important;
-        }
-
-        .daily-offer-contact-row {
-            font-size: 11px !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 3px !important;
             margin-bottom: 4px !important;
         }
 
-        .daily-offer-contact-btn {
-            padding: 6px 10px !important;
-            font-size: 11px !important;
+        .daily-offer-feat-item {
+            padding: 3px !important;
+            font-size: 9px !important;
+        }
+
+        .daily-offer-feat-icon {
+            font-size: 10px !important;
+        }
+        /* İletişim Kutusu - Mobil: Yan yana düzen */
+        .daily-offer-contact-box {
+            padding: 5px !important;
+            margin-top: 0 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 6px !important;
+        }
+
+        .daily-offer-contact-info {
+            flex: 1 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .daily-offer-contact-row {
+            font-size: 9px !important;
+            margin-bottom: 2px !important;
         }
 
         .daily-offer-contact-btns {
-            gap: 5px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 3px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .daily-offer-contact-btn {
+            padding: 5px 22px !important;
+            font-size: 9px !important;
+            white-space: nowrap !important;
         }
         /* Butonlar */
         .daily-offer-action-box {
-            gap: 5px !important;
-            margin-top: 10px !important;
+            gap: 4px !important;
+            margin-top: 6px !important;
         }
 
         .daily-offer-action-btn {
-            padding: 8px !important;
-            font-size: 11px !important;
+            padding: 6px !important;
+            font-size: 10px !important;
         }
 
         .daily-offer-view-cnt {
-            padding: 5px !important;
-            font-size: 11px !important;
+            padding: 4px !important;
+            font-size: 9px !important;
             margin-top: 0 !important;
         }
         /* Kapatma butonu biraz daha küçük */
@@ -975,30 +1004,60 @@
     /* ÇOK KÜÇÜK EKRANLAR İÇİN (iPhone SE, vb.) */
     @@media (max-width: 375px) {
         .modal-lg-custom {
-            max-width: 90% !important;
-            margin: 20px auto !important;
-            max-height: 85vh !important;
+            max-width: 88% !important;
+            margin: 10px auto !important;
+            max-height: 95vh !important;
         }
 
         .daily-offer-modal-custom .modal-content {
-            max-height: 80vh !important;
+            max-height: 92vh !important;
+            overflow: hidden !important;
+        }
+
+        .daily-offer-left-col {
+            padding: 12px !important;
+            gap: 5px !important;
+        }
+
+        .daily-offer-right-col {
+            padding: 8px 12px !important;
         }
 
         .daily-offer-slider-wrap {
-            height: 150px !important;
+            height: 130px !important;
         }
 
         .daily-offer-price-val {
             font-size: 18px !important;
         }
 
+        .daily-offer-price-box {
+            padding: 6px !important;
+            margin-bottom: 5px !important;
+        }
+
         .daily-offer-title-text {
-            font-size: 14px !important;
+            font-size: 13px !important;
+        }
+
+        .daily-offer-loc-box {
+            font-size: 10px !important;
+            margin-bottom: 5px !important;
+        }
+
+        .daily-offer-tags-wrapper {
+            margin-bottom: 5px !important;
+        }
+
+        .daily-offer-tag {
+            padding: 3px 6px !important;
+            font-size: 8px !important;
         }
 
         .daily-offer-feat-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 3px !important;
+            margin-bottom: 5px !important;
         }
 
         .daily-offer-feat-item {
@@ -1006,14 +1065,64 @@
             font-size: 9px !important;
         }
 
+        .daily-offer-feat-icon {
+            font-size: 12px !important;
+            margin-right: 4px !important;
+        }
+
+        .daily-offer-contact-box {
+            padding: 6px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 6px !important;
+        }
+
+        .daily-offer-contact-info {
+            flex: 1 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .daily-offer-contact-row {
+            font-size: 10px !important;
+            margin-bottom: 3px !important;
+        }
+
+        .daily-offer-contact-btns {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 3px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .daily-offer-contact-btn {
+            padding: 5px 8px !important;
+            font-size: 9px !important;
+            white-space: nowrap !important;
+        }
+
+        .daily-offer-action-box {
+            gap: 4px !important;
+            margin-top: 5px !important;
+        }
+
         .daily-offer-action-btn {
             padding: 6px !important;
             font-size: 10px !important;
         }
 
-        .daily-offer-contact-btn {
-            padding: 5px 8px !important;
+        .daily-offer-view-cnt {
+            padding: 4px !important;
             font-size: 10px !important;
+        }
+
+        .daily-offer-close-btn {
+            width: 26px !important;
+            height: 26px !important;
+            top: 5px !important;
+            right: 5px !important;
+            font-size: 12px !important;
         }
     }
 
@@ -1405,7 +1514,7 @@
 </a>
 
 <div class="tagline-container1" style="display: flex;">
-    <h2 class="tagline">YENİ NESİL İLAN SİTESİ</h2>
+    <h2 class="tagline" style="font-family: 'Caveat', cursive; font-weight: 700;">YENİ NESİL İLAN SİTESİ</h2>
 </div>
 
 <!-- Arama Formu ve Filtreler -->
@@ -1846,28 +1955,28 @@
                 @foreach (var comment in displayComments)
                 {
                     <div class="comment-card @(User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved ? "comment-unapproved" : "")" id="comment-@comment.Id">
+                        @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                        {
+                            <button class="comment-delete-btn-corner" onclick="deleteComment(@comment.Id)" type="button" title="Yorumu Sil">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        }
                         <p class="comment-user">
                             <strong>@comment.UserFullName</strong>
                             <span class="comment-date">(@comment.CreatedAt.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR")))</span>
                         </p>
                         <p class="comment-content">@Html.Raw(comment.Content)</p>
-                        @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                        @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
                         {
                             <div class="comment-admin-actions">
-                                @if (User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
-                                {
-                                    <button class="comment-approve-btn" onclick="approveComment(@comment.Id)" type="button">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                        Onayla
-                                    </button>
-                                }
-                                <button class="comment-delete-btn" onclick="deleteComment(@comment.Id)" type="button">
+                                <button class="comment-approve-btn" onclick="approveComment(@comment.Id)" type="button">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    Sil
+                                    Onayla
                                 </button>
                             </div>
                         }
@@ -2093,7 +2202,7 @@
                 $(this).text(btnText);
             });
 
-            // Yorum Silme
+            // Yorum Silme (class ile)
             $(".comment-delete-btn").click(function () {
                 var commentId = $(this).data("comment-id");
                 if(confirm("Yorumu silmek istediğinize emin misiniz?")) {
@@ -2121,6 +2230,40 @@
                 });
             });
         });
+
+        // deleteComment fonksiyonu (onclick için)
+        function deleteComment(commentId) {
+            if(confirm("Yorumu silmek istediğinize emin misiniz?")) {
+                $.ajax({
+                    url: '/Home/DeleteComment',
+                    type: 'POST',
+                    data: { commentId: commentId },
+                    success: function () {
+                        $("#comment-" + commentId).remove();
+                    },
+                    error: function () {
+                        alert("Yorum silinirken hata oluştu.");
+                    }
+                });
+            }
+        }
+
+        // approveComment fonksiyonu (onclick için)
+        function approveComment(commentId) {
+            $.ajax({
+                url: '/Home/ApproveComment',
+                type: 'POST',
+                data: { commentId: commentId },
+                success: function () {
+                    $("#comment-" + commentId).removeClass("comment-unapproved");
+                    $("#comment-" + commentId + " .comment-approve-btn").parent().remove();
+                    alert("Yorum onaylandı.");
+                },
+                error: function () {
+                    alert("Yorum onaylanırken hata oluştu.");
+                }
+            });
+        }
 
         // Options ve Filtreleme JS
         function showOption(optionId) {

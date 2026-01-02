@@ -10,6 +10,7 @@
 <!-- Yorumlar CSS Bağlantısı -->
 <link rel="stylesheet" type="text/css" href="~/css/yorumlar.css">
 <link rel="stylesheet" type="text/css" href="~/css/Anasayfa.css">
+<script src="~/js/site.js" defer></script>
 
 <!-- Navbar -->
 <nav class="navbaar">
@@ -68,6 +69,12 @@
 
         </ul>
         <div class="auth-buttoons">
+            <!-- İlan Ver butonu ve Ücretsiz etiketi - ÖNCELİKLİ -->
+            <div class="post-ad-container">
+                <span class="free-tag">Ücretsiz</span>
+                <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
+            </div>
+            
             @if (User.Identity.IsAuthenticated)
             {
                 var currentUser = await UserManager.GetUserAsync(User);
@@ -82,6 +89,7 @@
                             <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                             
                             <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                            <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
                             <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                             <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                             
@@ -111,13 +119,6 @@
             {
                 <a href="#" class="login" id="giris-buton">Giriş Yap</a>
             }
-
-
-            <!-- İlan Ver butonu ve Ücretsiz etiketi -->
-            <div class="post-ad-container">
-                <span class="free-tag">Ücretsiz</span>
-                <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-            </div>
         </div>
 
     </div>
@@ -379,30 +380,30 @@
         @foreach (var comment in Model)
         {
             <div class="comment-card" id="comment-@comment.Id">
+                @if (User.Identity.IsAuthenticated && 
+                    (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                {
+                    <button class="comment-delete-btn-corner" onclick="deleteComment(@comment.Id)" type="button" title="Yorumu Sil">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                }
                 <p class="comment-user">
                     <strong>@comment.UserFullName</strong>
                     <span class="comment-date">(@comment.CreatedAt.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR")))</span>
                 </p>
                 <p class="comment-content">@comment.Content</p>
                 
-                @if (User.Identity.IsAuthenticated && 
-                    (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
+                @if (User.Identity.IsAuthenticated && User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
                 {
                     <div class="comment-admin-actions">
-                        @if (User.Identity.Name == "sftumen41@gmail.com" && !comment.IsApproved)
-                        {
-                            <button class="comment-approve-btn" onclick="approveComment(@comment.Id)" type="button">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Onayla
-                            </button>
-                        }
-                        <button class="comment-delete-btn" onclick="deleteComment(@comment.Id)" type="button">
+                        <button class="comment-approve-btn" onclick="approveComment(@comment.Id)" type="button">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Sil
+                            Onayla
                         </button>
                     </div>
                 }
@@ -411,6 +412,73 @@
     </div>
 </div>
 
+
+<script>
+    // Yorum Silme Fonksiyonu
+    async function deleteComment(commentId) {
+        if (!confirm('Bu yorumu silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('/Home/DeleteComment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'commentId=' + commentId
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Yorumu sayfadan kaldır
+                const commentElement = document.getElementById('comment-' + commentId);
+                if (commentElement) {
+                    commentElement.remove();
+                }
+                alert('Yorum başarıyla silindi.');
+            } else {
+                alert('Hata: ' + (result.message || 'Yorum silinemedi.'));
+            }
+        } catch (error) {
+            console.error('Silme hatası:', error);
+            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+    }
+    
+    // Yorum Onaylama Fonksiyonu
+    async function approveComment(commentId) {
+        try {
+            const response = await fetch('/Home/ApproveComment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'commentId=' + commentId
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Onay butonunu kaldır
+                const commentElement = document.getElementById('comment-' + commentId);
+                if (commentElement) {
+                    const adminActions = commentElement.querySelector('.comment-admin-actions');
+                    if (adminActions) {
+                        adminActions.remove();
+                    }
+                }
+                alert('Yorum başarıyla onaylandı.');
+            } else {
+                alert('Hata: ' + (result.message || 'Yorum onaylanamadı.'));
+            }
+        } catch (error) {
+            console.error('Onaylama hatası:', error);
+            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+    }
+</script>
 
 <footer class="footer">
     <div class="footer-container">

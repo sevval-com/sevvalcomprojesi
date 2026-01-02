@@ -1,0 +1,515 @@
+@model IEnumerable<Sevval.Domain.Entities.PendingVideoViewModel>
+
+@{
+    ViewData["Title"] = "Bekleyen Videolar";
+    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+}
+
+<div class="w-full min-h-screen bg-blue-50/50 flex font-sans">
+    <style>
+        .pending-card {
+            position: relative;
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid rgba(59,130,246,.20);
+            box-shadow: 0 10px 24px rgba(13,110,253,.10), 0 2px 6px rgba(13,110,253,.06);
+            transition: transform .25s ease, box-shadow .25s ease;
+            overflow: hidden;
+        }
+        .pending-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 46px rgba(13,110,253,.22), 0 8px 18px rgba(13,110,253,.12);
+        }
+        .pending-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            z-index: 10;
+        }
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .approve-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+        }
+        .approve-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        .reject-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+        }
+        .reject-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+
+    <main class="flex-1 p-6 sm:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Üst Başlık -->
+            <header class="relative flex flex-col gap-4 sm:gap-6 mb-8 items-center text-center">
+                <div class="flex flex-col items-center">
+                    <h1 class="text-4xl font-extrabold text-blue-900">
+                        <i class="fas fa-clock text-amber-500 mr-3"></i>
+                        Bekleyen Videolar
+                    </h1>
+                    <p class="text-gray-600 mt-2">Onay bekleyen kullanıcı videoları</p>
+                    <div class="mt-4 flex items-center gap-4">
+                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-full font-semibold">
+                            <i class="fas fa-video"></i>
+                            @ViewBag.PendingCount Video Bekliyor
+                        </span>
+                        <a href="@Url.Action("Index")" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-arrow-left"></i>
+                            Videolara Dön
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-16">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-2xl font-bold text-gray-700 mb-2">Bekleyen Video Yok</h2>
+                    <p class="text-gray-500">Tüm videolar incelendi!</p>
+                </div>
+            }
+            else
+            {
+                <!-- Video Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach (var video in Model)
+                    {
+                        var safeVideoUrl = video.VideoYolu?.Replace("\\", "\\\\").Replace("'", "\\'") ?? "";
+                        var safeVideoTitle = video.VideoAdi?.Replace("\\", "\\\\").Replace("'", "\\'") ?? "";
+                        <div class="pending-card" data-video-id="@video.Id" data-video-url="@video.VideoYolu" data-is-youtube="@video.IsYouTube.ToString().ToLower()" data-video-title="@video.VideoAdi">
+                            <span class="pending-badge">
+                                <i class="fas fa-hourglass-half mr-1"></i> Bekliyor
+                            </span>
+                            <span class="watched-badge hidden" data-watched-id="@video.Id" style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4); z-index: 10;">
+                                <i class="fas fa-check-circle mr-1"></i> İzlendi
+                            </span>
+                            
+                            <!-- Thumbnail - Tıklanabilir -->
+                            <div class="relative aspect-video bg-gray-100 cursor-pointer group video-thumbnail" data-video-id="@video.Id">
+                                @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                {
+                                    <img src="@video.KapakFotografiYolu" 
+                                         alt="@video.VideoAdi" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.src='/images/video-placeholder.png'">
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                                        <i class="fas fa-video text-4xl text-blue-400"></i>
+                                    </div>
+                                }
+                                <!-- Play Overlay -->
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                                        <i class="fas fa-play text-2xl text-blue-600 ml-1"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-800 text-lg mb-2 line-clamp-2" title="@video.VideoAdi">
+                                    @video.VideoAdi
+                                </h3>
+                                
+                                <!-- Uploader Info -->
+                                <div class="flex items-center gap-2 mb-3 text-sm text-gray-600">
+                                    <i class="fas fa-user-circle text-blue-500"></i>
+                                    <span>@video.UploaderName</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 mb-3 text-sm text-gray-500">
+                                    <i class="fas fa-envelope"></i>
+                                    <span class="truncate" title="@video.UploaderEmail">@video.UploaderEmail</span>
+                                </div>
+
+                                <div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-folder text-blue-400"></i>
+                                        @video.Kategori
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-calendar text-blue-400"></i>
+                                        @video.YuklenmeTarihi.ToString("dd MMM yyyy")
+                                    </span>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2 mb-2">
+                                    <button class="action-btn bg-blue-500 hover:bg-blue-600 text-white flex-1 watch-btn" data-video-id="@video.Id">
+                                        <i class="fas fa-play"></i>
+                                        İzle
+                                    </button>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button class="action-btn approve-btn flex-1" onclick="approveVideo(@video.Id)">
+                                        <i class="fas fa-check"></i>
+                                        Onayla
+                                    </button>
+                                    <button class="action-btn reject-btn flex-1" onclick="showRejectModal(@video.Id)">
+                                        <i class="fas fa-times"></i>
+                                        Reddet
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </main>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 900px; width: 95%; padding: 0; overflow: hidden;">
+        <div class="bg-gray-900 p-4 flex items-center justify-between">
+            <h3 id="videoModalTitle" class="text-white font-bold text-lg truncate pr-4"></h3>
+            <button onclick="closeVideoModal()" class="text-white hover:text-gray-300 transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="relative bg-black" style="aspect-ratio: 16/9;">
+            <video id="videoPlayer" class="w-full h-full" controls>
+                Tarayıcınız video oynatmayı desteklemiyor.
+            </video>
+            <iframe id="youtubePlayer" class="w-full h-full hidden" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-exclamation-triangle text-amber-500 mr-2"></i>
+            Videoyu Reddet
+        </h3>
+        <p class="text-gray-600 mb-4">Bu videoyu reddetmek istediğinizden emin misiniz?</p>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Red Nedeni (Opsiyonel)</label>
+            <textarea id="rejectReason" 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+                      rows="3"
+                      placeholder="Kullanıcıya iletilecek red nedeni..."></textarea>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeRejectModal()" class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                İptal
+            </button>
+            <button onclick="confirmReject()" class="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Reddet
+            </button>
+        </div>
+        <input type="hidden" id="rejectVideoId" value="">
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentRejectVideoId = null;
+    const WATCHED_STORAGE_KEY = 'sevval_watched_pending_videos';
+    
+    // İzlenen videoları localStorage'dan yükle
+    function getWatchedVideos() {
+        try {
+            return JSON.parse(localStorage.getItem(WATCHED_STORAGE_KEY) || '[]');
+        } catch {
+            return [];
+        }
+    }
+    
+    // Video izlendi olarak işaretle
+    function markAsWatched(videoId) {
+        const watched = getWatchedVideos();
+        if (!watched.includes(videoId)) {
+            watched.push(videoId);
+            localStorage.setItem(WATCHED_STORAGE_KEY, JSON.stringify(watched));
+        }
+        // Badge'i göster
+        const badge = document.querySelector(`[data-watched-id="${videoId}"]`);
+        if (badge) {
+            badge.classList.remove('hidden');
+        }
+    }
+    
+    // Sayfa yüklendiğinde izlenen videoların badge'lerini göster
+    function showWatchedBadges() {
+        const watched = getWatchedVideos();
+        watched.forEach(videoId => {
+            const badge = document.querySelector(`[data-watched-id="${videoId}"]`);
+            if (badge) {
+                badge.classList.remove('hidden');
+            }
+        });
+    }
+    
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener('DOMContentLoaded', showWatchedBadges);
+
+    // Video Modal Functions
+    function openVideoModal(videoId) {
+        const card = document.querySelector(`[data-video-id="${videoId}"].pending-card`);
+        if (!card) {
+            console.error('Card not found for videoId:', videoId);
+            return;
+        }
+        
+        // Video izlendi olarak işaretle
+        markAsWatched(videoId);
+        
+        const videoUrl = card.getAttribute('data-video-url') || '';
+        const isYouTube = card.getAttribute('data-is-youtube') === 'true';
+        const title = card.getAttribute('data-video-title') || '';
+        
+        const modal = document.getElementById('videoModal');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const youtubePlayer = document.getElementById('youtubePlayer');
+        const modalTitle = document.getElementById('videoModalTitle');
+        
+        modalTitle.textContent = title;
+        
+        console.log('Opening video:', { videoId, videoUrl, isYouTube, title });
+        
+        if (isYouTube) {
+            // YouTube video
+            videoPlayer.classList.add('hidden');
+            youtubePlayer.classList.remove('hidden');
+            
+            // YouTube URL veya ID'den video ID'sini çıkar
+            let ytVideoId = videoUrl;
+            try {
+                if (videoUrl.includes('youtube.com/watch')) {
+                    ytVideoId = new URL(videoUrl).searchParams.get('v');
+                } else if (videoUrl.includes('youtu.be/')) {
+                    ytVideoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+                } else if (videoUrl.includes('youtube.com/embed/')) {
+                    ytVideoId = videoUrl.split('embed/')[1].split('?')[0];
+                }
+                // Eğer URL değilse, direkt ID olarak kullan
+            } catch(e) {
+                console.log('Using videoUrl as YouTube ID directly');
+            }
+            
+            if (ytVideoId) {
+                youtubePlayer.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1`;
+            }
+        } else {
+            // Local video
+            youtubePlayer.classList.add('hidden');
+            videoPlayer.classList.remove('hidden');
+            videoPlayer.src = videoUrl;
+            videoPlayer.play().catch(e => console.log('Autoplay blocked:', e));
+        }
+        
+        modal.classList.add('active');
+    }
+    
+    function closeVideoModal() {
+        const modal = document.getElementById('videoModal');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const youtubePlayer = document.getElementById('youtubePlayer');
+        
+        videoPlayer.pause();
+        videoPlayer.src = '';
+        youtubePlayer.src = '';
+        
+        modal.classList.remove('active');
+    }
+    
+    // Event delegation for watch buttons and thumbnails
+    document.addEventListener('click', function(e) {
+        const watchBtn = e.target.closest('.watch-btn');
+        const thumbnail = e.target.closest('.video-thumbnail');
+        
+        if (watchBtn) {
+            const videoId = watchBtn.dataset.videoId;
+            openVideoModal(videoId);
+        } else if (thumbnail) {
+            const videoId = thumbnail.dataset.videoId;
+            openVideoModal(videoId);
+        }
+    });
+
+    function approveVideo(videoId) {
+        if (!confirm('Bu videoyu onaylamak istediğinizden emin misiniz?')) return;
+
+        fetch('@Url.Action("ApproveVideo")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: `id=${videoId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Kartı animasyonla kaldır
+                const card = document.querySelector(`[data-video-id="${videoId}"]`);
+                if (card) {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.transform = 'scale(0.9)';
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.remove();
+                        updatePendingCount();
+                    }, 300);
+                }
+                showToast('Video başarıyla onaylandı!', 'success');
+            } else {
+                showToast(data.message || 'Bir hata oluştu', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Bir hata oluştu', 'error');
+        });
+    }
+
+    function showRejectModal(videoId) {
+        currentRejectVideoId = videoId;
+        document.getElementById('rejectVideoId').value = videoId;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').classList.add('active');
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').classList.remove('active');
+        currentRejectVideoId = null;
+    }
+
+    function confirmReject() {
+        const videoId = currentRejectVideoId;
+        const reason = document.getElementById('rejectReason').value.trim();
+
+        fetch('@Url.Action("RejectVideo")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: `id=${videoId}&reason=${encodeURIComponent(reason)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeRejectModal();
+                const card = document.querySelector(`[data-video-id="${videoId}"]`);
+                if (card) {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.transform = 'scale(0.9)';
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.remove();
+                        updatePendingCount();
+                    }, 300);
+                }
+                showToast('Video reddedildi', 'success');
+            } else {
+                showToast(data.message || 'Bir hata oluştu', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Bir hata oluştu', 'error');
+        });
+    }
+
+    function updatePendingCount() {
+        const cards = document.querySelectorAll('.pending-card');
+        const countBadge = document.querySelector('.bg-amber-100 span');
+        if (countBadge) {
+            countBadge.textContent = cards.length + ' Video Bekliyor';
+        }
+        if (cards.length === 0) {
+            location.reload();
+        }
+    }
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white font-semibold shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.3s ease';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Modal dışına tıklayınca kapat
+    document.getElementById('rejectModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRejectModal();
+        }
+    });
+    
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeVideoModal();
+        }
+    });
+    
+    // ESC tuşu ile modal kapat
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeVideoModal();
+            closeRejectModal();
+        }
+    });
+</script>
+@Html.AntiForgeryToken()
+}

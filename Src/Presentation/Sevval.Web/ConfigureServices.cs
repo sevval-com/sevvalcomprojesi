@@ -1,4 +1,6 @@
 using Sevval.Application.Interfaces.IService.Common;
+using Sevval.Application.Interfaces.Services;
+using Sevval.Infrastructure.Services;
 using Sevval.Persistence;
 using sevvalemlak.csproj.ClientServices.AnnouncementService;
 using sevvalemlak.csproj.ClientServices.CompanyService;
@@ -30,6 +32,10 @@ public static class ConfigureServices
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ISalesRequestClientService, SalesRequestClientService>();
         services.AddScoped<ICompanyClientService, CompanyClientService>();
+
+        // Video page services
+        services.AddScoped<IYouTubeUrlParser, YouTubeUrlParser>();
+        services.AddScoped<IVideoApprovalService, VideoApprovalService>();
 
         services.AddPersistence();
 

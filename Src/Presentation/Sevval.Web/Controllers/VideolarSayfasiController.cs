@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sevval.Application.Interfaces.Services;
 using Sevval.Domain.Entities;
 using Sevval.Persistence.Context;
 using Sevval.Web.Models;
@@ -16,12 +17,21 @@ public class VideolarSayfasiController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IYouTubeUrlParser _youTubeUrlParser;
+    private readonly IVideoApprovalService _videoApprovalService;
 
-    public VideolarSayfasiController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
+    public VideolarSayfasiController(
+        ApplicationDbContext context, 
+        UserManager<ApplicationUser> userManager, 
+        IWebHostEnvironment webHostEnvironment,
+        IYouTubeUrlParser youTubeUrlParser,
+        IVideoApprovalService videoApprovalService)
     {
         _context = context;
         _userManager = userManager;
         _webHostEnvironment = webHostEnvironment;
+        _youTubeUrlParser = youTubeUrlParser;
+        _videoApprovalService = videoApprovalService;
     }
 
     public async Task<IActionResult> Index(string kategori, int page = 1, int size = 12)
@@ -38,6 +48,7 @@ public class VideolarSayfasiController : Controller
         try
         {
             using var http = new HttpClient();
+            http.Timeout = TimeSpan.FromSeconds(5); // 5 saniye timeout - yavaşsa fallback'e düş
             using var resp = await http.GetAsync(apiUrl);
             resp.EnsureSuccessStatusCode();
             var json = await resp.Content.ReadAsStringAsync();
@@ -72,7 +83,7 @@ public class VideolarSayfasiController : Controller
                     }
                     return input;
                 }
-                videolar.Add(new Sevval.Web.Models.VideolarSayfasi
+                var videoItem = new Sevval.Web.Models.VideolarSayfasi
                 {
                     Id = v.Id,
                     VideoAdi = v.Title ?? string.Empty,
@@ -84,7 +95,18 @@ public class VideolarSayfasiController : Controller
                     Kategori = v.Category ?? string.Empty,
                     GoruntulenmeSayisi = v.ViewCount,
                     YuklenmeTarihi = v.CreatedDate
-                });
+                };
+                // Yükleyen kullanıcı bilgisini ekle
+                if (v.YukleyenKullanici != null)
+                {
+                    videoItem.YukleyenKullanici = new Sevval.Domain.Entities.ApplicationUser
+                    {
+                        FirstName = v.YukleyenKullanici.FirstName ?? "Sevval",
+                        LastName = v.YukleyenKullanici.LastName ?? "",
+                        ProfilePicturePath = v.YukleyenKullanici.ProfilePicturePath
+                    };
+                }
+                videolar.Add(videoItem);
             }
 
             // 4) Kategori rozetleri ve sayaçlar
@@ -102,11 +124,12 @@ public class VideolarSayfasiController : Controller
                 .ToDictionary(g => g.Key, g => g.Count());
             ViewBag.KategoriSayilari = kategoriSayilari;
             ViewBag.ToplamVideoSayisi = (parsed?.Data ?? new List<ApiVideo>()).Count;
+            ViewBag.ToplamIzlenme = (parsed?.Data ?? new List<ApiVideo>()).Sum(v => v.ViewCount);
 
             // 4.1) Kategori ikon ve renkleri (Categories tablosundan)
             try
             {
-                var allCategories = await _context.Categories.ToListAsync();
+                var allCategories = await _context.Categories.AsNoTracking().ToListAsync();
                 ViewBag.KategoriIconlari = allCategories
                     .Where(c => !string.IsNullOrWhiteSpace(c.Name))
                     .GroupBy(c => c.Name.Trim())
@@ -123,26 +146,41 @@ public class VideolarSayfasiController : Controller
         }
         catch
         {
-            // API hatasında boş liste ile devam edelim
-            // Fallback: yerel DB'den çek (canlı API sorunu olduğunda liste boş kalmasın)
+            // API hatasında veya timeout'ta yerel DB'den çek
             var fallback = await _context.VideolarSayfasi
-                .Include(v => v.YukleyenKullanici)
+                .AsNoTracking()
+                .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
                 .Where(v => string.IsNullOrEmpty(kategori) || v.Kategori == kategori)
                 .OrderByDescending(v => v.YuklenmeTarihi)
                 .ToListAsync();
             videolar = fallback;
-            ViewBag.Kategoriler = await _context.VideolarSayfasi.Select(v => v.Kategori).Distinct().ToListAsync();
+            
+            ViewBag.Kategoriler = await _context.VideolarSayfasi
+                .AsNoTracking()
+                .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .Select(v => v.Kategori).Distinct().ToListAsync();
+            
             var kategoriSayilari = await _context.VideolarSayfasi
+                .AsNoTracking()
+                .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
                 .GroupBy(v => v.Kategori)
                 .Select(g => new { Kategori = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Kategori, x => x.Count);
             ViewBag.KategoriSayilari = kategoriSayilari;
-            ViewBag.ToplamVideoSayisi = await _context.VideolarSayfasi.CountAsync();
+            
+            ViewBag.ToplamVideoSayisi = await _context.VideolarSayfasi
+                .AsNoTracking()
+                .CountAsync(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved);
+            
+            ViewBag.ToplamIzlenme = await _context.VideolarSayfasi
+                .AsNoTracking()
+                .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .SumAsync(v => v.GoruntulenmeSayisi);
 
             // Fallback'te de kategori ikon/renkleri yükle
             try
             {
-                var allCategories = await _context.Categories.ToListAsync();
+                var allCategories = await _context.Categories.AsNoTracking().ToListAsync();
                 ViewBag.KategoriIconlari = allCategories
                     .Where(c => !string.IsNullOrWhiteSpace(c.Name))
                     .GroupBy(c => c.Name)
@@ -168,6 +206,7 @@ public class VideolarSayfasiController : Controller
         if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(userId))
         {
             var watchedIds = await _context.VideoWatches
+                .AsNoTracking()
                 .Where(w => w.UserId == userId)
                 .Select(w => w.VideoId)
                 .ToListAsync();
@@ -192,6 +231,33 @@ public class VideolarSayfasiController : Controller
         ViewBag.TotalPages = totalPages;
         ViewBag.TotalCount = totalCount;
 
+        // Kullanıcı bilgilerini ViewBag ile geçir
+        var videoIds = paged.Select(v => v.Id).ToList();
+        var userInfoDict = new Dictionary<int, (string Name, string Photo)>();
+        
+        try
+        {
+            var videoUsers = await _context.VideolarSayfasi
+                .AsNoTracking()
+                .Include(v => v.YukleyenKullanici)
+                .Where(v => videoIds.Contains(v.Id))
+                .Select(v => new { v.Id, v.YukleyenKullanici })
+                .ToListAsync();
+            
+            foreach (var vu in videoUsers)
+            {
+                if (vu.YukleyenKullanici != null)
+                {
+                    var name = $"{vu.YukleyenKullanici.FirstName} {vu.YukleyenKullanici.LastName}".Trim();
+                    var photo = vu.YukleyenKullanici.ProfilePicturePath ?? "";
+                    userInfoDict[vu.Id] = (string.IsNullOrWhiteSpace(name) ? "Sevval.com" : name, photo);
+                }
+            }
+        }
+        catch { }
+        
+        ViewBag.VideoUserInfo = userInfoDict;
+
         return View(paged);
     }
 
@@ -203,29 +269,9 @@ public class VideolarSayfasiController : Controller
         public List<ApiVideo> Data { get; set; }
     }
 
-    private static string ExtractYouTubeId(string url)
+    private string ExtractYouTubeId(string url)
     {
-        if (string.IsNullOrWhiteSpace(url)) return null;
-        try
-        {
-            // Desteklenen formatlar: watch?v=ID, youtu.be/ID, /embed/ID
-            var uri = new Uri(url);
-            var host = uri.Host.ToLowerInvariant();
-            if (host.Contains("youtu.be"))
-            {
-                return uri.AbsolutePath.Trim('/');
-            }
-            if (uri.AbsolutePath.Contains("/embed/", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-                var idx = Array.IndexOf(parts, "embed");
-                if (idx >= 0 && idx + 1 < parts.Length) return parts[idx + 1];
-            }
-            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-            if (query.TryGetValue("v", out var v)) return v.ToString();
-        }
-        catch { }
-        return null;
+        return _youTubeUrlParser.ExtractVideoId(url);
     }
 
     private class ApiVideo
@@ -240,6 +286,14 @@ public class VideolarSayfasiController : Controller
         public DateTime CreatedDate { get; set; }
         public int ViewCount { get; set; }
         public int Duration { get; set; }
+        public ApiVideoUser YukleyenKullanici { get; set; }
+    }
+
+    private class ApiVideoUser
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string ProfilePicturePath { get; set; }
     }
 
     // YENİ EKLENEN METOT BAŞLANGICI
@@ -257,8 +311,21 @@ public class VideolarSayfasiController : Controller
             return NotFound();
         }
 
-        var userVideos = await _context.VideolarSayfasi
-            .Where(v => v.YukleyenKullaniciId == id)
+        // Mevcut kullanıcı kendi profilini mi görüntülüyor?
+        var currentUser = await _userManager.GetUserAsync(User);
+        var isOwnProfile = currentUser != null && currentUser.Id == id;
+        var isSuperAdmin = currentUser != null && _videoApprovalService.IsSuperAdmin(currentUser.Email);
+
+        IQueryable<VideolarSayfasi> query = _context.VideolarSayfasi
+            .Where(v => v.YukleyenKullaniciId == id);
+
+        // Kendi profili veya Super Admin ise tüm videoları göster, değilse sadece onaylıları
+        if (!isOwnProfile && !isSuperAdmin)
+        {
+            query = query.Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved);
+        }
+
+        var userVideos = await query
             .OrderByDescending(v => v.YuklenmeTarihi)
             .ToListAsync();
 
@@ -268,6 +335,9 @@ public class VideolarSayfasiController : Controller
             Videos = userVideos,
             TotalVideos = userVideos.Count
         };
+
+        // Kendi profili ise video durumlarını göster
+        ViewBag.IsOwnProfile = isOwnProfile;
 
         return View(viewModel);
     }
@@ -343,13 +413,23 @@ public class VideolarSayfasiController : Controller
         {
             return Challenge();
         }
+
+        // Super Admin kontrolü - Super Admin'in videoları otomatik onaylanır
+        var isSuperAdmin = _videoApprovalService.IsSuperAdmin(user.Email);
+        var approvalStatus = isSuperAdmin 
+            ? Sevval.Domain.Enums.VideoApprovalStatus.Approved 
+            : Sevval.Domain.Enums.VideoApprovalStatus.Pending;
+
         var yeniVideo = new VideolarSayfasi
         {
             VideoAdi = model.VideoAdi,
             VideoAciklamasi = model.VideoAciklamasi,
-            Kategori = model.Kategori,
+            Kategori = model.Kategori ?? "Genel",
             YukleyenKullaniciId = user.Id,
-            YuklenmeTarihi = DateTime.UtcNow
+            YuklenmeTarihi = DateTime.UtcNow,
+            ApprovalStatus = approvalStatus,
+            ApprovalDate = isSuperAdmin ? DateTime.UtcNow : null,
+            ApprovedByUserId = isSuperAdmin ? user.Id : null
         };
         string kapaklarKlasoru = Path.Combine(_webHostEnvironment.WebRootPath, "VideoSayfasi/Kapaklar");
         if (!Directory.Exists(kapaklarKlasoru)) Directory.CreateDirectory(kapaklarKlasoru);
@@ -396,7 +476,7 @@ public class VideolarSayfasiController : Controller
             yeniVideo.VideoYolu = GetYouTubeVideoId(model.YouTubeLink);
             if (string.IsNullOrEmpty(yeniVideo.VideoYolu))
             {
-                ModelState.AddModelError("YouTubeLink", "Geçersiz YouTube linki.");
+                ModelState.AddModelError("YouTubeLink", "Geçersiz YouTube linki. Desteklenen formatlar: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID");
                 return View(model);
             }
 
@@ -417,12 +497,19 @@ public class VideolarSayfasiController : Controller
         }
         _context.VideolarSayfasi.Add(yeniVideo);
         await _context.SaveChangesAsync();
+        
+        // Onay durumuna göre mesaj belirle
+        var successMessage = isSuperAdmin 
+            ? "Video başarıyla yüklendi ve yayına alındı." 
+            : "Video başarıyla yüklendi. Videonuz onaylandığı zaman yayına girecektir.";
+        
         // AJAX ise JSON redirect dön, değilse klasik redirect
         if (Request.Headers.ContainsKey("X-Requested-With") &&
             string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase))
         {
-            return Ok(new { success = true, redirectUrl = Url.Action("Index") });
+            return Ok(new { success = true, message = successMessage, redirectUrl = Url.Action("Index") });
         }
+        TempData["SuccessMessage"] = successMessage;
         return RedirectToAction("Index");
     }
 
@@ -480,7 +567,7 @@ public class VideolarSayfasiController : Controller
             var ytId = GetYouTubeVideoId(model.YouTubeLink);
             if (string.IsNullOrEmpty(ytId))
             {
-                ModelState.AddModelError("YouTubeLink", "Geçersiz YouTube linki.");
+                ModelState.AddModelError("YouTubeLink", "Geçersiz YouTube linki. Desteklenen formatlar: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID");
                 return View(model);
             }
             video.VideoYolu = ytId;
@@ -536,9 +623,7 @@ public class VideolarSayfasiController : Controller
 
     private string GetYouTubeVideoId(string url)
     {
-        var regex = new Regex(@"(?:https?:\/\/)?(?:www\.)?(?:(?:youtube\.com\/watch\?[^?]*v=|youtu\.be\/)([\w\-]+))(?:[^\s?&]*)", RegexOptions.IgnoreCase);
-        var match = regex.Match(url);
-        return match.Success ? match.Groups[1].Value : null;
+        return _youTubeUrlParser.ExtractVideoId(url);
     }
     public async Task<IActionResult> Play(int id)
     {
@@ -551,9 +636,22 @@ public class VideolarSayfasiController : Controller
             return NotFound();
         }
 
-        video.GoruntulenmeSayisi++;
-        _context.Update(video);
-        await _context.SaveChangesAsync();
+        // Görüntüleme sayısını artır (24 saat içinde aynı kişi 1 kez - cookie kontrolü)
+        var cookieKey = $"video_view_{id}";
+        if (!Request.Cookies.ContainsKey(cookieKey))
+        {
+            video.GoruntulenmeSayisi++;
+            await _context.SaveChangesAsync();
+            
+            // 24 saatlik cookie set et
+            Response.Cookies.Append(cookieKey, "1", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddHours(24),
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax
+            });
+        }
 
         var oneriVideolar = await _context.VideolarSayfasi
             .Where(v => v.Kategori == video.Kategori && v.Id != id)
@@ -563,10 +661,10 @@ public class VideolarSayfasiController : Controller
             .ToListAsync();
 
         var yorumlar = await _context.VideoYorumlari
-            .Where(c => c.VideoId == id && c.ParentYorumId == null) // Sadece ana yorumları çek
+            .Where(c => c.VideoId == id && c.ParentYorumId == null)
             .Include(c => c.Kullanici)
-            .Include(c => c.Yanitlar) // Yanıtları dahil et
-                .ThenInclude(r => r.Kullanici) // Yanıtları yapan kullanıcıları dahil et
+            .Include(c => c.Yanitlar)
+                .ThenInclude(r => r.Kullanici)
             .OrderByDescending(c => c.YorumTarihi)
             .ToListAsync();
 
@@ -582,7 +680,7 @@ public class VideolarSayfasiController : Controller
             CurrentUserVote = currentUserVote?.IsLike
         };
 
-        // Persist watched in DB for authenticated users
+        // Persist watched in DB for authenticated users & get watched IDs for suggested videos
         if (User.Identity.IsAuthenticated)
         {
             var uid = _userManager.GetUserId(User);
@@ -592,9 +690,66 @@ public class VideolarSayfasiController : Controller
                 _context.VideoWatches.Add(new VideoWatch { VideoId = id, UserId = uid, WatchedAtUtc = DateTime.UtcNow });
                 await _context.SaveChangesAsync();
             }
+            
+            // İzlenen video ID'lerini ViewBag'e ekle (önerilen videolarda "İzlendi" etiketi için)
+            var watchedIds = await _context.VideoWatches
+                .AsNoTracking()
+                .Where(w => w.UserId == uid)
+                .Select(w => w.VideoId)
+                .ToListAsync();
+            ViewBag.WatchedIds = new HashSet<int>(watchedIds);
+        }
+        else
+        {
+            ViewBag.WatchedIds = new HashSet<int>();
         }
 
         return View(viewModel);
+    }
+
+    /// <summary>
+    /// Video görüntülenme sayısını artırır (sayfa açıldığında çağrılır)
+    /// 24 saat içinde aynı kişi sadece 1 kez görüntüleme artırabilir (cookie ile kontrol)
+    /// </summary>
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Route("VideolarSayfasi/IncrementViewCount")]
+    public async Task<IActionResult> IncrementViewCount(int id)
+    {
+        try
+        {
+            // Cookie key: video_view_{id}
+            var cookieKey = $"video_view_{id}";
+            
+            // Cookie var mı kontrol et (24 saat içinde izlemiş mi?)
+            if (Request.Cookies.ContainsKey(cookieKey))
+            {
+                // Zaten izlemiş, artırma - 200 OK döndür (UI güncellemesi yapılmasın)
+                return Ok(new { incremented = false });
+            }
+            
+            var video = await _context.VideolarSayfasi.FindAsync(id);
+            if (video != null)
+            {
+                video.GoruntulenmeSayisi++;
+                await _context.SaveChangesAsync();
+                
+                // 24 saatlik cookie set et
+                Response.Cookies.Append(cookieKey, "1", new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddHours(24),
+                    HttpOnly = true,
+                    Secure = false, // localhost için false
+                    SameSite = SameSiteMode.Lax
+                });
+                
+                // Başarılı - 204 No Content döndür (UI güncellensin)
+                return NoContent();
+            }
+        }
+        catch { }
+
+        return Ok(new { incremented = false });
     }
 
     [HttpPost]
@@ -771,5 +926,478 @@ public class VideolarSayfasiController : Controller
             yorumTarihi = yeniYorum.YorumTarihi.ToString("d MMM yyyy"),
             isVideoOwner
         });
+    }
+
+    // ==================== VIDEO ONAY SİSTEMİ ====================
+
+    /// <summary>
+    /// Bekleyen videoları listeler (Sadece Super Admin)
+    /// </summary>
+    [Authorize]
+    public async Task<IActionResult> PendingVideos()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !_videoApprovalService.IsSuperAdmin(user.Email))
+        {
+            return Forbid();
+        }
+
+        var pendingVideos = await _videoApprovalService.GetPendingVideosAsync();
+        var viewModels = pendingVideos.Select(v => new PendingVideoViewModel
+        {
+            Id = v.Id,
+            VideoAdi = v.VideoAdi,
+            KapakFotografiYolu = v.KapakFotografiYolu,
+            VideoYolu = v.VideoYolu,
+            IsYouTube = v.IsYouTube,
+            UploaderName = v.YukleyenKullanici != null 
+                ? $"{v.YukleyenKullanici.FirstName} {v.YukleyenKullanici.LastName}" 
+                : "Bilinmiyor",
+            UploaderEmail = v.YukleyenKullanici?.Email ?? "Bilinmiyor",
+            YuklenmeTarihi = v.YuklenmeTarihi,
+            Kategori = v.Kategori
+        }).ToList();
+
+        ViewBag.PendingCount = viewModels.Count;
+        return View(viewModels);
+    }
+
+    /// <summary>
+    /// Videoyu onaylar (Sadece Super Admin)
+    /// </summary>
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApproveVideo(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !_videoApprovalService.IsSuperAdmin(user.Email))
+        {
+            return Json(new { success = false, message = "Bu işlem için yetkiniz yok." });
+        }
+
+        var result = await _videoApprovalService.ApproveVideoAsync(id, user.Id);
+        if (result)
+        {
+            return Json(new { success = true, message = "Video başarıyla onaylandı." });
+        }
+
+        return Json(new { success = false, message = "Video onaylanamadı. Video bulunamadı veya zaten işlenmiş." });
+    }
+
+    /// <summary>
+    /// Videoyu reddeder (Sadece Super Admin)
+    /// </summary>
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectVideo(int id, string? reason)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !_videoApprovalService.IsSuperAdmin(user.Email))
+        {
+            return Json(new { success = false, message = "Bu işlem için yetkiniz yok." });
+        }
+
+        var result = await _videoApprovalService.RejectVideoAsync(id, user.Id, reason);
+        if (result)
+        {
+            return Json(new { success = true, message = "Video reddedildi." });
+        }
+
+        return Json(new { success = false, message = "Video reddedilemedi. Video bulunamadı veya zaten işlenmiş." });
+    }
+
+    /// <summary>
+    /// Bekleyen video sayısını JSON olarak döner (Badge için)
+    /// </summary>
+    [Authorize]
+    public async Task<IActionResult> GetPendingVideoCount()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !_videoApprovalService.IsSuperAdmin(user.Email))
+        {
+            return Json(new { count = 0 });
+        }
+
+        var count = await _videoApprovalService.GetPendingVideoCountAsync();
+        return Json(new { count });
+    }
+
+    // ==================== VİDEOLARIM (KULLANICI VİDEOLARI) ====================
+
+    /// <summary>
+    /// Kullanıcının kendi videolarını listeler
+    /// </summary>
+    [Authorize]
+    public async Task<IActionResult> Videolarim()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Challenge();
+        }
+
+        // Kullanıcının tüm videolarını getir (tüm durumlar)
+        var userVideos = await _videoApprovalService.GetUserVideosByStatusAsync(user.Id, null);
+
+        return View(userVideos);
+    }
+
+    /// <summary>
+    /// Kullanıcının kendi videosunu silmesi (Sadece kendi videoları)
+    /// </summary>
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUserVideo(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Json(new { success = false, message = "Oturum açmanız gerekiyor." });
+        }
+
+        var video = await _context.VideolarSayfasi.FirstOrDefaultAsync(v => v.Id == id);
+        if (video == null)
+        {
+            return Json(new { success = false, message = "Video bulunamadı." });
+        }
+
+        // Sadece kendi videosunu silebilir
+        if (video.YukleyenKullaniciId != user.Id)
+        {
+            return Json(new { success = false, message = "Bu videoyu silme yetkiniz yok." });
+        }
+
+        // Fiziksel dosyaları sil
+        try
+        {
+            if (!video.IsYouTube && !string.IsNullOrWhiteSpace(video.VideoYolu) && video.VideoYolu.StartsWith("/"))
+            {
+                var fullVideoPath = Path.Combine(_webHostEnvironment.WebRootPath, video.VideoYolu.TrimStart('/'));
+                if (System.IO.File.Exists(fullVideoPath))
+                {
+                    System.IO.File.Delete(fullVideoPath);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(video.KapakFotografiYolu) && video.KapakFotografiYolu.StartsWith("/VideoSayfasi/"))
+            {
+                var fullCoverPath = Path.Combine(_webHostEnvironment.WebRootPath, video.KapakFotografiYolu.TrimStart('/'));
+                if (System.IO.File.Exists(fullCoverPath))
+                {
+                    System.IO.File.Delete(fullCoverPath);
+                }
+            }
+        }
+        catch
+        {
+            // Dosya silme hatalarını yutuyoruz
+        }
+
+        _context.VideolarSayfasi.Remove(video);
+        await _context.SaveChangesAsync();
+
+        return Json(new { success = true, message = "Video başarıyla silindi." });
+    }
+
+    // ==================== ÖNERİLEN VİDEOLAR API ====================
+
+    /// <summary>
+    /// Önerilen videoları JSON olarak döner (Fallback endpoint)
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetSuggestedVideos(int currentVideoId, string? category = null, int limit = 6)
+    {
+        try
+        {
+            var query = _context.VideolarSayfasi
+                .Include(v => v.YukleyenKullanici)
+                .Where(v => v.Id != currentVideoId && v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .AsQueryable();
+
+            // Önce aynı kategorideki videoları, sonra en son yüklenenleri getir
+            var normalizedCategory = !string.IsNullOrEmpty(category) ? category.Trim().TrimEnd('.') : "";
+            
+            var suggestedVideos = await query
+                .OrderByDescending(v => !string.IsNullOrEmpty(normalizedCategory) && 
+                    v.Kategori != null && v.Kategori.Trim().TrimEnd('.') == normalizedCategory ? 1 : 0)
+                .ThenByDescending(v => v.YuklenmeTarihi)
+                .Take(limit)
+                .Select(v => new
+                {
+                    id = v.Id,
+                    videoAdi = v.VideoAdi,
+                    videoAciklamasi = v.VideoAciklamasi,
+                    videoYolu = v.VideoYolu,
+                    kapakFotografiYolu = v.KapakFotografiYolu,
+                    kategori = v.Kategori,
+                    goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                    begeniSayisi = v.BegeniSayisi,
+                    dislikeSayisi = v.DislikeSayisi,
+                    yuklenmeTarihi = v.YuklenmeTarihi,
+                    isYouTube = v.IsYouTube,
+                    yukleyenKullanici = new
+                    {
+                        firstName = v.YukleyenKullanici != null ? v.YukleyenKullanici.FirstName : "Anonim",
+                        lastName = v.YukleyenKullanici != null ? v.YukleyenKullanici.LastName : "",
+                        profilePicturePath = v.YukleyenKullanici != null && v.YukleyenKullanici.ProfilePicturePath != null 
+                            ? v.YukleyenKullanici.ProfilePicturePath 
+                            : null
+                    }
+                })
+                .ToListAsync();
+
+            return Json(new
+            {
+                success = true,
+                videos = suggestedVideos
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message,
+                videos = new List<object>()
+            });
+        }
+    }
+
+    /// <summary>
+    /// Tüm videolarda arama yapar (tüm kategoriler, tüm sayfalar)
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> Search(string q)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(q))
+            {
+                return Json(new { success = true, videos = new List<object>() });
+            }
+
+            var searchTerm = NormalizeTurkish(q.Trim());
+
+            // API'den tüm videoları çek
+            var isLocal = string.Equals(Request?.Host.Host, "localhost", StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(Request?.Host.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase);
+            var apiBase = isLocal
+                ? "https://localhost:44347/api/v1"
+                : "http://94.73.131.202:8090/api/v1";
+            var apiUrl = $"{apiBase}/videos";
+
+            List<object> results = new();
+
+            try
+            {
+                using var http = new HttpClient();
+                http.Timeout = TimeSpan.FromSeconds(5);
+                using var resp = await http.GetAsync(apiUrl);
+                resp.EnsureSuccessStatusCode();
+                var json = await resp.Content.ReadAsStringAsync();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var parsed = System.Text.Json.JsonSerializer.Deserialize<ApiVideosResponse>(json, options);
+                var data = parsed?.Data ?? new List<ApiVideo>();
+
+                // Arama filtresi uygula - Türkçe karakterleri normalize ederek
+                var filtered = data.Where(v => 
+                    (!string.IsNullOrEmpty(v.Title) && NormalizeTurkish(v.Title).Contains(searchTerm)) ||
+                    (!string.IsNullOrEmpty(v.Description) && NormalizeTurkish(v.Description).Contains(searchTerm)) ||
+                    (!string.IsNullOrEmpty(v.Category) && NormalizeTurkish(v.Category).Contains(searchTerm))
+                ).ToList();
+
+                var currentBase = $"{Request.Scheme}://{Request.Host.ToUriComponent()}";
+                
+                results = filtered.OrderByDescending(v => v.CreatedDate).Select(v => {
+                    var isYouTube = (v.VideoUrl ?? string.Empty).Contains("youtube", StringComparison.OrdinalIgnoreCase);
+                    var ytId = isYouTube ? ExtractYouTubeId(v.VideoUrl) : null;
+                    
+                    string Rehost(string input)
+                    {
+                        if (string.IsNullOrWhiteSpace(input)) return input;
+                        if (input.StartsWith("/")) return currentBase + input;
+                        if (input.StartsWith("http://") || input.StartsWith("https://"))
+                        {
+                            try { var u = new Uri(input); return currentBase + u.PathAndQuery; }
+                            catch { return input; }
+                        }
+                        return input;
+                    }
+
+                    return new {
+                        id = v.Id,
+                        videoAdi = v.Title ?? string.Empty,
+                        videoAciklamasi = v.Description ?? string.Empty,
+                        videoYolu = isYouTube ? (ytId ?? string.Empty) : Rehost(v.VideoUrl ?? string.Empty),
+                        kapakFotografiYolu = string.IsNullOrWhiteSpace(v.ThumbnailUrl) ? null : Rehost(v.ThumbnailUrl),
+                        kategori = v.Category ?? string.Empty,
+                        goruntulenmeSayisi = v.ViewCount,
+                        yuklenmeTarihi = v.CreatedDate.ToString("d MMMM yyyy"),
+                        isYouTube = isYouTube
+                    };
+                }).Cast<object>().ToList();
+            }
+            catch
+            {
+                // API hatasında yerel DB'den ara
+                var allVideos = await _context.VideolarSayfasi
+                    .AsNoTracking()
+                    .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                    .OrderByDescending(v => v.YuklenmeTarihi)
+                    .ToListAsync();
+
+                // Türkçe normalize ederek filtrele
+                var localFiltered = allVideos.Where(v =>
+                    (!string.IsNullOrEmpty(v.VideoAdi) && NormalizeTurkish(v.VideoAdi).Contains(searchTerm)) ||
+                    (!string.IsNullOrEmpty(v.VideoAciklamasi) && NormalizeTurkish(v.VideoAciklamasi).Contains(searchTerm)) ||
+                    (!string.IsNullOrEmpty(v.Kategori) && NormalizeTurkish(v.Kategori).Contains(searchTerm))
+                ).ToList();
+
+                results = localFiltered.Select(v => new {
+                    id = v.Id,
+                    videoAdi = v.VideoAdi,
+                    videoAciklamasi = v.VideoAciklamasi,
+                    videoYolu = v.VideoYolu,
+                    kapakFotografiYolu = v.KapakFotografiYolu,
+                    kategori = v.Kategori,
+                    goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                    yuklenmeTarihi = v.YuklenmeTarihi.ToString("d MMMM yyyy"),
+                    isYouTube = v.IsYouTube
+                }).Cast<object>().ToList();
+            }
+
+            return Json(new { success = true, videos = results });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message, videos = new List<object>() });
+        }
+    }
+
+    /// <summary>
+    /// Türkçe karakterleri normalize eder (büyük/küçük harf duyarsız arama için)
+    /// </summary>
+    private static string NormalizeTurkish(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        
+        return text
+            .ToUpperInvariant()
+            .Replace("İ", "I")
+            .Replace("Ş", "S")
+            .Replace("Ğ", "G")
+            .Replace("Ü", "U")
+            .Replace("Ö", "O")
+            .Replace("Ç", "C")
+            .Replace("ı", "I")
+            .Replace("ş", "S")
+            .Replace("ğ", "G")
+            .Replace("ü", "U")
+            .Replace("ö", "O")
+            .Replace("ç", "C")
+            .Replace("i", "I");
+    }
+
+    /// <summary>
+    /// Tüm videoları client-side cache için döner (anlık arama için)
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAllVideosForSearch()
+    {
+        try
+        {
+            // API'den tüm videoları çek
+            var isLocal = string.Equals(Request?.Host.Host, "localhost", StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(Request?.Host.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase);
+            var apiBase = isLocal
+                ? "https://localhost:44347/api/v1"
+                : "http://94.73.131.202:8090/api/v1";
+            var apiUrl = $"{apiBase}/videos";
+
+            List<object> results = new();
+
+            try
+            {
+                using var http = new HttpClient();
+                http.Timeout = TimeSpan.FromSeconds(5);
+                using var resp = await http.GetAsync(apiUrl);
+                resp.EnsureSuccessStatusCode();
+                var json = await resp.Content.ReadAsStringAsync();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var parsed = System.Text.Json.JsonSerializer.Deserialize<ApiVideosResponse>(json, options);
+                var data = parsed?.Data ?? new List<ApiVideo>();
+
+                var currentBase = $"{Request.Scheme}://{Request.Host.ToUriComponent()}";
+                
+                results = data.OrderByDescending(v => v.CreatedDate).Select(v => {
+                    var isYouTube = (v.VideoUrl ?? string.Empty).Contains("youtube", StringComparison.OrdinalIgnoreCase);
+                    var ytId = isYouTube ? ExtractYouTubeId(v.VideoUrl) : null;
+                    
+                    string Rehost(string input)
+                    {
+                        if (string.IsNullOrWhiteSpace(input)) return input;
+                        if (input.StartsWith("/")) return currentBase + input;
+                        if (input.StartsWith("http://") || input.StartsWith("https://"))
+                        {
+                            try { var u = new Uri(input); return currentBase + u.PathAndQuery; }
+                            catch { return input; }
+                        }
+                        return input;
+                    }
+
+                    return new {
+                        id = v.Id,
+                        videoAdi = v.Title ?? string.Empty,
+                        videoAciklamasi = v.Description ?? string.Empty,
+                        videoYolu = isYouTube ? (ytId ?? string.Empty) : Rehost(v.VideoUrl ?? string.Empty),
+                        kapakFotografiYolu = string.IsNullOrWhiteSpace(v.ThumbnailUrl) ? null : Rehost(v.ThumbnailUrl),
+                        kategori = v.Category ?? string.Empty,
+                        goruntulenmeSayisi = v.ViewCount,
+                        yuklenmeTarihi = v.CreatedDate.ToString("d MMMM yyyy"),
+                        isYouTube = isYouTube,
+                        yukleyenKullanici = v.YukleyenKullanici != null ? new {
+                            firstName = v.YukleyenKullanici.FirstName ?? "Anonim",
+                            lastName = v.YukleyenKullanici.LastName ?? "",
+                            profilePicturePath = v.YukleyenKullanici.ProfilePicturePath
+                        } : new { firstName = "Anonim", lastName = "", profilePicturePath = (string?)null }
+                    };
+                }).Cast<object>().ToList();
+            }
+            catch
+            {
+                // API hatasında yerel DB'den al
+                var allVideos = await _context.VideolarSayfasi
+                    .AsNoTracking()
+                    .Include(v => v.YukleyenKullanici)
+                    .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                    .OrderByDescending(v => v.YuklenmeTarihi)
+                    .ToListAsync();
+
+                results = allVideos.Select(v => new {
+                    id = v.Id,
+                    videoAdi = v.VideoAdi,
+                    videoAciklamasi = v.VideoAciklamasi,
+                    videoYolu = v.VideoYolu,
+                    kapakFotografiYolu = v.KapakFotografiYolu,
+                    kategori = v.Kategori,
+                    goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                    yuklenmeTarihi = v.YuklenmeTarihi.ToString("d MMMM yyyy"),
+                    isYouTube = v.IsYouTube,
+                    yukleyenKullanici = new {
+                        firstName = v.YukleyenKullanici != null ? v.YukleyenKullanici.FirstName : "Anonim",
+                        lastName = v.YukleyenKullanici != null ? v.YukleyenKullanici.LastName : "",
+                        profilePicturePath = v.YukleyenKullanici?.ProfilePicturePath
+                    }
+                }).Cast<object>().ToList();
+            }
+
+            return Json(new { success = true, videos = results });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message, videos = new List<object>() });
+        }
     }
 }

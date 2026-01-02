@@ -1,0 +1,445 @@
+@model List<Sevval.Domain.Entities.PendingVideoViewModel>
+@{
+    ViewData["Title"] = "Bekleyen Videolar";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Şevval Ofis</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 2rem rgba(0,0,0,0.05);
+        }
+
+        .sidebar .nav-link {
+            color: #343a40;
+            font-size: 0.95rem;
+            padding: 0.85rem 1.5rem;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            border-radius: 0;
+            margin-bottom: 2px;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+
+        .sidebar .nav-link.active {
+            color: #0d6efd;
+            background-color: #e7f1ff;
+            border-left-color: #0d6efd;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link i {
+            width: 25px;
+            text-align: center;
+            color: #0d6efd;
+        }
+
+        .sidebar .site-home-link {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+        }
+
+        .sidebar .site-home-link:hover {
+            background-color: #0b5ed7;
+        }
+
+        .content {
+            width: 100%;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .sidebar-wrapper {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .video-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+
+        .video-info {
+            padding: 16px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #212529;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .video-meta i {
+            width: 18px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-approve:hover {
+            background: linear-gradient(135deg, #218838, #1aa179);
+            color: white;
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            border: none;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-reject:hover {
+            background: linear-gradient(135deg, #c82333, #c0392b);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .badge-pending {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+            font-weight: 600;
+        }
+
+        .pending-count-badge {
+            background: #dc3545;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar-wrapper d-none d-lg-block" id="sidebar">
+            <nav class="sidebar p-3 h-100">
+                <div class="text-center py-3">
+                    <img src="~/images/favlogo.webp" alt="Şevval Ofis Logo" class="img-fluid mb-3" style="max-width: 100px;">
+                    <h4 class="fw-bold text-primary">Şevval Ofis</h4>
+                </div>
+                <hr>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SehirlereGoreEmlakcilar", "SevvalOfis")"><i class="bi bi-building me-2"></i> Şehirlere Göre Emlakçılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("BireyselKullanicilar", "SevvalOfis")"><i class="bi bi-person-fill me-2"></i> Bireysel Kullanıcılar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanYonetim")"><i class="bi bi-clipboard2-data-fill me-2"></i> İlan Yönetimi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "IlanTakip")"><i class="bi bi-search me-2"></i> Bireysel İlan Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("TumIlanlar", "SevvalOfis")"><i class="bi bi-list-ul me-2"></i> Tüm İlanlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-diagram-3-fill me-2"></i> Kardeş Firma Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("IlanTalepTakip", "SevvalOfis")"><i class="bi bi-card-list me-2"></i> İlan Talep Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("GununIlaniTakip", "SevvalOfis")"><i class="bi bi-calendar-event-fill me-2"></i> Günün İlanı Takip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("AfisTalepler", "SevvalOfis")"><i class="bi bi-card-checklist me-2"></i> Afiş Talepleri</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="@Url.Action("BekleyenVideolar", "SevvalOfis")">
+                            <i class="bi bi-camera-video-fill me-2"></i> Bekleyen Videolar
+                            @if (ViewBag.PendingCount > 0)
+                            {
+                                <span class="pending-count-badge">@ViewBag.PendingCount</span>
+                            }
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("MailGonder", "SevvalOfis")"><i class="bi bi-envelope-fill me-2"></i> Mail Gönder</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("SmsMesaj", "SevvalOfis")"><i class="bi bi-chat-dots-fill me-2"></i> SMS Mesaj</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("EidsOnayliKullanicilar", "SevvalOfis")"><i class="bi bi-check-circle me-2"></i> EİDS Onaylı Kullanıcılar</a></li>
+                    <li class="nav-item mt-auto"><a class="nav-link site-home-link text-center" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content p-4">
+            <div class="d-flex align-items-center mb-4">
+                <button class="btn btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="display-5 fw-bold mb-0 ms-3">
+                    <i class="bi bi-camera-video-fill text-primary me-2"></i>
+                    Bekleyen Videolar
+                    @if (ViewBag.PendingCount > 0)
+                    {
+                        <span class="badge badge-pending ms-2">@ViewBag.PendingCount</span>
+                    }
+                </h1>
+            </div>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="bi bi-check-circle"></i>
+                    <h4 class="text-muted">Bekleyen video bulunmuyor</h4>
+                    <p class="text-muted">Tüm videolar onaylanmış durumda.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var video in Model)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3" id="video-card-@video.Id">
+                            <div class="video-card">
+                                @if (!string.IsNullOrEmpty(video.KapakFotografiYolu))
+                                {
+                                    <img src="@video.KapakFotografiYolu" alt="@video.VideoAdi" class="video-thumbnail">
+                                }
+                                else
+                                {
+                                    <div class="video-thumbnail d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-camera-video text-muted" style="font-size: 48px;"></i>
+                                    </div>
+                                }
+                                <div class="video-info">
+                                    <h5 class="video-title" title="@video.VideoAdi">@video.VideoAdi</h5>
+                                    <div class="video-meta">
+                                        <div class="mb-1">
+                                            <i class="bi bi-person"></i> @video.UploaderName
+                                        </div>
+                                        <div class="mb-1">
+                                            <i class="bi bi-envelope"></i> @video.UploaderEmail
+                                        </div>
+                                        <div class="mb-1">
+                                            <i class="bi bi-calendar"></i> @video.YuklenmeTarihi.ToString("dd.MM.yyyy HH:mm")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(video.Kategori))
+                                        {
+                                            <div>
+                                                <i class="bi bi-tag"></i> @video.Kategori
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-approve btn-sm" onclick="approveVideo(@video.Id)">
+                                            <i class="bi bi-check-lg"></i> Onayla
+                                        </button>
+                                        <button class="btn btn-reject btn-sm" onclick="showRejectModal(@video.Id, '@video.VideoAdi.Replace("'", "\\'").Replace("\"", "&quot;")')">
+                                            <i class="bi bi-x-lg"></i> Reddet
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">
+                        <i class="bi bi-x-circle text-danger me-2"></i>Video Reddet
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">
+                        <strong id="rejectVideoName"></strong> videosunu reddetmek istediğinize emin misiniz?
+                    </p>
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Red Sebebi (Opsiyonel)</label>
+                        <textarea class="form-control" id="rejectionReason" rows="3" placeholder="Kullanıcıya gösterilecek red sebebini yazın..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmReject()">
+                        <i class="bi bi-x-lg"></i> Reddet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Şevval Ofis</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "SevvalOfis")"><i class="bi bi-pie-chart-fill me-2"></i> Özet</a></li>
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Uyelikler", "SevvalOfis")"><i class="bi bi-people-fill me-2"></i> Üyelikler</a></li>
+                <li class="nav-item"><a class="nav-link active" href="@Url.Action("BekleyenVideolar", "SevvalOfis")"><i class="bi bi-camera-video-fill me-2"></i> Bekleyen Videolar</a></li>
+                <li class="nav-item"><a class="nav-link site-home-link text-center mt-3" href="/"><i class="bi bi-house-door-fill me-2"></i> Siteye Geri Dön</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentRejectVideoId = null;
+        const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+
+        function approveVideo(id) {
+            if (!confirm('Bu videoyu onaylamak istediğinize emin misiniz?')) return;
+
+            fetch('@Url.Action("ApproveVideo", "SevvalOfis")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': '@Html.AntiForgeryToken().ToString().Split("value=\"")[1].Split("\"")[0]'
+                },
+                body: 'id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('video-card-' + id).remove();
+                    updatePendingCount(-1);
+                    showToast('success', data.message);
+                } else {
+                    showToast('error', data.message);
+                }
+            })
+            .catch(error => {
+                showToast('error', 'Bir hata oluştu: ' + error);
+            });
+        }
+
+        function showRejectModal(id, videoName) {
+            currentRejectVideoId = id;
+            document.getElementById('rejectVideoName').textContent = videoName;
+            document.getElementById('rejectionReason').value = '';
+            rejectModal.show();
+        }
+
+        function confirmReject() {
+            if (!currentRejectVideoId) return;
+
+            const reason = document.getElementById('rejectionReason').value;
+
+            fetch('@Url.Action("RejectVideo", "SevvalOfis")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': '@Html.AntiForgeryToken().ToString().Split("value=\"")[1].Split("\"")[0]'
+                },
+                body: 'id=' + currentRejectVideoId + '&reason=' + encodeURIComponent(reason)
+            })
+            .then(response => response.json())
+            .then(data => {
+                rejectModal.hide();
+                if (data.success) {
+                    document.getElementById('video-card-' + currentRejectVideoId).remove();
+                    updatePendingCount(-1);
+                    showToast('success', data.message);
+                } else {
+                    showToast('error', data.message);
+                }
+                currentRejectVideoId = null;
+            })
+            .catch(error => {
+                rejectModal.hide();
+                showToast('error', 'Bir hata oluştu: ' + error);
+                currentRejectVideoId = null;
+            });
+        }
+
+        function updatePendingCount(delta) {
+            const badges = document.querySelectorAll('.pending-count-badge, .badge-pending');
+            badges.forEach(badge => {
+                let count = parseInt(badge.textContent) || 0;
+                count += delta;
+                if (count <= 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.textContent = count;
+                }
+            });
+
+            // Check if no videos left
+            const cards = document.querySelectorAll('[id^="video-card-"]');
+            if (cards.length === 0) {
+                location.reload();
+            }
+        }
+
+        function showToast(type, message) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+            
+            const toast = document.createElement('div');
+            toast.className = `alert ${alertClass} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `<i class="bi ${icon} me-2"></i>${message}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

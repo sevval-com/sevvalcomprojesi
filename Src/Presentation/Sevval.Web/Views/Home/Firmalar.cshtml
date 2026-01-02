@@ -37,10 +37,7 @@
     }
 }
 
-<!-- Dış CSS dosyaları -->
-<link rel="stylesheet" href="~/css/kardesfirmalar.css">
-<link rel="stylesheet" href="~/css/anasayfa.css">
-<link rel="icon" type="image/png" href="~/images/favlogo.webp">
+
 
 <!--
     YENİ MAVİ & BEYAZ ANİMASYONLU TASARIM
@@ -48,53 +45,6 @@
     ve daha fazla animasyon (başlıkta shimmer, kartta glow) eklendi.
 -->
 <style>
-    /* === DROPDOWN MENÜ - HOVER İLE AÇILSIN === */
-    .dropdown {
-        position: relative !important;
-    }
-
-    .dropdown-content {
-        position: absolute !important;
-        top: 100% !important;
-        background-color: white !important;
-        border-radius: 8px !important;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
-        z-index: 10000 !important;
-        min-width: 180px !important;
-        opacity: 0 !important;
-        transform: translateY(20px) !important;
-        transition: opacity 0.3s ease, transform 0.3s ease !important;
-        pointer-events: none !important;
-        display: block !important;
-        list-style: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .dropdown:hover .dropdown-content {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-        pointer-events: auto !important;
-    }
-
-    .dropdown-content li {
-        padding: 10px 15px !important;
-        transition: background-color 0.3s, color 0.3s !important;
-    }
-
-    .dropdown-content li a {
-        color: #009cfb !important;
-        font-weight: bold !important;
-        text-decoration: none !important;
-        font-size: 16px !important;
-        display: block !important;
-    }
-
-    .dropdown-content li a:hover {
-        background-color: rgba(0, 156, 251, 0.1) !important;
-        color: #0056b3 !important;
-    }
-
     /* === KÖK DEĞİŞKENLER (YENİ TEMA - MAVİ/BEYAZ) === */
     :root {
         --brand-primary: #3B82F6; /* Tailwind Blue 500 */
@@ -149,22 +99,20 @@
     }
 
     /* === TEMEL SAYFA STİLLERİ === */
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        margin: 0;
-        background-color: var(--bg-body);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+    /* Navbar'ı etkilememek için body stillerini sadece içerik için uygula */
 
-    .container {
+    
+    /* Navbar'ı etkilememek için özel kurallar - Navbar'ın kendi stilleri korunmalı */
+
+
+
+    
+    /* User grid - Anasayfa ile aynı genişlik */
+    .user-grid {
         width: 100%;
-        max-width: 1300px;
+        max-width: 100%;
+        padding: 0;
         margin: 0 auto;
-        padding: 0 16px;
         box-sizing: border-box;
     }
 
@@ -172,9 +120,12 @@
     .page-title {
         font-size: 2.8rem;
         font-weight: 800;
-        margin: 24px 0 20px 0;
+        margin: 20px auto;
+        padding: 0 1.5%;
         letter-spacing: .6px;
         text-align: center;
+        max-width: 100%;
+        box-sizing: border-box;
         
         /* Shimmer Efekti */
         background: linear-gradient(90deg, var(--text-dark), var(--brand-secondary), var(--text-dark));
@@ -192,37 +143,43 @@
         border-radius: var(--radius-lg);
         padding: 24px;
         box-shadow: var(--shadow-lg);
-        margin-bottom: 32px;
+        margin: 0 auto 32px auto;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
         
         /* Panel giriş animasyonu */
         animation: fadeInUp 0.8s ease-out 0.2s;
         animation-fill-mode: backwards;
     }
     
-    /* Filtreler (ÜST SIRA) */
+    /* Filtreler (ÜST SIRA - AYNI SATIRDA) */
     .filter-row {
-        display: grid;
-        grid-template-columns: 1fr; /* Mobil: Tek sütun */
-        gap: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
         margin-bottom: 20px;
+        align-items: flex-end;
     }
 
     .filter-group {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 4px;
+        flex: 1;
+        min-width: 150px;
     }
 
     .filter-group label {
         font-weight: 600;
         color: var(--text-dark);
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .filter-select {
-        height: 44px;
+        height: 36px;
         padding: 0 12px;
-        font-size: 16px;
+        font-size: 13px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         background-color: var(--bg-white);
@@ -234,12 +191,31 @@
         background-position: right 12px center;
         background-size: 16px 16px;
         cursor: pointer;
+        width: 100%;
     }
 
     .filter-select:focus {
         outline: none;
         border-color: var(--brand-primary);
         box-shadow: 0 0 0 3px var(--brand-primary-glow);
+    }
+    
+    /* Buton Grubu Inline (Filtrele/Temizle aynı satırda, kutularla aynı hizada) */
+    .button-group-inline {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+        min-width: 150px;
+        align-items: flex-end;
+        padding-top: 20px; /* Label yüksekliği kadar boşluk bırak */
+    }
+    
+    .button-group-inline .btn {
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+        flex: 1;
+        margin-bottom: 14px;
     }
 
     /* Arama Çubuğu (ORTA SIRA) */
@@ -563,37 +539,134 @@
 
     /* === RESPONSIVE TASARIM === */
 
+    /* Mobil (768px altı) */
+    @@media (max-width: 767px) {
+
+        
+        .page-title {
+            font-size: 2rem;
+            margin: 16px auto 12px auto;
+            padding: 0 1.5%;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .controls-form {
+            padding: 16px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .filter-row {
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-group {
+            flex: 1 1 100%;
+            min-width: 100%;
+        }
+        
+        .filter-group label {
+            font-size: 11px;
+        }
+        
+        .filter-select {
+            font-size: 12px;
+            height: 36px;
+        }
+        
+        .button-group-inline {
+            width: 100%;
+            min-width: 100%;
+            margin-top: 8px;
+        }
+        
+        .button-group-inline .btn {
+            flex: 1;
+        }
+        
+        .user-grid {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+    }
+
     /* Tablet (768px ve üstü) */
     @@media (min-width: 768px) {
+        /* Body padding navbar'ı etkilememeli - sadece içerik için */
+
+        
         .page-title {
             font-size: 3rem;
-            margin: 32px 0 24px 0;
+            margin: 32px auto 24px auto;
+            padding: 0 1.5%;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .controls-form {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto 32px auto;
+            box-sizing: border-box;
         }
 
         .filter-row {
-            grid-template-columns: 1fr 1fr; /* 2 sütun */
+            flex-wrap: nowrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .button-group-inline {
+            flex: 1;
+            min-width: 0;
         }
         
         .button-group {
             flex-direction: row; /* Yan yana */
             justify-content: flex-end; /* Sağa yasla */
         }
+        
+        .user-grid {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
     }
     
     /* Küçük Masaüstü (1024px ve üstü) */
     @@media (min-width: 1024px) {
-        .filter-row {
-             grid-template-columns: 1fr 1fr 1fr; /* Filtreler 3 sütun */
+        .filter-group {
+            flex: 1;
+        }
+        
+        .button-group-inline {
+            flex: 1;
         }
     }
 
 </style>
 
 
-<div class="container">
+<!-- Container wrapper - Anasayfa ile aynı yapı -->
+<div class="container main-content-container" style="padding-top: 20px;">
 
-    <!-- YENİ BAŞLIK (ORTALI) -->
-    <h1 class="page-title">FİRMALAR</h1>
+        <!-- YENİ BAŞLIK (ORTALI) -->
+        <h1 class="page-title">FİRMALAR</h1>
 
     <!-- Arama ve Filtreleme Formu (YENİ YERLEŞİM) -->
     <form method="get" action="@Url.Action("Firmalar", "Home")" class="controls-form">
@@ -631,6 +704,15 @@
                     <option value="date_desc">Üyelik Tarihi (Yeni-Eski)</option>
                 </select>
             </div>
+            
+            <!-- Butonlar (Aynı satırda) -->
+            <div class="button-group-inline">
+                <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
+                   class="btn btn-secondary press-feedback">
+                    Temizle
+                </a>
+                <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
+            </div>
         </div>
         
         <!-- Arama Çubuğu (ORTA SIRA) -->
@@ -642,21 +724,6 @@
                    class="search-input"
                    id="searchInput" />
             <button type="submit" class="search-btn press-feedback">Ara</button>
-        </div>
-
-        <!-- Buton Grubu (ALT SIRA) -->
-        <div class="button-group">
-            @if (!string.IsNullOrEmpty(currentSearch) ||
-            !string.IsNullOrEmpty(currentProvince) ||
-            !string.IsNullOrEmpty(currentDistrict) ||
-            !string.IsNullOrEmpty(currentSortBy))
-            {
-                <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
-                   class="btn btn-secondary press-feedback">
-                    Temizle
-                </a>
-            }
-            <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
         </div>
 
         <!-- Gizli Alanlar (Form gönderimi için gerekli) -->
@@ -828,7 +895,8 @@
         }
     </div>
 
-</div> <!-- .container sonu -->
+    </div> <!-- .container sonu -->
+
 
 
 @section Scripts {

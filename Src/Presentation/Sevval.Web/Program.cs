@@ -250,7 +250,6 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 // Route ekleme
 app.MapControllerRoute(
     name: "ilanver",

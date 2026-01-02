@@ -22,6 +22,7 @@
 
     <!-- Navbar için gerekli olan özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
+    <script src="~/js/site.js" defer></script>
 
     <!-- AntiForgery Token için -->
     @Html.AntiForgeryToken()
@@ -69,6 +70,7 @@
                                 <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
                                 <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                                 <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                                <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
                                 <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                                 <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                                 
@@ -341,6 +343,7 @@
                             <div class="list-group list-group-flush">
                                 <a href="@Url.Action("Panel", "Ilan")" class="list-group-item list-group-item-action">Raporlar</a>
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action">İlanlar</a>
+                                <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
                                 

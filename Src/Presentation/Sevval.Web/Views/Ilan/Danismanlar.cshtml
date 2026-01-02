@@ -22,99 +22,15 @@
 
     <!-- Navbar için gerekli olan özel CSS -->
     <link rel="stylesheet" href="~/css/Anasayfa.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
+    <script src="~/js/site.js" defer></script>
 
 </head>
 <body>
 
     <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container">
-            <div class="logo">
-                <a href="/">
-                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <span>Şevval Emlak</span>
-            </div>
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-                <li class="dropdoawn">
-                    <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-                </li>
-                <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
-                
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <li>
-                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                    </li>
-                }
-            </ul>
-            <div class="auth-buttoons">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                                <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                                <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                                <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                                <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                                
-                                <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                                <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                                @if (User.Identity.IsAuthenticated && (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-                                {
-                                    <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                                }
-                                <li><a href="@Url.Action("KategoriSecim", "Ilan")">İlan Ver</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
-                }
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account", new { Type = "GENEL" }) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Giriş Yap Pop-up -->
-    <div id="popup-giris" class="pencere" style="display:none;">
-        <div class="pencere-icerik">
-            <button class="kapat-buton" id="pencere-kapat">&times;</button>
-            <div class="sol-bolum">
-                <h2>Bireysel</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-            <div class="sag-bolum">
-                <h2>Kurumsal</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-        </div>
-    </div>
+    <partial name="_Navbar" />
 
     <!-- Genel Stil Tanımlamaları -->
     <style>
@@ -292,6 +208,7 @@
                             <div class="list-group list-group-flush">
                                 <a href="@Url.Action("Panel", "Ilan")" class="list-group-item list-group-item-action">Raporlar</a>
                                 <a href="@Url.Action("Ilanlar", "Ilan")" class="list-group-item list-group-item-action">İlanlar</a>
+                                <a href="@Url.Action("Videolarim", "VideolarSayfasi")" class="list-group-item list-group-item-action">Videolarım</a>
                                 <a href="@Url.Action("Danismanlar", "Ilan")" class="list-group-item list-group-item-action active" aria-current="true">Danışmanlar</a>
                                 <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
                                 
@@ -445,21 +362,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Navbar scriptleri
-            var hamburgerMenu = document.getElementById("hamburger-menu");
-            var navLinks = document.getElementById("nav-links");
-            if (hamburgerMenu) {
-                hamburgerMenu.addEventListener("click", function (event) {
-                    navLinks.classList.toggle("active");
-                    event.stopPropagation();
-                });
-            }
-            document.addEventListener("click", function (event) {
-                if (navLinks && !navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
-                    navLinks.classList.remove("active");
-                }
-            });
-
             // Giriş pop-up scripti
             const girisButon = document.getElementById('giris-buton');
             const popupGiris = document.getElementById('popup-giris');
