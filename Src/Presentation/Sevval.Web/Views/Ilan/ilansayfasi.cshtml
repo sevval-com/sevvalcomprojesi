@@ -1,4 +1,4 @@
-@model sevvalemlak.Dto.TumIlanlarDTO
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
 @using DocumentFormat.OpenXml.Office2010.PowerPoint
 @using Microsoft.AspNetCore.Identity
 @using sevvalemlak.Models
@@ -1410,20 +1410,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <img src="@("https://www.sevval.com/" + Model.User.ProfilePicturePath)"
                  alt="Profil Fotoğrafı"
                  class="profile-picture"
-                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.webp';" />
+                 onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg';" />
         }
         else if (!string.IsNullOrEmpty(Model.CompanyOwnerProfilePicturePath))
         {
             <img src="@("https://www.sevval.com/" + Model.CompanyOwnerProfilePicturePath)"
                  alt="Şirket Sahibi Profil Fotoğrafı"
                  class="profile-picture"
-                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/3177/3177440.webp';" />
+                 onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg';" />
         }
         else
         {
             <!-- Eğer hiç fotoğraf yolu yoksa, varsayılan ikonu göster -->
             <!-- Varsayılan ikon yerine doğrudan varsayılan bir resim gösteriyoruz -->
-            <img src="https://cdn-icons-png.flaticon.com/128/3177/3177440.webp"
+            <img src="/images/common/camera-placeholder.svg"
                  alt="Varsayılan Profil Fotoğrafı"
                  class="profile-picture" />
         }
@@ -1694,14 +1694,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="company-logo">
                 <img src="@Url.Content(Model.CompanyOwnerProfilePicturePath)"
                      alt="Firma Sahibi Profili"
-                     onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/128/14385/14385352.webp';" />
+                     onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg';" />
             </div>
         }
         else
         {
             <!-- Eğer CompanyOwnerProfilePicturePath boşsa, varsayılan bir resim göster -->
             <div class="company-logo">
-                <img src="https://cdn-icons-png.flaticon.com/128/14385/14385352.webp"
+                <img src="/images/common/camera-placeholder.svg"
                      alt="Varsayılan Firma Profili" />
             </div>
         }

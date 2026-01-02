@@ -3,19 +3,19 @@
     public static class GeneralConstants
     {
         //prod
-        //public const string BaseUrl = "https://www.sevval.com";
-        //public const string WwwRootPath = "C:\\inetpub\\SevvalEmlak\\wwwroot";
-        //public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
-        //public const string BaseClientUrl = "http://94.73.131.202:8090";
-        //public const string ConnectionString = "Data Source=C:\\inetpub\\SevvalBackEnd\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
-
-        //dev
-        public const string BaseUrl = "http://localhost:5096"; // Frontend URL
-        public const string WwwRootPath = "C:\\Users\\emreg\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Web\\wwwroot";
+        public const string BaseUrl = "https://www.sevval.com";
+        public const string WwwRootPath = "C:\\inetpub\\SevvalEmlak\\wwwroot";
         public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
-        public const string BaseClientUrl = "http://94.73.131.202:8090"; // API URL
-        // Deprecated: use appsettings.json -> ConnectionStrings:DefaultConnection
-        public const string ConnectionString = "";
+        public const string BaseClientUrl = "http://94.73.131.202:8090";
+        public const string ConnectionString = "Data Source=C:\\inetpub\\SevvalBackEnd\\sevvalemlak2.db;Cache=Shared;Mode=ReadWriteCreate";
+
+        ////dev
+        //public const string BaseUrl = "http://localhost:5096"; // Frontend URL
+        //public const string WwwRootPath = "C:\\Users\\emreg\\sevvalcomprojesi\\Src\\Presentation\\Sevval.Web\\wwwroot";
+        //public const string SendEstateConfirmationEmail = "sevvalsiteonay@gmail.com";
+        //public const string BaseClientUrl = "http://94.73.131.202:8090"; // API URL
+        //// Deprecated: use appsettings.json -> ConnectionStrings:DefaultConnection
+        //public const string ConnectionString = "";
 
         //dev-mac
         //public const string BaseUrl = "http://localhost:5096";

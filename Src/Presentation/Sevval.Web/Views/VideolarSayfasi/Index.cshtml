@@ -439,7 +439,7 @@
             }
              <script>
 
-                 // Video Arama Motoru
+                 // Video Arama Motoru - Tüm kategorilerde anlık arama yapar
                  document.addEventListener('DOMContentLoaded', function() {
                      const searchInput = document.getElementById('videoSearchInput');
                      const resultCount = document.getElementById('searchResultCount');
@@ -453,9 +453,11 @@
                      
                      console.log('Video arama motoru başlatıldı');
                      
-                     let searchTimeout;
+                     let allVideos = null; // Tüm videoları cache'le
+                     let originalCards = videoGrid.innerHTML; // Orijinal kartları sakla
+                     let isLoading = false;
                      
-                     // Türkçe karakter normalize fonksiyonu - tüm varyasyonları tek forma çevir
+                     // Türkçe karakter normalize fonksiyonu
                      function normalizeText(str) {
                          if (!str) return '';
                          return str
@@ -473,51 +475,128 @@
                              .replace(/ö/g, 'O')
                              .replace(/ç/g, 'C')
                              .replace(/i/g, 'I')
-                             .replace(/\s+/g, ' '); // Birden fazla boşluğu tek boşluğa çevir
+                             .replace(/\s+/g, ' ');
                      }
                      
-                     function performSearch() {
-                         const query = normalizeText(searchInput.value.trim());
-                         const videoCards = videoGrid.querySelectorAll('[data-video-id]');
-                         let visibleCount = 0;
-                         
-                         console.log('Arama yapılıyor:', query);
-                         
-                         videoCards.forEach(function(card) {
-                             const title = normalizeText(card.querySelector('.title-text')?.textContent || '');
-                             const description = normalizeText(card.getAttribute('data-description') || '');
-                             const matches = !query || title.includes(query) || description.includes(query);
-                             
-                             if (matches) {
-                                 card.style.display = '';
-                                 visibleCount++;
-                             } else {
-                                 card.style.display = 'none';
+                     // Tüm videoları önceden yükle
+                     async function loadAllVideos() {
+                         if (allVideos || isLoading) return;
+                         isLoading = true;
+                         try {
+                             const response = await fetch('/VideolarSayfasi/GetAllVideosForSearch');
+                             const data = await response.json();
+                             if (data.success && data.videos) {
+                                 allVideos = data.videos;
+                                 console.log('Tüm videolar yüklendi:', allVideos.length);
                              }
-                         });
+                         } catch (error) {
+                             console.error('Video yükleme hatası:', error);
+                         }
+                         isLoading = false;
+                     }
+                     
+                     // Sayfa yüklendiğinde videoları önceden yükle
+                     loadAllVideos();
+                     
+                     // Video kartı HTML'i oluştur
+                     function createVideoCard(video) {
+                         const thumbnailUrl = video.thumbnailUrl || video.kapakFotografiYolu || 
+                             (video.isYouTube ? `https://img.youtube.com/vi/${video.videoYolu}/hqdefault.webp` : 'https://placehold.co/600x400/3b82f6/ffffff?text=Video');
                          
-                         console.log('Bulunan:', visibleCount);
+                         return `
+                         <a href="/VideolarSayfasi/Play/${video.id}" class="group flex flex-col video-card" data-video-id="${video.id}" data-description="${video.videoAciklamasi || ''}">
+                             <div class="relative w-full video-thumb">
+                                 <div class="aspect-w-16 aspect-h-9 bg-blue-100 overflow-hidden">
+                                     <img src="${thumbnailUrl}" alt="${video.videoAdi || video.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/3b82f6/ffffff?text=Video'" />
+                                 </div>
+                                 <div class="shine"></div>
+                             </div>
+                             <div class="p-4 flex flex-col gap-3 flex-1">
+                                 <h3 class="text-lg font-bold text-blue-900 line-clamp-2 group-hover:text-blue-600 transition-colors title-text">${video.videoAdi || video.title}</h3>
+                                 <div class="flex items-center gap-3">
+                                     <img src="${video.userProfilePicture || '/images/common/camera-placeholder.svg'}" alt="Profil" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" onerror="this.onerror=null;this.src='/images/common/camera-placeholder.svg';" />
+                                     <span class="text-sm font-medium text-blue-700">${video.uploaderName || 'Anonim'}</span>
+                                 </div>
+                                 <div class="flex flex-wrap gap-2 mt-auto">
+                                     <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                         ${video.goruntulenmeSayisi || video.viewCount || 0}
+                                     </span>
+                                     <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-100">
+                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                                         ${video.begeniSayisi || video.likeCount || 0}
+                                     </span>
+                                     ${video.kategori || video.category ? `<span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-100">${video.kategori || video.category}</span>` : ''}
+                                 </div>
+                             </div>
+                         </a>`;
+                     }
+                     
+                     // Anlık arama yap
+                     function performSearch() {
+                         const query = searchInput.value.trim();
                          
-                         // Update result messages
-                         if (query) {
-                             if (visibleCount > 0) {
-                                 resultCount.textContent = `${visibleCount} video bulundu`;
+                         // Boş sorgu - orijinal kartları göster
+                         if (!query) {
+                             videoGrid.innerHTML = originalCards;
+                             resultCount.classList.add('hidden');
+                             noResults.classList.add('hidden');
+                             return;
+                         }
+                         
+                         const normalizedQuery = normalizeText(query);
+                         
+                         // Eğer tüm videolar yüklendiyse, onlarda ara
+                         if (allVideos && allVideos.length > 0) {
+                             const filtered = allVideos.filter(function(video) {
+                                 const title = normalizeText(video.videoAdi || video.title || '');
+                                 const description = normalizeText(video.videoAciklamasi || video.description || '');
+                                 const category = normalizeText(video.kategori || video.category || '');
+                                 return title.includes(normalizedQuery) || description.includes(normalizedQuery) || category.includes(normalizedQuery);
+                             });
+                             
+                             if (filtered.length > 0) {
+                                 videoGrid.innerHTML = filtered.map(createVideoCard).join('');
+                                 resultCount.textContent = `${filtered.length} video bulundu`;
                                  resultCount.classList.remove('hidden');
                                  noResults.classList.add('hidden');
                              } else {
+                                 videoGrid.innerHTML = '';
                                  resultCount.classList.add('hidden');
                                  noResults.classList.remove('hidden');
                              }
                          } else {
-                             resultCount.classList.add('hidden');
-                             noResults.classList.add('hidden');
+                             // Fallback: Mevcut kartlarda ara
+                             const tempDiv = document.createElement('div');
+                             tempDiv.innerHTML = originalCards;
+                             const videoCards = tempDiv.querySelectorAll('[data-video-id]');
+                             let visibleCount = 0;
+                             let html = '';
+                             
+                             videoCards.forEach(function(card) {
+                                 const title = normalizeText(card.querySelector('.title-text')?.textContent || '');
+                                 const description = normalizeText(card.getAttribute('data-description') || '');
+                                 if (title.includes(normalizedQuery) || description.includes(normalizedQuery)) {
+                                     html += card.outerHTML;
+                                     visibleCount++;
+                                 }
+                             });
+                             
+                             if (visibleCount > 0) {
+                                 videoGrid.innerHTML = html;
+                                 resultCount.textContent = `${visibleCount} video bulundu`;
+                                 resultCount.classList.remove('hidden');
+                                 noResults.classList.add('hidden');
+                             } else {
+                                 videoGrid.innerHTML = '';
+                                 resultCount.classList.add('hidden');
+                                 noResults.classList.remove('hidden');
+                             }
                          }
                      }
                      
-                     searchInput.addEventListener('input', function() {
-                         clearTimeout(searchTimeout);
-                         searchTimeout = setTimeout(performSearch, 300);
-                     });
+                     // Her tuş vuruşunda anlık arama
+                     searchInput.addEventListener('input', performSearch);
                  });
 
                  // Bekleyen video sayısını güncelle (Super Admin için)
