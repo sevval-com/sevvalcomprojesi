@@ -23,6 +23,26 @@
             padding: 32px 0 48px;
             position: relative;
             overflow: hidden;
+            min-height: calc(100vh - 220px);
+        }
+
+        .drone-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 20px 16px;
+        }
+
+        .drone-page-header .title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .drone-page-header .subtitle {
+            font-size: 13px;
+            color: var(--muted);
         }
 
         .drone-grid {
@@ -60,14 +80,20 @@
             border-radius: 16px;
             padding: 14px;
             margin-bottom: 16px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            align-items: center;
         }
 
         .drone-summary .item {
             color: var(--ink);
             font-weight: 700;
+            background: #fff;
+            border: 1px solid #bae6fd;
+            border-radius: 999px;
+            padding: 8px 12px;
+            min-width: 160px;
         }
 
         .drone-summary .label {
@@ -172,6 +198,23 @@
         .btn-primary-drone:hover { transform: translateY(-1px); }
         .btn-primary-drone:disabled { opacity: 0.7; cursor: not-allowed; }
 
+        .btn-primary-drone.is-loading {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .btn-primary-drone.is-loading::after {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            display: inline-block;
+        }
+
         .btn-ghost {
             border: 1px solid var(--border);
             background: #fff;
@@ -185,6 +228,48 @@
             font-size: 12px;
             color: var(--muted);
             text-align: right;
+        }
+
+        .generate-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 9999;
+        }
+
+        .generate-modal.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .generate-modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            min-width: 280px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+        }
+
+        .generate-modal-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .generate-modal-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .description-readonly {
@@ -259,6 +344,8 @@
 
         @@media (max-width: 576px) {
             .drone-card { padding: 16px; }
+            .drone-page-header { flex-direction: column; align-items: flex-start; }
+            .drone-summary .item { min-width: 100%; }
         }
     </style>
 }
@@ -287,6 +374,12 @@
 
 <section class="drone-page">
     <div class="container">
+        <div class="drone-page-header">
+            <div>
+                <div class="title">Video Oluştur</div>
+                <div class="subtitle">Parsel bilgileriyle video üretimini başlatın.</div>
+            </div>
+        </div>
         <div class="drone-summary">
             <div class="item">
                 <span class="label">İl / İlçe</span>
@@ -444,7 +537,8 @@
             };
 
             const updateButtonState = () => {
-                const ready = state.logoReady && state.avatarReady && els.descInput.value.trim().length > 0;
+                const hasMeta = Boolean(meta.il && meta.ilce && meta.mahalle && meta.ada && meta.parsel);
+                const ready = hasMeta && state.logoReady && state.avatarReady && els.descInput.value.trim().length > 0;
                 els.generateBtn.disabled = !ready;
             };
 
@@ -452,6 +546,39 @@
                 if (els.metaLoc) els.metaLoc.textContent = meta.il && meta.ilce ? `${meta.il} / ${meta.ilce}` : '—';
                 if (els.metaMahalle) els.metaMahalle.textContent = meta.mahalle || '—';
                 if (els.metaAp) els.metaAp.textContent = (meta.ada && meta.parsel) ? `${meta.ada} / ${meta.parsel}` : '—';
+            };
+
+
+            const showSuccessModal = (title, subtitle) => {
+                const existing = document.querySelector('.generate-modal');
+                if (existing) existing.remove();
+                const modal = document.createElement('div');
+                modal.className = 'generate-modal';
+                modal.innerHTML = `
+                    <div class="generate-modal-card">
+                        <div class="generate-modal-title">${title}</div>
+                        <div class="generate-modal-subtitle">${subtitle}</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                requestAnimationFrame(() => modal.classList.add('is-visible'));
+                return modal;
+            };
+
+            const showLoadingModal = (title, subtitle) => {
+                const existing = document.querySelector('.generate-modal');
+                if (existing) existing.remove();
+                const modal = document.createElement('div');
+                modal.className = 'generate-modal';
+                modal.innerHTML = `
+                    <div class="generate-modal-card">
+                        <div class="generate-modal-title">${title}</div>
+                        <div class="generate-modal-subtitle">${subtitle}</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                requestAnimationFrame(() => modal.classList.add('is-visible'));
+                return modal;
             };
 
             const areRequiredElsReady = () => {
@@ -512,6 +639,12 @@
 
             els.generateBtn.addEventListener('click', () => {
                 if (els.generateBtn.disabled) return;
+                if (!meta.il || !meta.ilce || !meta.mahalle || !meta.ada || !meta.parsel) {
+                    if (els.generateStatus) {
+                        els.generateStatus.textContent = 'Parsel bilgileri eksik. Parsel sorgu veya kayıtlı parsellerden gelmelisiniz.';
+                    }
+                    return;
+                }
                 if (!isAuthenticated) {
                     if (els.generateStatus) {
                         els.generateStatus.textContent = 'Devam etmek icin giris yapmalisiniz. Yonlendiriliyorsunuz...';
@@ -538,21 +671,30 @@
 
                 els.generateBtn.disabled = true;
                 if (els.generateStatus) els.generateStatus.textContent = 'Video isteği gönderiliyor...';
+                const loadingModal = showLoadingModal('Video oluşturuluyor', 'Lütfen bekleyin...');
 
                 fetch('/api/drone/create', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include'
                 })
                     .then((res) => {
                         if (!res.ok) throw new Error('İstek başarısız.');
                         return res.json().catch(() => ({}));
                     })
-                    .then(() => {
+                    .then((payload) => {
                         if (els.generateStatus) els.generateStatus.textContent = 'İstek alındı. Video oluşturma başlatıldı.';
+                        if (loadingModal) loadingModal.remove();
+                        const videoId = payload?.videoId;
+                        const redirectUrl = videoId
+                            ? `/Drone/ArsaVideolarim?videoId=${encodeURIComponent(videoId)}`
+                            : '/Drone/ArsaVideolarim';
+                        window.location.href = redirectUrl;
                     })
                     .catch((err) => {
                         console.error('Drone video isteği başarısız', err);
                         if (els.generateStatus) els.generateStatus.textContent = 'İstek gönderilemedi. Lütfen tekrar deneyin.';
+                        if (loadingModal) loadingModal.remove();
                     })
                     .finally(() => {
                         updateButtonState();
@@ -563,6 +705,11 @@
             updateMetaView();
             updateDescCount();
             updateButtonState();
+            if (!meta.il || !meta.ilce || !meta.mahalle || !meta.ada || !meta.parsel) {
+                if (els.generateStatus) {
+                    els.generateStatus.textContent = 'Parsel bilgisi bulunamadı. Parsel sorgu veya kayıtlı parsellerden gelmelisiniz.';
+                }
+            }
         });
     </script>
 }

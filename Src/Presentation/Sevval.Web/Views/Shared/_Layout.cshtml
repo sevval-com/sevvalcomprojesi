@@ -836,6 +836,12 @@
                                 <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                                 
                                 <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
+                                <li>
+                                    <span style="position: relative; display: inline-block;">
+                                        <span style="position: absolute; top: -10px; left: -10px; background-color: #28a745; color: white; font-size: 10px; font-weight: bold; padding: 3px 6px; border-radius: 4px; transform: rotate(-12deg); z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Yeni</span>
+                                        <a href="@Url.Action("Index", "Drone")">Şevval Drone</a>
+                                    </span>
+                                </li>
                                 <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
                                 @if (User.Identity.IsAuthenticated &&
                                (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
@@ -1250,23 +1256,33 @@
     </script>
 
     <script>
+        const girisButon = document.getElementById('giris-buton');
+        const popupGiris = document.getElementById('popup-giris');
+        const pencereKapat = document.getElementById('pencere-kapat');
+
         // Giriş Yap butonuna tıklandığında pop-up penceresini aç
-        document.getElementById('giris-buton').addEventListener('click', function (event) {
-            event.preventDefault();
-            document.getElementById('popup-giris').style.display = 'flex';
-        });
+        if (girisButon && popupGiris) {
+            girisButon.addEventListener('click', function (event) {
+                event.preventDefault();
+                popupGiris.style.display = 'flex';
+            });
+        }
 
         // Pop-up penceresinin dışında bir yere tıklandığında kapat
-        document.getElementById('popup-giris').addEventListener('click', function (event) {
-            if (event.target === this) {
-                this.style.display = 'none';
-            }
-        });
+        if (popupGiris) {
+            popupGiris.addEventListener('click', function (event) {
+                if (event.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        }
 
         // Kapatma butonuna tıklandığında pop-up penceresini kapat
-        document.getElementById('pencere-kapat').addEventListener('click', function () {
-            document.getElementById('popup-giris').style.display = 'none';
-        });
+        if (pencereKapat && popupGiris) {
+            pencereKapat.addEventListener('click', function () {
+                popupGiris.style.display = 'none';
+            });
+        }
         function toggleHamburgerMenu() {
             // Menü öğesinin görünür olup olmadığını kontrol et
             if (document.querySelector('.naav-linkss')) {
@@ -1283,4 +1299,3 @@
 
 </body>
 </html>
-

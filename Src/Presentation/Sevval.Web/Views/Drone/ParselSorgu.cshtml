@@ -1,8 +1,10 @@
 @{
     ViewData["Title"] = "Parsel Sorgulama";
+    ViewData["DroneTab"] = "ParselSorgu";
 }
 
 @section style {
+    <link rel="stylesheet" href="~/css/drone.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <style>
         :root {
@@ -156,17 +158,22 @@
         }
 
         .parsel-shell {
-            background: linear-gradient(180deg, #0f5bbf, #0ea5e9);
+            background: var(--drone-shell);
             padding: 32px 0 64px;
-            margin-top: -18px;
+            margin-top: 0;
         }
 
         .parsel-shell .container {
-            max-width: 1320px;
+            max-width: 1120px;
             display: flex;
+            flex-direction: column;
             justify-content: flex-start;
-            padding-left: 24px;
-            padding-right: 24px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .parsel-shell .drone-header {
+            margin-bottom: 8px;
         }
 
         .surface {
@@ -210,6 +217,98 @@
             border: 1px solid var(--parsel-border);
             font-weight: 700;
             color: var(--parsel-ink);
+        }
+
+        .parsel-toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .parsel-toast.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .parsel-toast .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+        }
+
+        .parsel-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .parsel-modal.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .parsel-modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .parsel-modal-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .parsel-modal-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .btn-ghost.is-loading,
+        .btn-primary-parsel.is-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .btn-ghost.is-loading::after,
+        .btn-primary-parsel.is-loading::after {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .form-grid {
@@ -437,6 +536,13 @@
             font-size: 14px;
         }
 
+        .map-actions .btn-primary-parsel,
+        .map-actions .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         @@media (max-width: 768px) {
             .parsel-hero { padding: 46px 0 36px; }
             .status-row { flex-direction: column; align-items: flex-start; }
@@ -447,6 +553,13 @@
 
 <section class="parsel-shell">
     <div class="container">
+        <div class="drone-header-row">
+            <div class="drone-header">
+                <div class="drone-title">Parsel Sorgula</div>
+                <div class="drone-subtitle">Ada/parsel bazlı arama yapın, hızlıca drone video oluşturun.</div>
+            </div>
+            @await Html.PartialAsync("_DroneTabs")
+        </div>
         <div class="parsel-layout">
             <div class="d-flex justify-content-center" id="form-panel">
                 <div class="surface">
@@ -503,6 +616,9 @@
                     <div class="section-head">
                         <div class="map-actions">
                             <button type="button" class="btn-ghost" id="yeni-sorgu-btn" style="display:none;">Yeni sorgu</button>
+                            <button type="button" class="btn-ghost" id="save-btn" style="display:none;">
+                                <i class="fa-regular fa-bookmark me-2"> </i>Parseli Kaydet
+                            </button>
                             <button type="button" class="btn-primary-parsel" id="video-btn" style="display:none;">
                                 <i class="fa-solid fa-video me-2"></i> Video Oluştur
                             </button>
@@ -552,8 +668,14 @@
                 formPanel: document.getElementById('form-panel'),
                 shell: document.querySelector('.parsel-shell'),
                 yeniSorgu: document.getElementById('yeni-sorgu-btn'),
-                videoBtn: document.getElementById('video-btn')
+                videoBtn: document.getElementById('video-btn'),
+                saveBtn: document.getElementById('save-btn')
             };
+
+            if (!els.form || !els.il || !els.ilce || !els.mahalle) {
+                console.warn('Parsel sorgu form elemanları bulunamadı.');
+                return;
+            }
 
             const state = {
                 tkgmUrl: '',
@@ -564,6 +686,12 @@
                     ada: '',
                     parsel: ''
                 },
+                parcelMeta: {
+                    alan: null,
+                    nitelik: '',
+                    mevkii: ''
+                },
+                coordinates: [],
                 selection: {
                     il: null,
                     ilce: null,
@@ -579,6 +707,36 @@
                 if (!els.status) return;
                 els.status.textContent = text;
                 els.status.dataset.tone = tone;
+            };
+
+            const showToast = (message) => {
+                const existing = document.querySelector('.parsel-toast');
+                if (existing) existing.remove();
+                const toast = document.createElement('div');
+                toast.className = 'parsel-toast';
+                toast.innerHTML = `<span class="dot"></span><span>${message}</span>`;
+                document.body.appendChild(toast);
+                requestAnimationFrame(() => toast.classList.add('is-visible'));
+                setTimeout(() => {
+                    toast.classList.remove('is-visible');
+                    setTimeout(() => toast.remove(), 200);
+                }, 2000);
+            };
+
+            const showModal = (title, subtitle) => {
+                const existing = document.querySelector('.parsel-modal');
+                if (existing) existing.remove();
+                const modal = document.createElement('div');
+                modal.className = 'parsel-modal';
+                modal.innerHTML = `
+                    <div class="parsel-modal-card">
+                        <div class="parsel-modal-title">${title}</div>
+                        <div class="parsel-modal-subtitle">${subtitle}</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                requestAnimationFrame(() => modal.classList.add('is-visible'));
+                return modal;
             };
 
             const setButtonLoading = (isLoading) => {
@@ -597,11 +755,25 @@
             const ensureMap = async () => {
                 await ensureLeaflet();
                 if (!state.map) {
-                    state.map = L.map('parsel-map');
+                    state.map = L.map('parsel-map', {
+                        zoomControl: false,
+                        dragging: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false,
+                        boxZoom: false,
+                        keyboard: false,
+                        tap: false,
+                        touchZoom: false,
+                        attributionControl: false
+                    });
                     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                         maxZoom: 19,
-                        attribution: 'Tiles © Powered by EmlakCozum.com'
+                        attribution: ''
                     }).addTo(state.map);
+                    L.control.attribution({
+                        position: 'bottomleft',
+                        prefix: false
+                    }).addTo(state.map).addAttribution('<span style="color:#ffd200;font-weight:600;">Powered by emlakcozum.com</span>');
                     state.map.setView([39.0, 35.0], 6);
                 }
                 els.mapWrap?.classList.add('is-visible');
@@ -655,6 +827,22 @@
                     if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
                 }
                 return '';
+            };
+
+            const extractParcelMeta = (payload) => {
+                const base = payload?.properties
+                    || payload?.feature?.properties
+                    || payload?.features?.[0]?.properties
+                    || payload?.data?.properties
+                    || payload?.data?.features?.[0]?.properties
+                    || {};
+                const alanRaw = pickProp(base, ['alan', 'Alan', 'alanMetrekare', 'alan_m2', 'm2', 'M2', 'area', 'Area']);
+                const alan = alanRaw ? Number(alanRaw) : null;
+                return {
+                    alan: Number.isFinite(alan) ? alan : null,
+                    nitelik: pickProp(base, ['nitelik', 'Nitelik', 'vasif', 'Vasif', 'niteligi']),
+                    mevkii: pickProp(base, ['mevkii', 'Mevkii', 'mevki', 'Mevki', 'mevkiiAdi'])
+                };
             };
 
             const setSelectLoading = (selectEl, placeholder) => {
@@ -803,12 +991,18 @@
                         setText(els.polygonState, 'Polygon alınamadı');
                         return;
                     }
+                    state.parcelMeta = extractParcelMeta(payload);
+                    state.coordinates = coords.map(([lng, lat]) => ({
+                        latitude: Number(lat),
+                        longitude: Number(lng)
+                    }));
                     const latlngs = coords.map(([lng, lat]) => [lat, lng]);
                     if (state.polygonLayer) {
                         state.map.removeLayer(state.polygonLayer);
                     }
                     state.polygonLayer = L.polygon(latlngs, { color: '#2563eb', weight: 3, fillOpacity: 0.35 }).addTo(state.map);
-                    state.map.fitBounds(state.polygonLayer.getBounds(), { padding: [12, 12] });
+                    state.map.fitBounds(state.polygonLayer.getBounds(), { padding: [32, 32] });
+                    state.map.zoomOut(1);
                     setTimeout(() => state.map?.invalidateSize(), 80);
                     setText(els.polygonState, 'Polygon çizildi');
                     setText(els.mapState, 'Harita güncel');
@@ -848,6 +1042,8 @@
                 }
 
                 state.lastQuery = { ada, parsel };
+                state.parcelMeta = { alan: null, nitelik: '', mevkii: '' };
+                state.coordinates = [];
                 state.tkgmUrl = buildTkgmUrl();
                 if (state.tkgmUrl) {
                     if (els.link) {
@@ -865,6 +1061,7 @@
                 els.result.classList.add('d-none');
                 await ensureMap();
                 if (els.videoBtn) els.videoBtn.style.display = 'none';
+                if (els.saveBtn) els.saveBtn.style.display = 'none';
                 setButtonLoading(true);
 
                 try {
@@ -875,6 +1072,7 @@
                     setText(els.lastQuery, `${ada} / ${parsel}`);
                     await renderPolygon(data);
                     if (els.videoBtn) els.videoBtn.style.display = 'inline-flex';
+                    if (els.saveBtn) els.saveBtn.style.display = 'inline-flex';
                 } catch (err) {
                     console.error('Polygon alınamadı', err);
                     setStatus('Polygon alınamadı.', 'error');
@@ -894,6 +1092,8 @@
                 els.resetBtn.addEventListener('click', () => {
                     els.form.reset();
                     state.selection = { il: null, ilce: null, mahalle: null };
+                    state.parcelMeta = { alan: null, nitelik: '', mevkii: '' };
+                    state.coordinates = [];
                     els.mahalleId.value = '';
                     state.tkgmUrl = '';
                     if (els.link) els.link.style.display = 'none';
@@ -904,6 +1104,7 @@
                     setText(els.mapState, 'Harita temizlendi');
                     els.mapWrap?.classList.add('is-visible');
                     if (els.videoBtn) els.videoBtn.style.display = 'none';
+                    if (els.saveBtn) els.saveBtn.style.display = 'none';
                     if (state.map && state.polygonLayer) {
                         state.map.removeLayer(state.polygonLayer);
                         state.polygonLayer = null;
@@ -915,12 +1116,15 @@
                 els.yeniSorgu.addEventListener('click', () => {
                     els.form?.reset();
                     state.selection = { il: null, ilce: null, mahalle: null };
+                    state.parcelMeta = { alan: null, nitelik: '', mevkii: '' };
+                    state.coordinates = [];
                     setSummary();
                     setText(els.polygonState, 'Polygon bekleniyor');
                     setText(els.mapState, 'Harita temizlendi');
                     if (els.link) els.link.style.display = 'none';
                     if (els.tkgmOpen) els.tkgmOpen.disabled = true;
                     if (els.videoBtn) els.videoBtn.style.display = 'none';
+                    if (els.saveBtn) els.saveBtn.style.display = 'none';
                     if (state.map && state.polygonLayer) {
                         state.map.removeLayer(state.polygonLayer);
                         state.polygonLayer = null;
@@ -935,6 +1139,57 @@
                     els.rawToggle.innerHTML = isHidden
                         ? '<i class="fa-regular fa-eye-slash me-2"></i>JSON çıktısını gizle'
                         : '<i class="fa-regular fa-file-code me-2"></i>JSON çıktısını göster';
+                });
+            }
+
+            if (els.saveBtn) {
+                els.saveBtn.addEventListener('click', async () => {
+                    const ada = state.lastQuery.ada || els.ada?.value.trim();
+                    const parsel = state.lastQuery.parsel || els.parsel?.value.trim();
+                    if (!state.selection.il || !state.selection.ilce || !state.selection.mahalle || !ada || !parsel) {
+                        setStatus('Lütfen il/ilçe/mahalle ile ada-parsel seçin.', 'error');
+                        return;
+                    }
+
+                    const payload = {
+                        il: state.selection.il?.name,
+                        ilce: state.selection.ilce?.name,
+                        mahalle: state.selection.mahalle?.name,
+                        mevkii: state.parcelMeta.mevkii || '',
+                        ada,
+                        parsel,
+                        nitelik: state.parcelMeta.nitelik || '',
+                        alan: state.parcelMeta.alan,
+                        coordinates: state.coordinates || []
+                    };
+
+                    try {
+                        els.saveBtn.disabled = true;
+                        els.saveBtn.classList.add('is-loading');
+                        setStatus('Parsel kaydediliyor...', 'info');
+                        const response = await fetch('/api/drone/save-parcel', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await response.json().catch(() => null);
+                        if (!response.ok || !data?.success) {
+                            setStatus('Parsel kaydedilemedi.', 'error');
+                            return;
+                        }
+                        setStatus('Parsel kaydedildi.', 'success');
+                        const modal = showModal('Parsel kaydedildi', 'Kayıtlı parseller sayfasına yönlendiriliyorsunuz.');
+                        setTimeout(() => {
+                            if (modal) modal.remove();
+                            window.location.href = '/Drone/KayitliParseller';
+                        }, 1200);
+                    } catch (err) {
+                        console.error('Parsel kaydetme hatası', err);
+                        setStatus('Parsel kaydedilemedi.', 'error');
+                    } finally {
+                        els.saveBtn.classList.remove('is-loading');
+                        els.saveBtn.disabled = false;
+                    }
                 });
             }
 
