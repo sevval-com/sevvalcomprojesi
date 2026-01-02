@@ -86,6 +86,7 @@ namespace sevvalemlak.Dto
         // Haftanın günleri
         public List<string> WeekDaysLabels { get; set; } // Haftanın günleri için
         public List<IlanModel> RandomIlanlar { get; internal set; }
+        public List<PhotoModel> RandomIlanFotograflari { get; set; } // Rastgele ilanların fotoğrafları (ayrı tutulmalı)
         // Yeni eklenen firma bilgileri
         public string CompanyLocation { get; set; }
         public int CompanyTotalIlanCount { get; set; }
