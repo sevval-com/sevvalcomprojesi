@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Sevval Drone";
+    ViewData["DroneTab"] = "Index";
+}
+
+@section style {
+    <link rel="stylesheet" href="~/css/drone.css" />
+}
+
+<section class="drone-shell">
+    <div class="drone-container">
+        <div class="drone-header-row">
+            <div class="drone-header">
+                <div class="drone-title">Sevval Drone</div>
+                <div class="drone-subtitle">Parsel sorgulama, kayıtlı parselleriniz ve arsa videolarınız tek panelde.</div>
+            </div>
+            @await Html.PartialAsync("_DroneTabs")
+        </div>
+
+        <div class="drone-grid">
+            <div class="drone-card">
+                <div class="drone-card-title">Parsel Sorgula</div>
+                <div class="drone-meta">Yeni parsel araması yapın ve hızlıca drone video oluşturun.</div>
+                <div>
+                    <a class="drone-button" href="@Url.Action("ParselSorgu", "Drone")">Parsel Sorgula</a>
+                </div>
+            </div>
+            <div class="drone-card">
+                <div class="drone-card-title">Kayıtlı Parseller</div>
+                <div class="drone-meta">Kaydettiğiniz parselleri görüntüleyin ve tek tıkla video üretin.</div>
+                <div>
+                    <a class="drone-button" href="@Url.Action("KayitliParseller", "Drone")">Parselleri Gör</a>
+                </div>
+            </div>
+            <div class="drone-card">
+                <div class="drone-card-title">Arsa Videolarım</div>
+                <div class="drone-meta">Oluşturulan videolarınızı takip edin ve indirin.</div>
+                <div>
+                    <a class="drone-button" href="@Url.Action("ArsaVideolarim", "Drone")">Videoları Gör</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
