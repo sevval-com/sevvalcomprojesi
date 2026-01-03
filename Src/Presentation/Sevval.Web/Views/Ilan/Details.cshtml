@@ -964,7 +964,8 @@
                                     <div class="ilan-image">
                                         @if (p != null && p.Count > 0)
                                         {
-                                            <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                            var imgUrl = p[0].StartsWith("http") ? p[0] : $"https://www.sevval.com/{p[0]}";
+                                            <img src="@imgUrl" alt="İlan Fotoğrafı" class="panel-image">
                                         }
                                         else
                                         {
@@ -985,7 +986,8 @@
                                 <div class="ilan-image inactive-image">
                                     @if (p != null && p.Count > 0)
                                     {
-                                        <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                        var imgUrl = p[0].StartsWith("http") ? p[0] : $"https://www.sevval.com/{p[0]}";
+                                        <img src="@imgUrl" alt="İlan Fotoğrafı" class="panel-image">
                                     }
                                     else
                                     {

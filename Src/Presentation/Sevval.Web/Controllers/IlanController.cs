@@ -260,222 +260,127 @@ public class IlanController : Controller
 
     public async Task<IActionResult> Panel()
     {
-        var userEmail = User.Identity.Name;
-        if (string.IsNullOrEmpty(userEmail))
+        try
         {
-            // Kullanıcı oturum açmamışsa veya e-postası yoksa giriş sayfasına yönlendir
-            return RedirectToAction("Login", "Account");
-        }
-
-        // 1. Kullanıcıyı getir
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-        if (user == null)
-        {
-            // Kullanıcı bulunamazsa giriş sayfasına yönlendir
-            return RedirectToAction("Login", "Account");
-        }
-
-        // 2. Aktif ilanları getir
-        var ilanlar = await _context.IlanBilgileri
-            .AsNoTracking()
-            .Where(i => i.Email == userEmail && i.Status == "active")
-            .ToListAsync();
-
-        // 3. Haftalık arama, favoriler ve görüntülenmeleri getir
-        var userWeeklySearch = await _context.HaftalikAramalar.FirstOrDefaultAsync(h => h.UserEmail == userEmail);
-        var haftalikBegeniler = await _context.HaftalikBegeniler.FirstOrDefaultAsync(h => h.UserEmail == userEmail);
-        var haftalikGoruntulenme = await _context.HaftalikGoruntulenmeler.FirstOrDefaultAsync(h => h.UserEmail == userEmail);
-
-        // Haftalık arama verilerini yoksa başlat
-        if (userWeeklySearch == null)
-        {
-            userWeeklySearch = new HaftalikArama
+            var userEmail = User.Identity?.Name;
+            if (string.IsNullOrEmpty(userEmail))
             {
-                UserEmail = userEmail,
-                Pazar = 0,
-                Pazartesi = 0,
-                Sali = 0,
-                Carsamba = 0,
-                Persembe = 0,
-                Cuma = 0,
-                Cumartesi = 0,
-                Toplam = 0,
-                LastResetDate = DateTime.Now // İlk oluşturulduğunda sıfırlama tarihini ayarla
-            };
-            _context.HaftalikAramalar.Add(userWeeklySearch);
-        }
-        else // Haftalık arama verisi varsa, haftalık sıfırlama kontrolü yap
-        {
-            // Haftanın ilk günü Pazartesi olarak kabul edelim
-            DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
-            DateTime startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (int)firstDayOfWeek);
-
-            // Eğer bugün haftanın ilk günü ise ve son sıfırlama bu haftadan önceyse sıfırla
-            if (DateTime.Today.DayOfWeek == firstDayOfWeek && userWeeklySearch.LastResetDate.Date < startOfWeek.Date)
-            {
-                userWeeklySearch.Pazar = 0;
-                userWeeklySearch.Pazartesi = 0;
-                userWeeklySearch.Sali = 0;
-                userWeeklySearch.Carsamba = 0;
-                userWeeklySearch.Persembe = 0;
-                userWeeklySearch.Cuma = 0;
-                userWeeklySearch.Cumartesi = 0;
-                userWeeklySearch.Toplam = 0;
-                userWeeklySearch.LastResetDate = DateTime.Now; // Sıfırlama tarihini güncelle
+                return RedirectToAction("Login", "Account");
             }
-        }
 
-        // Haftalık favori verilerini yoksa başlat
-        if (haftalikBegeniler == null)
-        {
-            haftalikBegeniler = new HaftalikBegeniler
+            // 1. Kullanıcıyı getir
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (user == null)
             {
-                UserEmail = userEmail,
-                Pazar = 0,
-                Pazartesi = 0,
-                Sali = 0,
-                Carsamba = 0,
-                Persembe = 0,
-                Cuma = 0,
-                Cumartesi = 0,
-                Toplam = 0
-            };
-            _context.HaftalikBegeniler.Add(haftalikBegeniler);
-        }
-
-        // Haftalık görüntülenme verilerini yoksa başlat
-        if (haftalikGoruntulenme == null)
-        {
-            haftalikGoruntulenme = new HaftalikGoruntulenme { UserEmail = userEmail };
-            _context.HaftalikGoruntulenmeler.Add(haftalikGoruntulenme);
-        }
-
-        // Haftalık görüntülenme değişimi için sözlük
-        var gunlukGoruntulenmeDegisimi = new Dictionary<int, int>
-        {
-            { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 },
-        };
-
-        // Görüntülenme sayıları üzerinden hesaplamalar
-        foreach (var ilan in ilanlar)
-        {
-            // GoruntulenmeTarihi boş değilse ve son 7 gün içindeyse işlenir
-            if (ilan.GoruntulenmeTarihi != DateTime.MinValue && ilan.GoruntulenmeTarihi.Date >= DateTime.Now.AddDays(-7).Date)
-            {
-                int gun = (int)ilan.GoruntulenmeTarihi.DayOfWeek;
-                gunlukGoruntulenmeDegisimi[gun] += ilan.GoruntulenmeSayisi; // Günlük görüntülenme sayısını artır
+                return RedirectToAction("Login", "Account");
             }
+
+            // 2. Aktif ilanları getir
+            var ilanlar = await _context.IlanBilgileri
+                .AsNoTracking()
+                .Where(i => i.Email == userEmail && i.Status == "active")
+                .ToListAsync();
+
+            // 3. Tüm ilanları getir (aktif/pasif sayımı için)
+            var tumIlanlar = await _context.IlanBilgileri
+                .AsNoTracking()
+                .Where(i => i.Email == userEmail)
+                .ToListAsync();
+
+            var activeCount = tumIlanlar.Count(i => i.Status == "active");
+            var inactiveCount = tumIlanlar.Count(i => i.Status != "active");
+
+            // Kategori sayımları
+            var konutCount = ilanlar.Count(i => i.Category == "Konut (Yaşam Alanı)");
+            var isYeriCount = ilanlar.Count(i => i.Category == "İş Yeri");
+            var arsaCount = ilanlar.Count(i => i.Category == "Arsa");
+            var tarlaCount = ilanlar.Count(i => i.Category == "Tarla");
+            var bahceCount = ilanlar.Count(i => i.Category == "Bahçe");
+
+            var kategoriAdlari = new List<string> { "Konut (Yaşam Alanı)", "İş Yeri", "Turistik Tesis", "Arsa", "Bahçe", "Tarla" };
+            var kategoriVerileri = kategoriAdlari.Select(k => ilanlar.Count(i => i.Category == k)).ToList();
+
+            var konutDurumlari = new Dictionary<string, int>
+            {
+                { "Satılık", ilanlar.Count(i => i.KonutDurumu == "Satılık") },
+                { "Kiralık", ilanlar.Count(i => i.KonutDurumu == "Kiralık") },
+                { "Devren Satılık", ilanlar.Count(i => i.KonutDurumu == "Devren Satılık") },
+                { "Devren Kiralık", ilanlar.Count(i => i.KonutDurumu == "Devren Kiralık") }
+            };
+
+            // Haftalık görüntülenme verilerini çek
+            var haftalikGoruntulenme = await _context.HaftalikGoruntulenmeler
+                .AsNoTracking()
+                .FirstOrDefaultAsync(h => h.UserEmail == userEmail);
+            
+            var weeklyViews = new List<int> { 0, 0, 0, 0, 0, 0, 0 };
+            var toplamGoruntulenme = 0;
+            
+            if (haftalikGoruntulenme != null)
+            {
+                weeklyViews = new List<int>
+                {
+                    haftalikGoruntulenme.Pazartesi,
+                    haftalikGoruntulenme.Sali,
+                    haftalikGoruntulenme.Carsamba,
+                    haftalikGoruntulenme.Persembe,
+                    haftalikGoruntulenme.Cuma,
+                    haftalikGoruntulenme.Cumartesi,
+                    haftalikGoruntulenme.Pazar
+                };
+                toplamGoruntulenme = haftalikGoruntulenme.Toplam;
+            }
+
+            // Basit model oluştur
+            var tumIlanlarDTO = new TumIlanlarDTO
+            {
+                WeeklyFavorites = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                ToplamFavori = 0,
+                WeeklySearches = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeeklyViews = weeklyViews,
+                WeekDays = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" },
+                ToplamGoruntulenme = toplamGoruntulenme,
+                ToplamArama = 0,
+                EnCokGoruntulenenIlanlar = ilanlar.OrderByDescending(i => i.GoruntulenmeSayisi).Take(3).ToList(),
+                IlanSayisi = ilanlar.Count,
+                TotalIlanCount = tumIlanlar.Count,
+                ActiveCount = activeCount,
+                InactiveCount = inactiveCount,
+                KonutIlanlariCount = konutCount,
+                IsYeriIlanlariCount = isYeriCount,
+                ArsaIlanlariCount = arsaCount,
+                TarlaIlanlariCount = tarlaCount,
+                BahceIlanlariCount = bahceCount,
+                KonutDurumlari = konutDurumlari,
+                WeeklySearchData = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeekDaysLabels = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" },
+                KategoriAdlari = kategoriAdlari,
+                KategoriVerileri = kategoriVerileri,
+                TalepCount = 0
+            };
+
+            return View(tumIlanlarDTO);
         }
-
-        // Haftalık görüntülenme verilerini güncelle
-        haftalikGoruntulenme.Pazar = gunlukGoruntulenmeDegisimi[0];
-        haftalikGoruntulenme.Pazartesi = gunlukGoruntulenmeDegisimi[1];
-        haftalikGoruntulenme.Sali = gunlukGoruntulenmeDegisimi[2];
-        haftalikGoruntulenme.Carsamba = gunlukGoruntulenmeDegisimi[3];
-        haftalikGoruntulenme.Persembe = gunlukGoruntulenmeDegisimi[4];
-        haftalikGoruntulenme.Cuma = gunlukGoruntulenmeDegisimi[5];
-        haftalikGoruntulenme.Cumartesi = gunlukGoruntulenmeDegisimi[6];
-        haftalikGoruntulenme.Toplam = gunlukGoruntulenmeDegisimi.Values.Sum();
-        _context.HaftalikGoruntulenmeler.Update(haftalikGoruntulenme);
-
-        // Haftalık arama verilerini güncelle (Bu veriler direkt HaftalikAramalar tablosundan alınacak)
-        // userWeeklySearch zaten güncellenmiş durumda (UpdateTelefonAramaSayisi metodu tarafından) veya sıfırlanmış durumda.
-        _context.HaftalikAramalar.Update(userWeeklySearch);
-
-
-        // Değişiklikleri veritabanına kaydet
-        await _context.SaveChangesAsync();
-
-        // İlan durumlarına göre sayım (sadece "active" durumdaki ilanlar)
-        var konutDurumlari = new Dictionary<string, int>
+        catch (Exception ex)
         {
-            { "Satılık", ilanlar.Count(i => i.KonutDurumu == "Satılık") },
-            { "Kiralık", ilanlar.Count(i => i.KonutDurumu == "Kiralık") },
-            { "Devren Satılık", ilanlar.Count(i => i.KonutDurumu == "Devren Satılık") },
-            { "Devren Kiralık", ilanlar.Count(i => i.KonutDurumu == "Devren Kiralık") }
-        };
-
-        // Kategorilere göre ilan sayımları
-        var kategoriAdlari = new List<string>
-        {
-            "Konut (Yaşam Alanı)", "İş Yeri", "Turistik Tesis", "Arsa", "Bahçe", "Tarla"
-        };
-        var kategoriVerileri = kategoriAdlari
-            .Select(kategori => ilanlar.Count(i => i.Category == kategori))
-            .ToList();
-
-        // Kategori bazlı sayımlar
-        var konutCount = ilanlar.Count(i => i.Category == "Konut (Yaşam Alanı)");
-        var isYeriCount = ilanlar.Count(i => i.Category == "İş Yeri");
-        var arsaCount = ilanlar.Count(i => i.Category == "Arsa");
-        var tarlaCount = ilanlar.Count(i => i.Category == "Tarla");
-        var bahceCount = ilanlar.Count(i => i.Category == "Bahçe");
-
-        // Aktif/Pasif sayımları - tüm ilanları al (sadece active değil)
-        var tumIlanlar = await _context.IlanBilgileri
-            .AsNoTracking()
-            .Where(i => i.Email == userEmail)
-            .ToListAsync();
-        var activeCount = tumIlanlar.Count(i => i.Status == "active");
-        var inactiveCount = tumIlanlar.Count(i => i.Status != "active");
-
-        // Kullanıcının şehrini al
-        string userCity = user?.City;
-        int talepCount = 0;
-        // Kullanıcının şehri varsa, satış taleplerini kontrol et
-        if (!string.IsNullOrEmpty(userCity))
-        {
-            talepCount = await _context.SatisTalepleri.AsNoTracking()
-                .CountAsync(st => st.ResidentialCity == userCity || st.LandCity == userCity);
+            Console.WriteLine($"Panel Error: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            
+            var emptyModel = new TumIlanlarDTO
+            {
+                WeeklyFavorites = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeeklySearches = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeeklyViews = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeekDays = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" },
+                WeeklySearchData = new List<int> { 0, 0, 0, 0, 0, 0, 0 },
+                WeekDaysLabels = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" },
+                KategoriAdlari = new List<string> { "Konut", "İş Yeri", "Turistik Tesis", "Arsa", "Bahçe", "Tarla" },
+                KategoriVerileri = new List<int> { 0, 0, 0, 0, 0, 0 },
+                KonutDurumlari = new Dictionary<string, int>(),
+                EnCokGoruntulenenIlanlar = new List<IlanModel>()
+            };
+            return View(emptyModel);
         }
-
-        // Nihai veriyi DTO'ya aktar
-        var tumIlanlarDTO = new TumIlanlarDTO
-        {
-            WeeklyFavorites = new List<int> // haftalikBegeniler'den doldur
-            {
-                haftalikBegeniler.Pazar, haftalikBegeniler.Pazartesi, haftalikBegeniler.Sali,
-                haftalikBegeniler.Carsamba, haftalikBegeniler.Persembe, haftalikBegeniler.Cuma,
-                haftalikBegeniler.Cumartesi
-            },
-            ToplamFavori = haftalikBegeniler.Toplam,
-            WeeklySearches = new List<int> // userWeeklySearch'ten doldur
-            {
-                userWeeklySearch.Pazartesi, userWeeklySearch.Sali, userWeeklySearch.Carsamba, // Pazartesi ile başlat
-                userWeeklySearch.Persembe, userWeeklySearch.Cuma, userWeeklySearch.Cumartesi, userWeeklySearch.Pazar
-            },
-            WeeklyViews = new List<int> // haftalikGoruntulenme'den doldur
-            {
-                haftalikGoruntulenme.Pazar, haftalikGoruntulenme.Pazartesi, haftalikGoruntulenme.Sali,
-                haftalikGoruntulenme.Carsamba, haftalikGoruntulenme.Persembe, haftalikGoruntulenme.Cuma,
-                haftalikGoruntulenme.Cumartesi
-            },
-            WeekDays = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" }, // Pazartesi ile başlat
-            ToplamGoruntulenme = haftalikGoruntulenme.Toplam,
-            ToplamArama = userWeeklySearch.Toplam,
-            EnCokGoruntulenenIlanlar = ilanlar.OrderByDescending(i => i.GoruntulenmeSayisi).Take(3).ToList(),
-            IlanSayisi = ilanlar.Count,
-            TotalIlanCount = tumIlanlar.Count,
-            ActiveCount = activeCount,
-            InactiveCount = inactiveCount,
-            KonutIlanlariCount = konutCount,
-            IsYeriIlanlariCount = isYeriCount,
-            ArsaIlanlariCount = arsaCount,
-            TarlaIlanlariCount = tarlaCount,
-            BahceIlanlariCount = bahceCount,
-            KonutDurumlari = konutDurumlari,
-            // WeeklySearchData ve WeekDaysLabels doğrudan HaftalikAramalar'dan gelen verilerle eşleşecek
-            WeeklySearchData = new List<int> {
-                userWeeklySearch.Pazartesi, userWeeklySearch.Sali, userWeeklySearch.Carsamba,
-                userWeeklySearch.Persembe, userWeeklySearch.Cuma, userWeeklySearch.Cumartesi, userWeeklySearch.Pazar
-            },
-            WeekDaysLabels = new List<string> { "Pzt", "Salı", "Çrş", "Prş", "Cuma", "Cmt", "Pzr" },
-            KategoriAdlari = kategoriAdlari,
-            KategoriVerileri = kategoriVerileri,
-            TalepCount = talepCount
-        };
-
-        return View(tumIlanlarDTO);
     }
 
 
@@ -1249,7 +1154,13 @@ public class IlanController : Controller
             return NotFound(); // Kullanıcı bulunamazsa hata döndür
         }
 
-        if (user.IsConsultant == false) // Şirket sahibi ise
+        // Bireysel kullanıcılar için Panel sayfasına yönlendir
+        if (user.UserTypes == "Bireysel")
+        {
+            return RedirectToAction("Panel", "Ilan");
+        }
+
+        if (user.IsConsultant == false) // Kurumsal şirket sahibi ise
         {
             // Şirket sahibinin Detaylar sayfasına yönlendir
             return RedirectToAction("Details", "Ilan", new { id = user.Id });
@@ -1325,12 +1236,23 @@ public class IlanController : Controller
         return slug;
     }
 
-    // Mevcut ilansayfasi metodu (eski URL'ler için hala çalışır - geriye dönük uyumluluk)
+    // Eski URL'ler için geriye dönük uyumluluk
     [HttpGet("/Ilan/ilansayfasi/{id:int}")]
+    public async Task<IActionResult> IlansayfasiById(int id)
+    {
+        return await IlansayfasiInternal(id, null);
+    }
+    
     // Yeni SEO dostu rota (ana rota bu olacak)
     // Örn: /ilan/remax-dogudan-hazar-golunde-satilik-villa-19269
+    // Route: slug-id formatı, id mutlaka sayı olmalı
     [HttpGet("ilan/{slug}-{id:int}", Name = "IlanDetaySeo")]
-    public async Task<IActionResult> ilansayfasi(int id, string slug)
+    public async Task<IActionResult> ilansayfasi(string slug, int id)
+    {
+        return await IlansayfasiInternal(id, slug);
+    }
+    
+    private async Task<IActionResult> IlansayfasiInternal(int id, string slug)
     {
         var userEmail = User?.Identity?.Name;
 
@@ -1396,6 +1318,38 @@ public class IlanController : Controller
                 ilanToUpdate.GoruntulenmeSayisi++;
                 ilanToUpdate.GoruntulenmeTarihi = DateTime.Now;
                 _context.IlanBilgileri.Update(ilanToUpdate);
+                
+                // Haftalık görüntülenme kaydı - ilan sahibinin email'i ile
+                var ilanSahibiEmail = ilanToUpdate.Email;
+                if (!string.IsNullOrEmpty(ilanSahibiEmail))
+                {
+                    var haftalikKayit = await _context.HaftalikGoruntulenmeler
+                        .FirstOrDefaultAsync(h => h.UserEmail == ilanSahibiEmail);
+                    
+                    if (haftalikKayit == null)
+                    {
+                        haftalikKayit = new Sevval.Domain.Entities.HaftalikGoruntulenme
+                        {
+                            UserEmail = ilanSahibiEmail
+                        };
+                        _context.HaftalikGoruntulenmeler.Add(haftalikKayit);
+                    }
+                    
+                    // Bugünün gününe göre sayacı artır
+                    var bugun = DateTime.Now.DayOfWeek;
+                    switch (bugun)
+                    {
+                        case DayOfWeek.Monday: haftalikKayit.Pazartesi++; break;
+                        case DayOfWeek.Tuesday: haftalikKayit.Sali++; break;
+                        case DayOfWeek.Wednesday: haftalikKayit.Carsamba++; break;
+                        case DayOfWeek.Thursday: haftalikKayit.Persembe++; break;
+                        case DayOfWeek.Friday: haftalikKayit.Cuma++; break;
+                        case DayOfWeek.Saturday: haftalikKayit.Cumartesi++; break;
+                        case DayOfWeek.Sunday: haftalikKayit.Pazar++; break;
+                    }
+                    haftalikKayit.Toplam++;
+                }
+                
                 await _context.SaveChangesAsync();
 
                 // İlan sayısını view'daki modele de yansıt

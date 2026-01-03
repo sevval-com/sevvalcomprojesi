@@ -1028,3 +1028,86 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
         height: auto !important;
     }
 }
+
+
+/* ============================================
+   POST-AD CONTAINER VE FREE-TAG STİLLERİ
+   ============================================ */
+.post-ad-container {
+    position: relative;
+    display: inline-block;
+}
+
+.free-tag {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    transform: rotate(-10deg);
+    z-index: 1;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.post-ad {
+    display: inline-block;
+    background-color: #ffffff;
+    color: #007bff;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    border: 1px solid #007bff;
+    transition: 0.3s ease;
+}
+
+.post-ad:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Mobil - post-ad stilleri */
+@media (max-width: 991px) and (max-height: 999px) {
+    .post-ad-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        position: relative !important;
+        flex-shrink: 1 !important;
+    }
+    
+    .auth-buttoons .post-ad,
+    .auth-buttons .post-ad {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: auto !important;
+        height: 32px !important;
+        padding: 0 10px !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        background: white !important;
+        color: #009cfb !important;
+        border: none !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+    }
+    
+    .free-tag {
+        position: absolute !important;
+        top: -6px !important;
+        left: -4px !important;
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+        background-color: #28a745 !important;
+        color: white !important;
+        font-weight: bold !important;
+        border-radius: 3px !important;
+        transform: rotate(-12deg) !important;
+        z-index: 100 !important;
+    }
+}

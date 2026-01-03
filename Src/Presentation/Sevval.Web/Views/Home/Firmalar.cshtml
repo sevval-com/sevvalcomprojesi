@@ -10,7 +10,7 @@
     int totalPages = ViewBag.TotalPages ?? 1;
     bool hasPreviousPage = ViewBag.HasPreviousPage ?? false;
     bool hasNextPage = ViewBag.HasNextPage ?? false;
-    int pageSize = ViewBag.PageSize ?? 20;
+    int pageSize = ViewBag.PageSize ?? 24;
     string currentSearch = ViewBag.CurrentSearch as string;
     string currentProvince = ViewBag.CurrentProvince as string;
     string currentDistrict = ViewBag.CurrentDistrict as string;
@@ -136,15 +136,15 @@
         animation: shimmer 4s linear infinite, fadeInDown 0.8s ease-out;
     }
 
-    /* === KONTROL PANELİ (YENİ YERLEŞİM) === */
+    /* === KONTROL PANELİ (YENİ YERLEŞİM - KÜÇÜK) === */
     .controls-form {
         background: var(--bg-white);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-lg);
-        padding: 24px;
+        padding: 10px 12px;
         box-shadow: var(--shadow-lg);
-        margin: 0 auto 32px auto;
-        max-width: 100%;
+        margin: 0 auto 20px auto;
+        max-width: 700px;
         width: 100%;
         box-sizing: border-box;
         
@@ -153,33 +153,32 @@
         animation-fill-mode: backwards;
     }
     
-    /* Filtreler (ÜST SIRA - AYNI SATIRDA) */
+    /* Filtreler (ALT SIRA - KÜÇÜK) */
     .filter-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 6px;
         align-items: flex-end;
     }
 
     .filter-group {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
         flex: 1;
-        min-width: 150px;
+        min-width: 100px;
     }
 
     .filter-group label {
         font-weight: 600;
         color: var(--text-dark);
-        font-size: 12px;
+        font-size: 10px;
     }
 
     .filter-select {
-        height: 36px;
-        padding: 0 12px;
-        font-size: 13px;
+        height: 26px;
+        padding: 0 8px;
+        font-size: 11px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         background-color: var(--bg-white);
@@ -188,8 +187,8 @@
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234B5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 16px 16px;
+        background-position: right 6px center;
+        background-size: 10px 10px;
         cursor: pointer;
         width: 100%;
     }
@@ -203,33 +202,39 @@
     /* Buton Grubu Inline (Filtrele/Temizle aynı satırda, kutularla aynı hizada) */
     .button-group-inline {
         display: flex;
-        gap: 8px;
+        gap: 4px;
         flex: 1;
-        min-width: 150px;
+        min-width: 100px;
         align-items: flex-end;
-        padding-top: 20px; /* Label yüksekliği kadar boşluk bırak */
+        padding-top: 0;
+        margin-bottom: 14px;
     }
     
     .button-group-inline .btn {
-        height: 36px;
-        padding: 0 16px;
-        font-size: 14px;
+        height: 26px;
+        padding: 0 10px;
+        font-size: 11px;
         flex: 1;
-        margin-bottom: 14px;
+        margin-bottom: 0;
+    }
+    
+    /* Temizle butonu - filtreleme yapılmadığında gizle */
+    .btn-clear-hidden {
+        display: none !important;
     }
 
-    /* Arama Çubuğu (ORTA SIRA) */
+    /* Arama Çubuğu (ÜST SIRA - KÜÇÜK) */
     .search-row {
         display: flex;
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
 
     .search-input {
         flex-grow: 1;
-        height: 48px;
-        padding: 0 16px;
-        font-size: 16px;
+        height: 28px;
+        padding: 0 10px;
+        font-size: 12px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md) 0 0 var(--radius-md);
         transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
@@ -248,20 +253,20 @@
     .search-input::placeholder { color: var(--text-light); opacity: 0.8; }
 
     .search-btn {
-    height: 48px;
-    padding: 0 24px;
-    font-size: 16px;
-    font-weight: 600;
-    border: 1px solid var(--brand-primary);
-    background: var(--brand-primary);
-    color: var(--text-white);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
-    cursor: pointer;
-    transition: background-color var(--transition-fast);
-    margin-left: -1px;
-    margin-top: 6px;
-    z-index: 1;
-    box-shadow: var(--shadow-sm);
+        height: 28px;
+        padding: 0 12px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid var(--brand-primary);
+        background: var(--brand-primary);
+        color: var(--text-white);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+        margin-left: -1px;
+        margin-top: 4px;
+        z-index: 1;
+        box-shadow: var(--shadow-sm);
     }
 
     .search-btn:hover {
@@ -614,8 +619,7 @@
         }
         
         .controls-form {
-            width: 100%;
-            max-width: 100%;
+            max-width: 700px;
             margin: 0 auto 32px auto;
             box-sizing: border-box;
         }
@@ -671,7 +675,18 @@
     <!-- Arama ve Filtreleme Formu (YENİ YERLEŞİM) -->
     <form method="get" action="@Url.Action("Firmalar", "Home")" class="controls-form">
         
-        <!-- Filtreler (ÜST SIRA) -->
+        <!-- Arama Çubuğu (ÜST SIRA) -->
+        <div class="search-row">
+            <input type="text"
+                   name="search"
+                   value="@currentSearch"
+                   placeholder="Firmaları Arayın..."
+                   class="search-input"
+                   id="searchInput" />
+            <button type="submit" class="search-btn press-feedback">Ara</button>
+        </div>
+        
+        <!-- Filtreler (ALT SIRA) -->
         <div class="filter-row">
             <!-- İl Filtresi -->
             <div class="filter-group">
@@ -707,23 +722,18 @@
             
             <!-- Butonlar (Aynı satırda) -->
             <div class="button-group-inline">
+                @{
+                    bool hasActiveFilter = !string.IsNullOrEmpty(currentSearch) || 
+                                          !string.IsNullOrEmpty(currentProvince) || 
+                                          !string.IsNullOrEmpty(currentDistrict) || 
+                                          !string.IsNullOrEmpty(currentSortBy);
+                }
                 <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
-                   class="btn btn-secondary press-feedback">
+                   class="btn btn-secondary press-feedback @(hasActiveFilter ? "" : "btn-clear-hidden")">
                     Temizle
                 </a>
                 <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
             </div>
-        </div>
-        
-        <!-- Arama Çubuğu (ORTA SIRA) -->
-        <div class="search-row">
-            <input type="text"
-                   name="search"
-                   value="@currentSearch"
-                   placeholder="Firmaları Arayın..."
-                   class="search-input"
-                   id="searchInput" />
-            <button type="submit" class="search-btn press-feedback">Ara</button>
         </div>
 
         <!-- Gizli Alanlar (Form gönderimi için gerekli) -->

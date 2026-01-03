@@ -276,4 +276,37 @@
         initGirisPopup();
     }
 })();
+
+// Anlık ziyaretçi sayısını güncelle
+(function() {
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    
+    async function updateVisitorCount() {
+        const el = document.getElementById('active-visitors-navbar');
+        if (!el) return;
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 saniye timeout
+            
+            const response = await fetch('/api/Visitor/active', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) return;
+            const data = await response.json();
+            const activeVisitors = data.data?.activeVisitorCount || data.Data?.ActiveVisitorCount || data.activeVisitors || data.ActiveVisitors || 0;
+            el.textContent = formatNumber(activeVisitors);
+        } catch (e) { 
+            // Timeout veya hata durumunda sessizce geç
+        }
+    }
+    
+    // Sayfa yüklendiğinde hemen çağır
+    updateVisitorCount();
+    
+    // Her 30 saniyede bir güncelle
+    setInterval(updateVisitorCount, 30000);
+})();
 </script>

@@ -47,7 +47,10 @@ namespace Sevval.Api.Controllers
         {
             // Videoları doğrudan VideolarSayfasi tablosundan oku ve basit DTO'ya dönüştür
             // Sadece onaylanmış videoları getir
-            var query = _context.VideolarSayfasi.Where(v => v.ApprovalStatus == VideoApprovalStatus.Approved).AsQueryable();
+            var query = _context.VideolarSayfasi
+                .Include(v => v.YukleyenKullanici)
+                .Where(v => v.ApprovalStatus == VideoApprovalStatus.Approved)
+                .AsQueryable();
             if (!string.IsNullOrWhiteSpace(category))
             {
                 query = query.Where(v => v.Kategori == category);
@@ -67,7 +70,14 @@ namespace Sevval.Api.Controllers
                     v.IsYouTube,
                     v.Kategori,
                     v.YuklenmeTarihi,
-                    v.GoruntulenmeSayisi
+                    v.GoruntulenmeSayisi,
+                    v.BegeniSayisi,
+                    YukleyenKullanici = v.YukleyenKullanici != null ? new
+                    {
+                        v.YukleyenKullanici.FirstName,
+                        v.YukleyenKullanici.LastName,
+                        v.YukleyenKullanici.ProfilePicturePath
+                    } : null
                 })
                 .ToListAsync();
 
@@ -86,7 +96,16 @@ namespace Sevval.Api.Controllers
                 isActive = true,
                 createdDate = v.YuklenmeTarihi,
                 viewCount = v.GoruntulenmeSayisi,
-                duration = 0
+                likeCount = v.BegeniSayisi,
+                duration = 0,
+                yukleyenKullanici = v.YukleyenKullanici != null ? new
+                {
+                    firstName = v.YukleyenKullanici.FirstName ?? "Anonim",
+                    lastName = v.YukleyenKullanici.LastName ?? "",
+                    profilePicturePath = !string.IsNullOrWhiteSpace(v.YukleyenKullanici.ProfilePicturePath) 
+                        ? BuildAbsoluteUrl(baseUrl, v.YukleyenKullanici.ProfilePicturePath) 
+                        : null
+                } : new { firstName = "Anonim", lastName = "", profilePicturePath = (string?)null }
             }).ToList();
 
             return Ok(new

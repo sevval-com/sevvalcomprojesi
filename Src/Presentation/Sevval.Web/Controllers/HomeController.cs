@@ -104,17 +104,18 @@ public class HomeController : Controller
     public async Task<IActionResult> Firmalar(CompanySearchDto model)
     {
         if (model.Page < 1) model.Page = 1;
-        if (model.Size < 1) model.Size = 20;
+        if (model.Size < 1) model.Size = 24;
 
-        var response = await _companyClientService.GetCompanies(new GetCompaniesQueryRequest()
+        // Tüm firmaları çek (sayfalama olmadan) - sıralama için
+        var allCompaniesResponse = await _companyClientService.GetCompanies(new GetCompaniesQueryRequest()
         {
-            Page = model.Page,
-            Size = model.Size,
+            Page = 1,
+            Size = 10000, // Tüm firmaları al
             CompanyName = model.Search,
             Search = model.Search,
             Province = model.Province,
             District = model.District,
-            SortBy = model.SortBy,
+            SortBy = "", // Sıralama yapmadan al
             UserTypes = "Emlakçı",
             IsConsultant = "0",
             IsActive = "active"
@@ -123,20 +124,45 @@ public class HomeController : Controller
         var result = await _companyClientService.GetTotalConsultantCount(new GetTotalConsultantCountQueryRequest()
         , CancellationToken.None);
 
+        var allCompanies = allCompaniesResponse?.Data ?? new List<GetCompaniesQueryResponse>();
+
+        // Sıralama uygula
+        IEnumerable<GetCompaniesQueryResponse> sortedCompanies = model.SortBy switch
+        {
+            "company_asc" => allCompanies.OrderBy(c => c.CompanyName, StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)),
+            "company_desc" => allCompanies.OrderByDescending(c => c.CompanyName, StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)),
+            "announcement_asc" => allCompanies.OrderBy(c => c.TotalAnnouncement).ThenBy(c => c.CompanyName, StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)),
+            "announcement_desc" => allCompanies.OrderByDescending(c => c.TotalAnnouncement).ThenBy(c => c.CompanyName, StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)),
+            "date_asc" => allCompanies.OrderBy(c => c.RegistrationDate),
+            "date_desc" => allCompanies.OrderByDescending(c => c.RegistrationDate),
+            // Varsayılan: Önce ilan sayısına göre (çoktan aza), sonra tarihe göre (yeniden eskiye)
+            _ => allCompanies.OrderByDescending(c => c.TotalAnnouncement).ThenByDescending(c => c.RegistrationDate)
+        };
+
+        var sortedList = sortedCompanies.ToList();
+        var totalItems = sortedList.Count;
+        var totalPages = (int)Math.Ceiling((double)totalItems / model.Size);
+
+        // Sayfalama uygula
+        var pagedCompanies = sortedList
+            .Skip((model.Page - 1) * model.Size)
+            .Take(model.Size)
+            .ToList();
+
         ViewBag.CurrentPage = model.Page;
         ViewBag.PageSize = model.Size;
         ViewBag.CurrentSearch = model.Search;
         ViewBag.CurrentProvince = model.Province;
         ViewBag.CurrentDistrict = model.District;
         ViewBag.CurrentSortBy = model.SortBy;
-        ViewBag.TotalItems = response?.Meta?.Pagination?.TotalItem;
-        ViewBag.TotalPages = response?.Meta?.Pagination?.TotalPage;
+        ViewBag.TotalItems = totalItems;
+        ViewBag.TotalPages = totalPages;
         ViewBag.HasPreviousPage = model.Page > 1;
-        ViewBag.HasNextPage = model.Page < (response?.Meta?.Pagination?.TotalPage ?? 0);
-        ViewBag.TotalFirmCount = response?.Meta?.Pagination?.TotalItem ?? 0; ;
+        ViewBag.HasNextPage = model.Page < totalPages;
+        ViewBag.TotalFirmCount = totalItems;
         ViewBag.TotalUserCount = result?.Data?.TotalCount ?? 0;
 
-        model.Companies = response?.Data;
+        model.Companies = pagedCompanies;
 
         return View(model);
     }
