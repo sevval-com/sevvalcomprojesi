@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Net.Http.Json;
 using System.Collections.Generic;
+using System.IO;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Sevval.Domain.Entities;
@@ -13,6 +15,7 @@ public class DroneApiController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly ILogger<DroneApiController> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
+    private const long MaxUploadBytes = 5 * 1024 * 1024;
 
     public DroneApiController(
         IHttpClientFactory httpClientFactory,
@@ -32,6 +35,14 @@ public class DroneApiController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.Description) || string.IsNullOrWhiteSpace(request.Lang))
         {
             return BadRequest(new { success = false, message = "Eksik parametreler." });
+        }
+        if (request.Logo != null && request.Logo.Length > MaxUploadBytes)
+        {
+            return StatusCode(413, new { success = false, message = "Firma logosu 5MB üstü. Lütfen değiştirin." });
+        }
+        if (request.Avatar != null && request.Avatar.Length > MaxUploadBytes)
+        {
+            return StatusCode(413, new { success = false, message = "Danışman fotoğrafı 5MB üstü. Lütfen değiştirin." });
         }
 
         var baseUrl = _configuration["SevvalVideo:BaseUrl"];
@@ -86,6 +97,26 @@ public class DroneApiController : ControllerBase
         );
         var logoDataUrl = await ToDataUrlAsync(request.Logo);
         var avatarDataUrl = await ToDataUrlAsync(request.Avatar);
+        if (currentUser != null)
+        {
+            var (logoPath, avatarPath) = await ResolveUserMediaPathsAsync(currentUser);
+            if (logoDataUrl == null)
+            {
+                if (IsMediaTooLarge(logoPath))
+                {
+                    return StatusCode(413, new { success = false, message = "Firma logosu 5MB üstü. Lütfen değiştirin." });
+                }
+                logoDataUrl = await ToDataUrlFromPathAsync(logoPath);
+            }
+            if (avatarDataUrl == null)
+            {
+                if (IsMediaTooLarge(avatarPath))
+                {
+                    return StatusCode(413, new { success = false, message = "Danışman fotoğrafı 5MB üstü. Lütfen değiştirin." });
+                }
+                avatarDataUrl = await ToDataUrlFromPathAsync(avatarPath);
+            }
+        }
         var jobId = (string?)null;
         var parcelId = (string?)null;
         var preparedVideoId = (string?)null;
@@ -193,19 +224,29 @@ public class DroneApiController : ControllerBase
                 return StatusCode((int)dataResponse.StatusCode, new { success = false, message = "Video verisi olusturulamadi." });
             }
 
-            var requestUrl = $"{baseUrl.TrimEnd('/')}/api/video/process-video";
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            _ = Task.Run(async () =>
             {
-                Content = JsonContent.Create(payload)
-            };
-
-            var response = await client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead);
-            var responseBody = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Sevval video istegi basarisiz. Status: {Status} Body: {Body}", response.StatusCode, responseBody);
-                return StatusCode((int)response.StatusCode, new { success = false, message = "Video istegi basarisiz." });
-            }
+                try
+                {
+                    var requestUrl = $"{baseUrl.TrimEnd('/')}/api/video/process-video";
+                    using var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+                    {
+                        Content = JsonContent.Create(payload)
+                    };
+                    var backgroundClient = _httpClientFactory.CreateClient();
+                    backgroundClient.Timeout = TimeSpan.FromMinutes(15);
+                    var response = await backgroundClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning("Sevval video istegi basarisiz (async). Status: {Status} Body: {Body}", response.StatusCode, responseBody);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Sevval video istegi hatasi (async)");
+                }
+            });
 
             return Ok(new
             {
@@ -315,6 +356,30 @@ public class DroneApiController : ControllerBase
 
         var response = await client.GetAsync($"{dataApiBaseUrl.TrimEnd('/')}/sevvaldrone/api/videos");
         return await ForwardResponseAsync(response, "videos", new { success = true, items = Array.Empty<object>() });
+    }
+
+    [HttpGet("user-media")]
+    public async Task<IActionResult> GetUserMedia()
+    {
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            return Ok(new { logoUrl = (string?)null, avatarUrl = (string?)null });
+        }
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null)
+        {
+            return Ok(new { logoUrl = (string?)null, avatarUrl = (string?)null });
+        }
+
+        var (logoPath, avatarPath) = await ResolveUserMediaPathsAsync(currentUser);
+        return Ok(new
+        {
+            logoUrl = NormalizePublicUrl(logoPath),
+            avatarUrl = NormalizePublicUrl(avatarPath),
+            logoTooLarge = IsMediaTooLarge(logoPath),
+            avatarTooLarge = IsMediaTooLarge(avatarPath)
+        });
     }
 
 
@@ -457,5 +522,118 @@ public class DroneApiController : ControllerBase
         var base64 = Convert.ToBase64String(stream.ToArray());
         var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType;
         return $"data:{contentType};base64,{base64}";
+    }
+
+    private async Task<(string? LogoPath, string? AvatarPath)> ResolveUserMediaPathsAsync(ApplicationUser user)
+    {
+        var avatarPath = NormalizeMediaPath(user.ProfilePicturePath);
+        string? logoPath = null;
+
+        if (user.IsConsultant && !string.IsNullOrWhiteSpace(user.ConsultantCompanyId))
+        {
+            var companyUser = await _userManager.FindByIdAsync(user.ConsultantCompanyId);
+            logoPath = NormalizeMediaPath(companyUser?.ProfilePicturePath);
+        }
+
+        if (string.IsNullOrWhiteSpace(logoPath))
+        {
+            logoPath = NormalizeMediaPath(user.ProfilePicturePath);
+        }
+
+        return (logoPath, avatarPath);
+    }
+
+    private static string? NormalizeMediaPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        var trimmed = path.Trim();
+        return IsPlaceholderPath(trimmed) ? null : trimmed;
+    }
+
+    private static string? NormalizePublicUrl(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return path;
+        }
+        return path.StartsWith('/') ? path : $"/{path}";
+    }
+
+    private static bool IsPlaceholderPath(string path)
+    {
+        var lowered = path.ToLowerInvariant();
+        return lowered.Contains("bosprofifoto") ||
+               lowered.Contains("boşprofifoto") ||
+               lowered.Contains("kurumsalbosfoto") ||
+               lowered.Contains("default-profile") ||
+               lowered.Contains("defaultuser");
+    }
+
+    private static bool IsHttpUrl(string path)
+    {
+        return path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetLocalFullPath(string path)
+    {
+        var relativePath = path.StartsWith('/') ? path[1..] : path;
+        var webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        return Path.Combine(webRoot, relativePath.Replace("\\", "/").TrimStart('/'));
+    }
+
+    private static long? GetLocalFileSize(string path)
+    {
+        var fullPath = GetLocalFullPath(path);
+        if (!System.IO.File.Exists(fullPath)) return null;
+        return new FileInfo(fullPath).Length;
+    }
+
+    private static bool IsMediaTooLarge(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        if (IsHttpUrl(path)) return false;
+        var size = GetLocalFileSize(path);
+        return size.HasValue && size.Value > MaxUploadBytes;
+    }
+
+    private async Task<string?> ToDataUrlFromPathAsync(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+
+        if (IsHttpUrl(path))
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                using var response = await client.GetAsync(path);
+                if (!response.IsSuccessStatusCode) return null;
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                if (bytes.Length == 0) return null;
+                var responseContentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+                return $"data:{responseContentType};base64,{Convert.ToBase64String(bytes)}";
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        var fullPath = GetLocalFullPath(path);
+        var size = GetLocalFileSize(path);
+        if (size.HasValue && size.Value > MaxUploadBytes) return null;
+        if (!System.IO.File.Exists(fullPath)) return null;
+
+        var provider = new FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(fullPath, out var contentType))
+        {
+            contentType = "application/octet-stream";
+        }
+
+        var bytesLocal = await System.IO.File.ReadAllBytesAsync(fullPath);
+        if (bytesLocal.Length == 0) return null;
+        return $"data:{contentType};base64,{Convert.ToBase64String(bytesLocal)}";
     }
 }
