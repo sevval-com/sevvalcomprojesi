@@ -1,8 +1,6 @@
-using MediatR;
+namespace Sevval.Api.Dtos.Messaging;
 
-namespace Sevval.Application.Features.Messaging.Queries.GetConversationMessages;
-
-public class GetConversationMessagesQuery : IRequest<IReadOnlyList<GetConversationMessagesResult>>
+public class GetConversationMessagesRequestDto
 {
     public string UserId { get; set; } = string.Empty;
 

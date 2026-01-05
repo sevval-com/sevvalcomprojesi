@@ -1,6 +1,7 @@
 using MediatR;
 using Sevval.Application.Interfaces.Messaging;
 using Sevval.Domain.Messaging;
+using MessagingMessage = Sevval.Domain.Messaging.Message;
 
 namespace Sevval.Application.Features.Messaging.Queries.GetConversationMessages;
 
@@ -15,18 +16,17 @@ public class GetConversationMessagesQueryHandler : IRequestHandler<GetConversati
 
     public async Task<IReadOnlyList<GetConversationMessagesResult>> Handle(GetConversationMessagesQuery request, CancellationToken cancellationToken)
     {
-        var messages = await _messageReadRepository.GetConversationAsync(request.UserId, request.OtherUserId, cancellationToken);
+        var messages = await _messageReadRepository.GetConversationAsync(
+            request.UserId,
+            request.OtherUserId,
+            request.Page,
+            request.PageSize,
+            cancellationToken);
 
-        var ordered = messages
-            .OrderByDescending(m => m.CreatedOnUtc)
-            .ThenByDescending(m => m.Id)
-            .Select(Map)
-            .ToList();
-
-        return ordered;
+        return messages.Select(Map).ToList();
     }
 
-    private static GetConversationMessagesResult Map(Message message) => new()
+    private static GetConversationMessagesResult Map(MessagingMessage message) => new()
     {
         Id = message.Id,
         SenderId = message.SenderId,
