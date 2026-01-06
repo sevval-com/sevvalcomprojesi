@@ -513,3 +513,6 @@ add_deleted_accounts_table.sql
 add_document_fields.sql
 add_recovery_token.sql
 apply_video_approval_migration.sql
+
+# prevent accidental api push
+emlakdrone-api-main/
