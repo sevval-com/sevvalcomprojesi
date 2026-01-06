@@ -8,110 +8,167 @@
             --ink: #0f172a;
             --muted: #6b7280;
             --brand: #0ea5e9;
-            --brand-2: #2563eb;
-            --border: #e2e8f0;
+            --brand-2: #1d4ed8;
+            --line: #e5e7eb;
             --surface: #ffffff;
-            --bg: linear-gradient(135deg, #0c4da2, #0ea5e9);
-            --shell: #f8fafc;
-            --ring: rgba(14, 165, 233, 0.18);
-            --shadow: 0 18px 45px rgba(0, 9, 45, 0.16);
-            --font: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+            --wash: #f5f7fb;
+            --wash-2: #eef2f7;
+            --font: "Manrope", "Inter", system-ui, -apple-system, sans-serif;
         }
 
-        .drone-page {
-            background: var(--shell);
-            padding: 32px 0 48px;
+        .drone-create {
+            background: var(--wash);
+            padding: 56px 0 80px;
             position: relative;
             overflow: hidden;
             min-height: calc(100vh - 220px);
+            font-family: var(--font);
         }
 
-        .drone-page-header {
+        .drone-shell {
+            max-width: 1120px;
+            margin: 0 auto;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 0 20px 16px;
+            flex-direction: column;
+            gap: 22px;
         }
 
-        .drone-page-header .title {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--ink);
-        }
-
-        .drone-page-header .subtitle {
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        .drone-grid {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: 1fr;
+        .drone-create .container {
             padding-left: 20px;
             padding-right: 20px;
         }
 
-        @@media (min-width: 768px) {
-            .drone-grid { grid-template-columns: repeat(2, minmax(320px, 1fr)); }
+        .drone-create::before,
+        .drone-create::after {
+            content: "";
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(14, 165, 233, 0.18), transparent 60%);
+            filter: blur(2px);
+            opacity: 0.7;
+            pointer-events: none;
         }
 
-        @@media (min-width: 1200px) {
-            .drone-grid {
-                grid-template-columns: repeat(3, minmax(320px, 1fr));
-                padding-left: 40px;
-                padding-right: 40px;
-            }
-        }
+        .drone-create::before { top: -180px; left: -120px; }
+        .drone-create::after { bottom: -220px; right: -160px; }
 
-        .drone-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            box-shadow: var(--shadow);
-            padding: 20px;
-            height: 100%;
-        }
-
-        .drone-summary {
-            background: #e0f2fe;
-            border: 1px solid #bae6fd;
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 16px;
+        .drone-hero {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .drone-summary .item {
-            color: var(--ink);
+        .hero-copy .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 11px;
+            color: var(--brand-2);
             font-weight: 700;
-            background: #fff;
-            border: 1px solid #bae6fd;
-            border-radius: 999px;
-            padding: 8px 12px;
-            min-width: 160px;
         }
 
-        .drone-summary .label {
-            display: block;
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 4px;
-        }
-
-        .drone-card h5 {
+        .hero-copy h1 {
+            font-size: 30px;
             font-weight: 800;
             color: var(--ink);
             margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
-        .drone-card p {
+        .hero-copy p {
             color: var(--muted);
-            margin-bottom: 12px;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .meta-grid {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .meta-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.35);
+        }
+
+        .meta-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .meta-note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .drone-content {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: 1fr;
+        }
+
+        @@media (min-width: 768px) {
+            .drone-shell { gap: 28px; }
+            .drone-content { gap: 24px; }
+            .meta-grid { gap: 12px; }
+        }
+
+        @@media (min-width: 992px) {
+            .meta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .drone-hero {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 32px;
+            }
+
+            .drone-content {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .drone-panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 16px 32px -24px rgba(15, 23, 42, 0.4);
+        }
+
+        .drone-panel.panel-wide {
+            grid-column: 1 / -1;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .panel-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0;
         }
 
         .form-label {
@@ -122,13 +179,19 @@
 
         .form-control, .form-select, textarea {
             border-radius: 14px;
-            border: 1px solid var(--border);
-            min-height: 44px;
+            border: 1px solid var(--line);
+            min-height: 46px;
+            padding: 10px 12px;
+        }
+
+        .description-input {
+            width: 100%;
+            resize: none;
         }
 
         .form-control:focus, .form-select:focus, textarea:focus {
             border-color: var(--brand);
-            box-shadow: 0 0 0 3px var(--ring);
+            box-shadow: none;
             outline: none;
         }
 
@@ -139,30 +202,31 @@
         }
 
         .chip {
-            padding: 10px 14px;
-            border-radius: 10px;
-            background: #f8fafc;
-            border: 1px solid var(--border);
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             color: var(--ink);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
             font-weight: 700;
+            min-height: 48px;
+            box-shadow: 0 10px 18px -16px rgba(15, 23, 42, 0.45);
         }
 
         .chip.active {
-            background: rgba(14, 165, 233, 0.15);
-            border-color: var(--brand);
-            color: var(--brand-2);
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.18);
+            background: rgba(14, 165, 233, 0.12);
+            border-color: rgba(14, 165, 233, 0.7);
+            color: #0b5e9b;
         }
 
         .upload-box {
-            border: 1px dashed var(--border);
-            border-radius: 12px;
-            padding: 14px;
+            border: 1px dashed rgba(15, 23, 42, 0.16);
+            border-radius: 16px;
+            padding: 14px 16px;
             display: grid;
-            gap: 6px;
-            background: #f8fafc;
+            gap: 8px;
+            background: #f9fafb;
         }
 
         .upload-box input { display: none; }
@@ -171,28 +235,48 @@
             display: inline-flex;
             gap: 8px;
             align-items: center;
-            padding: 10px 12px;
-            border-radius: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
             background: #e0f2fe;
             color: #075985;
             font-weight: 700;
             cursor: pointer;
         }
 
+        .upload-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-preview img {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .upload-preview span {
+            font-size: 13px;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
         .btn-primary-drone {
             background: linear-gradient(90deg, var(--brand), var(--brand-2));
             color: #fff;
             border: none;
-            padding: 12px 18px;
-            border-radius: 14px;
+            padding: 14px 18px;
+            border-radius: 16px;
             font-weight: 800;
             display: inline-flex;
             align-items: center;
             gap: 10px;
             width: 100%;
             justify-content: center;
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.26);
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            transition: transform 0.12s ease;
         }
 
         .btn-primary-drone:hover { transform: translateY(-1px); }
@@ -215,13 +299,9 @@
             display: inline-block;
         }
 
-        .btn-ghost {
-            border: 1px solid var(--border);
-            background: #fff;
-            color: var(--ink);
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-weight: 700;
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
         }
 
         .char-count {
@@ -233,7 +313,7 @@
         .generate-modal {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(15, 23, 42, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -251,10 +331,10 @@
         .generate-modal-card {
             background: #fff;
             border-radius: 16px;
-            padding: 20px 24px;
+            padding: 22px 24px;
             min-width: 280px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+            border: 1px solid var(--line);
         }
 
         .generate-modal-title {
@@ -268,29 +348,10 @@
             color: #64748b;
         }
 
-        @@keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .description-readonly {
-            background: #f8fafc;
-            cursor: not-allowed;
-            resize: none;
-        }
-
-        .description {
-            width: 100%;
-        }
-
-        .hint {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
         .drone-splash {
             position: fixed;
             inset: 0;
-            background: radial-gradient(120% 120% at 10% 10%, rgba(14, 165, 233, 0.28), transparent 45%), radial-gradient(110% 120% at 90% 20%, rgba(37, 99, 235, 0.25), transparent 55%), var(--bg);
+            background: radial-gradient(120% 120% at 10% 10%, rgba(14, 165, 233, 0.22), transparent 45%), radial-gradient(110% 120% at 90% 20%, rgba(37, 99, 235, 0.2), transparent 55%), linear-gradient(135deg, #0c4da2, #0ea5e9);
             display: grid;
             place-items: center;
             z-index: 9999;
@@ -308,7 +369,7 @@
 
         .splash-logo {
             position: absolute;
-            top: 98px;
+            top: 96px;
             left: 50%;
             transform: translateX(-50%);
             width: min(320px, 70vw);
@@ -316,7 +377,6 @@
             padding: 0;
             background: transparent;
             border: none;
-            box-shadow: none;
         }
 
         .drone-splash .drone {
@@ -337,15 +397,39 @@
             100% { transform: translateY(-135vh) scale(1.02); opacity: 0; }
         }
 
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @@media (prefers-reduced-motion: reduce) {
             .drone-splash .drone { animation: none; }
             .drone-splash { transition: none; }
         }
 
         @@media (max-width: 576px) {
-            .drone-card { padding: 16px; }
-            .drone-page-header { flex-direction: column; align-items: flex-start; }
-            .drone-summary .item { min-width: 100%; }
+            .hero-copy h1 { font-size: 23px; }
+            .hero-copy p { font-size: 14px; }
+            .drone-hero { gap: 12px; }
+            .meta-grid { grid-template-columns: 1fr; gap: 8px; }
+            .meta-card { padding: 10px 12px; border-radius: 14px; }
+            .meta-note { margin-top: 6px; }
+            .drone-panel { padding: 12px 14px; gap: 10px; border-radius: 18px; }
+            .panel-title { font-size: 16px; margin-bottom: 2px; }
+            .panel-subtitle { font-size: 13px; }
+            .form-label { margin-bottom: 4px; }
+            .upload-box { padding: 12px; }
+            .chip-group { flex-direction: column; gap: 8px; }
+            .chip { width: 100%; justify-content: center; min-height: 42px; padding: 10px 14px; }
+            .btn-primary-drone { min-height: 46px; padding: 12px 16px; }
+            .drone-content { gap: 12px; }
+            .drone-shell { gap: 14px; }
+            .drone-create { padding: 24px 0 40px; }
+            .drone-create .container { padding-left: 16px; padding-right: 16px; }
+        }
+
+        @@media (max-width: 420px) {
+            .meta-grid { grid-template-columns: 1fr; }
         }
     </style>
 }
@@ -372,104 +456,111 @@
     <img class="drone" src="~/assets/drone.svg" alt="" style="--x: 74%; --size: 20px; --dur: 4.8s; --delay: 0.32s;">
 </div>
 
-<section class="drone-page">
+<section class="drone-create">
     <div class="container">
-        <div class="drone-page-header">
-            <div>
-                <div class="title">Video Oluştur</div>
-                <div class="subtitle">Parsel bilgileriyle video üretimini başlatın.</div>
-            </div>
-        </div>
-        <div class="drone-summary">
-            <div class="item">
-                <span class="label">İl / İlçe</span>
-                <span id="meta-loc">—</span>
-            </div>
-            <div class="item">
-                <span class="label">Mahalle</span>
-                <span id="meta-mahalle">—</span>
-            </div>
-            <div class="item">
-                <span class="label">Ada / Parsel</span>
-                <span id="meta-ap">—</span>
-            </div>
-        </div>
-
-        <div class="drone-grid">
-            <div class="drone-card">
-                <h5>1) Dil ve Tapu durumu</h5>
-                <p>Seslendirme dilini ve tapu tipini seç.</p>
-                <div class="mb-3">
-                    <label class="form-label">Video Dili</label>
-                    <div class="chip-group" id="lang-group">
-                        <button type="button" class="chip active" data-value="tr">Türkçe</button>
-                        <button type="button" class="chip" data-value="ru">Русский</button>
-                        <button type="button" class="chip" data-value="ar">العربية</button>
-                    </div>
+        <div class="drone-shell">
+            <div class="drone-hero">
+                <div class="hero-copy">
+                    <div class="eyebrow">Drone</div>
+                    <h1>Video Oluştur</h1>
+                    <p>Parsel bilgilerini kontrol et, dil ve tapu tipini seç, marka görsellerini yükle ve seslendirme metnini gir.</p>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Tapu Durumu</label>
-                    <div class="chip-group" id="tapu-group">
-                        <button type="button" class="chip active" data-value="Tek Tapu">Tek Tapu</button>
-                        <button type="button" class="chip" data-value="Kooperatif">Kooperatif</button>
-                        <button type="button" class="chip" data-value="Hisseli">Hisseli</button>
-                        <button type="button" class="chip" data-value="Hobi Bahçesi">Hobi Bahçesi</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="drone-card">
-                <h5>2) Logo & Avatar</h5>
-                <p>Marka kimliğini ekle, ön izlemeyi gör.</p>
-                <div class="upload-box mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="form-label mb-1">Firma Logosu</div>
-                            <div class="hint">PNG/JPG, 2MB altı</div>
+                <div>
+                    <div class="meta-grid">
+                        <div class="meta-card">
+                            <div class="meta-title">İl / İlçe</div>
+                            <div class="meta-value" id="meta-loc">—</div>
                         </div>
-                        <label class="upload-label">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Yükle
+                        <div class="meta-card">
+                            <div class="meta-title">Mahalle</div>
+                            <div class="meta-value" id="meta-mahalle">—</div>
+                        </div>
+                        <div class="meta-card">
+                            <div class="meta-title">Ada / Parsel</div>
+                            <div class="meta-value" id="meta-ap">—</div>
+                        </div>
+                    </div>
+                    <div class="meta-note" id="generate-status"></div>
+                </div>
+            </div>
+
+            <div class="drone-content">
+                <div class="drone-panel">
+                    <div>
+                        <div class="panel-title">1) Dil ve Tapu durumu</div>
+                        <p class="panel-subtitle">Seslendirme dilini ve tapu tipini seç.</p>
+                    </div>
+                    <div>
+                        <label class="form-label">Video Dili</label>
+                        <div class="chip-group" id="lang-group">
+                            <button type="button" class="chip active" data-value="tr">Türkçe</button>
+                            <button type="button" class="chip" data-value="ru">Русский</button>
+                            <button type="button" class="chip" data-value="ar">العربية</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Tapu Durumu</label>
+                        <div class="chip-group" id="tapu-group">
+                            <button type="button" class="chip active" data-value="Tek Tapu">Tek Tapu</button>
+                            <button type="button" class="chip" data-value="Kooperatif">Kooperatif</button>
+                            <button type="button" class="chip" data-value="Hisseli">Hisseli</button>
+                            <button type="button" class="chip" data-value="Hobi Bahçesi">Hobi Bahçesi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drone-panel">
+                    <div>
+                        <div class="panel-title">2) Logo ve Avatar</div>
+                        <p class="panel-subtitle">Marka kimliğini ekle, dosyaları burada kontrol et.</p>
+                    </div>
+                    <div class="upload-box">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="form-label mb-1">Firma Logosu</div>
+                            <div class="hint">PNG/JPG, 250KB altı (otomatik küçültülür)</div>
+                            </div>
+                        <label class="upload-label" id="logo-upload-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span class="upload-label-text">Yükle</span>
                             <input type="file" id="logo-input" accept="image/*">
                         </label>
-                    </div>
-                    <div id="logo-preview" class="hint">Henüz dosya seçilmedi.</div>
-                </div>
-                <div class="upload-box">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="form-label mb-1">Danışman Fotoğrafı</div>
-                            <div class="hint">PNG/JPG, 2MB altı</div>
                         </div>
-                        <label class="upload-label">
-                            <i class="fa-solid fa-user"></i> Yükle
+                        <div id="logo-preview" class="hint">Henüz dosya seçilmedi.</div>
+                    </div>
+                    <div class="upload-box">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="form-label mb-1">Danışman Fotoğrafı</div>
+                            <div class="hint">PNG/JPG, 250KB altı (otomatik küçültülür)</div>
+                            </div>
+                        <label class="upload-label" id="avatar-upload-label">
+                            <i class="fa-solid fa-user"></i> <span class="upload-label-text">Yükle</span>
                             <input type="file" id="avatar-input" accept="image/*">
                         </label>
+                        </div>
+                        <div id="avatar-preview" class="hint">Henüz dosya seçilmedi.</div>
                     </div>
-                    <div id="avatar-preview" class="hint">Henüz dosya seçilmedi.</div>
                 </div>
-            </div>
 
-            <div class="drone-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="drone-panel panel-wide">
                     <div>
-                        <h5 class="mb-1">3) Seslendirme Metni</h5>
-                        <p class="mb-0">Metni düzenleyebilir veya varsayılanı kullanabilirsin.</p>
+                        <div class="panel-title">3) Seslendirme Metni</div>
+                        <p class="panel-subtitle">Metni düzenleyebilir veya varsayılanı kullanabilirsin.</p>
                     </div>
-                </div>
-                <div class="mb-2">
-                    <textarea class="form-control w-100 description" id="description-input" rows="6" placeholder="Arsanın özelliklerini ve çevresini anlat..." ></textarea>
-                    <div class="d-flex justify-content-between align-items-center mt-1">
-                        <span class="hint">Maks 700 karakter</span>
-                        <span class="char-count" id="desc-count">0/700</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-column flex-md-row align-items-start gap-2 mt-3">
-                    <button type="button" class="btn-primary-drone" id="generate-btn" disabled>
-                        <i class="fa-solid fa-video"></i> Video Oluştur
-                    </button>
                     <div>
-                        <div class="hint">Logo, avatar ve açıklama dolu olmalı.</div>
-                        <div class="hint" id="generate-status"></div>
+                    <textarea class="form-control description-input" id="description-input" rows="6" placeholder="Arsanın özelliklerini ve çevresini anlat..."></textarea>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <span class="hint">Maks 700 karakter</span>
+                            <span class="char-count" id="desc-count">0/700</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row align-items-start gap-2 mt-2">
+                        <button type="button" class="btn-primary-drone" id="generate-btn" disabled>
+                            <i class="fa-solid fa-video"></i> Video Oluştur
+                        </button>
+                        <div>
+                            <div class="hint">Logo, avatar ve açıklama dolu olmalı.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -485,12 +576,14 @@
             if (splash) {
                 setTimeout(() => {
                     splash.classList.add('is-hidden');
-                }, 1800);
+                }, 1600);
                 splash.addEventListener('transitionend', () => {
                     splash.remove();
                 });
             }
-
+            const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+            const TARGET_UPLOAD_BYTES = 250 * 1024;
+            const MAX_IMAGE_DIMENSION = 1600;
             const MAX_CHARS = 700;
             const params = new URLSearchParams(window.location.search);
             const meta = {
@@ -504,7 +597,9 @@
                 lang: 'tr',
                 tapu: 'Tek Tapu',
                 logoReady: false,
-                avatarReady: false
+                avatarReady: false,
+                logoFile: null,
+                avatarFile: null
             };
 
             const els = {
@@ -512,6 +607,8 @@
                 tapuChips: document.querySelectorAll('#tapu-group .chip'),
                 logoInput: document.getElementById('logo-input'),
                 avatarInput: document.getElementById('avatar-input'),
+                logoLabel: document.getElementById('logo-upload-label'),
+                avatarLabel: document.getElementById('avatar-upload-label'),
                 logoPreview: document.getElementById('logo-preview'),
                 avatarPreview: document.getElementById('avatar-preview'),
                 descInput: document.getElementById('description-input'),
@@ -523,10 +620,6 @@
                 metaAp: document.getElementById('meta-ap')
             };
 
-            const defaultDesc = () => {
-                return '';
-            };
-
             const updateChips = (chips, value) => {
                 chips.forEach((chip) => chip.classList.toggle('active', chip.dataset.value === value));
             };
@@ -534,6 +627,68 @@
             const updateDescCount = () => {
                 const len = els.descInput.value.length;
                 els.descCount.textContent = `${len}/${MAX_CHARS}`;
+            };
+
+            const formatFileSize = (bytes) => `${Math.round(bytes / 1024)} KB`;
+
+            const compressImage = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxDim = MAX_IMAGE_DIMENSION;
+                        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                        const targetWidth = Math.max(1, Math.round(img.width * scale));
+                        const targetHeight = Math.max(1, Math.round(img.height * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) {
+                            reject(new Error('canvas context missing'));
+                            return;
+                        }
+                        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                        let quality = 0.9;
+                        const encode = () => {
+                            canvas.toBlob((blob) => {
+                                if (!blob) {
+                                    reject(new Error('compression failed'));
+                                    return;
+                                }
+                                if (blob.size <= TARGET_UPLOAD_BYTES || quality <= 0.6) {
+                                    const baseName = file.name.includes('.') ? file.name.replace(/\.[^/.]+$/, '') : file.name;
+                                    const compressedFile = new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
+                                    resolve(compressedFile);
+                                    return;
+                                }
+                                quality -= 0.07;
+                                encode();
+                            }, 'image/jpeg', quality);
+                        };
+                        encode();
+                    };
+                    img.onerror = () => reject(new Error('image load failed'));
+                    img.src = reader.result;
+                };
+                reader.onerror = () => reject(new Error('file read failed'));
+                reader.readAsDataURL(file);
+            });
+
+            const compressImageIfNeeded = async (file) => {
+                if (!file.type.startsWith('image/')) return { file, wasCompressed: false };
+                if (file.size <= TARGET_UPLOAD_BYTES) return { file, wasCompressed: false };
+                const compressed = await compressImage(file);
+                return { file: compressed, wasCompressed: true };
+            };
+
+            const fetchImageAsFile = async (url, nameHint) => {
+                const response = await fetch(url, { credentials: 'include' });
+                if (!response.ok) throw new Error('image fetch failed');
+                const blob = await response.blob();
+                const extension = blob.type === 'image/png' ? 'png' : 'jpg';
+                const fileName = `${nameHint}.${extension}`;
+                return new File([blob], fileName, { type: blob.type || 'image/jpeg' });
             };
 
             const updateButtonState = () => {
@@ -548,21 +703,78 @@
                 if (els.metaAp) els.metaAp.textContent = (meta.ada && meta.parsel) ? `${meta.ada} / ${meta.parsel}` : '—';
             };
 
+            const showExistingMedia = (previewEl, url, label) => {
+                if (!previewEl || !url) return;
+                previewEl.textContent = '';
+                const wrapper = document.createElement('div');
+                wrapper.className = 'upload-preview';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = label;
+                const text = document.createElement('span');
+                text.textContent = label;
+                wrapper.append(img, text);
+                previewEl.appendChild(wrapper);
+            };
 
-            const showSuccessModal = (title, subtitle) => {
-                const existing = document.querySelector('.generate-modal');
-                if (existing) existing.remove();
-                const modal = document.createElement('div');
-                modal.className = 'generate-modal';
-                modal.innerHTML = `
-                    <div class="generate-modal-card">
-                        <div class="generate-modal-title">${title}</div>
-                        <div class="generate-modal-subtitle">${subtitle}</div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-                requestAnimationFrame(() => modal.classList.add('is-visible'));
-                return modal;
+            const updateUploadLabel = (labelEl, hasExisting) => {
+                if (!labelEl) return;
+                const textEl = labelEl.querySelector('.upload-label-text');
+                if (textEl) textEl.textContent = hasExisting ? 'Değiştir' : 'Yükle';
+            };
+
+            const loadUserMedia = async () => {
+                if (!isAuthenticated) return;
+                try {
+                    const response = await fetch('/api/drone/user-media', { credentials: 'include' });
+                    if (!response.ok) return;
+                    const payload = await response.json();
+                    if (payload?.logoUrl) {
+                        showExistingMedia(els.logoPreview, payload.logoUrl, 'Firma logosu yüklendi');
+                        updateUploadLabel(els.logoLabel, true);
+                        try {
+                            const file = await fetchImageAsFile(payload.logoUrl, 'firma-logosu');
+                            const { file: processed, wasCompressed } = await compressImageIfNeeded(file);
+                            if (processed.size > TARGET_UPLOAD_BYTES) {
+                                state.logoReady = false;
+                                state.logoFile = null;
+                                els.logoPreview.textContent = 'Firma logosu 250KB altına indirilemedi. Lütfen değiştirin.';
+                            } else {
+                                state.logoFile = processed;
+                                state.logoReady = true;
+                                els.logoPreview.textContent = `${processed.name} (${formatFileSize(processed.size)}${wasCompressed ? ', küçültüldü' : ''})`;
+                            }
+                        } catch (error) {
+                            state.logoReady = false;
+                            state.logoFile = null;
+                            els.logoPreview.textContent = 'Firma logosu alınamadı. Lütfen değiştirin.';
+                        }
+                    }
+                    if (payload?.avatarUrl) {
+                        showExistingMedia(els.avatarPreview, payload.avatarUrl, 'Danışman fotoğrafı yüklendi');
+                        updateUploadLabel(els.avatarLabel, true);
+                        try {
+                            const file = await fetchImageAsFile(payload.avatarUrl, 'danisman-fotografi');
+                            const { file: processed, wasCompressed } = await compressImageIfNeeded(file);
+                            if (processed.size > TARGET_UPLOAD_BYTES) {
+                                state.avatarReady = false;
+                                state.avatarFile = null;
+                                els.avatarPreview.textContent = 'Danışman fotoğrafı 250KB altına indirilemedi. Lütfen değiştirin.';
+                            } else {
+                                state.avatarFile = processed;
+                                state.avatarReady = true;
+                                els.avatarPreview.textContent = `${processed.name} (${formatFileSize(processed.size)}${wasCompressed ? ', küçültüldü' : ''})`;
+                            }
+                        } catch (error) {
+                            state.avatarReady = false;
+                            state.avatarFile = null;
+                            els.avatarPreview.textContent = 'Danışman fotoğrafı alınamadı. Lütfen değiştirin.';
+                        }
+                    }
+                    updateButtonState();
+                } catch (error) {
+                    console.warn('Drone medya bilgisi alınamadı.', error);
+                }
             };
 
             const showLoadingModal = (title, subtitle) => {
@@ -617,12 +829,47 @@
 
             const handleFile = (inputEl, previewEl, key) => {
                 if (!inputEl || !previewEl) return;
-                inputEl.addEventListener('change', () => {
+                inputEl.addEventListener('change', async () => {
                     const file = inputEl.files?.[0];
-                    if (!file) return;
-                    previewEl.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
-                    state[key] = true;
-                    updateButtonState();
+                    if (!file) {
+                        state[key] = false;
+                        if (inputEl === els.logoInput) state.logoFile = null;
+                        if (inputEl === els.avatarInput) state.avatarFile = null;
+                        updateButtonState();
+                        return;
+                    }
+                    if (!file.type.startsWith('image/')) {
+                        previewEl.textContent = 'Sadece görsel dosyası seçin.';
+                        state[key] = false;
+                        if (inputEl === els.logoInput) state.logoFile = null;
+                        if (inputEl === els.avatarInput) state.avatarFile = null;
+                        updateButtonState();
+                        return;
+                    }
+                    try {
+                        const { file: processed, wasCompressed } = await compressImageIfNeeded(file);
+                        if (processed.size > TARGET_UPLOAD_BYTES) {
+                            previewEl.textContent = 'Görsel 250KB altına indirilemedi. Lütfen daha küçük bir görsel seçin.';
+                            state[key] = false;
+                            if (inputEl === els.logoInput) state.logoFile = null;
+                            if (inputEl === els.avatarInput) state.avatarFile = null;
+                            updateButtonState();
+                            return;
+                        }
+                        previewEl.textContent = `${processed.name} (${formatFileSize(processed.size)}${wasCompressed ? ', küçültüldü' : ''})`;
+                        state[key] = true;
+                        if (inputEl === els.logoInput) state.logoFile = processed;
+                        if (inputEl === els.avatarInput) state.avatarFile = processed;
+                        if (inputEl === els.logoInput) updateUploadLabel(els.logoLabel, true);
+                        if (inputEl === els.avatarInput) updateUploadLabel(els.avatarLabel, true);
+                        updateButtonState();
+                    } catch (error) {
+                        previewEl.textContent = 'Görsel işlenemedi. Lütfen farklı bir dosya seçin.';
+                        state[key] = false;
+                        if (inputEl === els.logoInput) state.logoFile = null;
+                        if (inputEl === els.avatarInput) state.avatarFile = null;
+                        updateButtonState();
+                    }
                 });
             };
 
@@ -647,7 +894,7 @@
                 }
                 if (!isAuthenticated) {
                     if (els.generateStatus) {
-                        els.generateStatus.textContent = 'Devam etmek icin giris yapmalisiniz. Yonlendiriliyorsunuz...';
+                        els.generateStatus.textContent = 'Devam etmek için giriş yapmalısınız. Yönlendiriliyorsunuz...';
                     }
                     const currentPath = window.location.pathname + window.location.search;
                     const returnUrl = encodeURIComponent(currentPath);
@@ -664,8 +911,8 @@
                 formData.append('tapu', state.tapu);
                 formData.append('description', els.descInput.value.trim());
 
-                const logoFile = els.logoInput.files?.[0];
-                const avatarFile = els.avatarInput.files?.[0];
+                const logoFile = state.logoFile || els.logoInput.files?.[0];
+                const avatarFile = state.avatarFile || els.avatarInput.files?.[0];
                 if (logoFile) formData.append('logo', logoFile);
                 if (avatarFile) formData.append('avatar', avatarFile);
 
@@ -678,8 +925,11 @@
                     body: formData,
                     credentials: 'include'
                 })
-                    .then((res) => {
-                        if (!res.ok) throw new Error('İstek başarısız.');
+                    .then(async (res) => {
+                        if (!res.ok) {
+                            const errorPayload = await res.json().catch(() => null);
+                            throw new Error(errorPayload?.message || 'İstek başarısız.');
+                        }
                         return res.json().catch(() => ({}));
                     })
                     .then((payload) => {
@@ -693,7 +943,7 @@
                     })
                     .catch((err) => {
                         console.error('Drone video isteği başarısız', err);
-                        if (els.generateStatus) els.generateStatus.textContent = 'İstek gönderilemedi. Lütfen tekrar deneyin.';
+                        if (els.generateStatus) els.generateStatus.textContent = err?.message || 'İstek gönderilemedi. Lütfen tekrar deneyin.';
                         if (loadingModal) loadingModal.remove();
                     })
                     .finally(() => {
@@ -701,9 +951,9 @@
                     });
             });
 
-            // init
             updateMetaView();
             updateDescCount();
+            loadUserMedia();
             updateButtonState();
             if (!meta.il || !meta.ilce || !meta.mahalle || !meta.ada || !meta.parsel) {
                 if (els.generateStatus) {

@@ -25,6 +25,9 @@
             <li>
                 <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
             </li>
+            <li>
+                <a href="@Url.Action("Index", "Drone")">Şevval Drone</a>
+            </li>
             <li class="dropdoawn">
                 <a href="@Url.Action("About", "Home")">Hakkımızda</a>
             </li>
@@ -45,9 +48,9 @@
                 var currentUser = await UserManager.GetUserAsync(User);
                 if (currentUser != null)
                 {
-                    <div class="user-dropdown">
+                    <div class="dropdown">
                         <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                        <ul class="user-dropdown-content">
+                        <ul class="dropdown-content">
                             <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
                             <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                             <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
@@ -98,21 +101,14 @@
                 var navLinks = document.getElementById("nav-links");
                 var mobileMenuBtn = document.getElementById("mobile-menu-btn");
                 
-                // Mobil mi yoksa masaüstü görünümü mü kontrol et
-                // CSS ile uyumlu: yükseklik 1000px ve üstünde masaüstü görünümü
-                function isMobileView() {
-                    return window.innerWidth <= 991 && window.innerHeight < 1000;
-                }
-                
                 // Mobilde menü butonunu göster
                 function handleMobileMenu() {
-                    if (isMobileView()) {
+                    if (window.innerWidth <= 991) {
                         if (mobileMenuBtn) {
                             mobileMenuBtn.style.display = 'flex';
                             mobileMenuBtn.style.flexDirection = 'column';
                         }
                     } else {
-                        // Masaüstü görünümü - hamburger gizle, navlinks göster
                         if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
                         if (navLinks) navLinks.classList.remove('active');
                     }
@@ -136,53 +132,36 @@
                 handleMobileMenu();
                 window.addEventListener('resize', handleMobileMenu);
                 
-                // DROPDOWN MENÜ - Tıklama ile aç/kapat (Tüm dropdown'lar için)
-                var dropdowns = document.querySelectorAll('.user-dropdown');
+                // DROPDOWN MENÜ - Tıklama ile aç/kapat
+                var dropdown = document.querySelector('.dropdown');
+                var dropdownContent = document.querySelector('.dropdown-content');
+                var userName = document.querySelector('.user-name');
                 
-                dropdowns.forEach(function(dropdown) {
-                    var dropdownContent = dropdown.querySelector('.user-dropdown-content');
-                    var userName = dropdown.querySelector('.user-name');
+                if (userName && dropdownContent) {
+                    userName.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropdownContent.classList.toggle('show');
+                    });
                     
-                    if (userName && dropdownContent) {
-                        userName.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            // Diğer tüm dropdown'ları kapat
-                            document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
-                                if (content !== dropdownContent) {
-                                    content.classList.remove('show');
-                                }
-                            });
-                            
-                            // Bu dropdown'ı aç/kapat
-                            dropdownContent.classList.toggle('show');
-                        });
-                    }
-                });
-                
-                // Sayfa dışına tıklayınca tüm dropdown'ları kapat
-                document.addEventListener('click', function(e) {
-                    if (!e.target.closest('.user-dropdown')) {
-                        document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
-                            content.classList.remove('show');
-                        });
-                    }
-                });
-                
-                // Dropdown içindeki linklere tıklayınca menüyü kapat
-                document.querySelectorAll('.user-dropdown-content a').forEach(function(link) {
-                    link.addEventListener('click', function() {
-                        var dropdownContent = link.closest('.user-dropdown-content');
-                        if (dropdownContent) {
+                    // Sayfa dışına tıklayınca dropdown'ı kapat
+                    document.addEventListener('click', function(e) {
+                        if (dropdown && !dropdown.contains(e.target)) {
                             dropdownContent.classList.remove('show');
                         }
                     });
-                });
+                    
+                    // Dropdown içindeki linklere tıklayınca menüyü kapat (logout hariç)
+                    dropdownContent.querySelectorAll('a').forEach(function(link) {
+                        link.addEventListener('click', function() {
+                            dropdownContent.classList.remove('show');
+                        });
+                    });
+                }
                 
                 // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
                 function fixMobileNavbar() {
-                    if (isMobileView()) {
+                    if (window.innerWidth <= 991) {
                         // Auth butonları - gap 20px ve hizalı
                         var authButtons = document.querySelector('.auth-buttoons');
                         if (authButtons) {

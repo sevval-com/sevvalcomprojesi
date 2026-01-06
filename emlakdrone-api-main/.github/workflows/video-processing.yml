@@ -1,0 +1,19 @@
+name: Video Processing
+on:
+  http:
+    post:
+      paths:
+        - /api/video/generate
+
+jobs:
+  process-video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v2
+      - name: Process Video
+        run: |
+          # Video işleme kodu
+      - name: Upload to R2
+        uses: cloudflare/r2-upload-action@v1 

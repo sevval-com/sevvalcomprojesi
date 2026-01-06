@@ -486,6 +486,8 @@ $RECYCLE.BIN/
 *.mp4
 
 *.db
+*.db-shm
+*.db-wal
 
 obj/
 
