@@ -1,4 +1,6 @@
-@model sevvalemlak.Dto.TumIlanlarDTO
+﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.HeadTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
+@removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.BodyTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
 @using DocumentFormat.OpenXml.Office2010.PowerPoint
 @using Microsoft.AspNetCore.Identity
 @using sevvalemlak.Models
@@ -55,7 +57,7 @@
         youtubeVideoId = currentIlan.VideoLink.Split('?').LastOrDefault()?.Split('&').FirstOrDefault()?.Split('=').LastOrDefault();
     }
     var user = await UserManager.GetUserAsync(User);
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
     // Schema.org additionalProperty'leri için liste oluştur
     var additionalProperties = new List<string>();
     if (!string.IsNullOrEmpty(currentIlan?.MulkTipi)) { 
@@ -163,118 +165,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-    <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container">
-            <div class="logo">
-               <a href="/">
-                  <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <span>Sevval.com</span>
-            </div>
-            <!-- Hamburger Menu Icon -->
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    var hamburgerMenu = document.getElementById("hamburger-menu");
-                    var navLinks = document.getElementById("nav-links");
-
-                    // Hamburger menüye tıklanınca menüyü aç/kapat
-                    hamburgerMenu.addEventListener("click", function (event) {
-                        navLinks.classList.toggle("active");
-                        event.stopPropagation(); // Hamburger menüye tıklanınca kapanmayı engelle
-                    });
-
-                    // Sayfanın herhangi bir yerine tıklanınca menüyü kapat
-                    document.addEventListener("click", function (event) {
-                        if (!navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
-                            navLinks.classList.remove("active");
-                        }
-                    });
-                });
-            </script>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("Firmalar", "Home")">Firmalar</a></li>
-                <li class="dropdoawn">
-                    <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-                </li>
-
-                <li>
-                    <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
-                </li>
-
-               
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <li>
-                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                    </li>
-                   
-                }
-
-
-            </ul>
-            <div class="auth-buttoons">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-
-                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                                <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                                
-                                <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                                <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
-                                <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                                <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                                
-                                <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                                <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                                @if (User.Identity.IsAuthenticated &&
-                               (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-
-                                {
-                                    <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                                }
-                                <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                    else
-                    {
-                        <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
-                    }
-                }
-                else
-                {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
-                }
-
-
-                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-                </div>
-            </div>
-
-        </div>
-    </nav>
     <style>
         .post-ad-container {
             position: relative;
@@ -2209,60 +2099,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-content footer-contact">
-                <h2 class="footer-title">İletişim Bilgileri</h2>
-                <p class="footer-info">Adres: Güney Mh, Saatçi Sk, No:9/A Kocaeli/Körfez</p>
-                <p class="footer-info">
-                    Telefon: <a href="tel:+902129555541" class="footer-link">0212 955 55 41</a>
-                </p>
-                <p class="footer-info">
-                    Talep ve Öneri:
-                    <a id="contact-email" href="#" class="footer-link">sevvaltalep@gmail.com</a>
-                </p>
-
-                <script>
-                    document.getElementById("contact-email").addEventListener("click", function (event) {
-                        event.preventDefault(); // Bağlantıyı varsayılan olarak çalıştırmayı durdurur.
-
-                        const email = "sevvaltalep@gmail.com";
-                        const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-
-                        if (mobileRegex.test(navigator.userAgent)) {
-                            // Mobil cihazlarda Gmail uygulamasını açmaya çalış
-                            window.location.href = `mailto:${email}`;
-                        } else {
-                            // Masaüstü cihazlarda Gmail web sitesine yönlendir
-                            window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`, "_blank");
-                        }
-                    });
-                </script>
-
-            </div>
-
-            <div class="footer-section">
-                <h2 class="footer-title">Bizi Takip Edin</h2>
-                <div class="social-icons">
-                    <a href="https://www.kisa.link/wmZoa" class="social-icon" target="_blank">
-                        <img src="~/images/youtubelogo.webp" alt="Youtube">
-                    </a>
-                    <a href="https://www.instagram.com/sevvalcom?igsh=ZThycHI4eXp1dHlw" class="social-icon" target="_blank">
-                        <img src="~/images/instagramlogo.webp" alt="Instagram">
-                    </a>
-                    <a href="https://www.facebook.com/profile.php?id=61576226942639" class="social-icon" target="_blank">
-                        <img src="~/images/facebooklogo.webp" alt="Facebook">
-                    </a>
-                    <a href="https://www.kisa.link/KWiFP" class="social-icon" target="_blank">
-                        <img src="~/images/tiktoklogo.webp" alt="TikTok">
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Emlak Sitesi. Tüm Hakları Saklıdır.</p>
-        </div>
-    </footer>
 
 
 
@@ -2326,3 +2162,5 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 </body>
 </html>
+
+

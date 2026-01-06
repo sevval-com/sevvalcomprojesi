@@ -1513,3 +1513,52 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
         font-size: 10px !important;
     }
 }
+
+
+/* ============================================
+   YENİ BADGE STİLİ - Sevval Drone için (Navbar'a özel)
+   ============================================ */
+.navbaar .naav-linkss .nav-item-with-badge {
+    position: relative !important;
+    display: inline-block !important;
+    overflow: visible !important;
+}
+
+.navbaar .naav-linkss .nav-item-with-badge .new-badge {
+    position: absolute !important;
+    top: -8px !important;
+    right: -10px !important;
+    left: auto !important;
+    background-color: #28a745 !important;
+    color: white !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    padding: 2px 6px !important;
+    border-radius: 10px !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    animation: pulse-badge 2s infinite !important;
+    z-index: 9999 !important;
+}
+
+@keyframes pulse-badge {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Mobil görünümde badge */
+@media (max-width: 991px) and (max-height: 999px) {
+    .navbaar .naav-linkss .nav-item-with-badge .new-badge {
+        font-size: 8px !important;
+        padding: 1px 4px !important;
+        top: -6px !important;
+        right: -8px !important;
+    }
+}
