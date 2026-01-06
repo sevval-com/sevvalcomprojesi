@@ -1,0 +1,19 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideNavbar"] = ViewData["HideNavbar"] ?? false;
+    ViewData["HideFooter"] = true;
+    ViewData["BodyClass"] = "auth-body";
+}
+
+<div class="auth-wrapper">
+    @RenderBody()
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css">
+    @await RenderSectionAsync("AuthStyles", required: false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("AuthScripts", required: false)
+}

@@ -4,203 +4,15 @@
 
 @{
     ViewData["Title"] = "Paketler";
-    Layout = null;
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
 }
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Şevval Emlak</title>
-
-    <!-- CSS Libraries -->
+@section Styles {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Navbar için özel CSS -->
-    <link rel="stylesheet" href="~/css/Anasayfa.css" />
-    <link rel="stylesheet" href="~/css/navbar.css" />
-    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
-    <script src="~/js/site.js" defer></script>
-
     <style>
-        /* MOBİL NAVBAR - INLINE STİL */
-        @@media (max-width: 991px) {
-            .navbaar-container {
-                display: flex !important;
-                align-items: center !important;
-                position: relative !important;
-                padding: 10px 15px !important;
-            }
-            
-            .auth-buttoons {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                gap: 10px !important;
-                margin-right: 50px !important;
-            }
-            
-            .auth-buttoons .login,
-            .auth-buttoons .post-ad {
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                height: 32px !important;
-                padding: 0 12px !important;
-                font-size: 11px !important;
-                border-radius: 4px !important;
-                font-weight: bold !important;
-                white-space: nowrap !important;
-            }
-            
-            .auth-buttoons .login {
-                background: transparent !important;
-                color: white !important;
-                border: 1px solid white !important;
-            }
-            
-            .auth-buttoons .post-ad {
-                background: white !important;
-                color: #009cfb !important;
-                border: 1px solid #009cfb !important;
-            }
-            
-            .post-ad-container {
-                display: inline-flex !important;
-                align-items: center !important;
-                position: relative !important;
-            }
-            
-            .free-tag {
-                position: absolute !important;
-                top: -8px !important;
-                left: -8px !important;
-                font-size: 7px !important;
-                padding: 2px 4px !important;
-                background-color: #28a745 !important;
-                color: white !important;
-                border-radius: 3px !important;
-                transform: rotate(-15deg) !important;
-                z-index: 200 !important;
-            }
-            
-            .hamburger {
-                display: flex !important;
-                flex-direction: column !important;
-                position: absolute !important;
-                right: 10px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                cursor: pointer !important;
-                z-index: 1001 !important;
-            }
-            
-            .hamburger .line {
-                display: block !important;
-                width: 25px !important;
-                height: 3px !important;
-                background-color: white !important;
-                margin: 3px 0 !important;
-            }
-        }
-        
-        body {
-            background-color: #f0f2f5;
-        }
-
-        .pencere {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1100
-        }
-
-        .pencere-icerik {
-            background: linear-gradient(90deg,#1e88e5,#2196f3);
-            width: 460px;
-            height: 490px;
-            display: flex;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.3);
-            overflow: hidden;
-            position: relative;
-            padding: 20px;
-            box-sizing: border-box;
-            margin: auto
-        }
-
-        .sol-bolum, .sag-bolum {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center
-        }
-
-        .sag-bolum {
-            border-left: 2px solid #fff
-        }
-
-        .pencere-icerik h2 {
-            margin-bottom: 20px;
-            font-size: 28px;
-            color: #fff;
-            font-weight: 700
-        }
-
-        .baglanti {
-            margin: 15px 0;
-            padding: 15px 25px;
-            background: #fff;
-            color: #1e88e5;
-            text-decoration: none;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: background .3s,transform .2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,.2);
-            font-size: 18px;
-            width: 80%
-        }
-
-            .baglanti:hover {
-                background: #f1f1f1;
-                transform: translateY(-2px)
-            }
-
-        .kapat-buton {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            font-size: 30px;
-            color: #fff;
-            background: 0 0;
-            border: 2px solid #fff;
-            text-align: center;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center
-        }
-
-            .kapat-buton:hover {
-                color: #d32f2f;
-                border-color: #d32f2f
-            }
-
+        body { background-color: #f0f2f5; }
         .package-card {
             background: #fff;
             border-radius: 20px;
@@ -213,16 +25,11 @@
             position: relative;
             overflow: hidden;
         }
-
-            .package-card.popular {
-                border-color: #764ba2;
-            }
-
-            .package-card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 15px 50px rgba(0,0,0,0.12);
-            }
-
+        .package-card.popular { border-color: #764ba2; }
+        .package-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        }
         .popular-badge {
             position: absolute;
             top: 20px;
@@ -234,48 +41,13 @@
             font-weight: bold;
             font-size: 0.9rem;
         }
-
-        .package-card h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-
-        .price-tag {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #0d6efd;
-            margin-bottom: 2rem;
-        }
-
-            .price-tag .period {
-                font-size: 1rem;
-                font-weight: 500;
-                color: #777;
-            }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-            margin: 2rem 0;
-        }
-
-            .feature-list li {
-                padding: 10px 0;
-                border-bottom: 1px solid #eee;
-                color: #555;
-            }
-
-                .feature-list li:last-child {
-                    border-bottom: none;
-                }
-
-                .feature-list li i {
-                    color: #28a745;
-                    margin-right: 10px;
-                }
-
+        .package-card h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; color: #333; }
+        .price-tag { font-size: 3.5rem; font-weight: 700; color: #0d6efd; margin-bottom: 2rem; }
+        .price-tag .period { font-size: 1rem; font-weight: 500; color: #777; }
+        .feature-list { list-style: none; padding: 0; margin: 2rem 0; }
+        .feature-list li { padding: 10px 0; border-bottom: 1px solid #eee; color: #555; }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li i { color: #28a745; margin-right: 10px; }
         .btn-select-package {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
@@ -283,16 +55,8 @@
             font-size: 1.1rem;
             font-weight: bold;
         }
-
-            .btn-select-package:hover {
-                filter: brightness(1.1);
-            }
-
-        /* Modal Stilleri */
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
+        .btn-select-package:hover { filter: brightness(1.1); }
+        .modal-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .payment-option-card {
             border: 2px solid #e9ecef;
             border-radius: 15px;
@@ -301,129 +65,106 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-            .payment-option-card:hover {
-                border-color: #0d6efd;
-                background-color: #f8f9fa;
-                transform: translateY(-5px);
-                box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            }
-
-            .payment-option-card i {
-                font-size: 3rem;
-                margin-bottom: 1rem;
-                color: #0d6efd;
-            }
+        .payment-option-card:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .payment-option-card i { font-size: 3rem; margin-bottom: 1rem; color: #0d6efd; }
     </style>
-</head>
-<body>
-    @Html.AntiForgeryToken()
-    <!-- Navbar -->
-    <partial name="_Navbar" />
+}
 
-    <main class="container-fluid my-4">
-        <div class="row g-lg-4 g-3">
-            <aside class="col-lg-2">
-                <div class="d-lg-none mb-3 px-3">
-                    <button class="btn btn-primary w-100 p-3" type="button" data-bs-toggle="collapse" data-bs-target="#controlPanel" aria-expanded="false" aria-controls="controlPanel">
-                        <i class="fas fa-bars me-2"></i> Menü
-                    </button>
-                </div>
-                <div class="collapse d-lg-block" id="controlPanel">
-                    <div class="sticky-top" style="top: 20px;">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-gem me-2"></i>Satın Al</h5>
-                            </div>
-                            <div class="list-group list-group-flush">
-                                <a class="list-group-item list-group-item-action active" aria-current="page" href="@Url.Action("Index", "Satinal")"><i class="fas fa-box me-2"></i>Paketler</a>
-                                <a class="list-group-item list-group-item-action" href="@Url.Action("Dopingler", "Satinal")"><i class="fas fa-rocket me-2"></i>Dopingler</a>
-                                
-                                
-                                
-                                <a class="list-group-item list-group-item-action" href="@Url.Action("Panel", "Ilan")"><i class="fas fa-arrow-left me-2"></i>Panele Dön</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-            <section class="col-lg-10">
-                <h1 class="text-center mb-5 display-4 fw-bold text-primary">Premium Üyelik Paketleri</h1>
-                <div class="row g-4 justify-content-center">
-                    <div class="col-lg-6">
-                        <div class="package-card" data-bs-toggle="modal" data-bs-target="#paymentModal" data-link-monthly="https://www.paytr.com/link/yUK4Oec" data-package-type="taahhutlu">
-                            <h3>Taahhütlü Paket</h3>
-                            <div class="price-tag">₺500<span class="period">/ay</span></div>
-                            <ul class="feature-list">
-                                <li><i class="fas fa-check-circle"></i>12 Ay Taahhüt</li>
-                                <li><i class="fas fa-check-circle"></i>%50 Tasarruf Fırsatı</li>
-                                <li><i class="fas fa-check-circle"></i>Öncelikli Destek</li>
-                            </ul>
-                            <button class="btn btn-primary btn-lg btn-select-package">Paketi Seç</button>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="package-card popular" data-bs-toggle="modal" data-bs-target="#paymentModal" data-link-monthly="https://www.paytr.com/link/fkMteeC" data-package-type="taahhutsuz">
-                            <div class="popular-badge">Popüler</div>
-                            <h3>Taahhütsüz Paket</h3>
-                            <div class="price-tag">₺1000<span class="period">/ay</span></div>
-                            <ul class="feature-list">
-                                <li><i class="fas fa-check-circle"></i>Sınırsız Esneklik</li>
-                                <li><i class="fas fa-check-circle"></i>Dilediğin Zaman İptal Et</li>
-                                <li><i class="fas fa-check-circle"></i>7/24 Destek</li>
-                            </ul>
-                            <button class="btn btn-primary btn-lg btn-select-package">Paketi Seç</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+@Html.AntiForgeryToken()
 
-    <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow" style="border-radius: 20px;">
-                <div class="modal-header text-white">
-                    <h5 class="modal-title" id="paymentModalLabel">Ödeme Planınızı Seçin</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <div class="payment-option-card h-100" onclick="redirectToPayment('monthly')">
-                                <i class="bi bi-calendar-month"></i>
-                                <h4>Aylık Ödeme</h4>
-                                <p class="text-muted small">Esnek ve pratik ödeme</p>
-                            </div>
+<div class="container-fluid my-4">
+    <div class="row g-lg-4 g-3">
+        <aside class="col-lg-2">
+            <div class="d-lg-none mb-3 px-3">
+                <button class="btn btn-primary w-100 p-3" type="button" data-bs-toggle="collapse" data-bs-target="#controlPanel" aria-expanded="false" aria-controls="controlPanel">
+                    <i class="fas fa-bars me-2"></i> Menü
+                </button>
+            </div>
+            <div class="collapse d-lg-block" id="controlPanel">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-gem me-2"></i>Satın Al</h5>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="payment-option-card h-100" onclick="redirectToPayment('yearly')">
-                                <i class="bi bi-calendar-check"></i>
-                                <h4>Yıllık Ödeme</h4>
-                                <p class="text-muted small"><span class="badge bg-success">Yıllık öde, %15 tasarruf et!</span></p>
-                            </div>
+                        <div class="list-group list-group-flush">
+                            <a class="list-group-item list-group-item-action active" aria-current="page" href="@Url.Action("Index", "Satinal")"><i class="fas fa-box me-2"></i>Paketler</a>
+                            <a class="list-group-item list-group-item-action" href="@Url.Action("Dopingler", "Satinal")"><i class="fas fa-rocket me-2"></i>Dopingler</a>
+                            <a class="list-group-item list-group-item-action" href="@Url.Action("Panel", "Ilan")"><i class="fas fa-arrow-left me-2"></i>Panele Dön</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <section class="col-lg-10">
+            <h1 class="text-center mb-5 display-4 fw-bold text-primary">Premium Üyelik Paketleri</h1>
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-6">
+                    <div class="package-card" data-bs-toggle="modal" data-bs-target="#paymentModal" data-link-monthly="https://www.paytr.com/link/yUK4Oec" data-package-type="taahhutlu">
+                        <h3>Taahhütlü Paket</h3>
+                        <div class="price-tag">₺500<span class="period">/ay</span></div>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i>12 Ay Taahhüt</li>
+                            <li><i class="fas fa-check-circle"></i>%50 Tasarruf Fırsatı</li>
+                            <li><i class="fas fa-check-circle"></i>Öncelikli Destek</li>
+                        </ul>
+                        <button class="btn btn-primary btn-lg btn-select-package">Paketi Seç</button>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="package-card popular" data-bs-toggle="modal" data-bs-target="#paymentModal" data-link-monthly="https://www.paytr.com/link/fkMteeC" data-package-type="taahhutsuz">
+                        <div class="popular-badge">Popüler</div>
+                        <h3>Taahhütsüz Paket</h3>
+                        <div class="price-tag">₺1000<span class="period">/ay</span></div>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i>Sınırsız Esneklik</li>
+                            <li><i class="fas fa-check-circle"></i>Dilediğin Zaman İptal Et</li>
+                            <li><i class="fas fa-check-circle"></i>7/24 Destek</li>
+                        </ul>
+                        <button class="btn btn-primary btn-lg btn-select-package">Paketi Seç</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 20px;">
+            <div class="modal-header text-white">
+                <h5 class="modal-title" id="paymentModalLabel">Ödeme Planınızı Seçin</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="payment-option-card h-100" onclick="redirectToPayment('monthly')">
+                            <i class="bi bi-calendar-month"></i>
+                            <h4>Aylık Ödeme</h4>
+                            <p class="text-muted small">Esnek ve pratik ödeme</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="payment-option-card h-100" onclick="redirectToPayment('yearly')">
+                            <i class="bi bi-calendar-check"></i>
+                            <h4>Yıllık Ödeme</h4>
+                            <p class="text-muted small"><span class="badge bg-success">Yıllık öde, %15 tasarruf et!</span></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts {
     <script>
-        // Navbar ve popup scriptleri
-        document.addEventListener("DOMContentLoaded", function () {
-            var hamburgerMenu = document.getElementById("hamburger-menu");
-            var navLinks = document.getElementById("nav-links");
-            if (hamburgerMenu) {
-            const girisButon = document.getElementById('giris-buton'), popupGiris = document.getElementById('popup-giris'), pencereKapat = document.getElementById('pencere-kapat');
-            if (girisButon) girisButon.addEventListener('click', (e) => { e.preventDefault(); popupGiris.style.display = 'flex'; });
-            if (popupGiris) popupGiris.addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
-            if (pencereKapat) pencereKapat.addEventListener('click', () => { popupGiris.style.display = 'none'; });
-        });
-
-        // Ödeme scriptleri
         let selectedMonthlyLink = '';
         let selectedPackageType = '';
         const yearlyLinks = {
@@ -447,6 +188,4 @@
             }
         }
     </script>
-</body>
-</html>
-
+}

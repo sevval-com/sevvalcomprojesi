@@ -1,0 +1,23 @@
+@{
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
+    ViewData["HideNavbar"] = true;
+    ViewData["BodyClass"] = "admin-body";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    @RenderSection("AdminStyles", required: false)
+}
+
+<div class="admin-wrapper d-flex">
+    <partial name="_AdminSidebar" />
+    <div class="admin-content flex-grow-1">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("AdminScripts", required: false)
+}

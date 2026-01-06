@@ -242,8 +242,18 @@ hr {
         color: white;
     }
 
+    .option-button.active i,
+    .option-button.active span {
+        color: white;
+    }
+
     .option-button:hover {
         background-color: #0056b3;
+        color: white;
+    }
+
+    .option-button:hover i,
+    .option-button:hover span {
         color: white;
     }
 
@@ -255,7 +265,7 @@ hr {
     }
 
     .option-button:hover i {
-        color: #004c8c; /* Hoverda simge rengi koyulaşır */
+        color: white; /* Hoverda simge rengi beyaz */
     }
 
     .option-button span {

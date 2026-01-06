@@ -549,15 +549,17 @@ namespace EmlakSitesi.Controllers
         {
             var userEmail = User.Identity.Name; // Oturum açan kullanıcının emaili
             if (string.IsNullOrEmpty(userEmail))
-                return Json(new { success = false, message = "Kullanıcı oturum açmamış!" });
+                return RedirectToAction("Login", "Account");
 
             var ilanlar = await _context.IlanBilgileri
                 .Where(i => i.Email == userEmail && i.Status == "active")
                 .Select(i => new { i.Id, i.Title })
                 .ToListAsync();
 
-            // View ile ilanları gönderiyoruz
-            return View(ilanlar); // Iletilen ilanlar burada View'a aktarılacak
+            // ViewBag ile tuple listesi gönderiyoruz
+            ViewBag.Ilanlar = ilanlar.Select(i => (i.Id, i.Title ?? "")).ToList();
+
+            return View();
         }
 
         [HttpPost]
@@ -669,15 +671,17 @@ namespace EmlakSitesi.Controllers
         {
             var userEmail = User.Identity.Name; // Oturum açan kullanıcının emaili
             if (string.IsNullOrEmpty(userEmail))
-                return Json(new { success = false, message = "Kullanıcı oturum açmamış!" });
+                return RedirectToAction("Login", "Account");
 
             var ilanlar = await _context.IlanBilgileri
                 .Where(i => i.Email == userEmail && i.Status == "active")
                 .Select(i => new { i.Id, i.Title })
                 .ToListAsync();
 
-            // View ile ilanları gönderiyoruz
-            return View(ilanlar); // Iletilen ilanlar burada View'a aktarılacak
+            // ViewBag ile tuple listesi gönderiyoruz
+            ViewBag.Ilanlar = ilanlar.Select(i => (i.Id, i.Title ?? "")).ToList();
+
+            return View();
         }
 
 

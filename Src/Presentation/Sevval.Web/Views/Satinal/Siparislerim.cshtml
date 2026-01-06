@@ -5,185 +5,113 @@
 
 @{
     ViewData["Title"] = "Siparişlerim";
-    Layout = null;
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
 }
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Şevval Emlak</title>
-
-    <!-- CSS Libraries -->
+@section Styles {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Navbar için özel CSS -->
-    <link rel="stylesheet" href="~/css/Anasayfa.css" />
-    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
-    <script src="~/js/site.js" defer></script>
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
-
-        .table thead {
-            background-color: #0d6efd;
-            color: white;
-        }
-
-        .status-icon {
-            font-size: 1.5rem;
-            vertical-align: middle;
-        }
-
-        .badge-status {
-            font-size: .9rem;
-            padding: .5em .8em;
-        }
+        body { background-color: #f0f2f5; }
+        .table thead { background-color: #0d6efd; color: white; }
+        .status-icon { font-size: 1.5rem; vertical-align: middle; }
+        .badge-status { font-size: .9rem; padding: .5em .8em; }
     </style>
-</head>
-<body>
-    @Html.AntiForgeryToken()
-    <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container">
-            <div class="logo">
-                <a href="/">
-                    <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <span>Şevval Emlak</span>
-            </div>
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-                <li><a href="@Url.Action("About", "Home")">Hakkımızda</a></li>
-                <li><a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a></li>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <li><a href="@Url.Action("Panel", "Ilan")">Mağazam</a></li>
-                }
-            </ul>
-            <div class="auth-buttoons">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("Panel", "Ilan")">Panele Git</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                }
+}
+
+@Html.AntiForgeryToken()
+
+<div class="container my-5">
+    <h1 class="display-4 text-center mb-4 fw-bold text-primary"><i class="bi bi-receipt-cutoff me-3"></i>Siparişlerim</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle-fill me-2"></i> Henüz bir siparişiniz bulunmamaktadır.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>İlan Türü</th>
+                                <th>İsim Soyisim</th>
+                                <th>Firma</th>
+                                <th>Talep Tarihi</th>
+                                <th>Adres</th>
+                                <th class="text-center">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@item.Id</strong></td>
+                                    <td>@item.IlanTuru</td>
+                                    <td>@item.IsimSoyad</td>
+                                    <td>@item.Firma</td>
+                                    <td>@item.TalepTarihi.ToString("dd MMMM yyyy")</td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="showAddressModal('@item.Email')">
+                                            <i class="bi bi-geo-alt-fill me-1"></i> Göster
+                                        </button>
+                                    </td>
+                                    <td class="text-center">
+                                        @{
+                                            string statusClass = "bg-secondary";
+                                            string statusIcon = "bi-hourglass-split";
+                                            string statusText = item.Durum ?? "BEKLEMEDE";
+
+                                            switch (statusText)
+                                            {
+                                                case "BEKLEMEDE": statusClass = "bg-warning text-dark"; statusIcon = "bi-clock-history"; break;
+                                                case "SIRAYA ALINDI": statusClass = "bg-info text-dark"; statusIcon = "bi-list-ol"; break;
+                                                case "SİPARİŞ HAZIRLANIYOR": statusClass = "bg-primary"; statusIcon = "bi-box-seam"; break;
+                                                case "KARGOYA VERİLDİ": statusClass = "bg-success"; statusIcon = "bi-truck"; break;
+                                                case "TESLİM EDİLDİ": statusClass = "bg-dark"; statusIcon = "bi-check-circle-fill"; break;
+                                            }
+                                        }
+                                        <span class="badge rounded-pill @statusClass badge-status">
+                                            <i class="bi @statusIcon me-1"></i> @statusText
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </nav>
-    <main class="container my-5">
-        <h1 class="display-4 text-center mb-4 fw-bold text-primary"><i class="bi bi-receipt-cutoff me-3"></i>Siparişlerim</h1>
+    }
+</div>
 
-        @if (!Model.Any())
-        {
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle-fill me-2"></i> Henüz bir siparişiniz bulunmamaktadır.
+<!-- Adres Modalı -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addressModalLabel"><i class="bi bi-geo-alt-fill me-2"></i>Kullanıcı Adresi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
-        }
-        else
-        {
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>İlan Türü</th>
-                                    <th>İsim Soyisim</th>
-                                    <th>Firma</th>
-                                    <th>Talep Tarihi</th>
-                                    <th>Adres</th>
-                                    <th class="text-center">Durum</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td><strong>#@item.Id</strong></td>
-                                        <td>@item.IlanTuru</td>
-                                        <td>@item.IsimSoyad</td>
-                                        <td>@item.Firma</td>
-                                        <td>@item.TalepTarihi.ToString("dd MMMM yyyy")</td>
-                                        <td>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showAddressModal('@item.Email')">
-                                                <i class="bi bi-geo-alt-fill me-1"></i> Göster
-                                            </button>
-                                        </td>
-                                        <td class="text-center">
-                                            @{
-                                                string statusClass = "bg-secondary";
-                                                string statusIcon = "bi-hourglass-split";
-                                                string statusText = item.Durum ?? "BEKLEMEDE";
-
-                                                switch (statusText)
-                                                {
-                                                    case "BEKLEMEDE": statusClass = "bg-warning text-dark"; statusIcon = "bi-clock-history"; break;
-                                                    case "SIRAYA ALINDI": statusClass = "bg-info text-dark"; statusIcon = "bi-list-ol"; break;
-                                                    case "SİPARİŞ HAZIRLANIYOR": statusClass = "bg-primary"; statusIcon = "bi-box-seam"; break;
-                                                    case "KARGOYA VERİLDİ": statusClass = "bg-success"; statusIcon = "bi-truck"; break;
-                                                    case "TESLİM EDİLDİ": statusClass = "bg-dark"; statusIcon = "bi-check-circle-fill"; break;
-                                                }
-                                            }
-                                            <span class="badge rounded-pill @statusClass badge-status">
-                                                <i class="bi @statusIcon me-1"></i> @statusText
-                                            </span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        }
-    </main>
-
-    <!-- Adres Modalı -->
-    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="addressModalLabel"><i class="bi bi-geo-alt-fill me-2"></i>Kullanıcı Adresi</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="userAddress" class="lead"><i class="fas fa-spinner fa-spin me-2"></i> Adres yükleniyor...</p>
-                </div>
+            <div class="modal-body">
+                <p id="userAddress" class="lead"><i class="fas fa-spinner fa-spin me-2"></i> Adres yükleniyor...</p>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         function showAddressModal(email) {
             const addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
             const userAddressP = document.getElementById('userAddress');
-
             userAddressP.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Adres yükleniyor...';
             addressModal.show();
 
@@ -192,11 +120,9 @@
                 type: 'GET',
                 data: { email: email },
                 success: function (response) {
-                    if(response.address) {
-                        userAddressP.innerHTML = '<i class="bi bi-house-door-fill text-primary me-2"></i>' + response.address;
-                    } else {
-                        userAddressP.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Adres bilgisi bulunamadı.';
-                    }
+                    userAddressP.innerHTML = response.address 
+                        ? '<i class="bi bi-house-door-fill text-primary me-2"></i>' + response.address
+                        : '<i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Adres bilgisi bulunamadı.';
                 },
                 error: function () {
                     userAddressP.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Adres bilgisi alınamadı.';
@@ -204,6 +130,4 @@
             });
         }
     </script>
-</body>
-</html>
-
+}

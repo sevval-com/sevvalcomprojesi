@@ -1,451 +1,166 @@
 ﻿@model IEnumerable<Sevval.Domain.Entities.SatisTalep>
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
-@using System; 
+@using System
 @using Sevval.Domain.Entities
 
 @{
     ViewData["Title"] = "Satış Talepleri";
-    Layout = null;
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
 
-    // Kullanıcının şehrini al
     var user = await UserManager.GetUserAsync(User);
-    var userCity = user?.City; // ?. ile null kontrolü yap
+    var userCity = user?.City;
 }
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@ViewData["Title"]</title>
+@section Styles {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/talep.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body class="bg-light">
-    <div class="container py-5">
-        <div class="card shadow-lg border-0">
-            <div class="card-header text-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="card-title h4 mb-0"><i class="bi bi-table me-2"></i>Satış Talepleri</h2>
-                    <div class="d-flex gap-2">
-                        @* <button class="btn btn-light btn-sm"><i class="bi bi-filter"></i> Filtrele</button>
-                        <button class="btn btn-light btn-sm"><i class="bi bi-download"></i> İndir</button> *@
-                        <button class="btn btn-light btn-sm" onclick="window.location.href='/'">
-                            <i class="bi bi-house-door"></i> Ana Sayfaya Dön
-                        </button>
-                    </div>
-                </div>
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="card-title h4 mb-0"><i class="bi bi-table me-2"></i>Satış Talepleri</h2>
+                <button class="btn btn-light btn-sm" onclick="window.location.href='/'">
+                    <i class="bi bi-house-door"></i> Ana Sayfaya Dön
+                </button>
             </div>
-            <div class="card-body p-4">
-                @if (userCity != null)
+        </div>
+        <div class="card-body p-4">
+            @if (userCity != null)
+            {
+                var matchingTalepler = Model.Where(talep => talep.ResidentialCity == userCity || talep.LandCity == userCity).ToList();
+                if (matchingTalepler.Any())
                 {
-                    var matchingTalepler = Model.Where(talep => talep.ResidentialCity == userCity || talep.LandCity == userCity).ToList();
-                    if (matchingTalepler.Any())
-                    {
-                        <div class="table-responsive rounded-3">
-                            <table class="table data-table table-striped table-hover align-middle mb-0">
-                                <thead>
+                    <div class="table-responsive rounded-3">
+                        <table class="table data-table table-striped table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Sıra</th>
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectCategory))) { <th>Kategori</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectStatus))) { <th>Durum</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialCity))) { <th>İl</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialDistrict))) { <th>İlçe</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialVillage))) { <th>Mahalle</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandCity))) { <th>İl</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandDistrict))) { <th>İlçe</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandVillage))) { <th>Köy</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandAda))) { <th>Ada</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandParsel))) { <th>Parsel</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandArea))) { <th>Arazi Alanı</th> }
+                                    @if (matchingTalepler.Any(x => x.LandPrice != null)) { <th>Arazi Fiyatı</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Rooms))) { <th>Oda Sayısı</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.BuildingAge))) { <th>Bina Yaşı</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Floor))) { <th>Kat</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Area))) { <th>Alan</th> }
+                                    @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Price))) { <th>Fiyat</th> }
+                                    <th class="text-center">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in matchingTalepler)
+                                {
                                     <tr>
-                                        <th>Sıra</th>
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectCategory)))
-                                        {
-                                            <th>Kategori</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectStatus)))
-                                        {
-                                            <th>Durum</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialCity)))
-                                        {
-                                            <th>İl</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialDistrict)))
-                                        {
-                                            <th>İlçe</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialVillage)))
-                                        {
-                                            <th>Mahalle</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandCity)))
-                                        {
-                                            <th>İl</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandDistrict)))
-                                        {
-                                            <th>İlçe</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandVillage)))
-                                        {
-                                            <th>Köy</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandAda)))
-                                        {
-                                            <th>Ada</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandParsel)))
-                                        {
-                                            <th>Parsel</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandArea)))
-                                        {
-                                            <th>Arazi Alanı</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => x.LandPrice != null))
-                                        {
-                                            <th>Arazi Fiyatı</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Rooms)))
-                                        {
-                                            <th>Oda Sayısı</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.BuildingAge)))
-                                        {
-                                            <th>Bina Yaşı</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Floor)))
-                                        {
-                                            <th>Kat</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Area)))
-                                        {
-                                            <th>Alan</th>
-                                        }
-                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Price)))
-                                        {
-                                            <th>Fiyat</th>
-                                        }
-                                        <th class="text-center">İşlemler</th>
+                                        <td>@item.RequestNumber</td>
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectCategory))) { <td>@(item.selectCategory ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectStatus))) { <td>@(item.selectStatus ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialCity))) { <td>@(item.ResidentialCity ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialDistrict))) { <td>@(item.ResidentialDistrict ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialVillage))) { <td>@(item.ResidentialVillage ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandCity))) { <td>@(item.LandCity ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandDistrict))) { <td>@(item.LandDistrict ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandVillage))) { <td>@(item.LandVillage ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandAda))) { <td>@(item.LandAda ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandParsel))) { <td>@(item.LandParsel ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandArea))) { <td>@(item.LandArea != null ? item.LandArea + " m²" : "-")</td> }
+                                        @if (matchingTalepler.Any(x => x.LandPrice != null)) { <td>@(item.LandPrice != null ? item.LandPrice + " TL" : "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Rooms))) { <td>@(item.Rooms ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.BuildingAge))) { <td>@(item.BuildingAge ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Floor))) { <td>@(item.Floor ?? "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Area))) { <td>@(item.Area != null ? item.Area + " m²" : "-")</td> }
+                                        @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Price))) { <td>@(item.Price != null ? item.Price + " TL" : "-")</td> }
+                                        <td class="text-center">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detailsModal" onclick='ShowDetails(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(item)))'><i class="bi bi-info-circle"></i></button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#islemlerModal" onclick='ShowIslemler(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(item)))'><i class="fas fa-phone-alt"></i></button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in matchingTalepler)
-                                    {
-                                        <tr>
-                                            <td data-label="Sıra">@item.RequestNumber</td>
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectCategory)))
-                                            {
-                                                <td data-label="Kategori">@(string.IsNullOrEmpty(item.selectCategory) ? "-" : item.selectCategory)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.selectStatus)))
-                                            {
-                                                <td data-label="Durum">@(string.IsNullOrEmpty(item.selectStatus) ? "-" : item.selectStatus)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialCity)))
-                                            {
-                                                <td data-label="İl">@(string.IsNullOrEmpty(item.ResidentialCity) ? "-" : item.ResidentialCity)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialDistrict)))
-                                            {
-                                                <td data-label="İlçe">@(string.IsNullOrEmpty(item.ResidentialDistrict) ? "-" : item.ResidentialDistrict)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.ResidentialVillage)))
-                                            {
-                                                <td data-label="Mahalle">@(string.IsNullOrEmpty(item.ResidentialVillage) ? "-" : item.ResidentialVillage)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandCity)))
-                                            {
-                                                <td data-label="İl">@(string.IsNullOrEmpty(item.LandCity) ? "-" : item.LandCity)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandDistrict)))
-                                            {
-                                                <td data-label="İlçe">@(string.IsNullOrEmpty(item.LandDistrict) ? "-" : item.LandDistrict)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandVillage)))
-                                            {
-                                                <td data-label="Köy">@(string.IsNullOrEmpty(item.LandVillage) ? "-" : item.LandVillage)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandAda)))
-                                            {
-                                                <td data-label="Ada">@(string.IsNullOrEmpty(item.LandAda) ? "-" : item.LandAda)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandParsel)))
-                                            {
-                                                <td data-label="Parsel">@(string.IsNullOrEmpty(item.LandParsel) ? "-" : item.LandParsel)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.LandArea)))
-                                            {
-                                                <td data-label="Arazi Alanı">@(string.IsNullOrEmpty(item.LandArea) ? "-" : item.LandArea + " m²")</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => x.LandPrice != null))
-                                            {
-                                                <td data-label="Arazi Fiyatı">@(item.LandPrice == null ? "-" : item.LandPrice + " TL")</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Rooms)))
-                                            {
-                                                <td data-label="Oda Sayısı">@(string.IsNullOrEmpty(item.Rooms) ? "-" : item.Rooms)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.BuildingAge)))
-                                            {
-                                                <td data-label="Bina Yaşı">@(string.IsNullOrEmpty(item.BuildingAge) ? "-" : item.BuildingAge)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Floor)))
-                                            {
-                                                <td data-label="Kat">@(string.IsNullOrEmpty(item.Floor) ? "-" : item.Floor)</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Area)))
-                                            {
-                                                <td data-label="Alan">@(string.IsNullOrEmpty(item.Area) ? "-" : item.Area + " m²")</td>
-                                            }
-                                            @if (matchingTalepler.Any(x => !string.IsNullOrEmpty(x.Price)))
-                                            {
-                                                <td data-label="Fiyat">@(string.IsNullOrEmpty(item.Price) ? "-" : item.Price + " TL")</td>
-                                            }
-                                            <td class="text-center">
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#detailsModal"
-                                                            onclick='ShowDetails(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(item)))'>
-                                                        <i class="bi bi-info-circle"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#islemlerModal"
-                                                            onclick='ShowIslemler(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(item)))'>
-                                                        <i class="fas fa-phone-alt"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info d-flex align-items-center rounded-3" role="alert">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <div>Henüz Talebiniz Yok.</div>
-                        </div>
-                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
                 else
                 {
-                    <div class="alert alert-warning d-flex align-items-center rounded-3" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <div>Kullanıcı şehri bulunamadı. Lütfen profilinizi güncelleyin.</div>
-                    </div>
+                    <div class="alert alert-info d-flex align-items-center rounded-3"><i class="bi bi-info-circle-fill me-2"></i><div>Henüz Talebiniz Yok.</div></div>
                 }
-            </div>
+            }
+            else
+            {
+                <div class="alert alert-warning d-flex align-items-center rounded-3"><i class="bi bi-exclamation-triangle-fill me-2"></i><div>Kullanıcı şehri bulunamadı. Lütfen profilinizi güncelleyin.</div></div>
+            }
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="islemlerModal" tabindex="-1" aria-labelledby="islemlerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="islemlerModalLabel">
-                        <i class="fas fa-phone-alt me-2"></i>İşlemler
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p id="modalInfo"></p>
-                    <button id="callButton" type="button" class="btn btn-primary m-2 w-100 w-md-auto" onclick="callPhone(currentItem.Phone)">
-                        <i class="fas fa-phone"></i> Ara
-                    </button>
-                    <button type="button" class="btn btn-success m-2 w-100 w-md-auto" onclick="openWhatsApp(currentItem.Phone)">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                </div>
-            </div>
+<!-- İşlemler Modal -->
+<div class="modal fade" id="islemlerModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="fas fa-phone-alt me-2"></i>İşlemler</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body text-center">
+        <p id="modalInfo"></p>
+        <button id="callButton" type="button" class="btn btn-primary m-2 w-100" onclick="callPhone(currentItem.Phone)"><i class="fas fa-phone"></i> Ara</button>
+        <button type="button" class="btn btn-success m-2 w-100" onclick="openWhatsApp(currentItem.Phone)"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+    </div>
+</div></div></div>
+
+<!-- Detay Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1"><div class="modal-dialog modal-dialog-scrollable modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Detay Bilgileri</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-4"><h6>Kategori Bilgileri</h6><hr/>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">Kategori</label><div class="col-sm-9"><p id="detKategori" class="form-control-plaintext"></p></div></div>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">Durum</label><div class="col-sm-9"><p id="detDurum" class="form-control-plaintext"></p></div></div>
+        </div>
+        <div class="mb-4"><h6>Mülk Bilgileri</h6><hr/><div id="propertyDetailsContainer"></div></div>
+        <div class="mb-4"><h6>Mülk Sahibi Bilgileri</h6><hr/>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">Ad</label><div class="col-sm-9"><p id="detFirstName" class="form-control-plaintext"></p></div></div>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">Soyad</label><div class="col-sm-9"><p id="detLastName" class="form-control-plaintext"></p></div></div>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">E-Posta</label><div class="col-sm-9"><p id="detEmail" class="form-control-plaintext"></p></div></div>
+            <div class="row mb-2"><label class="col-sm-3 col-form-label">Telefon</label><div class="col-sm-9"><p id="detPhone" class="form-control-plaintext"></p></div></div>
         </div>
     </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button></div>
+</div></div></div>
 
-    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailsModalLabel">Detay Bilgileri</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-4">
-                            <h6>Kategori Bilgileri</h6>
-                            <hr />
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">Kategori</label>
-                                <div class="col-sm-9">
-                                    <p id="detKategori" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">Durum</label>
-                                <div class="col-sm-9">
-                                    <p id="detDurum" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <h6>Mülk Bilgileri</h6>
-                            <hr />
-                            <div id="propertyDetailsContainer"></div>
-                        </div>
-                        <div class="mb-4">
-                            <h6>Mülk Sahibi Bilgileri</h6>
-                            <hr />
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">Ad</label>
-                                <div class="col-sm-9">
-                                    <p id="detFirstName" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">Soyad</label>
-                                <div class="col-sm-9">
-                                    <p id="detLastName" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">E-Posta</label>
-                                <div class="col-sm-9">
-                                    <p id="detEmail" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <label class="col-sm-3 col-form-label">Telefon</label>
-                                <div class="col-sm-9">
-                                    <p id="detPhone" class="form-control-plaintext"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-
+@section Scripts {
     <script>
-        // Global değişken: Modalda kullanılacak veriyi saklamak için
         var currentItem = {};
-
-        // Modal açılırken çağrılacak fonksiyon
-        function ShowIslemler(item) {
-            currentItem = item; // Satırdaki SatisTalep bilgisini alıyoruz
-            // Örneğin, modalInfo alanında telefon numarasını gösterebilirsiniz
-            document.getElementById("modalInfo").innerText = "Telefon: " + currentItem.Phone;
-        }
-
-        // Telefon numarasını temizleyip arama formatına dönüştüren fonksiyon
-        function formatPhoneNumber(phone) {
-            if (!phone) return "";
-            // Sadece rakamları al
-            var formatted = phone.replace(/\D/g, '');
-            // Eğer numara 10 haneliyse (başında 0 eksikse) başına 0 ekle
-            if(formatted.length === 10 && formatted.charAt(0) !== '0'){
-                formatted = "0" + formatted;
-            }
-            return formatted;
-        }
-
-        // Telefon için arama fonksiyonu
-        function callPhone(phone) {
-            var formattedPhone = formatPhoneNumber(phone);
-            if(formattedPhone) {
-                window.location.href = "tel:" + formattedPhone;
-            } else {
-                alert("Geçerli bir telefon numarası bulunamadı.");
-            }
-        }
-
-        // WhatsApp mesajı için numara formatlama fonksiyonu
-        function formatPhoneForWhatsApp(phone) {
-            if (!phone) return "";
-            var formatted = phone.replace(/\D/g, '');
-            // Eğer numara 0 ile başlıyorsa kaldır ve ülke kodu ekle
-            if(formatted.startsWith("0")){
-                formatted = formatted.substring(1);
-            }
-            // Eğer ülke kodu yoksa ve numara 10 haneliyse (ör. 5XXXXXXXXX) Türkiye kodu ekle
-            if(formatted.length === 10 && !formatted.startsWith("90")){
-                formatted = "90" + formatted;
-            }
-            return formatted;
-        }
-
-        // WhatsApp ile mesaj gönderme fonksiyonu
+        function ShowIslemler(item) { currentItem = item; document.getElementById("modalInfo").innerText = "Telefon: " + currentItem.Phone; }
+        function formatPhoneNumber(phone) { if (!phone) return ""; var f = phone.replace(/\D/g, ''); if(f.length === 10 && f.charAt(0) !== '0') f = "0" + f; return f; }
+        function callPhone(phone) { var f = formatPhoneNumber(phone); if(f) window.location.href = "tel:" + f; else alert("Geçerli bir telefon numarası bulunamadı."); }
+        function formatPhoneForWhatsApp(phone) { if (!phone) return ""; var f = phone.replace(/\D/g, ''); if(f.startsWith("0")) f = f.substring(1); if(f.length === 10 && !f.startsWith("90")) f = "90" + f; return f; }
         function openWhatsApp(phone) {
-            var formattedPhone = formatPhoneForWhatsApp(phone);
-            if (!formattedPhone) {
-                alert("Geçerli bir telefon numarası bulunamadı.");
-                return;
-            }
-            var message = "Merhaba iyi günler. www.sevvalemlak.com.tr üzerinden yapmış olduğunuz Satış talebi dolayısyla size ulaşıyorum";
-            var encodedMessage = encodeURIComponent(message);
-
-            // Mobil tarayıcı kontrolü yapıyoruz
+            var f = formatPhoneForWhatsApp(phone);
+            if (!f) { alert("Geçerli bir telefon numarası bulunamadı."); return; }
+            var msg = encodeURIComponent("Merhaba iyi günler. www.sevvalemlak.com.tr üzerinden yapmış olduğunuz Satış talebi dolayısyla size ulaşıyorum");
             var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if(isMobile) {
-                window.location.href = "whatsapp://send?phone=" + formattedPhone + "&text=" + encodedMessage;
-            } else {
-                window.open("https://web.whatsapp.com/send?phone=" + formattedPhone + "&text=" + encodedMessage, '_blank');
-            }
+            if(isMobile) window.location.href = "whatsapp://send?phone=" + f + "&text=" + msg;
+            else window.open("https://web.whatsapp.com/send?phone=" + f + "&text=" + msg, '_blank');
         }
-
         function ShowDetails(item) {
-            // Kategori Bilgileri
             document.getElementById("detKategori").innerText = item.selectCategory || '-';
             document.getElementById("detDurum").innerText = item.selectStatus || '-';
-
-            // Mülk Bilgileri (sadece dolu olanlar gösterilecek)
-            const propertyFields = [
-                { key: "Rooms", label: "Oda Sayısı" },
-                { key: "Area", label: "Alan" },
-                { key: "BuildingAge", label: "Bina Yaşı" },
-                { key: "Floor", label: "Kat" },
-                { key: "Bathrooms", label: "Banyo" },
-                { key: "HeatingSystem", label: "Isıtma Sistemi" },
-                { key: "Parking", label: "Otopark" },
-                { key: "Price", label: "Fiyat" },
-                { key: "LandAda", label: "Ada" },
-                { key: "LandParsel", label: "Parsel" },
-                { key: "LandArea", label: "Arazi Alanı" },
-                { key: "Slope", label: "Eğim" },
-                { key: "RoadCondition", label: "Yol Durumu" },
-                { key: "DistanceToSettlement", label: "Yerleşim Yeri Uzaklığı" },
-                { key: "ZoningStatus", label: "İmar Durumu" },
-                { key: "LandPrice", label: "Arazi Fiyatı" }
-            ];
-
-            const container = document.getElementById("propertyDetailsContainer");
-            container.innerHTML = ""; // Önceki verileri temizle
-
-            propertyFields.forEach(field => {
-                const value = item[field.key];
-                if (value) {
-                    const row = document.createElement("div");
-                    row.className = "row mb-2";
-
-                    row.innerHTML = `
-                        <label class="col-sm-3 col-form-label">${field.label}</label>
-                        <div class="col-sm-9">
-                            <p class="form-control-plaintext">${field.key === "Price" || field.key === "LandPrice" ? value + ' TL' : (field.key === "Area" || field.key === "LandArea" ? value + ' m²' : value)}</p>
-                        </div>
-                    `;
-                    container.appendChild(row);
-                }
-
-            });
-
-            // Mülk Sahibi Bilgileri
+            const fields = [{key:"Rooms",label:"Oda Sayısı"},{key:"Area",label:"Alan"},{key:"BuildingAge",label:"Bina Yaşı"},{key:"Floor",label:"Kat"},{key:"Bathrooms",label:"Banyo"},{key:"HeatingSystem",label:"Isıtma Sistemi"},{key:"Parking",label:"Otopark"},{key:"Price",label:"Fiyat"},{key:"LandAda",label:"Ada"},{key:"LandParsel",label:"Parsel"},{key:"LandArea",label:"Arazi Alanı"},{key:"Slope",label:"Eğim"},{key:"RoadCondition",label:"Yol Durumu"},{key:"DistanceToSettlement",label:"Yerleşim Yeri Uzaklığı"},{key:"ZoningStatus",label:"İmar Durumu"},{key:"LandPrice",label:"Arazi Fiyatı"}];
+            const container = document.getElementById("propertyDetailsContainer"); container.innerHTML = "";
+            fields.forEach(f => { const v = item[f.key]; if (v) { const row = document.createElement("div"); row.className = "row mb-2"; row.innerHTML = `<label class="col-sm-3 col-form-label">${f.label}</label><div class="col-sm-9"><p class="form-control-plaintext">${f.key==="Price"||f.key==="LandPrice"?v+' TL':(f.key==="Area"||f.key==="LandArea"?v+' m²':v)}</p></div>`; container.appendChild(row); }});
             document.getElementById("detFirstName").innerText = item.FirstName || '-';
             document.getElementById("detLastName").innerText = item.LastName || '-';
             document.getElementById("detEmail").innerText = item.Email || '-';
             document.getElementById("detPhone").innerText = item.Phone || '-';
         }
     </script>
-</body>
-</html>
+}

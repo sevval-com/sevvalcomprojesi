@@ -1948,6 +1948,15 @@
             var displayComments = Model.Comments;
         }
 
+        @if (TempData["CommentSuccess"] != null)
+        {
+            <div class="comment-success-alert" id="commentSuccessAlert">
+                <i class="fas fa-check-circle"></i>
+                <span>@TempData["CommentSuccess"]</span>
+                <button type="button" onclick="this.parentElement.style.display='none'">&times;</button>
+            </div>
+        }
+
         <h3>Son Yorumlar</h3>
         <div class="comments-container">
             @if (displayComments.Any())
@@ -2001,8 +2010,10 @@
         {
             <!-- Üye olmayan kullanıcı için isim, soyisim ve yorum alanlarını içeren form -->
             <form asp-action="AddComment" method="post" class="comment-form" onsubmit="var t=this.querySelector('textarea[name=content]'); if(!t.value.trim()){alert('Lütfen bir yorum yazın.');return false;}">
-                <input type="text" name="firstName" placeholder="İsim" required />
-                <input type="text" name="lastName" placeholder="Soyisim" required />
+                <div class="name-fields">
+                    <input type="text" name="firstName" placeholder="İsim" required />
+                    <input type="text" name="lastName" placeholder="Soyisim" required />
+                </div>
                 <textarea name="content" rows="4" placeholder="Yorumunuzu yazın... (Enter ile gönder)" required onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); if(this.value.trim()) this.form.submit(); else alert('Lütfen bir yorum yazın.'); }"></textarea>
                 <button type="submit">Yorum Yap</button>
             </form>
