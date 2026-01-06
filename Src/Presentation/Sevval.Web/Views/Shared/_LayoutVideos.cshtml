@@ -24,6 +24,9 @@
                     aspectRatio: {
                         '16/9': '16 / 9',
                     },
+                    screens: {
+                        'lg': '900px',
+                    },
                 },
             },
             plugins: [],
@@ -38,13 +41,15 @@
 
 @RenderBody()
 
+<!-- Video Scripts - Doğrudan burada render et -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+@RenderSection("VideoScripts", required: false)
+
 @if (IsSectionDefined("Scripts"))
 {
     IgnoreSection("Scripts");
 }
 
 @section Scripts {
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-    
-    @RenderSection("VideoScripts", required: false)
+    <!-- Boş bırak, VideoScripts yukarıda render edildi -->
 }

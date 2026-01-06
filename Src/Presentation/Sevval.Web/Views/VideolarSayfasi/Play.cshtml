@@ -325,7 +325,7 @@
         </div>
     </div>
 </div>
-@section Scripts {
+@section VideoScripts {
     <style>
         /* Plyr base styling */
         .plyr { 
@@ -1077,7 +1077,7 @@
                 };
                 player.on('enterfullscreen', updateFsTooltip);
                 player.on('exitfullscreen', updateFsTooltip);
-                // İlk kurulum
+            // İlk kurulum
                 updateFsTooltip();
             })();
             const descBox = document.getElementById('description-box');
@@ -1339,24 +1339,14 @@
                 // İzlenen video ID'leri
                 const watchedIds = new Set(@Html.Raw(Json.Serialize(ViewBag.WatchedIds ?? new HashSet<int>())));
                 
-                console.log('Current Video ID:', currentVideoId);
-                console.log('Current Category:', currentCategory);
-                
                 // Sadece local endpoint'i kullan - API'ye düşme
                 let url = `/VideolarSayfasi/GetSuggestedVideos?currentVideoId=${currentVideoId}&category=${encodeURIComponent(currentCategory || '')}&limit=6`;
-                console.log('Trying local URL:', url);
                 
                 let response = await fetch(url);
                 let data = null;
                 
                 if (response.ok) {
                     data = await response.json();
-                    console.log('Local API Response:', data);
-                    console.log('Videos with user info:', data.videos?.map(v => ({
-                        id: v.id,
-                        title: v.videoAdi,
-                        uploader: v.yukleyenKullanici ? `${v.yukleyenKullanici.firstName} ${v.yukleyenKullanici.lastName}` : 'null'
-                    })));
                 }
                 
                 if (data && data.success && data.videos && data.videos.length > 0) {

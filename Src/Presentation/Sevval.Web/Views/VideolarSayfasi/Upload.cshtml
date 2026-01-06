@@ -1,4 +1,4 @@
-﻿@model Sevval.Web.Models.VideoUploadViewModel
+@model Sevval.Web.Models.VideoUploadViewModel
 @{
     ViewData["Title"] = "Video Yükle";
     Layout = "~/Views/Shared/_LayoutVideos.cshtml";
@@ -25,7 +25,7 @@
                     </div>
                     <div>
                         <label asp-for="VideoAciklamasi" class="form-label">Açıklama</label>
-                        <textarea asp-for="VideoAciklamasi" rows="5" class="form-input" placeholder="Videonuz hakkında bilgi verin..." maxlength="1000"></textarea>
+                        <textarea asp-for="VideoAciklamasi" rows="5" class="form-input" placeholder="Videonuz hakkında bilgi verin..." maxlength="1000" style="resize: vertical; min-height: 120px;"></textarea>
                         <span class="text-xs text-slate-500">Maksimum 1000 karakter</span>
                         <span asp-validation-for="VideoAciklamasi" class="form-error"></span>
                     </div>
@@ -43,6 +43,13 @@
                         </div>
                         <select asp-for="Kategori" id="categorySelect" class="form-input">
                             <option value="" selected>Bir kategori seçin...</option>
+                            @if (ViewBag.Kategoriler != null)
+                            {
+                                foreach (var kat in ViewBag.Kategoriler as List<string>)
+                                {
+                                    <option value="@kat">@kat</option>
+                                }
+                            }
                         </select>
                         <span asp-validation-for="Kategori" class="form-error"></span>
                         <p class="text-xs text-slate-500 mt-1">Kategoriler Category sayfasından yönetilir.</p>
@@ -281,22 +288,50 @@
             try {
                 const sel = document.getElementById('categorySelect');
                 if (!sel) return;
-                const res = await fetch('/Category/GetCategories');
-                const data = await res.json();
-                if (!data.success) return;
-                const items = data.categories || [];
-                sel.innerHTML = '<option value="">Bir kategori seçin...</option>' + items.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
 
-                // Canlıda seçili gelmeme sorununa karşı: URL'deki kategori parametresini uygula (case/trim tolerant)
+                // Mevcut seçimi sakla (kullanıcı fetch sırasında seçmiş olabilir)
+                const previousValue = sel.value;
+
+                console.log('Fetching categories...');
+                const res = await fetch('/Category/GetCategories');
+                if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+                
+                const data = await res.json();
+                if (!data.success) {
+                    console.warn('Category fetch returned unsuccessful:', data.message);
+                    return;
+                }
+                
+                const items = data.categories || [];
+                if (items.length === 0) {
+                     console.log('No categories returned from API. Keeping server-rendered options if any.');
+                     return;
+                }
+
+                // Yeni HTML'i oluştur
+                const optionsHtml = '<option value="">Bir kategori seçin...</option>' + 
+                    items.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+                
+                sel.innerHTML = optionsHtml;
+
+                // Seçimi geri yükle veya URL parametresinden ayarla
                 const urlParams = new URLSearchParams(window.location.search);
                 const qsKat = urlParams.get('kategori') || urlParams.get('category') || '';
                 const normalize = s => (s || '').toString().trim().replace(/\.$/, '');
-                const target = normalize(qsKat);
+                
+                // Öncelik: 1. URL parametresi, 2. Önceki manuel seçim
+                let target = normalize(qsKat);
+                if (!target && previousValue) {
+                    target = normalize(previousValue);
+                }
+
                 if (target) {
                     const opt = Array.from(sel.options).find(o => normalize(o.value).toLowerCase() === target.toLowerCase());
                     if (opt) sel.value = opt.value;
                 }
-            } catch (e) { console.error('Kategoriler yüklenemedi', e); }
+            } catch (e) { 
+                console.error('Kategoriler yüklenemedi:', e); 
+            }
         }
 
         function escapeHtml(str){

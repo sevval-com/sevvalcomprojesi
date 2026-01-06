@@ -6,6 +6,11 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 
@@ -193,21 +198,31 @@ textarea.form-control {
     }
 
     .step-circle {
-        width: 40px; /* Yuvarlak boyutunu küçült */
-        height: 40px; /* Yuvarlak boyutunu küçült */
-        font-size: 20px; /* Numara boyutunu küçült */
+        width: 30px; /* Yuvarlak boyutunu küçült */
+        height: 30px; /* Yuvarlak boyutunu küçült */
+        font-size: 14px; /* Numara boyutunu küçült */
     }
 
     .step-container {
-        flex-direction: column; /* Mobilde dikey düzen */
+        flex-direction: row !important; /* Mobilde yatay düzen */
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+        padding: 10px 5px !important;
+        overflow-x: auto !important;
+    }
+    
+    .step {
+        flex-shrink: 0 !important;
+        min-width: auto !important;
+    }
+    
+    .step-description {
+        font-size: 10px !important;
     }
 
     .step:not(:last-child):after {
-        width: 100%; /* Dikeydeki çizgi uzunluğunu ayarla */
-        height: 2px; /* Dikey çizgi kalınlığını ayarla */
-        left: 50%; /* Ortala */
-        transform: translateX(-50%); /* Ortalamak için kaydır */
-        top: 50%; /* Yüksekliği ortala */
+        width: 20px;
+        height: 2px;
     }
 
     .naav-linkss a {
@@ -791,3 +806,161 @@ textarea.form-control {
     .input-group > input {
         flex: 1;
     }
+
+
+/* ============================================
+   MOBİL GÖRÜNÜM DÜZELTMELERİ - İLAN SAYFALARI
+   ============================================ */
+@media (max-width: 991px) {
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+    
+    * {
+        box-sizing: border-box !important;
+    }
+    
+    .navbaar,
+    .navbaar-container,
+    .container,
+    .form-container,
+    form,
+    .step-container,
+    .category-box,
+    .ilan-container {
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+    
+    .form-group,
+    .form-control,
+    input,
+    select,
+    textarea {
+        max-width: 100% !important;
+    }
+    
+    /* Category info mobil düzeltmesi */
+    .category-info {
+        position: relative !important;
+        left: auto !important;
+        transform: none !important;
+        width: calc(100% - 20px) !important;
+        max-width: 100% !important;
+        margin: 10px auto !important;
+        padding: 10px !important;
+        flex-direction: column !important;
+    }
+    
+    .category-info label {
+        font-size: 16px !important;
+        margin-right: 0 !important;
+        margin-bottom: 5px !important;
+    }
+    
+    .category-info input {
+        width: 100% !important;
+        max-width: 100% !important;
+        font-size: 14px !important;
+    }
+    
+    /* Upload container mobil */
+    .upload-container {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .photo-upload-area,
+    .video-upload-area {
+        width: 120px !important;
+        height: 120px !important;
+        min-width: 120px !important;
+        min-height: 120px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .step-container {
+        padding: 5px !important;
+        gap: 3px !important;
+    }
+    
+    .step-circle {
+        width: 25px !important;
+        height: 25px !important;
+        font-size: 12px !important;
+    }
+    
+    .step-description {
+        font-size: 8px !important;
+    }
+    
+    .category-info label {
+        font-size: 14px !important;
+    }
+    
+    .category-info input {
+        font-size: 12px !important;
+        padding: 8px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .step-circle {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 10px !important;
+    }
+    
+    .step-description {
+        font-size: 7px !important;
+    }
+}
+
+
+/* ============================================
+   Z-INDEX DÜZELTMELERİ - NAVBAR ÜST
+   ============================================ */
+.navbaar {
+    z-index: 999999 !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.navbaar-container {
+    z-index: 999999 !important;
+    overflow: visible !important;
+}
+
+.auth-buttoons {
+    overflow: visible !important;
+}
+
+.naav-linkss {
+    z-index: 9999999 !important;
+}
+
+.naav-linkss.active {
+    z-index: 9999999 !important;
+}
+
+.user-dropdown {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.user-dropdown-content,
+.user-dropdown-content.show,
+.dropdown-content {
+    z-index: 9999999 !important;
+    position: absolute !important;
+}
+
+/* Sayfa içeriği z-index düşük */
+.step-container,
+.category-info,
+.ilan-container,
+form#myForm {
+    z-index: 1 !important;
+}

@@ -5,6 +5,11 @@ body {
     padding: 0;
     background-color: #f0f4f8; /* Açık gri arka plan */
     color: #333;
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 /* Navbar */
@@ -970,12 +975,13 @@ h2 {
         justify-content: flex-end;
         align-items: center;
         width: auto;
-        margin-right: 58px;
+        margin-right: 10px;
+        margin-left: auto;
     }
 
         .auth-buttoons a {
-            padding: 8px 12px; /* İç boşlukları artırdım */
-            font-size: 12px; /* Yazı boyutunu düzelttim */
+            padding: 6px 10px; /* İç boşlukları artırdım */
+            font-size: 11px; /* Yazı boyutunu düzelttim */
             text-align: center; /* Yazı ortalanacak */
             white-space: nowrap; /* Metnin satır atlamaması için */
         }
@@ -985,9 +991,14 @@ h2 {
             }
 
     .user-name {
-        padding: 8px 12px;
-        font-size: 14px;
+        padding: 6px 10px;
+        font-size: 12px;
         color: white; /* Beyaz yazı */
+    }
+    
+    .mobile-menu-btn {
+        margin-left: 5px;
+        margin-right: 5px;
     }
 
 
@@ -1010,22 +1021,51 @@ h2 {
 /* 420px ve altı için özel ayarlar */
 @media only screen and (max-width: 400px) {
     .navbaar-container {
-        padding: 5px; /* Daha küçük padding */
+        padding: 5px;
+        gap: 3px;
     }
 
     .logo {
-        font-size: 18px; /* Logo boyutunu küçült */
-        margin-right: 10px; /* Daha az margin */
+        font-size: 18px;
+        margin-right: 5px;
     }
 
     .naav-linkss {
-        left: 183px;
-        width: 51%;
+        left: 0;
+        width: 100%;
     }
 
     .auth-buttoons {
-        right: 33px;
-        position: relative;
+        gap: 3px;
+        margin-right: 5px;
+        margin-left: auto;
+        position: static;
+        right: auto;
+    }
+    
+    .auth-buttoons a {
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+    
+    .user-name {
+        padding: 4px 6px;
+        font-size: 9px;
+        max-width: 50px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .ilan-ver-btn {
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+    
+    .mobile-menu-btn {
+        margin-left: 3px;
+        margin-right: 3px;
+        width: 24px;
+        height: 24px;
     }
 
     .pencere-icerik {
@@ -1047,8 +1087,11 @@ h2 {
     .whatsapp-image {
         width: 50px !important;
     }
-}
-
+    
+    .visitor-counts-navbar {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
 }
 
 
@@ -1110,4 +1153,274 @@ h2 {
     z-index: 9998;
     width: 305%;
     max-width: 4000px;
+}
+
+
+/* ============================================
+   MOBİL GÖRÜNÜM DÜZELTMELERİ
+   Sayfa içi kaymaları engelle
+   ============================================ */
+@media (max-width: 991px) {
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+    
+    * {
+        box-sizing: border-box !important;
+    }
+    
+    .step-container,
+    .form-container,
+    form,
+    .container {
+        max-width: 100vw !important;
+    }
+    
+    /* Navbar overflow visible kalmalı - dropdown için */
+    .navbaar,
+    .navbaar-container,
+    .auth-buttoons {
+        overflow: visible !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .step-container {
+        padding: 0 10px !important;
+        gap: 5px !important;
+    }
+    
+    .step-circle {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 14px !important;
+    }
+    
+    .step-description {
+        font-size: 10px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .step-container {
+        padding: 0 5px !important;
+        gap: 3px !important;
+    }
+    
+    .step-circle {
+        width: 25px !important;
+        height: 25px !important;
+        font-size: 12px !important;
+    }
+    
+    .step-description {
+        font-size: 9px !important;
+    }
+}
+
+
+/* ============================================
+   USER DROPDOWN VE MOBİL MENÜ DÜZELTMELERİ
+   ============================================ */
+
+/* Navbar z-index - EN YÜKSEK */
+.navbaar {
+    z-index: 999999 !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.navbaar-container {
+    z-index: 999999 !important;
+    overflow: visible !important;
+}
+
+.auth-buttoons {
+    overflow: visible !important;
+}
+
+/* User dropdown stili */
+.user-dropdown {
+    position: relative;
+    z-index: 999999 !important;
+    overflow: visible !important;
+}
+
+.user-dropdown-content {
+    display: none;
+    position: absolute !important;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 180px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999999 !important;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+.user-dropdown-content.show {
+    display: block !important;
+}
+
+.user-dropdown-content li {
+    padding: 0;
+    margin: 0;
+}
+
+.user-dropdown-content li a,
+.user-dropdown-content li button {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.user-dropdown-content li a:hover,
+.user-dropdown-content li button:hover {
+    background: #f5f5f5;
+}
+
+.user-dropdown-content .logout-btn {
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    color: #dc3545;
+}
+
+/* Mobil menü (nav-links) z-index */
+.naav-linkss {
+    z-index: 9999999 !important;
+}
+
+.naav-linkss.active {
+    display: flex !important;
+    z-index: 9999999 !important;
+}
+
+/* Sayfa içeriği z-index - DÜŞÜK */
+.step-container,
+.category-info,
+.ilan-container,
+.form-container,
+form,
+.container {
+    z-index: 1 !important;
+    position: relative;
+}
+
+/* Mobil menü butonu - 991px altı */
+@media (max-width: 991px) {
+    .mobile-menu-btn {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 30px !important;
+        height: 30px !important;
+        padding: 5px !important;
+        background: rgba(255,255,255,0.2) !important;
+        border-radius: 5px !important;
+        cursor: pointer !important;
+        margin-left: 5px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .mobile-menu-btn div {
+        width: 18px !important;
+        height: 2px !important;
+        background: white !important;
+        margin: 2px 0 !important;
+    }
+    
+    /* Navbar container düzeltmesi */
+    .navbaar-container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+        max-width: 100vw !important;
+        overflow: hidden !important;
+    }
+    
+    .auth-buttoons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        flex-shrink: 0 !important;
+    }
+}
+
+/* 480px altı için daha küçük butonlar */
+@media (max-width: 480px) {
+    .mobile-menu-btn {
+        width: 26px !important;
+        height: 26px !important;
+    }
+    
+    .mobile-menu-btn div {
+        width: 16px !important;
+    }
+    
+    .auth-buttoons {
+        gap: 5px !important;
+    }
+    
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+    }
+    
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        max-width: 60px !important;
+    }
+    
+    .login,
+    .auth-buttoons .login {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+    }
+}
+
+/* 375px altı için */
+@media (max-width: 375px) {
+    .mobile-menu-btn {
+        width: 24px !important;
+        height: 24px !important;
+        margin-left: 3px !important;
+    }
+    
+    .mobile-menu-btn div {
+        width: 14px !important;
+    }
+    
+    .auth-buttoons {
+        gap: 3px !important;
+    }
+    
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn {
+        padding: 4px 6px !important;
+        font-size: 9px !important;
+    }
+    
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 4px 6px !important;
+        font-size: 9px !important;
+        max-width: 50px !important;
+    }
 }

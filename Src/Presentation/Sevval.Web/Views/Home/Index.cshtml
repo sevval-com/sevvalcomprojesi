@@ -248,7 +248,7 @@
     }
 
     /* --- POPUPS CONTAINER RESPONSIVE AYARLARI (MOBİL YAN YANA) --- */
-    @@media (max-width: 768px) {
+    @@media (max-width: 991px) {
         .popups-container {
             display: flex !important;
             flex-direction: row !important; /* Yan yana zorla */
@@ -349,7 +349,7 @@
     }
 
     /* Responsive tasarım (Diğer Kısımlar) */
-    @@media (max-width: 768px) {
+    @@media (max-width: 991px) {
         .recently-visited-grid {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
@@ -446,8 +446,9 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        gap: 20px;
         justify-content: flex-start;
+        overflow: hidden;
     }
 
     .daily-offer-right-col {
@@ -455,6 +456,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
 
     /* Etiketler */
@@ -799,47 +801,122 @@
             font-weight: bold;
         }
 
-    /* ORTA EKRAN (TABLET) */
+    /* ORTA EKRAN (TABLET - iPad Air dahil) */
     @@media (min-width: 769px) and (max-width: 991px) {
         .modal-lg-custom {
             max-width: 95%;
-            margin: 10px auto;
+            margin: 5px auto;
+        }
+        
+        .daily-offer-modal-custom .modal-content {
+            max-height: 95vh !important;
         }
 
         .daily-offer-left-col {
-            padding: 15px;
-            overflow-y: auto;
-            max-height: 400px;
-            gap: 15px;
+            padding: 10px;
+            overflow: hidden !important;
+            max-height: none !important;
+            gap: 5px;
         }
 
         .daily-offer-right-col {
-            padding: 15px;
+            padding: 10px;
+            overflow: hidden !important;
+            gap: 5px;
         }
 
         .daily-offer-slider-wrap {
-            height: 250px;
+            height: 160px;
         }
 
         .daily-offer-price-val {
-            font-size: 26px;
+            font-size: 20px;
+        }
+        
+        .daily-offer-price-lbl {
+            font-size: 10px;
+        }
+        
+        .daily-offer-price-box {
+            padding: 5px;
+            margin-bottom: 5px;
         }
 
         .daily-offer-title-text {
-            font-size: 18px;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .daily-offer-loc-box {
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .daily-offer-tags-wrapper {
+            margin-bottom: 5px;
+            gap: 3px;
+        }
+        
+        .daily-offer-tag {
+            padding: 2px 6px;
+            font-size: 8px;
+        }
+        
+        .daily-offer-feat-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+            margin-bottom: 5px;
+        }
+        
+        .daily-offer-feat-item {
+            padding: 3px;
+            font-size: 9px;
+        }
+        
+        .daily-offer-feat-icon {
+            font-size: 10px;
         }
 
         .daily-offer-contact-btns {
             flex-direction: row;
         }
+        
+        .daily-offer-contact-box {
+            padding: 6px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-offer-contact-info {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .daily-offer-contact-row {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        
+        .daily-offer-contact-btn {
+            padding: 5px 10px;
+            font-size: 9px;
+        }
 
         .daily-offer-action-box {
-            gap: 10px;
+            gap: 4px;
+            margin-top: 5px;
         }
 
         .daily-offer-action-btn {
-            padding: 10px 10px;
-            font-size: 12px;
+            padding: 6px 8px;
+            font-size: 10px;
+        }
+        
+        .daily-offer-view-cnt {
+            padding: 4px;
+            font-size: 9px;
         }
     }
 
@@ -1126,6 +1203,12 @@
 
         .daily-offer-left-col {
             border-right: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden !important;
+            max-height: none !important;
+        }
+        
+        .daily-offer-right-col {
+            overflow: hidden !important;
         }
     }
 
@@ -1248,6 +1331,147 @@
             box-shadow: 0 4px 10px rgba(0, 120, 215, 0.3);
             transform: scale(1.05);
         }
+
+    /* ============================================
+       TELEFONDA MASAÜSTÜ GÖRÜNÜMÜ - YÜKSEKLİK BAZLI
+       Kullanıcı telefondan "Masaüstü Görünümü" seçtiğinde
+       viewport yüksekliği artar (genellikle 1000px+)
+       Bu durumda günün ilanı modalı masaüstü gibi görünür
+       ============================================ */
+    @@media (max-width: 991px) and (min-height: 1000px) {
+        .modal-lg-custom {
+            max-width: 95% !important;
+            margin: 10px auto !important;
+        }
+
+        .daily-offer-modal-custom .modal-content {
+            max-height: 90vh !important;
+            overflow: hidden !important;
+        }
+
+        .daily-offer-left-col {
+            padding: 20px !important;
+            overflow: hidden !important;
+            gap: 10px !important;
+        }
+
+        .daily-offer-right-col {
+            padding: 20px !important;
+            overflow: hidden !important;
+        }
+
+        .daily-offer-slider-wrap {
+            height: 280px !important;
+        }
+
+        .daily-offer-price-val {
+            font-size: 26px !important;
+        }
+
+        .daily-offer-price-lbl {
+            font-size: 11px !important;
+        }
+
+        .daily-offer-price-box {
+            padding: 12px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .daily-offer-title-text {
+            font-size: 18px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .daily-offer-loc-box {
+            font-size: 12px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .daily-offer-tags-wrapper {
+            margin-bottom: 10px !important;
+            gap: 6px !important;
+        }
+
+        .daily-offer-tag {
+            padding: 5px 10px !important;
+            font-size: 10px !important;
+        }
+
+        .daily-offer-feat-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .daily-offer-feat-item {
+            padding: 8px !important;
+            font-size: 11px !important;
+        }
+
+        .daily-offer-feat-icon {
+            font-size: 14px !important;
+        }
+
+        .daily-offer-contact-box {
+            padding: 12px !important;
+        }
+
+        .daily-offer-contact-row {
+            font-size: 12px !important;
+            margin-bottom: 6px !important;
+        }
+
+        .daily-offer-contact-btn {
+            padding: 8px 16px !important;
+            font-size: 11px !important;
+        }
+
+        .daily-offer-action-box {
+            gap: 10px !important;
+            margin-top: 12px !important;
+        }
+
+        .daily-offer-action-btn {
+            padding: 10px 16px !important;
+            font-size: 12px !important;
+        }
+
+        .daily-offer-view-cnt {
+            padding: 8px !important;
+            font-size: 12px !important;
+        }
+
+        .daily-offer-close-btn {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 16px !important;
+        }
+    }
+
+    /* Daha yüksek ekranlar için (1200px+) daha büyük elementler */
+    @@media (max-width: 991px) and (min-height: 1200px) {
+        .daily-offer-slider-wrap {
+            height: 350px !important;
+        }
+
+        .daily-offer-price-val {
+            font-size: 30px !important;
+        }
+
+        .daily-offer-title-text {
+            font-size: 20px !important;
+        }
+
+        .daily-offer-feat-item {
+            padding: 10px !important;
+            font-size: 12px !important;
+        }
+
+        .daily-offer-action-btn {
+            padding: 12px 20px !important;
+            font-size: 13px !important;
+        }
+    }
 </style>
 
 @if (ViewBag.GununIlan != null)
@@ -1284,7 +1508,7 @@
                 <div class="modal-body p-0">
                     <div class="row g-0">
                         <!-- Sol Taraf: Bilgiler -->
-                        <div class="col-lg-5 col-12 order-2 order-lg-1">
+                        <div class="col-md-5 col-12 order-2 order-md-1">
                             <div class="daily-offer-left-col">
                                 <div>
                                     <!-- Tags -->
@@ -1426,7 +1650,7 @@
                         </div>
 
                         <!-- Sağ Taraf: Slider ve Aksiyon Butonları -->
-                        <div class="col-lg-7 col-12 order-1 order-lg-2">
+                        <div class="col-md-7 col-12 order-1 order-md-2">
                             <div class="daily-offer-right-col">
                                 <!-- Swiper Container (Benzersiz ID) -->
                                 <div class="daily-offer-slider-wrap">
@@ -1928,7 +2152,7 @@
     </div>
 
     <!-- WhatsApp Logo -->
-    <a id="whatsapp-link-8" href="https://wa.me/905070775666?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum" target="_blank" class="whatsapp-float">
+    <a id="whatsapp-link-8" href="https://wa.me/905558339022?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum" target="_blank" class="whatsapp-float">
         <img src="~/sablon/img/724destek.webp" alt="WhatsApp" class="whatsapp-image" loading="lazy" width="90" height="90">
     </a>
 
@@ -2027,7 +2251,7 @@
         <div class="contact-right">
             <h2>Bizimle İletişime Geçin</h2>
             <p>Sizin için en iyi yatırıma yardımcı olalım! Satın almak, kiralamak veya satmak istiyorsanız, deneyimli danışmanlarımızla iletişime geçerek hemen adım atın.</p>
-            <a id="whatsapp-link-7" class="whatsapp-button" target="_blank" href="https://wa.me/905070775666?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum">
+            <a id="whatsapp-link-7" class="whatsapp-button" target="_blank" href="https://wa.me/905558339022?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum">
                 <img src="~/sablon/img/WhatsApp_icon.webp" alt="WhatsApp İkonu" class="whatsapp-icon" loading="lazy" width="24" height="24">
                 7/24 WhatsApp Destek
             </a>

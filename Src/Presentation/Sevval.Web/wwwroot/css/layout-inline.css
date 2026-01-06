@@ -16,8 +16,17 @@ body.modal-open {
 
 /* Tagline font - FOUT önleme */
 .tagline {
-    font-family: 'Caveat', cursive !important;
+    font-family: 'Caveat', 'Brush Script MT', cursive !important;
     font-weight: 700 !important;
+}
+
+/* Font yüklenene kadar yazıyı gizle */
+.fonts-loading .tagline {
+    visibility: hidden;
+}
+
+.fonts-loaded .tagline {
+    visibility: visible;
 }
 
 /* ============================================

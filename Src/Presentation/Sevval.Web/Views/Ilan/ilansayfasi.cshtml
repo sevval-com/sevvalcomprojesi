@@ -1,4 +1,4 @@
-﻿@model sevvalemlak.Dto.TumIlanlarDTO
+@model sevvalemlak.Dto.TumIlanlarDTO
 @removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.HeadTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
 @removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.BodyTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
 @using DocumentFormat.OpenXml.Office2010.PowerPoint
@@ -1786,7 +1786,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="random-ilanlar-list">
             @foreach (var ilan in Model.RandomIlanlar)
             {
-                var ilanFotograf = Model._Fotograflar.FirstOrDefault(f => f.IlanId == ilan.Id);
+                var ilanFotograf = Model.RandomIlanFotograflari.FirstOrDefault(f => f.IlanId == ilan.Id);
 
                 <div class="random-ilan-card">
                     <div class="ilan-image-container">
