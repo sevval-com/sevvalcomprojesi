@@ -1,0 +1,521 @@
+/* SevvalOfis Index Page Styles */
+
+/* Chart Container */
+.chart-container {
+    height: 400px;
+}
+
+/* --- GÜNÜN İLANI STİLLERİ (ADMIN PANEL İÇİN) --- */
+.daily-offer-modal-custom .modal-content {
+    background: linear-gradient(135deg, #009cfb 0%, #0056b3 100%);
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    color: white;
+    overflow: hidden;
+}
+
+.daily-offer-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
+    aspect-ratio: 1;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 1060;
+}
+
+.daily-offer-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.daily-offer-left-col {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: flex-start;
+}
+
+.daily-offer-right-col {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.daily-offer-tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.daily-offer-tag {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    color: white;
+}
+
+.daily-offer-tag:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.daily-offer-cat {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.daily-offer-cat::after {
+    content: "🏘️";
+    margin-left: 6px;
+}
+
+.daily-offer-stat {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border-color: rgba(76, 175, 80, 0.5);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.daily-offer-stat::after {
+    content: "✓";
+    margin-left: 6px;
+    font-weight: bold;
+}
+
+.daily-offer-subcat {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    border-color: rgba(33, 150, 243, 0.5);
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.daily-offer-subcat::after {
+    content: "📌";
+    margin-left: 6px;
+}
+
+.daily-offer-price-box {
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid #FFD700;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+}
+
+.daily-offer-price-lbl {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.daily-offer-price-val {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+    animation: dailyOfferPriceGlow 2s ease-in-out infinite;
+}
+
+@keyframes dailyOfferPriceGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4)) brightness(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)) brightness(1.2);
+    }
+}
+
+.daily-offer-title-box .daily-offer-title-text {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+    color: white;
+}
+
+.daily-offer-loc-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.daily-offer-loc-icon {
+    color: #01e11b;
+}
+
+.daily-offer-feat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.daily-offer-feat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    color: white;
+}
+
+.daily-offer-feat-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 5px 20px rgba(1, 225, 27, 0.3);
+    border-color: #01e11b;
+}
+
+.daily-offer-feat-icon {
+    color: #01e11b;
+    width: 20px;
+    font-size: 18px;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 0 5px rgba(1, 225, 27, 0.5));
+}
+
+.daily-offer-feat-item:hover .daily-offer-feat-icon {
+    transform: rotate(360deg) scale(1.2);
+}
+
+.daily-offer-contact-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    margin-top: 0;
+}
+
+.daily-offer-contact-info {
+    margin-bottom: 12px;
+}
+
+.daily-offer-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.daily-offer-contact-icon {
+    color: #01e11b;
+    width: 16px;
+}
+
+.daily-offer-contact-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.daily-offer-contact-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: white;
+}
+
+.daily-offer-wa-btn {
+    background: #25d366;
+}
+
+.daily-offer-wa-btn:hover {
+    background: #128c7e;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.daily-offer-call-btn {
+    background: #009cfb;
+}
+
+.daily-offer-call-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.daily-offer-slider-wrap {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    height: 450px;
+    position: relative;
+}
+
+.daily-offer-slider-wrap .swiper-slide {
+    background: rgba(0,0,0,0.2);
+}
+
+.daily-offer-slider-wrap .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.daily-offer-action-box {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.daily-offer-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    width: 100%;
+}
+
+.daily-offer-btn-primary {
+    background: linear-gradient(135deg, #01e11b 0%, #00c41a 100%);
+    box-shadow: 0 4px 12px rgba(1, 225, 27, 0.3);
+}
+
+.daily-offer-btn-primary:hover {
+    background: linear-gradient(135deg, #00c41a 0%, #00a015 100%);
+    transform: translateY(-3px) scale(1.02);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.daily-offer-btn-orange {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.daily-offer-btn-orange:hover {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    transform: translateY(-3px) scale(1.02);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.daily-offer-view-cnt {
+    grid-column: span 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 18px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.daily-offer-view-cnt:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.daily-offer-modal-custom .swiper-button-prev,
+.daily-offer-modal-custom .swiper-button-next {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.daily-offer-modal-custom .swiper-button-prev:after,
+.daily-offer-modal-custom .swiper-button-next:after {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* MOBİL RESPONSIVE */
+@media (max-width: 768px) {
+    .modal-lg-custom {
+        max-width: 92% !important;
+        margin: 15px auto !important;
+        max-height: 90vh !important;
+    }
+
+    .daily-offer-modal-custom .modal-content {
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+    }
+
+    .daily-offer-left-col {
+        padding: 10px !important;
+        overflow-y: visible !important;
+        max-height: none !important;
+        gap: 8px !important;
+    }
+
+    .daily-offer-right-col {
+        padding: 5px 10px !important;
+        gap: 5px !important;
+    }
+
+    .daily-offer-slider-wrap {
+        height: 200px !important;
+        border-radius: 10px !important;
+    }
+
+    .daily-offer-price-val {
+        font-size: 22px !important;
+    }
+
+    .daily-offer-price-lbl {
+        font-size: 10px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .daily-offer-price-box {
+        padding: 8px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .daily-offer-title-text {
+        font-size: 16px !important;
+        margin-bottom: 5px !important;
+        line-height: 1.2 !important;
+    }
+
+    .daily-offer-title-box {
+        margin-bottom: 0 !important;
+    }
+
+    .daily-offer-loc-box {
+        font-size: 11px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .daily-offer-tags-wrapper {
+        margin-bottom: 8px !important;
+        gap: 4px !important;
+    }
+
+    .daily-offer-tag {
+        padding: 4px 8px !important;
+        font-size: 9px !important;
+    }
+
+    .daily-offer-feat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 5px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .daily-offer-feat-item {
+        padding: 5px !important;
+        font-size: 10px !important;
+    }
+
+    .daily-offer-feat-icon {
+        font-size: 14px !important;
+    }
+
+    .daily-offer-contact-box {
+        padding: 8px !important;
+        margin-top: 0 !important;
+    }
+
+    .daily-offer-contact-row {
+        font-size: 11px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .daily-offer-contact-btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+    }
+
+    .daily-offer-contact-btns {
+        gap: 5px !important;
+    }
+
+    .daily-offer-action-box {
+        gap: 5px !important;
+        margin-top: 10px !important;
+    }
+
+    .daily-offer-action-btn {
+        padding: 8px !important;
+        font-size: 11px !important;
+    }
+
+    .daily-offer-view-cnt {
+        padding: 5px !important;
+        font-size: 11px !important;
+        margin-top: 0 !important;
+    }
+
+    .daily-offer-close-btn {
+        width: 30px !important;
+        height: 30px !important;
+        top: 10px !important;
+        right: 10px !important;
+        font-size: 14px !important;
+    }
+}

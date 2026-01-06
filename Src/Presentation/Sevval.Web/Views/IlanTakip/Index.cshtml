@@ -1,714 +1,287 @@
-﻿   @model List<Sevval.Domain.Entities.BireyselIlanTakibi>
+﻿@model List<Sevval.Domain.Entities.BireyselIlanTakibi>
 @{
     ViewBag.Title = "Bireysel İlan Takip";
-    Layout = null;
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
 }
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title</title>
+
+@section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="~/css/IlanTakip.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        .cell-data {
-            display: inline-block; /* İçeriği inline-block olarak ayarla */
-        }
-
-        .edit-icon {
-            margin-left: 5px; /* İkon ile yazı arasında boşluk bırak */
-            cursor: pointer; /* Düzenleme ikonuna tıklanabilir görünüm ver */
-        }
-
-        .save-icon {
-            margin-left: 5px;
-            cursor: pointer;
-            color: green; /* Kaydetme ikonu rengi */
-        }
-
-        .cancel-icon {
-            margin-left: 5px;
-            cursor: pointer;
-            color: red; /* İptal ikonu rengi */
-        }
-
-        .input-field {
-            display: none; /* Input alanını başlangıçta gizle */
-            width: auto; /* Input genişliğini içeriğe göre ayarla */
-        }
-
-        .ilan-girildi-mi-icon {
-            margin-left: 5px; /* Icon ile yazı arasında boşluk */
-        }
+        .cell-data { display: inline-block; }
+        .edit-icon { margin-left: 5px; cursor: pointer; }
+        .save-icon { margin-left: 5px; cursor: pointer; color: green; }
+        .cancel-icon { margin-left: 5px; cursor: pointer; color: red; }
+        .input-field { display: none; width: auto; }
+        .ilan-girildi-mi-icon { margin-left: 5px; }
     </style>
-</head>
-<body>
-    <div class="container my-5">
-        <h2 class="text-center mb-4">@ViewData["Title"]</h2>
-        <div class="text-center mt-4">
-            <button id="btnYeniKayit" class="btn btn-primary btn-lg me-2">Yeni Kayıt Ekle</button>
-            <button id="btnAnaSayfa" class="btn btn-primary btn-lg me-2">Ana Sayfaya Dön</button>
-            <button id="btnExcelIndir" class="btn btn-success btn-lg">Excel Olarak İndir</button>
+}
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+    <div class="text-center mt-4">
+        <button id="btnYeniKayit" class="btn btn-primary btn-lg me-2">Yeni Kayıt Ekle</button>
+        <button id="btnAnaSayfa" class="btn btn-primary btn-lg me-2">Ana Sayfaya Dön</button>
+        <button id="btnExcelIndir" class="btn btn-success btn-lg">Excel Olarak İndir</button>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center mt-4">Henüz kayıtlı ilan bulunmamaktadır.</div>
+    }
+    else
+    {
+        <div class="table-title-container text-center mb-3 mt-4">
+            <div class="table-title">Bireysel İlan Takip</div>
         </div>
-
-        <script>
-            document.getElementById('btnAnaSayfa').addEventListener('click', function () {
-                window.location.href = '/';
-            });
-
-            document.addEventListener('DOMContentLoaded', function () {
-                window.scrollTo(0, 0);
-                const wrapper = document.querySelector('.modern-table-wrapper');
-                if (wrapper) {
-                    wrapper.scrollTo(0, 0);
-                }
-            });
-
-            // Excel İndirme İşlemi
-            document.getElementById('btnExcelIndir').addEventListener('click', function () {
-                // Excel oluşturma işlemini başlatmak için sunucu tarafına bir istek gönderilir
-                window.location.href = '/IlanTakip/ExportToExcel'; // Bu URL'yi Controller'daki action ile eşleştirin
-            });
-        </script>
-
-        @if (!Model.Any())
-        {
-            <div class="alert alert-info text-center">
-                Henüz kayıtlı ilan bulunmamaktadır.
-            </div>
-        }
-        else
-        {
-            <div class="table-title-container text-center mb-3">
-                <div class="table-title">Bireysel İlan Takip</div>
-            </div>
-            <div class="table-responsive modern-table-wrapper">
-                <table class="table modern-table">
-                    <thead class="sticky-header">
+        <div class="table-responsive modern-table-wrapper">
+            <table class="table modern-table">
+                <thead class="sticky-header">
+                    <tr>
+                        <th class="number-column">No</th>
+                        <th>Kategori</th><th>İsim</th><th>Cep Tel.</th><th>İl</th><th>İlçe</th><th>Mahalle/Köy</th>
+                        <th>Ada</th><th>Parsel</th><th>M²</th><th>Oda Sayısı</th><th>Bina Yaşı</th><th>Bina Kat Sayısı</th>
+                        <th>Bulunduğu Kat</th><th>Isıtma Sistemi</th><th>Balkon</th><th>İmar</th><th>Tapu</th><th>İlan No</th>
+                        <th>Eline İstenen Fiyat</th><th>İlan Fiyatı</th><th>Referans</th><th>İlan Girildi Mi?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = Model.Count - 1; i >= 0; i--)
+                    {
+                        var item = Model[i];
                         <tr>
-                            <th class="number-column">No</th>
-                            <th>Kategori</th>
-                            <th>İsim</th>
-                            <th>Cep Tel.</th>
-                            <th>İl</th>
-                            <th>İlçe</th>
-                            <th>Mahalle/Köy</th>
-                            <th>Ada</th>
-                            <th>Parsel</th>
-                            <th>M²</th>
-                            <th>Oda Sayısı</th>
-                            <th>Bina Yaşı</th>
-                            <th>Bina Kat Sayısı</th>
-                            <th>Bulunduğu Kat</th>
-                            <th>Isıtma Sistemi</th>
-                            <th>Balkon</th>
-                            <th>İmar</th>
-                            <th>Tapu</th>
-                            <th>İlan No</th>
-                            <th>Eline İstenen Fiyat</th>
-                            <th>İlan Fiyatı</th>
-                            <th>Referans</th>
-                            <th>İlan Girildi Mi?</th>
+                            <td class="number-column">@((i + 1))</td>
+                            @foreach (var field in new[] { "Kategori", "Isim", "CepTel", "Il", "Ilce", "MahalleKoy", "Ada", "Parsel", "Metrekare", "OdaSayisi", "BinaYasi", "BinaKatSayisi", "BulunduguKat", "IsitmaSistemi", "Balkon", "Imar", "Tapu", "IlanNo", "Fiyat", "IlanFiyati", "Referans" })
+                            {
+                                var value = item.GetType().GetProperty(field)?.GetValue(item)?.ToString() ?? "";
+                                <td data-field="@field" data-record="@item.Id">
+                                    <span class="cell-data">@value</span>
+                                    <i class="bi bi-pencil edit-icon"></i>
+                                </td>
+                            }
+                            <td data-field="IlanGirildiMi" data-record="@item.Id">
+                                <span class="cell-data">
+                                    @if (string.IsNullOrEmpty(item.IlanGirildiMi))
+                                    { <span>X</span> }
+                                    else
+                                    { @item.IlanGirildiMi <i class="bi bi-check-circle-fill text-success ilan-girildi-mi-icon"></i> }
+                                </span>
+                                <i class="bi bi-pencil edit-icon"></i>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = Model.Count - 1; i >= 0; i--)
-                        {
-                            var item = Model[i];
-                            <tr>
-                                <td class="number-column">@((i + 1))</td>
-                                <td data-field="Kategori" data-record="@item.Id">
-                                    <span class="cell-data">@item.Kategori</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Isim" data-record="@item.Id">
-                                    <span class="cell-data">@item.Isim</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="CepTel" data-record="@item.Id">
-                                    <span class="cell-data">@item.CepTel</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Il" data-record="@item.Id">
-                                    <span class="cell-data">@item.Il</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Ilce" data-record="@item.Id">
-                                    <span class="cell-data">@item.Ilce</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="MahalleKoy" data-record="@item.Id">
-                                    <span class="cell-data">@item.MahalleKoy</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Ada" data-record="@item.Id">
-                                    <span class="cell-data">@item.Ada</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Parsel" data-record="@item.Id">
-                                    <span class="cell-data">@item.Parsel</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Metrekare" data-record="@item.Id">
-                                    <span class="cell-data">@item.Metrekare</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="OdaSayisi" data-record="@item.Id">
-                                    <span class="cell-data">@item.OdaSayisi</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="BinaYasi" data-record="@item.Id">
-                                    <span class="cell-data">@item.BinaYasi</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="BinaKatSayisi" data-record="@item.Id">
-                                    <span class="cell-data">@item.BinaKatSayisi</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="BulunduguKat" data-record="@item.Id">
-                                    <span class="cell-data">@item.BulunduguKat</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="IsitmaSistemi" data-record="@item.Id">
-                                    <span class="cell-data">@item.IsitmaSistemi</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Balkon" data-record="@item.Id">
-                                    <span class="cell-data">@item.Balkon</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Imar" data-record="@item.Id">
-                                    <span class="cell-data">@item.Imar</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Tapu" data-record="@item.Id">
-                                    <span class="cell-data">@item.Tapu</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="IlanNo" data-record="@item.Id">
-                                    <span class="cell-data">@item.IlanNo</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Fiyat" data-record="@item.Id">
-                                    <span class="cell-data">@item.Fiyat</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="IlanFiyati" data-record="@item.Id">
-                                    <span class="cell-data">@item.IlanFiyati</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="Referans" data-record="@item.Id">
-                                    <span class="cell-data">@item.Referans</span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                                <td data-field="IlanGirildiMi" data-record="@item.Id">
-                                    <span class="cell-data">
-                                        @if (string.IsNullOrEmpty(item.IlanGirildiMi))
-                                        {
-                                            <span>X</span>
-                                        }
-                                        else
-                                        {
-                                            @item.IlanGirildiMi
-                                            <i class="bi bi-check-circle-fill text-success ilan-girildi-mi-icon"></i>
-                                        }
-                                    </span>
-                                    <i class="bi bi-pencil edit-icon"></i>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-  
-
-    <script>
-        $(document).ready(function () {
-            $('.edit-icon').on('click', function () {
-                var cell = $(this).closest('td');
-                var cellDataSpan = cell.find('.cell-data');
-                var currentText = cellDataSpan.text();
-                var fieldName = cell.data('field');
-                var recordId = cell.data('record');
-
-                // Eğer input alanı zaten varsa, işlem yapma
-                if (cell.find('.input-field').length > 0) return;
-
-                // Span içeriğini input alanıyla değiştir
-                cellDataSpan.hide();
-                var input = $('<input>', {
-                    type: 'text',
-                    class: 'input-field form-control',
-                    value: currentText
-                });
-                cell.prepend(input);  // Input'u hücrenin başına ekle
-                input.focus();
-
-                // Kaydet ve İptal ikonlarını ekle
-                var saveIcon = $('<i>', {
-                    class: 'bi bi-save-fill save-icon'
-                });
-                var cancelIcon = $('<i>', {
-                    class: 'bi bi-x-circle-fill cancel-icon'
-                });
-                cell.append(saveIcon);
-                cell.append(cancelIcon);
-
-                // Input alanının dışına tıklanınca veya Enter'a basılınca kaydet
-                input.on('blur keydown', function (e) {
-                    if (e.type === 'blur' || e.keyCode === 13) {
-                        var newText = $(this).val();
-                        // Burada sunucuya güncelleme isteği gönderebilirsiniz
-                        $.post('/IlanTakip/UpdateCell', { id: recordId, fieldName: fieldName, newValue: newText }, function (response) {
-                            if (response.success) {
-                                cellDataSpan.text(newText);
-                                cellDataSpan.show();
-                            } else {
-                                alert('Güncelleme başarısız oldu!');
-                                cellDataSpan.show();
-                            }
-                            input.remove();
-                            saveIcon.remove();
-                            cancelIcon.remove();
-                        });
                     }
-                });
-
-                // Kaydet ikonuna tıklanınca
-                saveIcon.on('click', function () {
-                    var newText = input.val();
-                    $.post('/IlanTakip/UpdateCell', { id: recordId, fieldName: fieldName, newValue: newText }, function (response) {
-                        if (response.success) {
-                            cellDataSpan.text(newText);
-                            cellDataSpan.show();
-                        } else {
-                            alert('Güncelleme başarısız oldu!');
-                            cellDataSpan.show();
-                        }
-                        input.remove();
-                        saveIcon.remove();
-                        cancelIcon.remove();
-                    });
-                });
-
-                // İptal ikonuna tıklanınca
-                cancelIcon.on('click', function () {
-                    cellDataSpan.show();
-                    input.remove();
-                    saveIcon.remove();
-                    cancelIcon.remove();
-                });
-            });
-        });
-    </script>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-        <!-- Modal: Değer Güncelle -->
-        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Değer Güncelle</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="text" id="newValue" class="form-control" placeholder="Yeni değeri girin">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                        <button type="button" id="saveBtn" class="btn btn-primary">Kaydet</button>
-                    </div>
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
+    }
+</div>
 
-        <!-- Bootstrap JS Bundle -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- jQuery Script: Hücre düzenleme -->
-        <script>
-            var currentRecordId;
-            var currentField;
+<!-- Modal: Değer Güncelle -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="editModalLabel">Değer Güncelle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body"><input type="text" id="newValue" class="form-control" placeholder="Yeni değeri girin"></div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button><button type="button" id="saveBtn" class="btn btn-primary">Kaydet</button></div>
+        </div>
+    </div>
+</div>
 
-            $(document).ready(function(){
-                // Kalem ikonuna tıklanınca modal açılır
-                $('.edit-icon').on('click', function(event){
-                    event.stopPropagation();
-                    var cell = $(this).closest('td');
-                    currentRecordId = cell.data('record');
-                    currentField = cell.data('field');
-                    var currentValue = cell.find('.cell-data').text().trim();
-                    $('#newValue').val(currentValue);
-                    var editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                    editModal.show();
-                });
-
-                // Kaydet butonuna basıldığında AJAX ile güncelleme yapılır
-                $('#saveBtn').on('click', function(){
-                    var newValue = $('#newValue').val();
-                    $.ajax({
-                        url: '@Url.Action("UpdateCell", "IlanTakip")',
-                        type: 'POST',
-                        data: { id: currentRecordId, fieldName: currentField, newValue: newValue },
-                        success: function(response){
-                            if(response.success){
-                                // Hücredeki değeri güncelle
-                                $('td[data-record="'+currentRecordId+'"][data-field="'+currentField+'"] .cell-data').text(newValue);
-                                var editModalEl = document.getElementById('editModal');
-                                var modal = bootstrap.Modal.getInstance(editModalEl);
-                                modal.hide();
-                            } else {
-                                alert('Güncelleme sırasında bir hata oluştu.');
-                            }
-                        },
-                        error: function(){
-                            alert('Güncelleme sırasında bir hata oluştu.');
-                        }
-                    });
-                });
-            });
-        </script>
-
-        <!-- Yeni Kayıt Formu Modal -->
-        <div class="modal fade" id="yeniKayitModal" tabindex="-1" aria-labelledby="yeniKayitModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content modern-modal">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="yeniKayitModalLabel">Yeni Kayıt Formu</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="kayitFormu" method="post" asp-action="Create">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label for="kategori" class="form-label">Kategori</label>
-                                    <!-- İki grup halinde butonlar: Sol taraf Konut grubu, sağ taraf Arsa grubu -->
-                                    <div class="d-flex gap-2">
-                                        <!-- Konut grubu: "Konut", "Turistik Tesis" ve "İş Yeri" seçenekleri -->
-                                        <button type="button" class="btn btn-outline-primary konut-secim-btn" id="konutSec">Konut</button>
-                                        <button type="button" class="btn btn-outline-primary konut-secim-btn" id="turistikTesisSec">Turistik Tesis</button>
-                                        <button type="button" class="btn btn-outline-primary konut-secim-btn" id="isYeriSec">İş Yeri</button>
-                                    </div>
-                                    <div class="d-flex gap-2 mt-2">
-                                        <!-- Arsa grubu: "Arsa", "Tarla" ve "Bahçe" seçenekleri -->
-                                        <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="arsaSec">Arsa</button>
-                                        <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="tarlaSec">Tarla</button>
-                                        <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="bahceSec">Bahçe</button>
-                                        <input type="hidden" name="Kategori" id="kategoriInput" required>
-                                    </div>
-                                </div>
-
-                                <!-- Konut Form Alanları -->
-                                <div id="konutFormu" class="row g-3">
-                                    <div class="col-md-4">
-                                        <label for="isim" class="form-label">İsim</label>
-                                        <input type="text" name="Isim" class="form-control" id="isim" placeholder="İsim" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ceptel" class="form-label">Cep Tel.</label>
-                                        <input type="text" name="CepTel" class="form-control" id="ceptel" placeholder="Cep Tel." required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="il" class="form-label">İl</label>
-                                        <select name="Il" class="form-control" id="il" required>
-                                            <option value="">İl Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ilce" class="form-label">İlçe</label>
-                                        <select name="Ilce" class="form-control" id="ilce">
-                                            <option value="">İlçe Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="mahalle" class="form-label">Mahalle/Köy</label>
-                                        <select name="MahalleKoy" class="form-control" id="mahalle">
-                                            <option value="">Mahalle/Köy Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="odaSayisi" class="form-label">Oda Sayısı</label>
-                                        <input type="number" name="OdaSayisi" class="form-control" id="odaSayisi" placeholder="Oda Sayısı">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="binaYasi" class="form-label">Bina Yaşı</label>
-                                        <input type="number" name="BinaYasi" class="form-control" id="binaYasi" placeholder="Bina Yaşı">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="binaKatSayisi" class="form-label">Bina Kat Sayısı</label>
-                                        <input type="number" name="BinaKatSayisi" class="form-control" id="binaKatSayisi" placeholder="Bina Kat Sayısı">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="bulunduguKat" class="form-label">Bulunduğu Kat</label>
-                                        <input type="number" name="BulunduguKat" class="form-control" id="bulunduguKat" placeholder="Bulunduğu Kat">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="isitmaSistemi" class="form-label">Isıtma Sistemi</label>
-                                        <input type="text" name="IsitmaSistemi" class="form-control" id="isitmaSistemi" placeholder="Isıtma Sistemi">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="balkon" class="form-label">Balkon</label>
-                                        <select name="Balkon" class="form-control" id="balkon">
-                                            <option value="">Balkon Seçiniz</option>
-                                            <option value="Var">Var</option>
-                                            <option value="Yok">Yok</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Arsa (Arazi) Form Alanları -->
-                                <div id="araziFormu" class="row g-3" style="display: none;">
-                                    <div class="col-md-4">
-                                        <label for="isimArazi" class="form-label">İsim</label>
-                                        <input type="text" name="Isim" class="form-control" id="isimArazi" placeholder="İsim" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ceptelArazi" class="form-label">Cep Tel.</label>
-                                        <input type="text" name="CepTel" class="form-control" id="ceptelArazi" placeholder="Cep Tel." required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ilArazi" class="form-label">İl</label>
-                                        <select name="Il" class="form-control" id="ilArazi" required>
-                                            <option value="">İl Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ilceArazi" class="form-label">İlçe</label>
-                                        <select name="Ilce" class="form-control" id="ilceArazi">
-                                            <option value="">İlçe Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="mahalleArazi" class="form-label">Mahalle/Köy</label>
-                                        <select name="MahalleKoy" class="form-control" id="mahalleArazi">
-                                            <option value="">Mahalle/Köy Seçiniz</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ada" class="form-label">Ada</label>
-                                        <input type="text" name="Ada" class="form-control" id="ada" placeholder="Ada">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="parsel" class="form-label">Parsel</label>
-                                        <input type="text" name="Parsel" class="form-control" id="parsel" placeholder="Parsel">
-                                    </div>
-                                </div>
-
-                                <!-- Ortak Alanlar -->
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label for="metrekare" class="form-label">M²</label>
-                                        <input type="text" name="Metrekare" class="form-control" id="metrekare" placeholder="M²">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="imar" class="form-label">İmar</label>
-                                        <input type="text" name="Imar" class="form-control" id="imar" placeholder="İmar">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="tapu" class="form-label">Tapu</label>
-                                        <input type="text" name="Tapu" class="form-control" id="tapu" placeholder="Tapu">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="ilanNo" class="form-label">İlan No</label>
-                                        <input type="text" name="IlanNo" class="form-control" id="ilanNo" placeholder="İlan No">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="fiyat" class="form-label">Eline İstediği Fiyat</label>
-                                        <input type="text" name="Fiyat" class="form-control" id="fiyat" placeholder="Fiyat">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="IlanFiyati" class="form-label">İlan Fiyatı Fiyat</label>
-                                        <input type="text" name="IlanFiyati" class="form-control" id="IlanFiyati" placeholder="IlanFiyati">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="referans" class="form-label">Referans</label>
-                                        <select name="Referans" class="form-select" id="referans" required>
-                                            <option value="">Seçiniz</option>
-                                            @foreach (var item in ViewBag.ReferansOptions)
-                                            {
-                                                <option value="@item.Value">@item.Text</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
+<!-- Yeni Kayıt Formu Modal -->
+<div class="modal fade" id="yeniKayitModal" tabindex="-1" aria-labelledby="yeniKayitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content modern-modal">
+            <div class="modal-header"><h4 class="modal-title" id="yeniKayitModalLabel">Yeni Kayıt Formu</h4><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="kayitFormu" method="post" asp-action="Create">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="kategori" class="form-label">Kategori</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary konut-secim-btn" id="konutSec">Konut</button>
+                                <button type="button" class="btn btn-outline-primary konut-secim-btn" id="turistikTesisSec">Turistik Tesis</button>
+                                <button type="button" class="btn btn-outline-primary konut-secim-btn" id="isYeriSec">İş Yeri</button>
                             </div>
-                        </form>
+                            <div class="d-flex gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="arsaSec">Arsa</button>
+                                <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="tarlaSec">Tarla</button>
+                                <button type="button" class="btn btn-outline-primary arazi-secim-btn" id="bahceSec">Bahçe</button>
+                                <input type="hidden" name="Kategori" id="kategoriInput" required>
+                            </div>
+                        </div>
+                        <!-- Konut Form Alanları -->
+                        <div id="konutFormu" class="row g-3">
+                            <div class="col-md-4"><label class="form-label">İsim</label><input type="text" name="Isim" class="form-control" id="isim" required></div>
+                            <div class="col-md-4"><label class="form-label">Cep Tel.</label><input type="text" name="CepTel" class="form-control" id="ceptel" required></div>
+                            <div class="col-md-4"><label class="form-label">İl</label><select name="Il" class="form-control" id="il" required><option value="">İl Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">İlçe</label><select name="Ilce" class="form-control" id="ilce"><option value="">İlçe Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">Mahalle/Köy</label><select name="MahalleKoy" class="form-control" id="mahalle"><option value="">Mahalle/Köy Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">Oda Sayısı</label><input type="number" name="OdaSayisi" class="form-control" id="odaSayisi"></div>
+                            <div class="col-md-4"><label class="form-label">Bina Yaşı</label><input type="number" name="BinaYasi" class="form-control" id="binaYasi"></div>
+                            <div class="col-md-4"><label class="form-label">Bina Kat Sayısı</label><input type="number" name="BinaKatSayisi" class="form-control" id="binaKatSayisi"></div>
+                            <div class="col-md-4"><label class="form-label">Bulunduğu Kat</label><input type="number" name="BulunduguKat" class="form-control" id="bulunduguKat"></div>
+                            <div class="col-md-4"><label class="form-label">Isıtma Sistemi</label><input type="text" name="IsitmaSistemi" class="form-control" id="isitmaSistemi"></div>
+                            <div class="col-md-4"><label class="form-label">Balkon</label><select name="Balkon" class="form-control" id="balkon"><option value="">Seçiniz</option><option value="Var">Var</option><option value="Yok">Yok</option></select></div>
+                        </div>
+                        <!-- Arazi Form Alanları -->
+                        <div id="araziFormu" class="row g-3" style="display: none;">
+                            <div class="col-md-4"><label class="form-label">İsim</label><input type="text" name="Isim" class="form-control" id="isimArazi" required></div>
+                            <div class="col-md-4"><label class="form-label">Cep Tel.</label><input type="text" name="CepTel" class="form-control" id="ceptelArazi" required></div>
+                            <div class="col-md-4"><label class="form-label">İl</label><select name="Il" class="form-control" id="ilArazi" required><option value="">İl Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">İlçe</label><select name="Ilce" class="form-control" id="ilceArazi"><option value="">İlçe Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">Mahalle/Köy</label><select name="MahalleKoy" class="form-control" id="mahalleArazi"><option value="">Mahalle/Köy Seçiniz</option></select></div>
+                            <div class="col-md-4"><label class="form-label">Ada</label><input type="text" name="Ada" class="form-control" id="ada"></div>
+                            <div class="col-md-4"><label class="form-label">Parsel</label><input type="text" name="Parsel" class="form-control" id="parsel"></div>
+                        </div>
+                        <!-- Ortak Alanlar -->
+                        <div class="row g-3">
+                            <div class="col-md-4"><label class="form-label">M²</label><input type="text" name="Metrekare" class="form-control" id="metrekare"></div>
+                            <div class="col-md-4"><label class="form-label">İmar</label><input type="text" name="Imar" class="form-control" id="imar"></div>
+                            <div class="col-md-4"><label class="form-label">Tapu</label><input type="text" name="Tapu" class="form-control" id="tapu"></div>
+                            <div class="col-md-4"><label class="form-label">İlan No</label><input type="text" name="IlanNo" class="form-control" id="ilanNo"></div>
+                            <div class="col-md-4"><label class="form-label">Eline İstediği Fiyat</label><input type="text" name="Fiyat" class="form-control" id="fiyat"></div>
+                            <div class="col-md-4"><label class="form-label">İlan Fiyatı</label><input type="text" name="IlanFiyati" class="form-control" id="IlanFiyati"></div>
+                            <div class="col-md-4">
+                                <label class="form-label">Referans</label>
+                                <select name="Referans" class="form-select" id="referans" required>
+                                    <option value="">Seçiniz</option>
+                                    @if (ViewBag.ReferansOptions != null) 
+                                    { 
+                                        foreach (var item in ViewBag.ReferansOptions) 
+                                        { 
+                                            var val = item.GetType().GetProperty("Value")?.GetValue(item)?.ToString() ?? "";
+                                            var txt = item.GetType().GetProperty("Text")?.GetValue(item)?.ToString() ?? "";
+                                            <option value="@val">@txt</option> 
+                                        } 
+                                    }
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer modern-modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                        <button type="submit" class="btn btn-success" id="kaydetBtn">Kaydet</button>
-                    </div>
-                </div>
+                </form>
             </div>
+            <div class="modal-footer modern-modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button><button type="submit" class="btn btn-success" id="kaydetBtn">Kaydet</button></div>
         </div>
+    </div>
+</div>
 
-        <script>
-            $(document).ready(function () {
-              // Kategori Seçim Butonları: Gruplar arası geçişte, görünmeyen form elemanlarını disable ediyoruz.
-              $(".konut-secim-btn").click(function () {
-                var kategori = $(this).text(); // Butonun metnini alır (örn. Konut, Turistik Tesis, İş Yeri)
-                $("#kategoriInput").val(kategori);
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.getElementById('btnAnaSayfa').addEventListener('click', function () { window.location.href = '/'; });
+        document.getElementById('btnExcelIndir').addEventListener('click', function () { window.location.href = '/IlanTakip/ExportToExcel'; });
+
+        var currentRecordId, currentField;
+        $(document).ready(function(){
+            $('.edit-icon').on('click', function(event){
+                event.stopPropagation();
+                var cell = $(this).closest('td');
+                currentRecordId = cell.data('record');
+                currentField = cell.data('field');
+                var currentValue = cell.find('.cell-data').text().trim();
+                $('#newValue').val(currentValue);
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+
+            $('#saveBtn').on('click', function(){
+                var newValue = $('#newValue').val();
+                $.ajax({
+                    url: '@Url.Action("UpdateCell", "IlanTakip")',
+                    type: 'POST',
+                    data: { id: currentRecordId, fieldName: currentField, newValue: newValue },
+                    success: function(response){
+                        if(response.success){
+                            $('td[data-record="'+currentRecordId+'"][data-field="'+currentField+'"] .cell-data').text(newValue);
+                            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                        } else { alert('Güncelleme sırasında bir hata oluştu.'); }
+                    },
+                    error: function(){ alert('Güncelleme sırasında bir hata oluştu.'); }
+                });
+            });
+
+            $(".konut-secim-btn").click(function () {
+                $("#kategoriInput").val($(this).text());
                 $("#konutFormu").show().find("input, select").prop("disabled", false);
                 $("#araziFormu").hide().find("input, select").prop("disabled", true);
-                $(".konut-secim-btn").removeClass("active");
-                $(".arazi-secim-btn").removeClass("active");
+                $(".konut-secim-btn, .arazi-secim-btn").removeClass("active");
                 $(this).addClass("active");
-              });
-              $(".arazi-secim-btn").click(function () {
-                var kategori = $(this).text(); // Butonun metnini alır (örn. Arsa, Tarla, Bahçe)
-                $("#kategoriInput").val(kategori);
+            });
+            $(".arazi-secim-btn").click(function () {
+                $("#kategoriInput").val($(this).text());
                 $("#araziFormu").show().find("input, select").prop("disabled", false);
                 $("#konutFormu").hide().find("input, select").prop("disabled", true);
-                $(".arazi-secim-btn").removeClass("active");
-                $(".konut-secim-btn").removeClass("active");
+                $(".arazi-secim-btn, .konut-secim-btn").removeClass("active");
                 $(this).addClass("active");
-              });
+            });
 
-              // Kayıt Formu Göster: Modal açıldığında varsayılan olarak Konut formu seçilsin
-              $("#btnYeniKayit").click(function () {
+            $("#btnYeniKayit").click(function () {
                 $("#yeniKayitModal").modal('show');
                 $(".konut-secim-btn").first().click();
-              });
+            });
 
-              // 1. İsim alanı: yalnızca harf ve boşluk (Her iki form grubunda uygulanıyor)
-              $("#isim, #isimArazi").on('input', function () {
-                var value = $(this).val();
-                var filtered = value.replace(/[^a-zA-ZığüşöçıİĞÜŞÖÇ\s]/g, '');
-                if (filtered !== value) {
-                  $(this).val(filtered);
-                }
-              });
+            $("#isim, #isimArazi").on('input', function () { $(this).val($(this).val().replace(/[^a-zA-ZığüşöçıİĞÜŞÖÇ\s]/g, '')); });
+            $("#ceptel, #ceptelArazi").on('input', function () {
+                var digits = $(this).val().replace(/\D/g, '');
+                if (digits.length > 0 && digits.charAt(0) !== '0') digits = '0' + digits;
+                var f = digits;
+                if (digits.length > 4) f = digits.substring(0, 4) + " " + digits.substring(4);
+                if (digits.length > 7) f = digits.substring(0, 4) + " " + digits.substring(4, 7) + " " + digits.substring(7);
+                if (digits.length > 9) f = digits.substring(0, 4) + " " + digits.substring(4, 7) + " " + digits.substring(7, 9) + " " + digits.substring(9, 11);
+                $(this).val(f);
+            });
+            $("#ada, #parsel, #metrekare, #ilanNo, #odaSayisi, #binaYasi, #binaKatSayisi, #bulunduguKat").on('input', function () { $(this).val($(this).val().replace(/\D/g, '')); });
+            $("#fiyat").on('input', function () {
+                var digits = $(this).val().replace(/[TLtrl.\s]/g, '').replace(/\D/g, '');
+                if (digits === '') { $(this).val(''); return; }
+                $(this).val(parseInt(digits, 10).toLocaleString('tr-TR') + " TL");
+            });
 
-              // 2. Cep Tel. alanı: sadece rakam, otomatik "0" ekleme ve biçimlendirme
-              $("#ceptel, #ceptelArazi").on('input', function () {
-                var value = $(this).val();
-                var digits = value.replace(/\D/g, '');
-                if (digits.length > 0 && digits.charAt(0) !== '0') {
-                  digits = '0' + digits;
-                }
-                var formatted = digits;
-                if (digits.length > 4) {
-                  formatted = digits.substring(0, 4) + " " + digits.substring(4);
-                }
-                if (digits.length > 7) {
-                  formatted = digits.substring(0, 4) + " " + digits.substring(4, 7) + " " + digits.substring(7);
-                }
-                if (digits.length > 9) {
-                  formatted = digits.substring(0, 4) + " " + digits.substring(4, 7) + " " + digits.substring(7, 9) + " " + digits.substring(9, 11);
-                }
-                $(this).val(formatted);
-              });
-
-              // 3. Ada, Parsel, M², İlan No, Oda Sayısı, Bina Yaşı, Bina Kat Sayısı, Bulunduğu Kat: sadece rakam
-              $("#ada, #parsel, #metrekare, #ilanNo, #odaSayisi, #binaYasi, #binaKatSayisi, #bulunduguKat").on('input', function () {
-                var value = $(this).val();
-                var digits = value.replace(/\D/g, '');
-                if (digits !== value) {
-                  $(this).val(digits);
-                }
-              });
-
-              // 4. Fiyat alanı: sadece sayı, noktalama otomatik düzenleme ve sonuna " TL" ekleme
-              $("#fiyat").on('input', function () {
-                var value = $(this).val();
-                value = value.replace(/[TLtrl.\s]/g, '');
-                var digits = value.replace(/\D/g, '');
-                if (digits === '') {
-                  $(this).val('');
-                  return;
-                }
-                var num = parseInt(digits, 10);
-                var formatted = num.toLocaleString('tr-TR') + " TL";
-                $(this).val(formatted);
-              });
-
-              // İl-İlçe-Mahalle Veri Yükleme
-              $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
+            $.getJSON("/data/TR-İl-İlçe-Mahalle_(City-County-Neighborhood).json", function (data) {
                 data.sort((a, b) => a.Il.localeCompare(b.Il));
-                function populateIller(selector) {
-                  $(selector).empty().append('<option value="">İl Seçiniz</option>');
-                  data.forEach(function (il) {
-                    $(selector).append(new Option(il.Il, il.Il));
-                  });
-                }
-                populateIller("#il");
-                populateIller("#ilArazi");
+                function populateIller(selector) { $(selector).empty().append('<option value="">İl Seçiniz</option>'); data.forEach(il => $(selector).append(new Option(il.Il, il.Il))); }
+                populateIller("#il"); populateIller("#ilArazi");
                 $("#il, #ilArazi").change(function () {
-                  const selectedIl = $(this).val();
-                  const selectedIlData = data.find(c => c.Il === selectedIl);
-                  const ilceSelector = $(this).attr("id") === "il" ? "#ilce" : "#ilceArazi";
-                  const mahalleSelector = $(this).attr("id") === "il" ? "#mahalle" : "#mahalleArazi";
-                  $(ilceSelector).empty().append('<option value="">İlçe Seçiniz</option>');
-                  $(mahalleSelector).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
-                  if (selectedIlData) {
-                    selectedIlData.Ilce.sort((a, b) => a.Ilce.localeCompare(b.Ilce));
-                    selectedIlData.Ilce.forEach(function (ilce) {
-                      $(ilceSelector).append(new Option(ilce.Ilce, ilce.Ilce));
-                    });
-                  }
+                    const selectedIlData = data.find(c => c.Il === $(this).val());
+                    const ilceSelector = $(this).attr("id") === "il" ? "#ilce" : "#ilceArazi";
+                    const mahalleSelector = $(this).attr("id") === "il" ? "#mahalle" : "#mahalleArazi";
+                    $(ilceSelector).empty().append('<option value="">İlçe Seçiniz</option>');
+                    $(mahalleSelector).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+                    if (selectedIlData) { selectedIlData.Ilce.sort((a, b) => a.Ilce.localeCompare(b.Ilce)); selectedIlData.Ilce.forEach(ilce => $(ilceSelector).append(new Option(ilce.Ilce, ilce.Ilce))); }
                 });
                 $("#ilce, #ilceArazi").change(function () {
-                  const selectedIl = $(this).closest("select").attr("id") === "ilce" ? $("#il").val() : $("#ilArazi").val();
-                  const selectedIlce = $(this).val();
-                  const selectedIlData = data.find(c => c.Il === selectedIl);
-                  const mahalleSelector = $(this).attr("id") === "ilce" ? "#mahalle" : "#mahalleArazi";
-                  $(mahalleSelector).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
-                  if (selectedIlData && selectedIlce) {
-                    const selectedIlceData = selectedIlData.Ilce.find(d => d.Ilce === selectedIlce);
-                    if (selectedIlceData) {
-                      let allMahalleler = [];
-                      selectedIlceData.Semt.forEach(semt => {
-                        allMahalleler.push(...semt.Mahalle.map(m => m.Mahalle));
-                      });
-                      allMahalleler.sort((a, b) => a.localeCompare(b));
-                      allMahalleler.forEach(mahalle => {
-                        $(mahalleSelector).append(new Option(mahalle, mahalle));
-                      });
+                    const selectedIl = $(this).attr("id") === "ilce" ? $("#il").val() : $("#ilArazi").val();
+                    const selectedIlData = data.find(c => c.Il === selectedIl);
+                    const mahalleSelector = $(this).attr("id") === "ilce" ? "#mahalle" : "#mahalleArazi";
+                    $(mahalleSelector).empty().append('<option value="">Mahalle/Köy Seçiniz</option>');
+                    if (selectedIlData) {
+                        const selectedIlceData = selectedIlData.Ilce.find(d => d.Ilce === $(this).val());
+                        if (selectedIlceData) {
+                            let allMahalleler = [];
+                            selectedIlceData.Semt.forEach(semt => allMahalleler.push(...semt.Mahalle.map(m => m.Mahalle)));
+                            allMahalleler.sort((a, b) => a.localeCompare(b)).forEach(m => $(mahalleSelector).append(new Option(m, m)));
+                        }
                     }
-                  }
                 });
-              });
+            });
 
-              // Form Gönderme İşlemi
-              $("#kaydetBtn").click(function (e) {
+            $("#kaydetBtn").click(function (e) {
                 e.preventDefault();
-                var formData = $("#kayitFormu").serialize();
                 $.ajax({
-                  type: "POST",
-                  url: $("#kayitFormu").attr("action"),
-                  data: formData,
-                  success: function (response) {
-                    console.log("Kayıt başarıyla eklendi!");
-                    $("#yeniKayitModal").modal('hide');
-                    $("#kayitFormu")[0].reset();
-                    // Tüm alanları yeniden aktif hale getiriyoruz
-                    $("#konutFormu, #araziFormu").find("input, select").prop("disabled", false);
-                    window.location.reload();
-                  },
-                  error: function (xhr, status, error) {
-                    console.error("Kayıt eklenirken hata oluştu: " + error);
-                    alert("Kayıt eklenirken bir hata oluştu. Lütfen tekrar deneyiniz.");
-                  }
+                    type: "POST", url: $("#kayitFormu").attr("action"), data: $("#kayitFormu").serialize(),
+                    success: function () { $("#yeniKayitModal").modal('hide'); $("#kayitFormu")[0].reset(); window.location.reload(); },
+                    error: function () { alert("Kayıt eklenirken bir hata oluştu."); }
                 });
-              });
+            });
 
-              // Modal Kapatıldığında Formu Temizle
-              $('#yeniKayitModal').on('hidden.bs.modal', function () {
+            $('#yeniKayitModal').on('hidden.bs.modal', function () {
                 $(this).find('form')[0].reset();
                 $(".konut-secim-btn, .arazi-secim-btn").removeClass("active");
                 $("#konutFormu").show().find("input, select").prop("disabled", false);
                 $("#araziFormu").hide().find("input, select").prop("disabled", true);
-              });
             });
-        </script>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
-</body>
-</html>
+        });
+    </script>
+}

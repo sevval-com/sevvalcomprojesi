@@ -7,103 +7,23 @@
     Layout = null; // Layout kullanılmıyor
 }
 
-<!-- Stil Dosyası Bağlantısı -->
-<link rel="stylesheet" href="~/css/tebrikler.css" />
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgu_ri7xBqCBNn5WRgTcR2ADbvq0f1hK0&libraries=places"></script>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İlan Yayınlandı - Şevval Emlak</title>
+    <link rel="stylesheet" href="~/css/tebrikler.css" />
+    <link rel="stylesheet" href="~/css/navbar.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgu_ri7xBqCBNn5WRgTcR2ADbvq0f1hK0&libraries=places"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="~/js/site.js" defer></script>
+</head>
+<body>
 
 <!-- Navbar -->
-<nav class="navbaar">
-    <div class="navbaar-container">
-        <div class="logo">
-            <a href="/">
-                  <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-            <span>Sevval.com</span>
-        </div>
-        <div class="haamburger" id="hamburger">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line"></div>
-        </div>
-        <ul class="naav-linkss" id="nav-links">
-            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <li>
-                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                </li>
-                
-            }
-
-            <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-            <li class="dropdoawn">
-                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-            </li>
-
-            <li>
-                <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
-            </li>
-
-            
-
-        </ul>
-        <div class="auth-buttoons">
-            @if (User.Identity.IsAuthenticated)
-            {
-                var currentUser = await UserManager.GetUserAsync(User);
-
-                // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
-                if (currentUser != null)
-                {
-                    <div class="dropdown">
-                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                        <ul class="dropdown-content">
-                            <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                            
-                            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                            <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
-                            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                            
-                            <li><a href="@Url.Action("Akademi", "Ilan")">Satın Al</a></li>
-                            <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                            @if (User.Identity.IsAuthenticated &&
-                           (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-
-                            {
-                                <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                            }
-                            <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
-                            <li>
-                                <form asp-action="Logout" asp-controller="Account" method="post">
-                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                }
-                else
-                {
-                    <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
-                }
-            }
-            else
-            {
-                <a href="#" class="login" id="login-button">Giriş Yap</a>
-            }
-
-
-            <!-- İlan Ver butonu ve Ücretsiz etiketi -->
-            <div class="post-ad-container">
-                <span class="free-tag">Ücretsiz</span>
-                <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account") : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-            </div>
-        </div>
-
-    </div>
-</nav>
+<partial name="_NavbarIlan" />
 <style>
     .post-ad-container {
         position: relative;
@@ -230,3 +150,6 @@
 
     </div>
 </div>
+
+</body>
+</html>

@@ -871,7 +871,7 @@
                 else
                 {
                     <img src="@Model.About.ProfilePicturePath"
-                         alt="Profil Fotoğrafı" class="profile-img" 
+                         alt="" class="profile-img" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="default-profile-icon" style="display: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="camera-svg">
@@ -959,7 +959,8 @@
                                     <div class="ilan-image">
                                         @if (p != null && p.Count > 0)
                                         {
-                                            <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                            var imgUrl = p[0].StartsWith("http") ? p[0] : $"https://www.sevval.com/{p[0]}";
+                                            <img src="@imgUrl" alt="İlan Fotoğrafı" class="panel-image">
                                         }
                                         else
                                         {
@@ -980,7 +981,8 @@
                                 <div class="ilan-image inactive-image">
                                     @if (p != null && p.Count > 0)
                                     {
-                                        <img src="https://www.sevval.com/@p[0]" alt="İlan Fotoğrafı" class="panel-image">
+                                        var imgUrl = p[0].StartsWith("http") ? p[0] : $"https://www.sevval.com/{p[0]}";
+                                        <img src="@imgUrl" alt="İlan Fotoğrafı" class="panel-image">
                                     }
                                     else
                                     {
@@ -1308,6 +1310,24 @@
                 requestAnimationFrame(scrollStep);
             }
 
+
+            // === Profil Resmi Fallback ===
+            document.addEventListener('DOMContentLoaded', function() {
+                const profileImg = document.querySelector('.profile-picture .profile-img');
+                if (profileImg) {
+                    profileImg.onerror = function() {
+                        this.style.display = 'none';
+                        const fallback = this.nextElementSibling;
+                        if (fallback) fallback.style.display = 'flex';
+                    };
+                    // Eğer resim zaten yüklenememiş ve cache'den geliyorsa
+                    if (profileImg.complete && profileImg.naturalHeight === 0) {
+                        profileImg.style.display = 'none';
+                        const fallback = profileImg.nextElementSibling;
+                        if (fallback) fallback.style.display = 'flex';
+                    }
+                }
+            });
 
             // === YENİ: "Daha Fazla Şehir" Fonksiyonu ===
             document.addEventListener('DOMContentLoaded', function() {

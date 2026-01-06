@@ -4,7 +4,7 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    Layout = null; // Layout kullanılmıyor
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -13,361 +13,651 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kategori Seçimi</title>
+    
+    <!-- Stil Dosyaları - Anasayfa ile aynı -->
+    <link rel="stylesheet" href="~/css/Anasayfa.css">
+    <link rel="stylesheet" href="~/css/navbar.css">
     <link rel="stylesheet" href="~/css/KategoriSecim.css">
     <link rel="stylesheet" href="~/css/hizmetler.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <link rel="icon" type="image/png" href="~/images/favlogo.webp">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/site.js" defer></script>
+    
+    <style>
+        /* Global - Yatay scroll engelle */
+        html, body {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+        }
+        
+        /* KategoriSecim.css ve hizmetler.css navbar override'ları */
+        nav.navbaar {
+            padding: clamp(10px, 1.5vw, 20px) clamp(15px, 2.5vw, 30px) !important;
+        }
+        
+        nav.navbaar .naav-linkss {
+            margin-top: 0 !important;
+        }
+        
+        nav.navbaar .logo img {
+            width: auto !important;
+            height: clamp(45px, 5vw, 65px) !important;
+        }
+        
+        /* Navbar'daki ziyaretçi sayıları için stil */
+        .visitor-counts-navbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin-left: 0;
+            transform: scale(.95);
+            background: rgba(255,255,255,.18);
+            border: 1px solid rgba(255,255,255,.35);
+            padding: 6px 10px;
+            border-radius: 999px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+        }
+
+        .visitor-counts-navbar span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1;
+        }
+
+        .visitor-counts-navbar .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            height: auto;
+            font-size: 16px;
+            line-height: 1;
+            color: #01e11b;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            text-shadow: 0 0 6px rgba(1,225,27,.25);
+        }
+        
+        /* MASAÜSTÜ VE MOBİL NAVBAR DÜZELTMELERİ */
+        
+        /* Masaüstü - butonlar arası mesafe */
+        .auth-buttoons, .auth-buttons {
+            gap: 15px !important;
+        }
+        
+        /* Ücretsiz etiketi - masaüstü */
+        .post-ad-container {
+            position: relative !important;
+            display: inline-block !important;
+        }
+        
+        .free-tag {
+            position: absolute !important;
+            top: -8px !important;
+            left: -8px !important;
+            background-color: #28a745 !important;
+            color: white !important;
+            font-size: 9px !important;
+            font-weight: bold !important;
+            padding: 2px 5px !important;
+            border-radius: 3px !important;
+            transform: rotate(-12deg) !important;
+            z-index: 100 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        }
+        
+        /* MOBİL NAVBAR - Sadece küçük ekranlarda VE yükseklik 1000px'den küçükse */
+        /* Yükseklik 1000px ve üstünde masaüstü görünümü uygulanır */
+        @@media (max-width: 991px) and (max-height: 999px) {
+            /* KategoriSecim.css ve hizmetler.css mobil override'ları */
+            nav.navbaar {
+                padding: 0 !important;
+                background-color: transparent !important;
+                background: linear-gradient(90deg, #009cfb, #0056b3) !important;
+            }
+            
+            nav.navbaar .navbaar-container {
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+            }
+            
+            nav.navbaar .logo {
+                margin-right: 0 !important;
+            }
+            
+            nav.navbaar .logo img {
+                width: 40px !important;
+                height: 40px !important;
+            }
+            
+            nav.navbaar .naav-linkss {
+                position: absolute !important;
+                top: 100% !important;
+                left: auto !important;
+                right: 0 !important;
+                width: auto !important;
+                min-width: 160px !important;
+                max-width: 200px !important;
+                margin-top: 0 !important;
+            }
+            
+            nav.navbaar .auth-buttoons {
+                margin-right: 0 !important;
+                width: auto !important;
+                justify-content: flex-end !important;
+            }
+            
+            nav.navbaar .haamburger,
+            nav.navbaar .hamburger {
+                display: none !important;
+                position: static !important;
+            }
+            
+            /* Mobil için sayfa içeriği düzeltmeleri */
+            .main-container {
+                flex-direction: column !important;
+                align-items: center !important;
+                padding: 10px !important;
+                overflow-x: hidden !important;
+            }
+            
+            .container {
+                flex-direction: column !important;
+                width: 100% !important;
+                padding: 10px !important;
+                gap: 15px !important;
+            }
+            
+            .step {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: 200px !important;
+                max-height: 350px !important;
+                padding: 15px !important;
+            }
+            
+            h1 {
+                font-size: 20px !important;
+                margin-top: 15px !important;
+            }
+            
+            .navbaar {
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            
+            .navbaar-container {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 10px 8px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                flex-wrap: nowrap !important;
+                overflow: visible !important;
+            }
+            
+            /* Logo alanı */
+            .navbaar-container .logo {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .navbaar-container .logo img {
+                width: 40px !important;
+                height: 40px !important;
+                object-fit: contain !important;
+            }
+            
+            /* Anlık ziyaretçi sayacı - mobilde tam görünsün ve sola yaklaştır */
+            .visitor-counts-navbar {
+                padding: 5px 8px !important;
+                font-size: 11px !important;
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+                overflow: visible !important;
+                min-width: fit-content !important;
+                margin-left: 4px !important;
+            }
+            
+            .visitor-counts-navbar .icon {
+                font-size: 14px !important;
+                margin-right: 4px !important;
+            }
+            
+            .visitor-counts-navbar span {
+                display: inline-flex !important;
+                align-items: center !important;
+            }
+            
+            /* Nav linkler gizle - mobilde - MAVİ TEMA */
+            .naav-linkss {
+                display: none !important;
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+                min-width: 160px !important;
+                max-width: 200px !important;
+                border-radius: 8px !important;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
+                padding: 8px 0 !important;
+                z-index: 10000 !important;
+                flex-direction: column !important;
+            }
+            
+            .naav-linkss.active {
+                display: flex !important;
+            }
+            
+            .naav-linkss li {
+                list-style: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .naav-linkss li a {
+                display: block !important;
+                padding: 10px 16px !important;
+                color: white !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                transition: background 0.2s !important;
+                border-bottom: none !important;
+                text-align: left !important;
+                white-space: nowrap !important;
+            }
+            
+            .naav-linkss li a:hover {
+                background: rgba(255,255,255,0.15) !important;
+            }
+            
+            .naav-linkss li:last-child a {
+                border-bottom: none !important;
+            }
+            
+            /* Auth butonları */
+            .auth-buttoons,
+            .auth-buttons {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 6px !important;
+                margin: 0 !important;
+                flex-shrink: 0 !important;
+            }
+            
+            /* Kullanıcı adı butonu */
+            .auth-buttoons .dropdown,
+            .auth-buttons .dropdown,
+            .auth-buttoons .user-dropdown,
+            .auth-buttons .user-dropdown {
+                flex-shrink: 0 !important;
+            }
+            
+            .auth-buttoons .user-name,
+            .auth-buttons .user-name {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-width: 80px !important;
+                max-width: 120px !important;
+                height: 32px !important;
+                padding: 0 10px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                background: transparent !important;
+                color: white !important;
+                border: 1.5px solid white !important;
+                border-radius: 6px !important;
+                text-decoration: none !important;
+            }
+            
+            /* Giriş Yap butonu */
+            .auth-buttoons .login,
+            .auth-buttons .login {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-width: 70px !important;
+                height: 32px !important;
+                padding: 0 10px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                background: transparent !important;
+                color: white !important;
+                border: 1.5px solid white !important;
+                border-radius: 6px !important;
+                text-decoration: none !important;
+            }
+            
+            /* İlan Ver container */
+            .post-ad-container {
+                display: inline-flex !important;
+                align-items: center !important;
+                position: relative !important;
+                flex-shrink: 0 !important;
+            }
+            
+            /* İlan Ver butonu */
+            .auth-buttoons .post-ad,
+            .auth-buttons .post-ad {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-width: 60px !important;
+                height: 32px !important;
+                padding: 0 10px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                background: white !important;
+                color: #009cfb !important;
+                border: none !important;
+                border-radius: 6px !important;
+                text-decoration: none !important;
+            }
+            
+            /* İlan Ver butonu - ilan-ver-btn class */
+            .auth-buttoons .ilan-ver-btn,
+            .auth-buttons .ilan-ver-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-width: 60px !important;
+                height: 32px !important;
+                padding: 0 10px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+            }
+            
+            /* Ücretsiz etiketi */
+            .free-tag {
+                position: absolute !important;
+                top: -6px !important;
+                left: -4px !important;
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+                background-color: #28a745 !important;
+                color: white !important;
+                font-weight: bold !important;
+                border-radius: 3px !important;
+                transform: rotate(-12deg) !important;
+                z-index: 100 !important;
+            }
+            
+            /* Hamburger menü butonu - HER ZAMAN GÖRÜNÜR */
+            .mobile-menu-btn,
+            #mobile-menu-btn {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                width: 36px !important;
+                height: 36px !important;
+                padding: 6px !important;
+                background: rgba(255,255,255,0.15) !important;
+                border-radius: 6px !important;
+                cursor: pointer !important;
+                flex-shrink: 0 !important;
+                margin-left: 6px !important;
+            }
+            
+            #mobile-menu-btn div,
+            .mobile-menu-btn div {
+                width: 20px !important;
+                height: 2px !important;
+                background: white !important;
+                margin: 2px 0 !important;
+                border-radius: 1px !important;
+            }
+        }
+        
+        /* 500px - 1200px genişlik için özel düzenleme */
+        @@media (min-width: 500px) and (max-width: 1200px) and (min-height: 1000px) {
+            .navbaar {
+                padding: clamp(6px, 1vw, 12px) clamp(5px, 0.8vw, 10px) !important;
+            }
+            
+            .navbaar-container {
+                padding: 0 clamp(5px, 0.8vw, 10px) !important;
+                gap: clamp(5px, 0.8vw, 12px) !important;
+            }
+            
+            /* Logo ve Anlık yazısı en sola yapıştır ve küçült */
+            .navbaar-container .logo {
+                max-width: min(140px, 15vw) !important;
+                margin-left: 0 !important;
+                padding-left: 0 !important;
+            }
+            
+            .logo img {
+                height: clamp(25px, 3vw, 35px) !important;
+                width: auto !important;
+            }
+            
+            .visitor-counts-navbar {
+                font-size: clamp(7px, 0.8vw, 10px) !important;
+                padding: clamp(2px, 0.4vw, 4px) clamp(4px, 0.7vw, 7px) !important;
+                margin-left: clamp(3px, 0.6vw, 6px) !important;
+            }
+            
+            .naav-linkss {
+                margin-left: clamp(8px, 1.2vw, 15px) !important;
+                gap: clamp(5px, 0.8vw, 12px) !important;
+            }
+            
+            .naav-linkss li a {
+                font-size: clamp(9px, 0.85vw, 12px) !important;
+            }
+        }
+        
+        /* MASAÜSTÜ GÖRÜNÜMÜ - Yükseklik 1000px ve üstünde (telefondan masaüstü sitesi göster seçildiğinde) */
+        @@media (min-height: 1000px) {
+            .navbaar {
+                padding: clamp(8px, 1.2vw, 15px) clamp(12px, 2vw, 25px) !important;
+                overflow: hidden !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            .navbaar-container {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                flex-wrap: nowrap !important;
+                gap: clamp(10px, 2vw, 25px) !important;
+                padding: 0 clamp(10px, 1.5vw, 20px) !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+            
+            /* Logo ve Anlık yazısı solda */
+            .navbaar-container .logo {
+                order: 1 !important;
+                flex-shrink: 1 !important;
+                display: flex !important;
+                align-items: center !important;
+                min-width: 0 !important;
+                max-width: min(200px, 18vw) !important;
+            }
+            
+            .navbaar-container .logo img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            .visitor-counts-navbar {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                font-size: clamp(8px, 0.9vw, 11px) !important;
+                padding: clamp(2px, 0.5vw, 5px) clamp(5px, 0.9vw, 9px) !important;
+                margin-left: clamp(5px, 0.9vw, 10px) !important;
+                flex-shrink: 0 !important;
+            }
+            
+            /* Navlinks ortada */
+            .naav-linkss {
+                display: flex !important;
+                position: static !important;
+                background: transparent !important;
+                flex-direction: row !important;
+                gap: clamp(6px, 1vw, 16px) !important;
+                padding: 0 clamp(4px, 0.8vw, 12px) !important;
+                box-shadow: none !important;
+                margin-left: clamp(10px, 1.5vw, 20px) !important;
+                order: 2 !important;
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+                align-items: center !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                top: auto !important;
+                right: auto !important;
+                overflow: hidden !important;
+            }
+            
+            .naav-linkss li a {
+                display: inline !important;
+                padding: 0 !important;
+                font-size: clamp(10px, 0.95vw, 14px) !important;
+                border-bottom: none !important;
+                background: transparent !important;
+                color: white !important;
+                text-align: left !important;
+            }
+            
+            .naav-linkss li {
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+                width: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .mobile-menu-btn,
+            #mobile-menu-btn,
+            .hamburger {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
+            
+            .logo img {
+                height: clamp(30px, 3.5vw, 45px) !important;
+                width: auto !important;
+            }
+            
+            .visitor-counts-navbar {
+                display: inline-flex !important;
+                font-size: clamp(8px, 0.9vw, 11px) !important;
+                padding: clamp(2px, 0.5vw, 5px) clamp(5px, 0.9vw, 9px) !important;
+                margin-left: clamp(5px, 0.9vw, 10px) !important;
+            }
+            
+            .auth-buttoons,
+            .auth-buttons {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: clamp(5px, 0.8vw, 10px) !important;
+                margin-left: auto !important;
+                order: 3 !important;
+                flex-shrink: 1 !important;
+                min-width: 0 !important;
+                align-items: center !important;
+            }
+            
+            .auth-buttoons .ilan-ver-btn,
+            .auth-buttons .ilan-ver-btn,
+            .ilan-ver-btn {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                padding: clamp(5px, 0.8vw, 10px) clamp(8px, 1.2vw, 14px) !important;
+                font-size: clamp(10px, 0.9vw, 13px) !important;
+                gap: clamp(3px, 0.5vw, 6px) !important;
+                border-radius: clamp(12px, 1.5vw, 20px) !important;
+            }
+            
+            .auth-buttoons .login,
+            .auth-buttons .login {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                padding: clamp(5px, 0.8vw, 10px) clamp(8px, 1.2vw, 14px) !important;
+                font-size: clamp(10px, 0.9vw, 13px) !important;
+                height: auto !important;
+                min-width: auto !important;
+                max-width: none !important;
+                border: 2px solid white !important;
+                border-radius: clamp(4px, 0.5vw, 7px) !important;
+                background: transparent !important;
+                color: white !important;
+            }
+            
+            .auth-buttoons .user-name,
+            .auth-buttons .user-name {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                padding: clamp(4px, 0.7vw, 8px) clamp(6px, 1vw, 12px) !important;
+                font-size: clamp(9px, 0.85vw, 12px) !important;
+                height: auto !important;
+                min-width: auto !important;
+                max-width: 150px !important;
+                border: 2px solid white !important;
+                border-radius: clamp(4px, 0.5vw, 7px) !important;
+                background: transparent !important;
+                color: white !important;
+            }
+            
+            .auth-buttoons .ilan-ver-btn i,
+            .ilan-ver-btn i {
+                display: inline !important;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbaar">
-        <div class="navbaar-container">
-            <div class="logo">
-                <a href="/">
-                  <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-                <span>Sevval.com</span>
-            </div>
-            <!-- Hamburger Menu Icon -->
-            <div class="hamburger" id="hamburger-menu">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    var hamburgerMenu = document.getElementById("hamburger-menu");
-                    var navLinks = document.getElementById("nav-links");
-
-                    // Hamburger menüye tıklanınca menüyü aç/kapat
-                    hamburgerMenu.addEventListener("click", function (event) {
-                        navLinks.classList.toggle("active");
-                        event.stopPropagation(); // Hamburger menüye tıklanınca kapanmayı engelle
-                    });
-
-                    // Sayfanın herhangi bir yerine tıklanınca menüyü kapat
-                    document.addEventListener("click", function (event) {
-                        if (!navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
-                            navLinks.classList.remove("active");
-                        }
-                    });
-                });
-            </script>
-            <ul class="naav-linkss" id="nav-links">
-                <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-                <li><a href="@Url.Action("KardesFirmalar", "Home")">Firmalar</a></li>
-                <li class="dropdoawn">
-                    <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-                </li>
-
-                <li>
-                    <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
-                </li>
-
-                
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <li>
-                        <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                    </li>
-                   
-                }
-
-
-            </ul>
-            <div class="auth-buttoons">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    var currentUser = await UserManager.GetUserAsync(User);
-
-                    // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
-                    if (currentUser != null)
-                    {
-                        <div class="dropdown">
-                            <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                            <ul class="dropdown-content">
-                                <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                                <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                                
-                                <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                                <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
-                                <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                                <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                                
-                                <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                                <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                                @if (User.Identity.IsAuthenticated &&
-                               (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-
-                                {
-                                    <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                                }
-                                <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
-                                <li>
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
-                                        <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    }
-                    else
-                    {
-                        <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
-                    }
-                }
-                else
-                {
-                    <a href="#" class="login" id="giris-buton">Giriş Yap</a>
-                }
-
-
-                <!-- İlan Ver butonu ve Ücretsiz etiketi -->
-                <div class="post-ad-container">
-                    <span class="free-tag">Ücretsiz</span>
-                    <a href="@(!User.Identity.IsAuthenticated ? @Url.Action("Login", "Account",new {Type="GENEL"}) : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-                </div>
-            </div>
-
-        </div>
-    </nav>
-    <style>
-        .post-ad-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .free-tag {
-            position: absolute;
-            top: -10px;
-            left: -10px; /* Daha sağa kaydırmak için artırabilirsiniz */
-            background-color: #007bff; /* Mavi arka plan */
-            color: white; /* Beyaz metin rengi */
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
-            transform: rotate(-10deg); /* Hafif eğik bir görünüm */
-            z-index: 1;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
-        }
-
-        .post-ad {
-            display: inline-block;
-            background-color: #ffffff; /* Beyaz arka plan */
-            color: #007bff; /* Mavi yazı rengi */
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            border: 1px solid #007bff; /* Mavi çerçeve */
-            transition: 0.3s ease;
-        }
-
-            .post-ad:hover {
-                background-color: #007bff; /* Hoverda mavi arka plan */
-                color: white; /* Hoverda beyaz metin */
-            }
-
-        .coming-soon-tag {
-            position: absolute;
-            top: 20px;
-            left: 55px; /* Etiketi daha sağa kaydırmak için artırabilirsiniz */
-            background-color: #007bff; /* Mavi arka plan */
-            color: white; /* Beyaz metin rengi */
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
-            transform: none; /* Düz bir görünüm için çapraz rotayı kaldırdık */
-            z-index: 1;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Hafif gölge */
-        }
-    </style>
-    <!-- Pop-up Penceresi -->
-    <div id="popup-giris" class="pencere">
-        <div class="pencere-icerik">
-            <button class="kapat-buton" id="pencere-kapat">&times;</button> <!-- Kapat Butonu -->
-            <div class="sol-bolum">
-                <h2>Bireysel</h2>
-                <a href="@Url.Action("Login", "Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("Register", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-            <div class="sag-bolum">
-                <h2>Kurumsal</h2>
-                <a href="@Url.Action("Login","Account")" class="baglanti">Giriş Yap</a>
-                <a href="@Url.Action("EstateRegister", "Account")" class="baglanti">Üye Ol</a>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* Pop-up penceresi stili */
-        .pencere {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1100;
-        }
-
-        /* Pop-up içeriği stili */
-        .pencere-icerik {
-            background: linear-gradient(90deg, #1e88e5, #2196f3); /* Mavi tonları */
-            width: 460px;
-            height: 490px;
-            display: flex;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            animation: gorunmeEfekti 0.3s ease;
-            position: relative;
-            padding: 20px;
-            box-sizing: border-box;
-            margin: auto;
-        }
-
-        /* Sol ve sağ bölümler */
-        .sol-bolum, .sag-bolum {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        /* Sağ bölümdeki ayırıcı */
-        .sag-bolum {
-            border-left: 2px solid #fff;
-        }
-
-        /* Başlık stilleri */
-        h2 {
-            margin-bottom: 20px;
-            font-size: 28px;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        /* Bağlantı buton stilleri */
-        .baglanti {
-            margin: 15px 0;
-            padding: 15px 25px;
-            background: #fff;
-            color: #1e88e5;
-            text-decoration: none;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            font-size: 18px;
-            width: 80%;
-        }
-
-            .baglanti:hover {
-                background: #f1f1f1;
-                transform: translateY(-2px);
-            }
-
-            .baglanti:focus {
-                outline: none;
-            }
-
-        /* Kapat butonu */
-        .kapat-buton {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            font-size: 30px;
-            color: #fff;
-            background: none;
-            border: 2px solid #fff;
-            text-align: center;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .kapat-buton:hover {
-                color: #d32f2f;
-                border-color: #d32f2f;
-            }
-    </style>
-
-    <script>
-        // Giriş Yap butonuna tıklandığında pop-up penceresini aç
-        document.getElementById('giris-buton').addEventListener('click', function (event) {
-            event.preventDefault();
-            document.getElementById('popup-giris').style.display = 'flex';
-        });
-
-        // Pop-up penceresinin dışında bir yere tıklandığında kapat
-        document.getElementById('popup-giris').addEventListener('click', function (event) {
-            if (event.target === this) {
-                this.style.display = 'none';
-            }
-        });
-
-        // Kapatma butonuna tıklandığında pop-up penceresini kapat
-        document.getElementById('pencere-kapat').addEventListener('click', function () {
-            document.getElementById('popup-giris').style.display = 'none';
-        });
-               function toggleHamburgerMenu() {
-            // Menü öğesinin görünür olup olmadığını kontrol et
-            if (document.querySelector('.naav-linkss')) {
-                document.querySelector('.naav-linkss').classList.toggle('active');
-            }
-        }
-
-        // Başlangıçta tıklama olayını ekleyelim
-        document.querySelector('.haamburger').addEventListener('click', toggleHamburgerMenu);
-
-
-    </script>
-
-    <script>
-        // Sayfa yüklendiğinde çalışacak kodlar
-        window.onload = function() {
-            // Hamburger menü
-            const hamburger = document.getElementById('hamburger');
-            const navLinks = document.getElementById('nav-links');
-
-            if (hamburger) {
-                hamburger.addEventListener('click', function() {
-                    navLinks.classList.toggle('active');
-                    hamburger.classList.toggle('active');
-                });
-            }
-
-         
-
-               // Kategori seçim fonksiyonları
-        function selectType(type) {
-            document.getElementById('confirmation-text').innerText = `Seçilen Durum: ${type}`;
-
-            // Doğrulama sistemi olmadan step3 açılıyor
-            document.getElementById('step3').classList.remove('hidden');
-        }
-
-    </script>
+    <!-- Navbar - Anasayfa ile aynı -->
+    <partial name="_Navbar" />
 
 
 
 
-    <h1>Kategori Seçimi</h1>
+    <h1 style="margin-top: 30px;">Kategori Seçimi</h1>
     <div class="main-container">
         <div class="container">
             <h3 style="text-align: center;" id="category-info"></h3> <!-- Seçim Bilgileri için yer -->
@@ -528,8 +818,8 @@
                 <p id="selections"></p>
                 <p id="confirmation-text"></p>
                 <p>Tebrikler! Kategori seçiminiz tamamlanmıştır.</p>
-                <form id="categoryForm">
-                    <button type="button" onclick="redirectToCategory()">Devam</button>
+                <form id="categoryForm" style="text-align: center;">
+                    <button type="button" onclick="redirectToCategory()" style="margin: 0 auto; display: block;">Devam</button>
                 </form>
             </div>
         </div>
@@ -706,20 +996,7 @@
                 }
             }
         }
-        @section Scripts {
-                    <script src="~/js/auth.js"></script>
-        }
 </script>
-
-    <style>
-        .hidden {
-            display: none;
-        }
-    </style>
-
-    
-
-  
 
     <script>
         // Kullanıcı cihazını tespit et
@@ -733,27 +1010,30 @@
             : `https://web.whatsapp.com/send?phone=${whatsappNumber8}&text=${message8}`; // Tarayıcıda WhatsApp Web
 
         // Bağlantıyı ayarla
-        document.getElementById("whatsapp-link-8").href = whatsappLink8;
+        var whatsappLinkElement = document.getElementById("whatsapp-link-8");
+        if (whatsappLinkElement) {
+            whatsappLinkElement.href = whatsappLink8;
+        }
     </script>
 
     <style>
         .whatsapp-float {
             position: fixed;
-            bottom: 20px; /* Ekranın altından 20px yukarıda */
-            right: 20px; /* Ekranın sağından 20px içeride */
-            z-index: 1001; /* Üstte görünmesini sağlamak için yüksek bir z-index */
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
         }
 
         .whatsapp-image {
-            width: 90px; /* Resmin genişliği */
-            height: auto; /* Yüksekliği orantılı olarak ayarla
-                                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
-            transition: transform 0.3s; /* Hover efekti için geçiş süresi */
+            width: 90px;
+            height: auto;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
         }
 
-            .whatsapp-image:hover {
-                transform: scale(1.1); /* Üzerine gelindiğinde büyütme efekti */
-            }
+        .whatsapp-image:hover {
+            transform: scale(1.1);
+        }
     </style>
 
 </body>

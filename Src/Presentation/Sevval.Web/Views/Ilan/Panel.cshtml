@@ -2,7 +2,11 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @{
-    var user = await UserManager.GetUserAsync(User);
+    ApplicationUser user = null;
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        user = await UserManager.GetUserAsync(User);
+    }
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Raporlar";
 }
@@ -74,7 +78,11 @@
                             <a href="@Url.Action("Sozlesmeler", "Ilan")" class="list-group-item list-group-item-action">Sözleşmeler</a>
                             <a href="@Url.Action("Settings", "Account")" class="list-group-item list-group-item-action">Ayarlar</a>
                             <a href="@Url.Action("Index", "Satinal")" class="list-group-item list-group-item-action">Satın Al</a>
-                            @if (User.Identity.IsAuthenticated && (new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" }).Contains(User.Identity.Name, StringComparer.OrdinalIgnoreCase))
+                            @{
+                                var allowedEmails = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
+                                var currentUserEmail = User.Identity?.Name;
+                            }
+                            @if (User.Identity?.IsAuthenticated == true && !string.IsNullOrEmpty(currentUserEmail) && allowedEmails.Contains(currentUserEmail, StringComparer.OrdinalIgnoreCase))
                             {
                                 <a href="@Url.Action("Index", "SevvalOfis")" class="list-group-item list-group-item-action">Şevval Ofis</a>
                             }

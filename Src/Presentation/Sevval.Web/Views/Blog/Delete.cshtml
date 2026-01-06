@@ -1,35 +1,26 @@
 ﻿@model YourProjectName.Models.Blog
 @{
-    ViewData["Title"] = $"Yazıyı Sil: {Model.Title}"; // SEO dostu sekme başlığı
-    Layout = null; // Düzen sayfasını kullanmıyoruz, tüm HTML burada olacak
+    ViewData["Title"] = $"Yazıyı Sil: {Model.Title}";
+    ViewData["Description"] = $"Şevval Emlak Blog'da '{Model.Title}' başlıklı blog yazısını silme onayı sayfası.";
+    Layout = "_Layout";
+    ViewData["HideNavbar"] = true;
+    ViewData["HideFooter"] = true;
 
     // Admin olarak görünecek ek e-posta adresleri
     var additionalAdmins = new List<string> { "sftumen41@gmail.com", "exdel.txt@gmail.com" };
     var isAdminOrAdditionalAdmin = User.IsInRole("Admin") || (User.Identity.IsAuthenticated && additionalAdmins.Contains(User.Identity.Name));
 }
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- SEO için meta açıklaması -->
-    <meta name="description" content="Şevval Emlak Blog'da '@Model.Title' başlıklı blog yazısını silme onayı sayfası." />
-    <!-- SEO için anahtar kelimeler -->
-    <meta name="keywords" content="blog yazısı sil, @(Model.Title), gayrimenkul blogu, emlak, emlakçılık, Şevval Blog" />
-    <!-- Yazar bilgisi -->
-    <meta name="author" content="Şevval" />
-    <!-- Sayfa başlığı -->
-    <title>@ViewData["Title"] - Şevval Emlak Blog</title>
+
+@section Styles {
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts - Poppins (Modern ve estetik bir font) -->
+    <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- İsteğe bağlı, ikonlar için -->
+    <!-- İkonlar için -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- DeleteBlog.css dosyasını buraya bağlıyoruz -->
+    <!-- DeleteBlog.css -->
     <link rel="stylesheet" href="~/css/DeleteBlog.css">
-</head>
-<body>
+}
     <!-- Header Bölümü (Diğer sayfalarla aynı stil) -->
     <header class="header-bg py-4">
         <div class="container d-flex justify-content-between align-items-center">
@@ -87,7 +78,7 @@
         </div>
     </main>
 
-    <!-- Footer Bölümü (Diğer sayfalarla aynı stil) -->
+    <!-- Footer Bölümü -->
     <footer class="footer-bg text-center">
         <div class="container">
             <p class="mb-0">&copy; @DateTime.Now.Year Şevval Blog. Tüm Hakları Saklıdır.</p>
@@ -95,7 +86,6 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS ve bağımlılıkları -->
+@section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+}

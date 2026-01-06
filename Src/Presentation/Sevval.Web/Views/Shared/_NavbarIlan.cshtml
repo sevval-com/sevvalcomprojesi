@@ -1,6 +1,15 @@
 @using Microsoft.AspNetCore.Identity
 @using Sevval.Domain.Entities
 @inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ApplicationUser? currentUser = null;
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
 
 <nav class="navbaar">
     <div class="navbaar-container" style="position: relative;">
@@ -25,9 +34,6 @@
             <li>
                 <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
             </li>
-            <li>
-                <a href="@Url.Action("Index", "Drone")">Şevval Drone</a>
-            </li>
             <li class="dropdoawn">
                 <a href="@Url.Action("About", "Home")">Hakkımızda</a>
             </li>
@@ -43,14 +49,13 @@
                 <span class="btn-text-hover">Ücretsiz</span>
             </a>
             
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                var currentUser = await UserManager.GetUserAsync(User);
                 if (currentUser != null)
                 {
-                    <div class="dropdown">
+                    <div class="user-dropdown">
                         <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                        <ul class="dropdown-content">
+                        <ul class="user-dropdown-content">
                             <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
                             <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                             <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
@@ -101,9 +106,12 @@
                 var navLinks = document.getElementById("nav-links");
                 var mobileMenuBtn = document.getElementById("mobile-menu-btn");
                 
-                // Mobilde menü butonunu göster
+                function isMobileView() {
+                    return window.innerWidth <= 991 && window.innerHeight < 1000;
+                }
+                
                 function handleMobileMenu() {
-                    if (window.innerWidth <= 991) {
+                    if (isMobileView()) {
                         if (mobileMenuBtn) {
                             mobileMenuBtn.style.display = 'flex';
                             mobileMenuBtn.style.flexDirection = 'column';
@@ -114,7 +122,6 @@
                     }
                 }
                 
-                // Menü butonuna tıklayınca
                 if (mobileMenuBtn) {
                     mobileMenuBtn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -122,7 +129,6 @@
                     });
                 }
                 
-                // Sayfa dışına tıklayınca menüyü kapat
                 document.addEventListener('click', function(e) {
                     if (navLinks && mobileMenuBtn && !navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
                         navLinks.classList.remove('active');
@@ -132,37 +138,47 @@
                 handleMobileMenu();
                 window.addEventListener('resize', handleMobileMenu);
                 
-                // DROPDOWN MENÜ - Tıklama ile aç/kapat
-                var dropdown = document.querySelector('.dropdown');
-                var dropdownContent = document.querySelector('.dropdown-content');
-                var userName = document.querySelector('.user-name');
+                var dropdowns = document.querySelectorAll('.user-dropdown');
                 
-                if (userName && dropdownContent) {
-                    userName.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dropdownContent.classList.toggle('show');
-                    });
+                dropdowns.forEach(function(dropdown) {
+                    var dropdownContent = dropdown.querySelector('.user-dropdown-content');
+                    var userName = dropdown.querySelector('.user-name');
                     
-                    // Sayfa dışına tıklayınca dropdown'ı kapat
-                    document.addEventListener('click', function(e) {
-                        if (dropdown && !dropdown.contains(e.target)) {
+                    if (userName && dropdownContent) {
+                        userName.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
+                                if (content !== dropdownContent) {
+                                    content.classList.remove('show');
+                                }
+                            });
+                            
+                            dropdownContent.classList.toggle('show');
+                        });
+                    }
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.user-dropdown')) {
+                        document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
+                            content.classList.remove('show');
+                        });
+                    }
+                });
+                
+                document.querySelectorAll('.user-dropdown-content a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        var dropdownContent = link.closest('.user-dropdown-content');
+                        if (dropdownContent) {
                             dropdownContent.classList.remove('show');
                         }
                     });
-                    
-                    // Dropdown içindeki linklere tıklayınca menüyü kapat (logout hariç)
-                    dropdownContent.querySelectorAll('a').forEach(function(link) {
-                        link.addEventListener('click', function() {
-                            dropdownContent.classList.remove('show');
-                        });
-                    });
-                }
+                });
                 
-                // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
                 function fixMobileNavbar() {
-                    if (window.innerWidth <= 991) {
-                        // Auth butonları - gap 20px ve hizalı
+                    if (isMobileView()) {
                         var authButtons = document.querySelector('.auth-buttoons');
                         if (authButtons) {
                             authButtons.style.display = 'flex';
@@ -173,7 +189,6 @@
                     }
                 }
                 
-                // Sayfa yüklendiğinde ve resize olduğunda çalıştır
                 fixMobileNavbar();
                 window.addEventListener('resize', fixMobileNavbar);
             });
@@ -219,7 +234,6 @@
 </div>
 
 <script>
-// Giriş Popup JavaScript
 (function() {
     function initGirisPopup() {
         var girisButon = document.getElementById('giris-buton');
@@ -255,7 +269,6 @@
     }
 })();
 
-// Anlık ziyaretçi sayısını güncelle
 (function() {
     function formatNumber(num) {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -267,7 +280,7 @@
         
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 saniye timeout
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
             
             const response = await fetch('/api/Visitor/active', { signal: controller.signal });
             clearTimeout(timeoutId);
@@ -276,15 +289,10 @@
             const data = await response.json();
             const activeVisitors = data.data?.activeVisitorCount || data.Data?.ActiveVisitorCount || data.activeVisitors || data.ActiveVisitors || 0;
             el.textContent = formatNumber(activeVisitors);
-        } catch (e) { 
-            // Timeout veya hata durumunda sessizce geç
-        }
+        } catch (e) { }
     }
     
-    // Sayfa yüklendiğinde hemen çağır
     updateVisitorCount();
-    
-    // Her 30 saniyede bir güncelle
     setInterval(updateVisitorCount, 30000);
 })();
 </script>

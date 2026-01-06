@@ -411,13 +411,34 @@
                     </ul>
                 </div>
 
+                <!-- Sıralama Dropdown -->
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-sort me-1"></i> Sırala
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-desc"><i class="fas fa-calendar-alt me-2"></i>En Yeni</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="date-asc"><i class="fas fa-calendar me-2"></i>En Eski</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-asc"><i class="fas fa-arrow-up me-2"></i>Fiyat (Artan)</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-desc"><i class="fas fa-arrow-down me-2"></i>Fiyat (Azalan)</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="title-asc"><i class="fas fa-sort-alpha-down me-2"></i>A'dan Z'ye</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="title-desc"><i class="fas fa-sort-alpha-up me-2"></i>Z'den A'ya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="views-desc"><i class="fas fa-eye me-2"></i>En Çok Görüntülenen</a></li>
+                        </ul>
+                    </div>
+                </div>
+
 
                 <!-- İlan Listesi -->
                 <div class="ilan-listesi">
                     @foreach (var ilan in Model._Ilanlar)
                     {
                         var fotograf = Model._Fotograflar?.FirstOrDefault(x => x.IlanId == ilan.Id);
-                        <div class="card shadow-sm mb-3 ilan-kart" data-id="@ilan.Id" data-title="@ilan?.Title?.ToLower()" data-status="@ilan?.Status?">
+                        <div class="card shadow-sm mb-3 ilan-kart" data-id="@ilan.Id" data-title="@ilan?.Title" data-status="@ilan?.Status" data-price="@ilan.Price" data-date="@ilan.GirisTarihi.ToString("yyyy-MM-dd")" data-views="@ilan.GoruntulenmeSayisi">
                             <div class="row g-0">
                                 <div class="col-md-3 p-2">
                                     <a href="@Url.Action("ilansayfasi", "Ilan", new { id = ilan.Id })" class="image-container-16-9">
@@ -602,7 +623,7 @@
                 });
             }
             document.addEventListener("click", function (event) {
-                if (navLinks && !navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
+                if (navLinks && hamburgerMenu && !navLinks.contains(event.target) && !hamburgerMenu.contains(event.target)) {
                     navLinks.classList.remove("active");
                 }
             });
@@ -692,11 +713,63 @@
             });
 
             // Fiyat Güncelleme
+            function savePriceForId(id) {
+                const priceInput = document.getElementById(`price-input-${id}`);
+                const newPrice = parseFloat(priceInput.value);
+                const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const saveBtn = document.querySelector(`.save-price[data-id="${id}"]`);
+                const priceText = document.getElementById(`price-text-${id}`);
+
+                if (newPrice < 1000 || newPrice > 500000000) {
+                    alert("Fiyat 1.000 TL ile 500.000.000 TL arasında olmalıdır.");
+                    return;
+                }
+
+                // Butonu devre dışı bırak ve loading göster
+                if (saveBtn) {
+                    saveBtn.classList.add('fa-spinner', 'fa-spin');
+                    saveBtn.classList.remove('fa-check');
+                }
+
+                fetch('/Ilan/UpdatePrice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': csrfToken },
+                    body: JSON.stringify({ ilanId: id, newPrice })
+                }).then(res => res.json()).then(data => {
+                    // Loading'i kaldır
+                    if (saveBtn) {
+                        saveBtn.classList.remove('fa-spinner', 'fa-spin');
+                        saveBtn.classList.add('fa-check');
+                    }
+                    
+                    if (data.newPrice) {
+                        priceText.textContent = `${data.newPrice.toLocaleString('tr-TR')} TL`;
+                        document.querySelector(`.cancel-price[data-id="${id}"]`).click(); // Reset UI
+                        
+                        // Başarı mesajı göster
+                        const container = document.getElementById(`price-container-${id}`);
+                        const successMsg = document.createElement('span');
+                        successMsg.className = 'text-success ms-2 small';
+                        successMsg.innerHTML = '<i class="fa fa-check-circle"></i> Fiyat güncellendi';
+                        container.appendChild(successMsg);
+                        setTimeout(() => successMsg.remove(), 3000);
+                    }
+                }).catch(err => {
+                    // Loading'i kaldır
+                    if (saveBtn) {
+                        saveBtn.classList.remove('fa-spinner', 'fa-spin');
+                        saveBtn.classList.add('fa-check');
+                    }
+                    alert('Fiyat güncellenirken bir hata oluştu.');
+                });
+            }
+
             document.querySelectorAll('.edit-price').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     document.getElementById(`price-text-${id}`).classList.add('d-none');
                     document.getElementById(`price-input-${id}`).classList.remove('d-none');
+                    document.getElementById(`price-input-${id}`).focus();
                     this.classList.add('d-none');
                     document.querySelector(`.save-price[data-id="${id}"]`).classList.remove('d-none');
                     document.querySelector(`.cancel-price[data-id="${id}"]`).classList.remove('d-none');
@@ -717,25 +790,18 @@
             document.querySelectorAll('.save-price').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
-                    const priceInput = document.getElementById(`price-input-${id}`);
-                    const newPrice = parseFloat(priceInput.value);
-                    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    savePriceForId(id);
+                });
+            });
 
-                    if (newPrice < 1000 || newPrice > 500000000) {
-                        alert("Fiyat 1.000 TL ile 500.000.000 TL arasında olmalıdır.");
-                        return;
+            // Enter tuşu ile fiyat güncelleme
+            document.querySelectorAll('[id^="price-input-"]').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const id = this.id.replace('price-input-', '');
+                        savePriceForId(id);
                     }
-
-                    fetch('/Ilan/UpdatePrice', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': csrfToken },
-                        body: JSON.stringify({ ilanId: id, newPrice })
-                    }).then(res => res.json()).then(data => {
-                        if (data.newPrice) {
-                            document.getElementById(`price-text-${id}`).textContent = `${data.newPrice.toLocaleString()} TL`;
-                            document.querySelector(`.cancel-price[data-id="${id}"]`).click(); // Reset UI
-                        }
-                    });
                 });
             });
 
@@ -861,13 +927,89 @@
                 const searchValue = document.getElementById('searchInput').value.toLowerCase();
 
                 filteredItems = allItems.filter(item => {
-                    const title = item.getAttribute('data-title') || '';
+                    const title = (item.getAttribute('data-title') || '').toLowerCase();
                     return title.includes(searchValue);
+                });
+
+                // Mevcut sıralama varsa uygula
+                if (currentSortType) {
+                    applySorting(filteredItems, currentSortType);
+                    // DOM'daki sırayı güncelle
+                    filteredItems.forEach(item => {
+                        ilanListesiContainer.appendChild(item);
+                    });
+                }
+
+                displayPage(1);
+                setupPagination();
+            }
+
+            // Sıralama durumunu tut
+            let currentSortType = null;
+
+            // Sıralama uygula (array'i yerinde sıralar)
+            function applySorting(items, sortType) {
+                items.sort((a, b) => {
+                    switch (sortType) {
+                        case 'date-desc':
+                            return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                        case 'date-asc':
+                            return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                        case 'price-asc':
+                            return parseFloat(a.getAttribute('data-price') || 0) - parseFloat(b.getAttribute('data-price') || 0);
+                        case 'price-desc':
+                            return parseFloat(b.getAttribute('data-price') || 0) - parseFloat(a.getAttribute('data-price') || 0);
+                        case 'title-asc':
+                            return (a.getAttribute('data-title') || '').trim().localeCompare((b.getAttribute('data-title') || '').trim(), 'tr-TR');
+                        case 'title-desc':
+                            return (b.getAttribute('data-title') || '').trim().localeCompare((a.getAttribute('data-title') || '').trim(), 'tr-TR');
+                        case 'views-desc':
+                            return parseInt(b.getAttribute('data-views') || 0) - parseInt(a.getAttribute('data-views') || 0);
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            // Sıralama fonksiyonu
+            function sortAds(sortType) {
+                currentSortType = sortType;
+                console.log('Sıralama başladı:', sortType);
+                console.log('Sıralanacak ilan sayısı:', filteredItems.length);
+                
+                applySorting(filteredItems, sortType);
+
+                // Debug: İlk 5 ilanın başlığını göster
+                console.log('Sıralama sonrası ilk 5 ilan:');
+                filteredItems.slice(0, 5).forEach((item, i) => {
+                    console.log(i + 1, item.getAttribute('data-title'));
+                });
+
+                // DOM'daki sırayı güncelle
+                filteredItems.forEach(item => {
+                    ilanListesiContainer.appendChild(item);
                 });
 
                 displayPage(1);
                 setupPagination();
             }
+
+            // Sıralama butonlarına event listener ekle
+            document.querySelectorAll('.sort-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sortType = this.getAttribute('data-sort');
+                    sortAds(sortType);
+                    
+                    // Aktif sıralama seçeneğini güncelle
+                    document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Dropdown buton metnini güncelle
+                    const sortText = this.textContent.trim();
+                    document.getElementById('sortDropdown').innerHTML = '<i class="fas fa-sort me-1"></i> ' + sortText;
+                });
+            });
 
             // Initial setup
             filterAds();

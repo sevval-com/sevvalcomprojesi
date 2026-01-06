@@ -133,7 +133,7 @@ public class HomeController : Controller
         ViewBag.TotalPages = response?.Meta?.Pagination?.TotalPage;
         ViewBag.HasPreviousPage = model.Page > 1;
         ViewBag.HasNextPage = model.Page < (response?.Meta?.Pagination?.TotalPage ?? 0);
-        ViewBag.TotalFirmCount = response?.Meta?.Pagination?.TotalItem ?? 0; ;
+        ViewBag.TotalFirmCount = response?.Meta?.Pagination?.TotalItem ?? 0;
         ViewBag.TotalUserCount = result?.Data?.TotalCount ?? 0;
 
         model.Companies = response?.Data;
@@ -185,6 +185,7 @@ public class HomeController : Controller
 
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
+            TempData["CommentSuccess"] = "Yorumunuz alındı. Onaylandıktan sonra yayınlanacaktır.";
             return RedirectToAction("Index");
         }
         else
@@ -195,6 +196,7 @@ public class HomeController : Controller
                 comment.UserId = null;
                 _context.Comments.Add(comment);
                 await _context.SaveChangesAsync();
+                TempData["CommentSuccess"] = "Yorumunuz alındı. Onaylandıktan sonra yayınlanacaktır.";
                 return RedirectToAction("Index");
             }
             return RedirectToAction("Index");

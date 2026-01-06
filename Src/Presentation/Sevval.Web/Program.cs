@@ -142,8 +142,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
-        options.SlidingExpiration = false; // Kullanýcý çýkmadýðý sürece çýkýþ yapmasýn
-        options.ExpireTimeSpan = TimeSpan.FromDays(90); // Oturum süresi 90 gün
+        options.SlidingExpiration = true; // Kullanıcı aktifken oturum yenilensin
+        options.ExpireTimeSpan = TimeSpan.FromDays(30); // Beni hatırla seçilirse 30 gün
         options.LoginPath = "/Account/Login"; // Giriþ sayfasýnýn yolu
         options.LogoutPath = "/Account/Logout"; // Çýkýþ sayfasýnýn yolu
         options.AccessDeniedPath = "/Account/AccessDenied";

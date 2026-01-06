@@ -22,7 +22,7 @@ namespace YourProjectNamespace.Controllers
             var ilanlar = await _context.BireyselIlanTakipleri.ToListAsync();
             var consultantOptions = await _context.ConsultantInvitations
                .Where(c => c.CompanyName == "ŞEVVAL EMLAK" || c.CompanyName == "ACR EMLAK")
-               .Select(c => new
+               .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                {
                    Value = c.FirstName + " " + c.LastName,
                    Text = c.FirstName + " " + c.LastName
@@ -31,7 +31,7 @@ namespace YourProjectNamespace.Controllers
 
             var userOptions = await _context.Users
                 .Where(u => u.CompanyName == "ŞEVVAL EMLAK" || u.CompanyName == "ACR EMLAK")
-                .Select(u => new
+                .Select(u => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
                     Value = u.FirstName + " " + u.LastName,
                     Text = u.FirstName + " " + u.LastName
@@ -54,7 +54,7 @@ namespace YourProjectNamespace.Controllers
             }
             var consultantOptions = await _context.ConsultantInvitations
                .Where(c => c.CompanyName == "ŞEVVAL EMLAK" || c.CompanyName == "ACR EMLAK")
-               .Select(c => new
+               .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                {
                    Value = c.FirstName + " " + c.LastName,
                    Text = c.FirstName + " " + c.LastName
@@ -63,7 +63,7 @@ namespace YourProjectNamespace.Controllers
 
             var userOptions = await _context.Users
                 .Where(u => u.CompanyName == "ŞEVVAL EMLAK" || u.CompanyName == "ACR EMLAK")
-                .Select(u => new
+                .Select(u => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
                     Value = u.FirstName + " " + u.LastName,
                     Text = u.FirstName + " " + u.LastName
