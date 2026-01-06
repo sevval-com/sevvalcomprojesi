@@ -855,13 +855,8 @@
             <div class="profile-picture">
                 @{
                     var profilePicPath = Model.About?.ProfilePicturePath ?? "";
-                    var lowerProfilePath = profilePicPath.ToLower();
                     var hasValidProfilePic = !string.IsNullOrEmpty(profilePicPath) 
-                        && (lowerProfilePath.EndsWith(".webp") || lowerProfilePath.EndsWith(".jpg") || lowerProfilePath.EndsWith(".jpeg") || lowerProfilePath.EndsWith(".png") || lowerProfilePath.EndsWith(".gif"))
-                        && !lowerProfilePath.Contains("flaticon")
-                        && !lowerProfilePath.Contains("cdn-icons")
-                        && !lowerProfilePath.Contains("placeholder")
-                        && !lowerProfilePath.Contains("default");
+                        && (profilePicPath.EndsWith(".webp") || profilePicPath.EndsWith(".jpg") || profilePicPath.EndsWith(".jpeg") || profilePicPath.EndsWith(".png") || profilePicPath.EndsWith(".gif"));
                 }
                 @if (!hasValidProfilePic)
                 {

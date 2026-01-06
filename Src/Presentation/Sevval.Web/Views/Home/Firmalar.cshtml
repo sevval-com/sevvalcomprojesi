@@ -37,7 +37,9 @@
     }
 }
 
-
+<!-- Dış CSS dosyaları -->
+<link rel="stylesheet" href="~/css/kardesfirmalar.css">
+<link rel="icon" type="image/png" href="~/images/favlogo.webp">
 
 <!--
     YENİ MAVİ & BEYAZ ANİMASYONLU TASARIM
@@ -99,20 +101,22 @@
     }
 
     /* === TEMEL SAYFA STİLLERİ === */
-    /* Navbar'ı etkilememek için body stillerini sadece içerik için uygula */
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+        background-color: var(--bg-body);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 
-    
-    /* Navbar'ı etkilememek için özel kurallar - Navbar'ın kendi stilleri korunmalı */
-
-
-
-    
-    /* User grid - Anasayfa ile aynı genişlik */
-    .user-grid {
+    .container {
         width: 100%;
-        max-width: 100%;
-        padding: 0;
+        max-width: 1300px;
         margin: 0 auto;
+        padding: 0 16px;
         box-sizing: border-box;
     }
 
@@ -120,12 +124,9 @@
     .page-title {
         font-size: 2.8rem;
         font-weight: 800;
-        margin: 20px auto;
-        padding: 0 1.5%;
+        margin: 24px 0 20px 0;
         letter-spacing: .6px;
         text-align: center;
-        max-width: 100%;
-        box-sizing: border-box;
         
         /* Shimmer Efekti */
         background: linear-gradient(90deg, var(--text-dark), var(--brand-secondary), var(--text-dark));
@@ -190,7 +191,6 @@
         background-position: right 6px center;
         background-size: 10px 10px;
         cursor: pointer;
-        width: 100%;
     }
 
     .filter-select:focus {
@@ -199,7 +199,7 @@
         box-shadow: 0 0 0 3px var(--brand-primary-glow);
     }
     
-    /* Buton Grubu Inline (Filtrele/Temizle aynı satırda, kutularla aynı hizada) */
+    /* Buton Grubu Inline (Filtrele/Temizle aynı satırda) */
     .button-group-inline {
         display: flex;
         gap: 4px;
@@ -546,34 +546,15 @@
 
     /* Mobil (768px altı) */
     @@media (max-width: 767px) {
-
-        
-        .page-title {
-            font-size: 2rem;
-            margin: 16px auto 12px auto;
-            padding: 0 1.5%;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .controls-form {
-            padding: 16px;
-            margin: 0 auto 20px auto;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-        
         .filter-row {
-            flex-direction: column;
+            flex-direction: row;
             flex-wrap: wrap;
-            gap: 10px;
         }
         
         .filter-group {
-            flex: 1 1 100%;
-            min-width: 100%;
+            flex: 1 1 30%;
+            min-width: 100px;
+            max-width: none;
         }
         
         .filter-group label {
@@ -587,28 +568,17 @@
         
         .button-group-inline {
             width: 100%;
-            min-width: 100%;
-            margin-top: 8px;
+            margin-left: 0;
+            margin-top: 12px;
         }
         
         .button-group-inline .btn {
             flex: 1;
         }
-        
-        .user-grid {
-            width: 100%;
-            max-width: 100%;
-            padding: 0;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
     }
 
     /* Tablet (768px ve üstü) */
     @@media (min-width: 768px) {
-        /* Body padding navbar'ı etkilememeli - sadece içerik için */
-
-        
         .page-title {
             font-size: 3rem;
             margin: 32px auto 24px auto;
@@ -629,48 +599,29 @@
         }
         
         .filter-group {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .button-group-inline {
-            flex: 1;
-            min-width: 0;
+            max-width: 280px;
         }
         
         .button-group {
             flex-direction: row; /* Yan yana */
             justify-content: flex-end; /* Sağa yasla */
         }
-        
-        .user-grid {
-            width: 100%;
-            max-width: 100%;
-            padding: 0;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
     }
     
     /* Küçük Masaüstü (1024px ve üstü) */
     @@media (min-width: 1024px) {
         .filter-group {
-            flex: 1;
-        }
-        
-        .button-group-inline {
-            flex: 1;
+            max-width: 300px;
         }
     }
 
 </style>
 
 
-<!-- Container wrapper - Anasayfa ile aynı yapı -->
-<div class="container main-content-container" style="padding-top: 20px;">
+<div class="container">
 
-        <!-- YENİ BAŞLIK (ORTALI) -->
-        <h1 class="page-title">FİRMALAR</h1>
+    <!-- YENİ BAŞLIK (ORTALI) -->
+    <h1 class="page-title">FİRMALAR</h1>
 
     <!-- Arama ve Filtreleme Formu (YENİ YERLEŞİM) -->
     <form method="get" action="@Url.Action("Firmalar", "Home")" class="controls-form">
@@ -905,8 +856,7 @@
         }
     </div>
 
-    </div> <!-- .container sonu -->
-
+</div> <!-- .container sonu -->
 
 
 @section Scripts {
