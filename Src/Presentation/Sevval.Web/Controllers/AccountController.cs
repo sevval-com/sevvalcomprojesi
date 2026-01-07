@@ -121,7 +121,7 @@ public class AccountController : Controller
                             await _context.SaveChangesAsync();
                             
                             // Sign in user and show success message
-                            await _signInManager.SignInAsync(user, isPersistent: true);
+                            await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
                             TempData["SuccessMessage"] = "Hoş geldiniz! Hesabınız başarıyla kurtarıldı ve tekrar aktif edildi.";
                             return RedirectToAction("Index", "Home");
                         }
@@ -149,7 +149,7 @@ public class AccountController : Controller
 
                 if (user.EmailConfirmed) // Kurumsal girişler için e-posta onayı zorunlu değilse bu kısım değişebilir
                 {
-                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: true, lockoutOnFailure: false);
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: false);
                     if (result.Succeeded)
                         return RedirectToAction("Index", "Home");
                     else if (result.IsLockedOut)

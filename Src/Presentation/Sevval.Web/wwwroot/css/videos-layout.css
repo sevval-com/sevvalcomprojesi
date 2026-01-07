@@ -1,0 +1,139 @@
+/* Videos Layout - Videolar sayfasına özel stiller */
+
+/* Temel body ayarları */
+body {
+    font-family: 'Calibri', sans-serif;
+    background-color: #f8fafc;
+}
+
+:root {
+    --plyr-color-main: #2563eb;
+}
+
+/* Popup stilleri */
+.pencere {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+}
+
+.pencere-icerik {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    width: 500px;
+    min-height: 400px;
+    display: flex;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 123, 255, 0.3);
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+.sol-bolum, .sag-bolum {
+    flex: 1;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.sol-bolum {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+.sag-bolum {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-container {
+    margin-bottom: 20px;
+}
+
+.icon-container i {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.sol-bolum h2, .sag-bolum h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.section-description {
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.baglanti {
+    margin: 8px 0;
+    padding: 12px 20px;
+    background: #fff;
+    color: #1e88e5;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 16px;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.baglanti:hover {
+    background: #f1f1f1;
+}
+
+.kapat-buton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kapat-buton:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+    .pencere-icerik {
+        width: 90%;
+        flex-direction: column;
+        min-height: auto;
+    }
+    
+    .sag-bolum {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .sol-bolum, .sag-bolum {
+        padding: 30px 20px;
+    }
+}

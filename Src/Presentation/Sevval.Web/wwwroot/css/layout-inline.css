@@ -1,0 +1,585 @@
+/* ============================================
+   LAYOUT INLINE CSS - _Layout.cshtml'den taşındı
+   ============================================ */
+
+/* Global - Yatay scroll engelle */
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+/* Modal açıkken body scroll engelle */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* Tagline font - FOUT önleme */
+.tagline {
+    font-family: 'Caveat', cursive !important;
+    font-weight: 700 !important;
+}
+
+/* ============================================
+   NAVBAR STILLERI - Mobil ve Masaüstü
+   ============================================ */
+
+/* Masaüstü - butonlar arası mesafe */
+.auth-buttoons, .auth-buttons {
+    gap: 15px !important;
+}
+
+/* Ücretsiz etiketi - masaüstü */
+.post-ad-container {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+.free-tag {
+    position: absolute !important;
+    top: -8px !important;
+    left: -8px !important;
+    background-color: #28a745 !important;
+    color: white !important;
+    font-size: 9px !important;
+    font-weight: bold !important;
+    padding: 2px 5px !important;
+    border-radius: 3px !important;
+    transform: rotate(-12deg) !important;
+    z-index: 100 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* ============================================
+   VISITOR COUNTS NAVBAR
+   ============================================ */
+.visitor-counts-navbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: 0;
+    transform: scale(.95);
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.35);
+    padding: 6px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+.visitor-counts-navbar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+}
+
+.visitor-counts-navbar .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    font-size: 16px;
+    line-height: 1;
+    color: #01e11b;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: 0 0 6px rgba(1,225,27,.25);
+}
+
+
+/* ============================================
+   SEVVALDRONE SERVICE POPUP
+   ============================================ */
+.sevvaldrone-popup {
+    background: linear-gradient(90deg, #1e88e5, #2196f3);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    padding: 20px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    max-width: 230px;
+    position: relative;
+}
+
+.sevvaldrone-popup:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.sevvaldrone-popup h3 {
+    font-size: 24px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.sevvaldrone-popup p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.drone-icon {
+    width: 80px;
+    height: 80px;
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: .5rem;
+    background-color: #01e11b;
+}
+
+.drone-icon img {
+    fill: white;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: invert(100%);
+}
+
+/* ============================================
+   VIDEO MODAL
+   ============================================ */
+.video-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+}
+
+.video-modal-content {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    animation: gorunmeEfekti 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.video-modal-content .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.video-modal-content iframe {
+    width: 100%;
+    height: 450px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.video-modal-content .order-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.video-modal-content .whatsapp-button {
+    background-color: #25D366;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.video-modal-content .whatsapp-button:hover {
+    background-color: #1DA851;
+}
+
+.video-modal-content .whatsapp-button i {
+    font-size: 24px;
+}
+
+
+/* ============================================
+   POP-UP PENCERESI (Giriş Yap Modal)
+   ============================================ */
+.pencere {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.pencere-icerik {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    width: 500px;
+    min-height: 400px;
+    display: flex;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 123, 255, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    padding: 0;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+.sol-bolum, .sag-bolum {
+    flex: 1;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sol-bolum:hover, .sag-bolum:hover {
+    transform: translateY(-5px);
+}
+
+.sol-bolum {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+.sag-bolum {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-container {
+    margin-bottom: 20px;
+}
+
+.icon-container i {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sol-bolum:hover .icon-container i,
+.sag-bolum:hover .icon-container i {
+    transform: scale(1.1);
+    color: #fff;
+}
+
+.sol-bolum h2, .sag-bolum h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.section-description {
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.kapat-buton {
+    position: absolute;
+    top: 15px;
+    padding: 12px;
+    z-index: 1000000;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.kapat-buton:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* ============================================
+   RESPONSIVE - POP-UP PENCERESI
+   ============================================ */
+@media (max-width: 768px) {
+    .pencere {
+        padding: 5%;
+        align-items: flex-start;
+        padding-top: 10vh;
+    }
+    
+    .pencere-icerik {
+        max-width: 90%;
+        min-height: auto;
+        max-height: 100% !important;
+        overflow-y: auto;
+        height: 100% !important;
+        width: 100%;
+        flex-direction: column !important;
+        top: 0 !important;
+        left: 0;
+        transform: scale(1) !important;
+    }
+    
+    .kapat-buton {
+        width: 8vw !important;
+        max-width: 35px !important;
+        height: 8vw !important;
+        max-height: 35px !important;
+        right: 3% !important;
+        font-size: 4vw !important;
+    }
+    
+    .sol-bolum, .sag-bolum {
+        padding: 6% 5%;
+    }
+    
+    .sol-bolum h2, .sag-bolum h2 {
+        font-size: 5vw;
+        margin-bottom: 4%;
+    }
+
+    .icon-container i {
+        font-size: 10vw;
+    }
+
+    .section-description {
+        font-size: 3.5vw;
+        margin-bottom: 5%;
+    }
+    
+    .tagline-container {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .pencere {
+        padding: 4%;
+        align-items: flex-start;
+        padding-top: 5vh;
+    }
+    
+    .pencere-icerik {
+        width: 100%;
+        flex-direction: column;
+        min-height: auto;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    
+    .sag-bolum {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .sol-bolum, .sag-bolum {
+        padding: 5% 4%;
+        min-height: auto;
+    }
+
+    .icon-container i {
+        font-size: 8vw;
+    }
+
+    .sol-bolum h2, .sag-bolum h2 {
+        font-size: 4.5vw;
+        margin-bottom: 3%;
+    }
+
+    .section-description {
+        font-size: 3vw;
+        margin-bottom: 4%;
+    }
+
+    .baglanti {
+        padding: 3% 5%;
+        font-size: 3.5vw;
+        margin: 2% 0;
+    }
+}
+
+/* ============================================
+   DETAILED SEARCH LINK
+   ============================================ */
+.detailed-search-link {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    font-size: 16px;
+    font-weight: bold;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.detailed-search-link:hover {
+    background-color: #218838;
+}
+
+/* ============================================
+   WHATSAPP FLOAT BUTTON
+   ============================================ */
+.whatsapp-float {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    z-index: 1001;
+}
+
+.whatsapp-image {
+    width: 20vw;
+    max-width: 90px;
+    height: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.whatsapp-image:hover {
+    transform: scale(1.1);
+}
+
+/* ============================================
+   FLOATING LANGUAGE BUTTON
+   ============================================ */
+#floating_button {
+    position: absolute;
+    top: 4%;
+    left: 23%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 2.5% 5%;
+    border-radius: 50px;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 4vw;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    scale: 0.8;
+}
+
+#floating_button:hover {
+    background-color: #45a049;
+}
+
+/* ============================================
+   COOKIE BANNER
+   ============================================ */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #333;
+    color: white;
+    padding: 15px 20px;
+    z-index: 10000;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.cookie-banner p {
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+.cookie-banner a {
+    color: #4CAF50;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.accept-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.decline-button {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}

@@ -14,6 +14,61 @@
     justify-content: center;
 }
 
+/* Yorum başarı mesajı */
+.comment-success-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 1px solid #34d399;
+    color: #065f46;
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(52, 211, 153, 0.2);
+    animation: slideDown 0.4s ease;
+}
+
+.comment-success-alert i {
+    font-size: 20px;
+    color: #10b981;
+}
+
+.comment-success-alert span {
+    flex: 1;
+}
+
+.comment-success-alert button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #065f46;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.comment-success-alert button:hover {
+    opacity: 1;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
     .comments-section:hover {
         box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
     }
@@ -114,11 +169,17 @@
     .comment-user strong {
         color: #0b5ed7;
         font-size: 16px;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
     }
 
 .comment-date {
     font-size: 12px;
     color: #6b7280;
+    flex-shrink: 0;
 }
 
 /* Yorum İçeriği */
@@ -146,18 +207,43 @@
         grid-template-columns: 1fr;
         gap: 12px;
     }
+    /* Mobilde isim-soyisim alt alta */
+    .comment-form .name-fields {
+        flex-direction: column;
+    }
 }
 
 /* Form alanı ve butonları */
 .comment-form {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
-    align-items: start;
+    align-items: stretch;
     margin: 4px 0 20px 0;
+    width: 100%;
 }
 
-.comment-form input[type="text"],
+/* İsim ve Soyisim alanları için wrapper - yan yana eşit genişlikte */
+.comment-form .name-fields {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+/* İsim ve Soyisim alanları yan yana, eşit genişlikte */
+.comment-form input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
 .comment-form textarea {
     width: 100%;
     border: 1px solid #e5e7eb;
@@ -167,12 +253,9 @@
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     background-color: #fff;
-}
-
-.comment-form textarea {
-    grid-column: 1 / -1;
     min-height: 120px;
     resize: vertical;
+    box-sizing: border-box;
 }
 
 .comment-form input[type="text"]:focus,

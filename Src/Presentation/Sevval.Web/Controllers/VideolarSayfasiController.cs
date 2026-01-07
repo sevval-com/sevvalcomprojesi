@@ -149,6 +149,7 @@ public class VideolarSayfasiController : Controller
             // API hatasında veya timeout'ta yerel DB'den çek
             var fallback = await _context.VideolarSayfasi
                 .AsNoTracking()
+                .Include(v => v.YukleyenKullanici)
                 .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
                 .Where(v => string.IsNullOrEmpty(kategori) || v.Kategori == kategori)
                 .OrderByDescending(v => v.YuklenmeTarihi)
@@ -235,26 +236,42 @@ public class VideolarSayfasiController : Controller
         var videoIds = paged.Select(v => v.Id).ToList();
         var userInfoDict = new Dictionary<int, (string Name, string Photo)>();
         
-        try
+        // Önce paged listesindeki videoların YukleyenKullanici bilgisini kullan (API'den gelen veriler)
+        foreach (var video in paged)
         {
-            var videoUsers = await _context.VideolarSayfasi
-                .AsNoTracking()
-                .Include(v => v.YukleyenKullanici)
-                .Where(v => videoIds.Contains(v.Id))
-                .Select(v => new { v.Id, v.YukleyenKullanici })
-                .ToListAsync();
-            
-            foreach (var vu in videoUsers)
+            if (video.YukleyenKullanici != null)
             {
-                if (vu.YukleyenKullanici != null)
-                {
-                    var name = $"{vu.YukleyenKullanici.FirstName} {vu.YukleyenKullanici.LastName}".Trim();
-                    var photo = vu.YukleyenKullanici.ProfilePicturePath ?? "";
-                    userInfoDict[vu.Id] = (string.IsNullOrWhiteSpace(name) ? "Sevval.com" : name, photo);
-                }
+                var name = $"{video.YukleyenKullanici.FirstName} {video.YukleyenKullanici.LastName}".Trim();
+                var photo = video.YukleyenKullanici.ProfilePicturePath ?? "";
+                userInfoDict[video.Id] = (string.IsNullOrWhiteSpace(name) ? "Sevval.com" : name, photo);
             }
         }
-        catch { }
+        
+        // Eksik olanları yerel DB'den tamamla
+        var missingIds = videoIds.Where(id => !userInfoDict.ContainsKey(id)).ToList();
+        if (missingIds.Any())
+        {
+            try
+            {
+                var videoUsers = await _context.VideolarSayfasi
+                    .AsNoTracking()
+                    .Include(v => v.YukleyenKullanici)
+                    .Where(v => missingIds.Contains(v.Id))
+                    .Select(v => new { v.Id, v.YukleyenKullanici })
+                    .ToListAsync();
+                
+                foreach (var vu in videoUsers)
+                {
+                    if (vu.YukleyenKullanici != null)
+                    {
+                        var name = $"{vu.YukleyenKullanici.FirstName} {vu.YukleyenKullanici.LastName}".Trim();
+                        var photo = vu.YukleyenKullanici.ProfilePicturePath ?? "";
+                        userInfoDict[vu.Id] = (string.IsNullOrWhiteSpace(name) ? "Sevval.com" : name, photo);
+                    }
+                }
+            }
+            catch { }
+        }
         
         ViewBag.VideoUserInfo = userInfoDict;
 
@@ -285,6 +302,7 @@ public class VideolarSayfasiController : Controller
         public bool IsActive { get; set; }
         public DateTime CreatedDate { get; set; }
         public int ViewCount { get; set; }
+        public int LikeCount { get; set; }
         public int Duration { get; set; }
         public ApiVideoUser YukleyenKullanici { get; set; }
     }
@@ -1347,21 +1365,33 @@ public class VideolarSayfasiController : Controller
                         return input;
                     }
 
+                    var uploaderFirstName = v.YukleyenKullanici?.FirstName ?? "Anonim";
+                    var uploaderLastName = v.YukleyenKullanici?.LastName ?? "";
+                    var uploaderFullName = string.IsNullOrWhiteSpace(uploaderLastName) 
+                        ? uploaderFirstName 
+                        : $"{uploaderFirstName} {uploaderLastName}";
+
                     return new {
                         id = v.Id,
                         videoAdi = v.Title ?? string.Empty,
+                        title = v.Title ?? string.Empty,
                         videoAciklamasi = v.Description ?? string.Empty,
+                        description = v.Description ?? string.Empty,
                         videoYolu = isYouTube ? (ytId ?? string.Empty) : Rehost(v.VideoUrl ?? string.Empty),
                         kapakFotografiYolu = string.IsNullOrWhiteSpace(v.ThumbnailUrl) ? null : Rehost(v.ThumbnailUrl),
+                        thumbnailUrl = string.IsNullOrWhiteSpace(v.ThumbnailUrl) ? null : Rehost(v.ThumbnailUrl),
                         kategori = v.Category ?? string.Empty,
+                        category = v.Category ?? string.Empty,
                         goruntulenmeSayisi = v.ViewCount,
+                        viewCount = v.ViewCount,
+                        begeniSayisi = v.LikeCount,
+                        likeCount = v.LikeCount,
                         yuklenmeTarihi = v.CreatedDate.ToString("d MMMM yyyy"),
                         isYouTube = isYouTube,
-                        yukleyenKullanici = v.YukleyenKullanici != null ? new {
-                            firstName = v.YukleyenKullanici.FirstName ?? "Anonim",
-                            lastName = v.YukleyenKullanici.LastName ?? "",
-                            profilePicturePath = v.YukleyenKullanici.ProfilePicturePath
-                        } : new { firstName = "Anonim", lastName = "", profilePicturePath = (string?)null }
+                        uploaderName = uploaderFullName,
+                        userProfilePicture = !string.IsNullOrWhiteSpace(v.YukleyenKullanici?.ProfilePicturePath) 
+                            ? Rehost(v.YukleyenKullanici.ProfilePicturePath) 
+                            : "/images/common/camera-placeholder.svg"
                     };
                 }).Cast<object>().ToList();
             }
@@ -1375,21 +1405,35 @@ public class VideolarSayfasiController : Controller
                     .OrderByDescending(v => v.YuklenmeTarihi)
                     .ToListAsync();
 
-                results = allVideos.Select(v => new {
-                    id = v.Id,
-                    videoAdi = v.VideoAdi,
-                    videoAciklamasi = v.VideoAciklamasi,
-                    videoYolu = v.VideoYolu,
-                    kapakFotografiYolu = v.KapakFotografiYolu,
-                    kategori = v.Kategori,
-                    goruntulenmeSayisi = v.GoruntulenmeSayisi,
-                    yuklenmeTarihi = v.YuklenmeTarihi.ToString("d MMMM yyyy"),
-                    isYouTube = v.IsYouTube,
-                    yukleyenKullanici = new {
-                        firstName = v.YukleyenKullanici != null ? v.YukleyenKullanici.FirstName : "Anonim",
-                        lastName = v.YukleyenKullanici != null ? v.YukleyenKullanici.LastName : "",
-                        profilePicturePath = v.YukleyenKullanici?.ProfilePicturePath
-                    }
+                results = allVideos.Select(v => {
+                    var uploaderFirstName = v.YukleyenKullanici?.FirstName ?? "Anonim";
+                    var uploaderLastName = v.YukleyenKullanici?.LastName ?? "";
+                    var uploaderFullName = string.IsNullOrWhiteSpace(uploaderLastName) 
+                        ? uploaderFirstName 
+                        : $"{uploaderFirstName} {uploaderLastName}";
+                    
+                    return new {
+                        id = v.Id,
+                        videoAdi = v.VideoAdi,
+                        title = v.VideoAdi,
+                        videoAciklamasi = v.VideoAciklamasi,
+                        description = v.VideoAciklamasi,
+                        videoYolu = v.VideoYolu,
+                        kapakFotografiYolu = v.KapakFotografiYolu,
+                        thumbnailUrl = v.KapakFotografiYolu,
+                        kategori = v.Kategori,
+                        category = v.Kategori,
+                        goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                        viewCount = v.GoruntulenmeSayisi,
+                        begeniSayisi = v.BegeniSayisi,
+                        likeCount = v.BegeniSayisi,
+                        yuklenmeTarihi = v.YuklenmeTarihi.ToString("d MMMM yyyy"),
+                        isYouTube = v.IsYouTube,
+                        uploaderName = uploaderFullName,
+                        userProfilePicture = !string.IsNullOrWhiteSpace(v.YukleyenKullanici?.ProfilePicturePath) 
+                            ? v.YukleyenKullanici.ProfilePicturePath 
+                            : "/images/common/camera-placeholder.svg"
+                    };
                 }).Cast<object>().ToList();
             }
 

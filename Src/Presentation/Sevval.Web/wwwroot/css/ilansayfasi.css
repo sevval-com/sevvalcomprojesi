@@ -1,4 +1,4 @@
-﻿* {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -15,14 +15,22 @@ body {
     margin: 0; /* Sayfa kenar boşluklarını sıfırlama */
 }
 /* CSS */ .container {
-    max-width: 960px;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* İlan sayfası için col-md-4 genişletme */
+.col-md-4 {
+    flex: 0 0 100%;
+    max-width: 1100px;
 }
 
 .ilan-card {
     margin-bottom: 20px;
     border-radius: 10px;
-    width: max-content;
+    width: 100%;
+    max-width: 1100px;
     padding: 20px;
     transition: all 0.3s;
 }
@@ -80,11 +88,11 @@ hr {
 /* Fotoğraf Galeri Konteyneri */
 .photo-gallery-container {
     position: relative;
-    width: 103%;
-    max-width: 905px;
+    width: 100%;
+    max-width: 1100px;
     margin: 0 auto;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
     background-color: #ffffff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     display: inline-block;
@@ -142,15 +150,13 @@ hr {
 .photo-preview-container {
     display: flex;
     flex-direction: column !important;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
-    margin-top: 0px;
-    margin-left: 11px;
-    position: absolute;
-    top: 284px;
-    right: -507px;
-    transition: transform 0.3s ease-in-out;
+    margin: 10px auto;
+    position: relative;
+    width: 100%;
+    z-index: 10;
 }
 
 /* Fotoğraf Önizleme Elemanı */
@@ -176,19 +182,20 @@ hr {
         background: linear-gradient(135deg, #007bff, #00bfff);
         color: #fff;
         font-weight: bold;
-        font-size: 6.2rem !important;
+        font-size: 1.2rem !important;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 15px;
+        border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         border: 2px solid #0056b3;
         transition: transform 0.3s ease-in-out, box-shadow 0.3s ease, background 0.3s ease;
         position: relative;
-        scale: 0.2;
-        left: -229px;
-        top: 241px;
-        width: 359px;
+        left: auto;
+        top: auto;
+        width: 80px;
+        height: 40px;
+        margin: 10px auto;
     }
 
         /* Hover Efekti: Büyütme ve Arka Plan Değişikliği */
@@ -242,8 +249,18 @@ hr {
         color: white;
     }
 
+    .option-button.active i,
+    .option-button.active span {
+        color: white;
+    }
+
     .option-button:hover {
         background-color: #0056b3;
+        color: white;
+    }
+
+    .option-button:hover i,
+    .option-button:hover span {
         color: white;
     }
 
@@ -255,7 +272,7 @@ hr {
     }
 
     .option-button:hover i {
-        color: #004c8c; /* Hoverda simge rengi koyulaşır */
+        color: white; /* Hoverda simge rengi beyaz */
     }
 
     .option-button span {
@@ -2809,12 +2826,14 @@ h2 {
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    font-size: 24px;
+    font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, background-color 0.2s;
+    padding: 0;
+    line-height: 1;
     cursor: pointer;
     position: absolute;
     top: 14px;

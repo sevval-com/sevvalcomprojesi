@@ -7,136 +7,33 @@
 @{
     var user = await UserManager.GetUserAsync(User);
     Layout = null;
+    var firstName = user?.FirstName ?? "";
+    var lastName = user?.LastName ?? "";
+    var phoneNumber = user?.PhoneNumber ?? "";
+    var email = user?.Email ?? "";
+    var profilePicturePath = user?.ProfilePicturePath ?? "";
 }
 
-<!-- Stil Dosyası Bağlantısı -->
-<link rel="stylesheet" href="~/css/ilandet.css" />
-<link rel="stylesheet" href="~/css/hizmetler.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places"></script>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<link rel="icon" type="image/png" href="~/images/favlogo.webp">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-<script src="~/js/site.js" defer></script>
-
-
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>İş Yeri İlanı - Şevval Emlak</title>
+    <link rel="stylesheet" href="~/css/ilandet.css" />
+    <link rel="stylesheet" href="~/css/hizmetler.css">
+    <link rel="stylesheet" href="~/css/navbar.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="~/images/favlogo.webp">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="~/js/site.js" defer></script>
+</head>
+<body>
 
 <!-- Navbar -->
-<nav class="navbaar">
-    <div class="navbaar-container">
-        <div class="logo">
-           <a href="/">
-                  <img src="~/images/LOGO mavi.webp" alt="Firma Logosu">
-                </a>
-            <span>Sevval.com</span>
-        </div>
-        <div class="haamburger" id="hamburger">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line"></div>
-        </div>
-        <ul class="naav-linkss" id="nav-links">
-            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <li>
-                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
-                </li>
-              
-            }
+<partial name="_NavbarIlan" />
 
-            <li><a href="@Url.Action("KardesFirmalar", "Home")">Kardeş Firmalar</a></li>
-            <li class="dropdoawn">
-                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
-            </li>
-
-
-
-        </ul>
-        <div class="auth-buttoons">
-            @if (User.Identity.IsAuthenticated)
-            {
-                var currentUser = await UserManager.GetUserAsync(User);
-
-                // currentUser nesnesinin null olup olmadığını kontrol ediyoruz
-                if (currentUser != null)
-                {
-                    <div class="dropdown">
-                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
-                        <ul class="dropdown-content">
-                            <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
-                            <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
-                            
-                            <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
-                            <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
-                            <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
-                            <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
-                            
-                            <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
-                            <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
-                            @if (User.Identity.IsAuthenticated &&
-                           (User.Identity.Name == "sftumen41@gmail.com" || User.Identity.Name == "exdel.txt@gmail.com"))
-
-                            {
-                                <li><a href="@Url.Action("Index", "SevvalOfis")">Şevval Ofis</a></li>
-                            }
-                            <li><a href="@Url.Action("KategoriSecim", "Ilan" )">İlan Ver</a></li>
-                            <li>
-                                <form asp-action="Logout" asp-controller="Account" method="post">
-                                    <button type="submit" class="logout-btn">Çıkış Yap</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                }
-                else
-                {
-                    <p>Kullanıcı bilgileri alınamadı.</p> <!-- Kullanıcı bilgileri alınamadığında gösterilecek mesaj -->
-                }
-            }
-            else
-            {
-                <a href="#" class="login" id="login-button">Giriş Yap</a>
-            }
-
-
-            <!-- İlan Ver butonu için yönlendirme -->
-            <a href="@(!User.Identity.IsAuthenticated ? Url.Action("Login", "Account") : Url.Action("KategoriSecim", "Ilan"))" class="post-ad" id="post-ad-button">+ İlan Ver</a>
-        </div>
-
-      
-
-        <!-- Butonun Aktifliği için JavaScript -->
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function () {
-                const floatingButton = document.getElementById('floating_button');
-                const translateElement = document.getElementById('google_translate_element');
-                let clickCount = 0; // Tıklama sayacı
-
-                // Çeviri elementini başlangıçta gizli yap
-                translateElement.style.display = "none";
-
-                floatingButton.addEventListener('click', function () {
-                    clickCount++;
-
-                    if (clickCount === 1) {
-                        // İlk tıklamada çeviri elementini göster
-                        translateElement.style.display = "block";
-                    } else if (clickCount === 3) {
-                        // Üçüncü tıklamada her şeyi gizle ve sayacı sıfırla
-                        translateElement.style.display = "none";
-                        clickCount = 0;
-                    }
-                });
-
-                // Çeviri elementindeki dil seçme işlemi (içerikteki bir tıklama simülasyonu)
-                translateElement.addEventListener('click', function () {
-                    console.log("Dil seçimi yapıldı!"); // İsteğe bağlı olarak işlev ekleyin
-                });
-            });
-        </script>
-
-    </div>
-</nav>
 <form asp-action="Kaydet" method="post" enctype="multipart/form-data" id="myForm">
     <!-- Yuvarlak Aşama Çizgileri -->
     <div class="step-container">
@@ -1981,22 +1878,22 @@ function validateNetVsBrut() {
 
     <div class="form-group" hidden>
         <label for="FirstName">Ad:</label>
-        <input type="text" class="form-control" id="FirstName" name="FirstName" value="@user.FirstName" readonly />
+        <input type="text" class="form-control" id="FirstName" name="FirstName" value="@firstName" readonly />
     </div>
 
     <div class="form-group" hidden>
         <label for="LastName">Soyad:</label>
-        <input type="text" class="form-control" id="LastName" name="LastName" value="@user.LastName" readonly />
+        <input type="text" class="form-control" id="LastName" name="LastName" value="@lastName" readonly />
     </div>
 
     <div class="form-group" hidden>
         <label for="PhoneNumber">Telefon Numarası:</label>
-        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@user.PhoneNumber" readonly />
+        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@phoneNumber" readonly />
     </div>
 
     <div class="form-group" hidden>
         <label for="Email">E-posta:</label>
-        <input type="email" class="form-control" id="Email" name="Email" value="@user.Email" readonly />
+        <input type="email" class="form-control" id="Email" name="Email" value="@email" readonly />
     </div>
 
             <div class="form-group" style="display: none;">
@@ -2018,7 +1915,7 @@ function validateNetVsBrut() {
             <div class="form-group" style="display: none;">
                 <label for="ProfilePicturePath">Profil Fotoğrafı:</label>
                 <div>
-                    <img src="@user.ProfilePicturePath" alt="Profil Fotoğrafı" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+                    <img src="@profilePicturePath" alt="Profil Fotoğrafı" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
                 </div>
             </div>
             <!-- Kaydet ve Devam Et Butonu -->
@@ -2499,3 +2396,7 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1000;">
         }
 
 </style>
+
+</script>
+</body>
+</html>

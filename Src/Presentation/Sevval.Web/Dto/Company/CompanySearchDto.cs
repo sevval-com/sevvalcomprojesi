@@ -10,7 +10,14 @@ public class CompanySearchDto
     public string? District { get; set; }
 
     public int Page { get; set; } = 1;
-    public int Size { get; set; } = 20;
+    public int Size { get; set; } = 24;
+    
+    // URL'den pageSize parametresi geldiğinde Size'a yönlendir
+    public int PageSize 
+    { 
+        get => Size; 
+        set => Size = value; 
+    }
 
     public List<GetCompaniesQueryResponse> Companies { get; set; }=new List<GetCompaniesQueryResponse>();
 
