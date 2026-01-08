@@ -1249,12 +1249,13 @@ h2 {
 
 .user-dropdown-content {
     display: none;
-    position: absolute !important;
-    top: 100%;
-    right: 0;
+    position: fixed !important;
+    top: 60px !important;
+    right: 0 !important;
+    left: auto !important;
     background: white;
     min-width: 180px;
-    border-radius: 8px;
+    border-radius: 0 0 0 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 9999999 !important;
     list-style: none;

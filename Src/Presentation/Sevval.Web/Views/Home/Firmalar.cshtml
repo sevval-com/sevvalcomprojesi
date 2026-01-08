@@ -145,7 +145,7 @@
         padding: 10px 12px;
         box-shadow: var(--shadow-lg);
         margin: 0 auto 20px auto;
-        max-width: 700px;
+        max-width: 900px;
         width: 100%;
         box-sizing: border-box;
         
@@ -177,9 +177,9 @@
     }
 
     .filter-select {
-        height: 26px;
-        padding: 0 8px;
-        font-size: 11px;
+        height: 36px;
+        padding: 0 10px;
+        font-size: 12px;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         background-color: var(--bg-white);
@@ -188,8 +188,8 @@
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234B5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        background-position: right 6px center;
-        background-size: 10px 10px;
+        background-position: right 8px center;
+        background-size: 12px 12px;
         cursor: pointer;
     }
 
@@ -207,13 +207,13 @@
         min-width: 100px;
         align-items: flex-end;
         padding-top: 0;
-        margin-bottom: 14px;
+        margin-bottom: 0;
     }
     
     .button-group-inline .btn {
-        height: 26px;
-        padding: 0 10px;
-        font-size: 11px;
+        height: 36px;
+        padding: 0 14px;
+        font-size: 12px;
         flex: 1;
         margin-bottom: 0;
     }
@@ -228,11 +228,12 @@
         display: flex;
         width: 100%;
         margin-bottom: 12px;
+        align-items: stretch;
     }
 
     .search-input {
         flex-grow: 1;
-        height: 28px;
+        height: 36px;
         padding: 0 10px;
         font-size: 12px;
         border: 1px solid var(--border-color);
@@ -253,8 +254,8 @@
     .search-input::placeholder { color: var(--text-light); opacity: 0.8; }
 
     .search-btn {
-        height: 28px;
-        padding: 0 12px;
+        height: 36px;
+        padding: 0 14px;
         font-size: 12px;
         font-weight: 600;
         border: 1px solid var(--brand-primary);
@@ -264,7 +265,7 @@
         cursor: pointer;
         transition: background-color var(--transition-fast);
         margin-left: -1px;
-        margin-top: 4px;
+        margin-top: 5px;
         z-index: 1;
         box-shadow: var(--shadow-sm);
     }
@@ -429,12 +430,16 @@
 
     /* Kart İçeriği */
     .user-name {
-        font-size: 18px;
+        font-size: 14px;
         font-weight: 800;
         color: var(--text-dark);
         letter-spacing: .2px;
         margin: 4px 0 2px 0;
         text-transform: uppercase;
+        word-break: normal !important;
+        white-space: normal !important;
+        max-width: 100%;
+        line-height: 1.4;
     }
     .user-name a { color: inherit; text-decoration: none; }
     .user-name a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -589,7 +594,7 @@
         }
         
         .controls-form {
-            max-width: 700px;
+            max-width: 1400px;
             margin: 0 auto 32px auto;
             box-sizing: border-box;
         }
@@ -679,11 +684,11 @@
                                           !string.IsNullOrEmpty(currentDistrict) || 
                                           !string.IsNullOrEmpty(currentSortBy);
                 }
+                <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
                 <a href="@Url.Action("Firmalar", "Home", new { pageSize = pageSize })"
                    class="btn btn-secondary press-feedback @(hasActiveFilter ? "" : "btn-clear-hidden")">
                     Temizle
                 </a>
-                <button type="submit" class="btn btn-primary press-feedback">Filtrele</button>
             </div>
         </div>
 

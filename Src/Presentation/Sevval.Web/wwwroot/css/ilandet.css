@@ -555,7 +555,7 @@ textarea.form-control {
     }
 }
 
-}
+
 
 
 
@@ -954,7 +954,10 @@ textarea.form-control {
 .user-dropdown-content.show,
 .dropdown-content {
     z-index: 9999999 !important;
-    position: absolute !important;
+    position: fixed !important;
+    top: 60px !important;
+    right: 0 !important;
+    left: auto !important;
 }
 
 /* Sayfa içeriği z-index düşük */

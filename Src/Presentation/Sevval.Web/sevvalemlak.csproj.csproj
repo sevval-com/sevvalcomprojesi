@@ -7,6 +7,8 @@
     <NuGetAudit>false</NuGetAudit>
     <NuGetAuditMode>direct</NuGetAuditMode>
     <Features>experimental-data-section-string-literals</Features>
+    <!-- Workaround for .NET SDK 9.0 StaticWebAssets duplicate key bug -->
+    <CompressionEnabled>false</CompressionEnabled>
   </PropertyGroup>
 
   <ItemGroup>

@@ -160,6 +160,222 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </head>
 <body>
 
+    <!-- YENİ TAB SİSTEMİ - Global JavaScript -->
+    <script>
+        // Yeni tab sistemi - Her ilan için benzersiz ID kullanır
+        function switchIlanTab(ilanId, tabName, buttonElement) {
+            // İlgili ilan kartındaki tüm tab içeriklerini gizle
+            const container = document.querySelector(`[data-ilan-id="${ilanId}"]`);
+            if (!container) {
+                console.error('Container bulunamadı:', ilanId);
+                return;
+            }
+
+            // Tüm tab içeriklerini gizle (aynı ilan kartındaki)
+            const allTabContents = container.parentElement.querySelectorAll('.tab-content');
+            allTabContents.forEach(content => {
+                if (content.id && content.id.endsWith(`-${ilanId}`)) {
+                    content.style.display = 'none';
+                }
+            });
+
+            // Tüm tab butonlarından active sınıfını kaldır (aynı container'daki)
+            container.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // İlgili tab içeriğini göster
+            const targetContent = document.getElementById(`${tabName}-${ilanId}`);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+            } else {
+                console.error('Tab içeriği bulunamadı:', `${tabName}-${ilanId}`);
+            }
+
+            // Tıklanan butona active sınıfını ekle
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+
+            // Konum sekmesi açıldıysa haritayı yükle
+            if (tabName === 'location') {
+                setTimeout(function() {
+                    initIlanMap(ilanId);
+                }, 200);
+            }
+        }
+
+        // Harita yükleme fonksiyonu - Her ilan için ayrı
+        const ilanMapData = {}; // İlan ID'sine göre adres ve harita durumunu sakla
+
+        function initIlanMap(ilanId) {
+            console.log('initIlanMap çağrıldı, ilanId:', ilanId);
+            
+            // Eğer harita zaten yüklenmişse tekrar yükleme
+            if (ilanMapData[ilanId] && ilanMapData[ilanId].initialized) {
+                console.log('Harita zaten yüklenmiş');
+                return;
+            }
+
+            const mapDiv = document.getElementById(`map-${ilanId}`);
+            if (!mapDiv) {
+                console.error(`Harita div bulunamadı: map-${ilanId}`);
+                return;
+            }
+
+            // Adres bilgisini container'dan al
+            const container = document.querySelector(`[data-ilan-id="${ilanId}"]`);
+            if (!container) {
+                console.error(`Container bulunamadı: data-ilan-id="${ilanId}"`);
+                return;
+            }
+
+            let adresData = container.getAttribute('data-ilan-adres');
+            if (!adresData) {
+                console.warn(`İlan ${ilanId} için adres bilgisi bulunamadı`);
+                return;
+            }
+
+            // JSON string ise parse et (tırnak işaretlerini kaldır)
+            let ilanAdres = adresData;
+            if (adresData.startsWith('"') && adresData.endsWith('"')) {
+                try {
+                    ilanAdres = JSON.parse(adresData);
+                } catch (e) {
+                    console.warn('Adres parse edilemedi, olduğu gibi kullanılıyor:', adresData);
+                }
+            }
+            
+            console.log('Harita yüklenecek, adres:', ilanAdres);
+
+            // Google Maps script yüklü mü kontrol et
+            if (window.google && window.google.maps) {
+                loadMapForIlan(ilanId, ilanAdres);
+            } else {
+                // Script yükle
+                if (!window.__mapsScriptLoading) {
+                    window.__mapsScriptLoading = true;
+                    const script = document.createElement('script');
+                    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places&v=weekly';
+                    script.async = true;
+                    script.defer = true;
+                    script.onload = function() {
+                        window.__mapsScriptLoading = false;
+                        loadMapForIlan(ilanId, ilanAdres);
+                    };
+                    script.onerror = function() {
+                        window.__mapsScriptLoading = false;
+                        // Fallback: iframe
+                        const mapDiv = document.getElementById(`map-${ilanId}`);
+                        if (mapDiv) {
+                            mapDiv.innerHTML = `<iframe src="https://www.google.com/maps?q=${encodeURIComponent(ilanAdres)}&output=embed" width="100%" height="350" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+                        }
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    // Script yükleniyor, bekle
+                    const checkInterval = setInterval(() => {
+                        if (window.google && window.google.maps) {
+                            clearInterval(checkInterval);
+                            loadMapForIlan(ilanId, ilanAdres);
+                        }
+                    }, 100);
+                }
+            }
+        }
+
+        function loadMapForIlan(ilanId, ilanAdres) {
+            console.log('loadMapForIlan çağrıldı, ilanId:', ilanId, 'adres:', ilanAdres);
+            
+            const mapDiv = document.getElementById(`map-${ilanId}`);
+            if (!mapDiv) {
+                console.error(`Harita div bulunamadı: map-${ilanId}`);
+                return;
+            }
+            
+            if (!ilanAdres || ilanAdres.trim().length === 0) {
+                console.warn(`İlan ${ilanId} için adres boş`);
+                mapDiv.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Adres bilgisi bulunamadı.</p>';
+                return;
+            }
+
+            if (!window.google || !window.google.maps) {
+                console.error('Google Maps API yüklenmemiş');
+                // Fallback: iframe
+                mapDiv.innerHTML = `<iframe src="https://www.google.com/maps?q=${encodeURIComponent(ilanAdres)}&output=embed" width="100%" height="350" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+                ilanMapData[ilanId] = { initialized: true };
+                return;
+            }
+
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: ilanAdres }, function (results, status) {
+                console.log('Geocode sonucu, status:', status);
+                if (status === 'OK' && results && results.length) {
+                    const latLng = results[0].geometry.location;
+                    const map = new google.maps.Map(mapDiv, {
+                        zoom: 14,
+                        center: latLng,
+                        mapTypeControl: false,
+                        streetViewControl: false
+                    });
+                    new google.maps.Marker({
+                        map: map,
+                        position: latLng,
+                        title: 'İlan Konumu'
+                    });
+                    ilanMapData[ilanId] = { initialized: true, map: map };
+                    console.log('Harita başarıyla yüklendi');
+                } else {
+                    console.warn('Geocode başarısız, iframe fallback kullanılıyor');
+                    // Fallback: iframe
+                    mapDiv.innerHTML = `<iframe src="https://www.google.com/maps?q=${encodeURIComponent(ilanAdres)}&output=embed" width="100%" height="350" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+                    ilanMapData[ilanId] = { initialized: true };
+                }
+            });
+        }
+    </script>
+
+    <style>
+        /* Tab Sistemi Stilleri - Eski sistem */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            color: #0197f6;
+            background: #f0f8ff;
+        }
+
+        .tab-button.active {
+            color: #0197f6;
+            border-bottom-color: #0197f6;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            border: 2px solid #0197f6;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: white;
+            min-height: 100px;
+        }
+    </style>
+
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSQR6TXV"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -1067,23 +1283,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <hr style="border-top: 2px solid #007bff;">
 
-                        <!-- Tab Başlıkları -->
-                        <div class="tabs">
-                            <button class="tab-button active" onclick="showTab('description')">Açıklama</button>
-                            <button class="tab-button" onclick="showTab('features')">Özellikler</button>
-                             <button class="tab-button" onclick="showTab('location')">Konum</button>
+                        <!-- TAB SİSTEMİ - Her ilan için benzersiz ID -->
+                        <div class="tabs" data-ilan-id="@ilan.Id" data-ilan-adres='@Html.Raw(System.Text.Json.JsonSerializer.Serialize((ilan?.Konum ?? ($"{ilan?.mahalleKoy} {ilan?.semt} {ilan?.sehir}")).Trim()))'>
+                            <button class="tab-button active" onclick="switchIlanTab(@ilan.Id, 'description', this)">Açıklama</button>
+                            <button class="tab-button" onclick="switchIlanTab(@ilan.Id, 'features', this)">Özellikler</button>
+                            <button class="tab-button" onclick="switchIlanTab(@ilan.Id, 'location', this)">Konum</button>
                         </div>
 
-                        <!-- İçerik Alanı -->
-                        <div id="description" class="tab-content" style="display: block; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; ; overflow-y: auto;">
+                        <!-- Tab İçerikleri -->
+                        <div id="description-@ilan.Id" class="tab-content" style="display: block; overflow-y: auto;">
                             <h3 style="margin: 0; color: #0197f6;">İlan Açıklaması</h3>
                             <p style="white-space: pre-wrap; word-wrap: break-word; margin: 10px 0;">@ilan.Description</p>
                         </div>
 
-
-                        <div id="features" class="tab-content" style="display: none; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; background-color: white;">
-                            <h3 style="margin: 0; color: #0197f6;">İlan Özellikleri</h3>
-                            <div class="features-grid">
+                        <div id="features-@ilan.Id" class="tab-content" style="display: none;">
+                                <h3 style="margin: 0; color: #0197f6;">İlan Özellikleri</h3>
+                                <div class="features-grid">
                                 @if (ilan.Area != 0)
                                 {
                                     <div><strong style="color: #0197f6;">Metrekare:</strong> @ilan.Area</div>
@@ -1186,59 +1401,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 }
                             </div>
                         </div>
-                        <!-- Konum -->
-                        <div id="location" class="tab-content" style="display:block; border: 2px solid #0197f6; padding: 10px; border-radius: 5px; width: 100%; max-width: 1000px; background-color: white;">
-                            <h3 style="margin: 0; color: #0197f6;">Konum</h3>
 
+                        <!-- Konum Tab -->
+                        <div id="location-@ilan.Id" class="tab-content" style="display: none;">
+                            <h3 style="margin: 0; color: #0197f6;">Konum</h3>
                             <!-- İlan Konumunu Gösteren Harita -->
-                            <div id="map-container" style="margin-top: 20px;">
+                            <div class="map-container" style="margin-top: 20px;">
                                 <div>
                                     <h4 style="color: #0197f6;">İlan Konumu</h4>
-                                    <div id="map" style="width: 100%; height: 350px;"></div> <!-- İlan Konumu Haritası -->
+                                    <div id="map-@ilan.Id" style="width: 100%; height: 350px;"></div>
                                 </div>
                             </div>
                         </div>
-
-                        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKvpCKYOWOjfhqVkTIn-oeOtwDv0ekQBY&libraries=places&callback=initMap&v=weekly" defer></script>
-
-                        <script>
-                            // Razor'dan güvenli adres üretimi (boşsa sehir/semt/mahalleKoy birleştir)
-                            var ilanAdres = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((ilan?.Konum ?? ($"{ilan?.mahalleKoy} {ilan?.semt} {ilan?.sehir}")).Trim()));
-
-                            // global callback (Google API callback calls this)
-                            window.initMap = function () {
-                                if (!ilanAdres || ilanAdres.trim().length === 0) {
-                                    console.warn('Adres bilgisi boş. Harita gösterilemiyor.');
-                                    return;
-                                }
-
-                                var geocoder = new google.maps.Geocoder();
-                                geocoder.geocode({ address: ilanAdres }, function (results, status) {
-                                    if (status === 'OK' && results && results.length) {
-                                        var latLng = results[0].geometry.location;
-                                        var map = new google.maps.Map(document.getElementById('map'), {
-                                            zoom: 14,
-                                            center: latLng,
-                                            mapTypeControl: false,
-                                            streetViewControl: false
-                                        });
-                                        new google.maps.Marker({
-                                            map: map,
-                                            position: latLng,
-                                            title: 'İlan Konumu'
-                                        });
-                                    } else {
-                                        // Fallback: Iframe embed ile göster (API kısıtı/adres hatası durumunda)
-                                        var iframeSrc = 'https://www.google.com/maps?q=' + encodeURIComponent(ilanAdres) + '&output=embed';
-                                        var mapDiv = document.getElementById('map');
-                                        mapDiv.innerHTML = '<iframe src="' + iframeSrc + '" width="100%" height="350" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
-                                    }
-                                });
-                            }
-
-                            // Not needed: API script will call initMap via callback param
-                        </script>
-
 
                         <style>
                             /* InfoWindow tasarımını güzelleştirme */
@@ -1989,24 +2163,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             });
         }
 
-        function showTab(tabName) {
-            document.querySelectorAll(".tab-content").forEach(content => {
-                content.style.display = "none";
-            });
-
-            document.getElementById(tabName).style.display = "block";
-
-            document.querySelectorAll(".tab-button").forEach(button => {
-                button.classList.remove("active");
-            });
-
-            document
-                .querySelector(button[('onclick="showTab(\'${tabName}\')')])
-                .classList.add("active");
-        }
-
         window.onload = function () {
-            showTab("description");
+            // Tab sistemi - İlk sekmeyi göster (description)
+            // Her ilan kartı için ayrı ayrı ilk sekmeyi göster
+            document.querySelectorAll('.tabs[data-ilan-id]').forEach(container => {
+                const ilanId = container.getAttribute('data-ilan-id');
+                if (ilanId) {
+                    const firstTab = document.getElementById(`description-${ilanId}`);
+                    if (firstTab) {
+                        firstTab.style.display = 'block';
+                    }
+                }
+            });
 
             var videoGallery = document.getElementById("video-gallery");
             var videoButton = document.getElementById("video-button");

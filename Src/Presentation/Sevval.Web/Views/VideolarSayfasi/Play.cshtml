@@ -4,7 +4,7 @@
 @model VideoPlayViewModel
 @{
     ViewData["Title"] = Model.Video.VideoAdi;
-    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     var currentUser = await UserManager.GetUserAsync(User);
     Func<string, Microsoft.AspNetCore.Html.IHtmlContent> FormatDescription = (description) =>
     {
@@ -23,9 +23,15 @@
             height: 60px !important;
             overflow-y: scroll !important;
         }
+    .comment-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+    }
     .comment-buttons button{
-        padding: 0 8px !important;
-        max-width: 120px !important;
+        padding: 6px 12px !important;
+        max-width: none !important;
+        flex-shrink: 0 !important;
     }
     .edit-btn, .delete-btn{
         max-width: 90px !important;
@@ -167,12 +173,12 @@
                         </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <div class="flex items-center bg-slate-100 rounded-full flex-1 sm:flex-none">
-                                <button id="likeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-l-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == true ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                <button type="button" id="likeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-l-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == true ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
                                         <i class="fas fa-thumbs-up text-sm sm:text-base"></i>
                                         <span id="likeCount" class="font-semibold text-xs">@Model.Video.BegeniSayisi</span>
                                     </button>
                                     <div class="border-l border-slate-300 h-4 sm:h-5"></div>
-                                <button id="dislikeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-r-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == false ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
+                                <button type="button" id="dislikeButton" data-videoid="@Model.Video.Id" class="flex w-full sm:w-auto items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-1 rounded-r-full group transition text-xs sm:text-sm @(User.Identity.IsAuthenticated && Model.CurrentUserVote == false ? "text-blue-600 bg-blue-100" : "text-slate-600 hover:bg-slate-200")">
                                         <i class="fas fa-thumbs-down text-sm sm:text-base"></i>
                                         <span id="dislikeCount" class="font-semibold text-xs">@Model.Video.DislikeSayisi</span>
                                     </button>
@@ -240,9 +246,9 @@
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="videoId" value="@Model.Video.Id" />
                                 <textarea name="yorumMetni" class="w-full border-slate-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition p-2.5 text-sm" rows="1" placeholder="Yorum ekle..."></textarea>
-                                <div class="comment-buttons text-right mt-2 hidden">
-                                    <button type="button" class="cancel-comment text-slate-600 font-semibold py-2 px-4 rounded-full hover:bg-slate-100 transition text-sm">İptal</button>
-                                    <button type="submit" class="bg-slate-800 text-white font-semibold py-2 px-5 ml-0 rounded-full hover:bg-slate-900 transition disabled:bg-slate-400 text-sm" disabled>Yorum Yap</button>
+                                <div class="comment-buttons flex flex-row justify-end items-center gap-2 mt-2 hidden">
+                                    <button type="submit" class="bg-slate-800 text-white font-semibold py-2 px-5 rounded-full hover:bg-slate-900 transition disabled:bg-slate-400 text-sm whitespace-nowrap" disabled>Yorum Yap</button>
+                                    <button type="button" class="cancel-comment text-slate-600 font-semibold py-2 px-4 rounded-full hover:bg-slate-100 transition text-sm border border-slate-300 whitespace-nowrap">İptal</button>
                                 </div>
                             </form>
                         </div>
@@ -326,6 +332,11 @@
     </div>
 </div>
 @section VideoScripts {
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    
     <style>
         /* Plyr base styling */
         .plyr { 
@@ -671,9 +682,15 @@
             
             .plyr__menu__container { margin-bottom: 8px; }
             
+            .comment-buttons {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+            }
             .comment-buttons button {
-                padding: 0 8px !important;
-                max-width: 120px !important;
+                padding: 6px 12px !important;
+                max-width: none !important;
+                flex-shrink: 0 !important;
             }
         }
         
@@ -1221,21 +1238,22 @@
                 return html;
             }
             const handleVote = async (isLike) => {
-                const videoId = document.getElementById('likeButton').dataset.videoid;
-                
-                // Client IP adresini al
-                let clientIp = 'Unknown';
-                try {
-                    const ipResponse = await fetch('https://api.ipify.org?format=json');
-                    const ipData = await ipResponse.json();
-                    clientIp = ipData.ip;
-                } catch (error) {
-                    console.warn('IP adresi alınamadı, varsayılan değer kullanılıyor:', error);
+                // Giriş yapmamış kullanıcılar oy veremez
+                if (!IS_AUTH) {
+                    if (confirm('Oy vermek için giriş yapmanız gerekiyor. Giriş sayfasına yönlendirilmek ister misiniz?')) {
+                        window.location.href = LOGIN_URL;
+                    }
+                    return;
                 }
                 
-                // API endpoint'e istek gönder (same-origin API_BASE ile)
-                const apiBase = window.API_BASE || '/api/proxy';
-                fetch(`${apiBase}/videos/${videoId}/vote`, {
+                const videoId = document.getElementById('likeButton').dataset.videoid;
+                const voteKey = `video_vote_${videoId}`;
+                
+                // Mevcut oy durumunu al
+                const currentVote = localStorage.getItem(voteKey); // 'like', 'dislike' veya null
+                
+                // API endpoint'e istek gönder - HER ZAMAN proxy kullan
+                fetch(`/api/proxy/videos/${videoId}/vote`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -1243,7 +1261,7 @@
                     },
                     body: JSON.stringify({ 
                         isLike: isLike,
-                        ipAddress: clientIp
+                        currentVote: currentVote
                     })
                 }).then(res => {
                     if (!res.ok) {
@@ -1252,16 +1270,25 @@
                     return res.json();
                 }).then(data => {
                     if(data.success) {
+                        // Sayıları güncelle
                         document.getElementById('likeCount').textContent = data.likeCount;
                         document.getElementById('dislikeCount').textContent = data.dislikeCount;
+                        
                         const likeButton = document.getElementById('likeButton');
                         const dislikeButton = document.getElementById('dislikeButton');
                         likeButton.classList.remove('text-blue-600', 'bg-blue-100');
                         dislikeButton.classList.remove('text-blue-600', 'bg-blue-100');
+                        
+                        // Yeni oy durumunu kaydet ve UI'ı güncelle
                         if(data.voteStatus === true) {
+                            localStorage.setItem(voteKey, 'like');
                             likeButton.classList.add('text-blue-600', 'bg-blue-100');
                         } else if (data.voteStatus === false) {
+                            localStorage.setItem(voteKey, 'dislike');
                             dislikeButton.classList.add('text-blue-600', 'bg-blue-100');
+                        } else {
+                            // Oy geri alındı
+                            localStorage.removeItem(voteKey);
                         }
                     } else { 
                         console.error(data.message || 'Oylama başarısız');
@@ -1272,10 +1299,29 @@
                     alert('Oylama sırasında bir hata oluştu: ' + err.message);
                 });
             };
+            
+            // Sayfa yüklendiğinde mevcut oy durumunu kontrol et
+            const videoId = document.getElementById('likeButton')?.dataset.videoid;
+            if (videoId) {
+                const existingVote = localStorage.getItem(`video_vote_${videoId}`);
+                if (existingVote === 'like') {
+                    document.getElementById('likeButton')?.classList.add('text-blue-600', 'bg-blue-100');
+                } else if (existingVote === 'dislike') {
+                    document.getElementById('dislikeButton')?.classList.add('text-blue-600', 'bg-blue-100');
+                }
+            }
+            
             const likeButton = document.getElementById('likeButton');
             const dislikeButton = document.getElementById('dislikeButton');
-            if (likeButton) likeButton.addEventListener('click', () => handleVote(true));
-            if (dislikeButton) dislikeButton.addEventListener('click', () => handleVote(false));
+            
+            // Giriş yapmamış kullanıcılar için butonları stil olarak ayarla
+            if (!IS_AUTH) {
+                if (likeButton) likeButton.classList.add('opacity-70');
+                if (dislikeButton) dislikeButton.classList.add('opacity-70');
+            }
+            
+            if (likeButton) likeButton.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); handleVote(true); return false; });
+            if (dislikeButton) dislikeButton.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); handleVote(false); return false; });
             
             // Önerilen videoları yükle
             loadSuggestedVideos();
