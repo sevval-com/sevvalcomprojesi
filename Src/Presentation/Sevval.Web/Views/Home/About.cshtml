@@ -1511,15 +1511,20 @@
 </script>
 <style>
     .whatsapp-float {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1001;
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 1001 !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: 90px !important;
+        display: block !important;
     }
 
 .whatsapp-image {
-    width: 90px;
-    height: auto;
+    width: 90px !important;
+    height: auto !important;
+    max-width: 90px !important;
     transition: transform 0.3s;
 }
 
@@ -1540,6 +1545,33 @@
         .whatsapp-image:hover {
             transform: scale(1.1);
         }
+
+/* Mobil için whatsapp butonu */
+@@media (max-width: 768px) {
+    .whatsapp-float {
+        bottom: 15px !important;
+        right: 15px !important;
+        max-width: 70px !important;
+    }
+    
+    .whatsapp-image {
+        width: 70px !important;
+        max-width: 70px !important;
+    }
+}
+
+@@media (max-width: 480px) {
+    .whatsapp-float {
+        bottom: 10px !important;
+        right: 10px !important;
+        max-width: 60px !important;
+    }
+    
+    .whatsapp-image {
+        width: 60px !important;
+        max-width: 60px !important;
+    }
+}
        
         
 </style>

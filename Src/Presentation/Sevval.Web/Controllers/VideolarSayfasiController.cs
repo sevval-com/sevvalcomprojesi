@@ -109,40 +109,63 @@ public class VideolarSayfasiController : Controller
                 videolar.Add(videoItem);
             }
 
-            // 4) Kategori rozetleri ve sayaçlar
-            var kategoriler = (parsed?.Data ?? new List<ApiVideo>())
-                .Where(d => !string.IsNullOrWhiteSpace(d.Category))
-                .GroupBy(d => d.Category!.Trim())
-                .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
-                .ToList();
-            ViewBag.Kategoriler = kategoriler;
-
-            var kategoriSayilari = (parsed?.Data ?? new List<ApiVideo>())
-                .Where(d => !string.IsNullOrWhiteSpace(d.Category))
-                .GroupBy(d => d.Category!)
-                .ToDictionary(g => g.Key, g => g.Count());
-            ViewBag.KategoriSayilari = kategoriSayilari;
-            ViewBag.ToplamVideoSayisi = (parsed?.Data ?? new List<ApiVideo>()).Count;
-            ViewBag.ToplamIzlenme = (parsed?.Data ?? new List<ApiVideo>()).Sum(v => v.ViewCount);
-
-            // 4.1) Kategori ikon ve renkleri (Categories tablosundan)
+            // 4) Kategori rozetleri ve sayaçlar - Categories tablosundan çek
+            List<string> kategoriler;
+            Dictionary<string, int> kategoriSayilari;
+            Dictionary<string, string> kategoriIconlari = new();
+            Dictionary<string, string> kategoriRenkleri = new();
+            
             try
             {
                 var allCategories = await _context.Categories.AsNoTracking().ToListAsync();
-                ViewBag.KategoriIconlari = allCategories
-                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                
+                // Kategori sayılarını videolardan hesapla
+                kategoriSayilari = (parsed?.Data ?? new List<ApiVideo>())
+                    .Where(d => !string.IsNullOrWhiteSpace(d.Category))
+                    .GroupBy(d => d.Category!.Trim())
+                    .ToDictionary(g => g.Key, g => g.Count());
+                
+                // Sadece video yüklenmiş kategorileri göster
+                kategoriler = allCategories
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name) && kategoriSayilari.ContainsKey(c.Name.Trim()) && kategoriSayilari[c.Name.Trim()] > 0)
+                    .Select(c => c.Name.Trim())
+                    .Distinct()
+                    .ToList();
+                
+                kategoriIconlari = allCategories
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name) && kategoriler.Contains(c.Name.Trim()))
                     .GroupBy(c => c.Name.Trim())
                     .ToDictionary(g => g.Key, g => g.Last().Icon ?? string.Empty);
 
-                ViewBag.KategoriRenkleri = allCategories
-                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                kategoriRenkleri = allCategories
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name) && kategoriler.Contains(c.Name.Trim()))
                     .GroupBy(c => c.Name.Trim())
                     .ToDictionary(g => g.Key, g => string.IsNullOrWhiteSpace(g.Last().Color)
                         ? "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
                         : g.Last().Color);
             }
-            catch { /* Categories tablosu yoksa sessizce geç */ }
+            catch
+            {
+                // Fallback: API'den gelen kategorileri kullan (zaten sadece video olanlar)
+                kategoriler = (parsed?.Data ?? new List<ApiVideo>())
+                    .Where(d => !string.IsNullOrWhiteSpace(d.Category))
+                    .GroupBy(d => d.Category!.Trim())
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .ToList();
+
+                kategoriSayilari = (parsed?.Data ?? new List<ApiVideo>())
+                    .Where(d => !string.IsNullOrWhiteSpace(d.Category))
+                    .GroupBy(d => d.Category!)
+                    .ToDictionary(g => g.Key, g => g.Count());
+            }
+            
+            ViewBag.Kategoriler = kategoriler;
+            ViewBag.KategoriSayilari = kategoriSayilari;
+            ViewBag.KategoriIconlari = kategoriIconlari;
+            ViewBag.KategoriRenkleri = kategoriRenkleri;
+            ViewBag.ToplamVideoSayisi = (parsed?.Data ?? new List<ApiVideo>()).Count;
+            ViewBag.ToplamIzlenme = (parsed?.Data ?? new List<ApiVideo>()).Sum(v => v.ViewCount);
         }
         catch
         {
@@ -156,17 +179,24 @@ public class VideolarSayfasiController : Controller
                 .ToListAsync();
             videolar = fallback;
             
-            ViewBag.Kategoriler = await _context.VideolarSayfasi
+            // Sadece video yüklenmiş kategorileri göster
+            var videoKategorileri = await _context.VideolarSayfasi
                 .AsNoTracking()
                 .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .Where(v => v.Kategori != null)
                 .Select(v => v.Kategori).Distinct().ToListAsync();
+            ViewBag.Kategoriler = videoKategorileri;
             
-            var kategoriSayilari = await _context.VideolarSayfasi
+            var kategoriGruplari = await _context.VideolarSayfasi
                 .AsNoTracking()
                 .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .Where(v => v.Kategori != null && v.Kategori != "")
                 .GroupBy(v => v.Kategori)
                 .Select(g => new { Kategori = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.Kategori, x => x.Count);
+                .ToListAsync();
+            var kategoriSayilari = kategoriGruplari
+                .Where(x => !string.IsNullOrEmpty(x.Kategori))
+                .ToDictionary(x => x.Kategori!, x => x.Count);
             ViewBag.KategoriSayilari = kategoriSayilari;
             
             ViewBag.ToplamVideoSayisi = await _context.VideolarSayfasi
@@ -178,17 +208,17 @@ public class VideolarSayfasiController : Controller
                 .Where(v => v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
                 .SumAsync(v => v.GoruntulenmeSayisi);
 
-            // Fallback'te de kategori ikon/renkleri yükle
+            // Fallback'te de kategori ikon/renkleri yükle (sadece video olan kategoriler için)
             try
             {
                 var allCategories = await _context.Categories.AsNoTracking().ToListAsync();
                 ViewBag.KategoriIconlari = allCategories
-                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name) && videoKategorileri.Contains(c.Name.Trim()))
                     .GroupBy(c => c.Name)
                     .ToDictionary(g => g.Key, g => g.Last().Icon ?? string.Empty);
 
                 ViewBag.KategoriRenkleri = allCategories
-                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name) && videoKategorileri.Contains(c.Name.Trim()))
                     .GroupBy(c => c.Name)
                     .ToDictionary(g => g.Key, g => string.IsNullOrWhiteSpace(g.Last().Color)
                         ? "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
@@ -362,8 +392,22 @@ public class VideolarSayfasiController : Controller
     // YENİ EKLENEN METOT BİTİŞİ
 
     [Authorize]
-    public IActionResult Upload()
+    public async Task<IActionResult> Upload()
     {
+        // Kategorileri yükle ve ViewBag'e at
+        try
+        {
+            var categories = await _context.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => c.Name)
+                .ToListAsync();
+            ViewBag.Kategoriler = categories;
+        }
+        catch
+        {
+            ViewBag.Kategoriler = new List<string>();
+        }
         return View();
     }
 
@@ -686,16 +730,12 @@ public class VideolarSayfasiController : Controller
             .OrderByDescending(c => c.YorumTarihi)
             .ToListAsync();
 
-        var currentUserVote = User.Identity.IsAuthenticated ?
-            await _context.VideoLikes.FirstOrDefaultAsync(l => l.VideoId == id && l.UserId == _userManager.GetUserId(User)) :
-            null;
-
         var viewModel = new VideoPlayViewModel
         {
             Video = video,
             OneriVideolar = oneriVideolar,
             Yorumlar = yorumlar,
-            CurrentUserVote = currentUserVote?.IsLike
+            CurrentUserVote = null // Basitleştirildi - cookie ile kontrol edilecek
         };
 
         // Persist watched in DB for authenticated users & get watched IDs for suggested videos

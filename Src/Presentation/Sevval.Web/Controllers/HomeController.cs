@@ -592,13 +592,130 @@ public class HomeController : Controller
     [HttpGet("api/proxy/videos/suggested")]
     public async Task<IActionResult> GetSuggestedVideosProxy([FromQuery] int currentVideoId, [FromQuery] string category, [FromQuery] int limit = 6)
     {
-        try { using var httpClient = new HttpClient(); var url = $"http://94.73.131.202:8090/api/v1/videos/suggested?currentVideoId={currentVideoId}&category={Uri.EscapeDataString(category ?? string.Empty)}&limit={limit}"; var response = await httpClient.GetAsync(url); if (response.IsSuccessStatusCode) return Content(await response.Content.ReadAsStringAsync(), "application/json"); return StatusCode((int)response.StatusCode, "External API error"); } catch (Exception ex) { return StatusCode(500, $"Proxy error: {ex.Message}"); }
+        try 
+        { 
+            // Yerel veritabanından önerilen videoları getir
+            var query = _context.VideolarSayfasi
+                .Include(v => v.YukleyenKullanici)
+                .Where(v => v.Id != currentVideoId && v.ApprovalStatus == Sevval.Domain.Enums.VideoApprovalStatus.Approved)
+                .AsQueryable();
+
+            var normalizedCategory = !string.IsNullOrEmpty(category) ? category.Trim().TrimEnd('.') : "";
+            
+            var suggestedVideos = await query
+                .OrderByDescending(v => !string.IsNullOrEmpty(normalizedCategory) && 
+                    v.Kategori != null && v.Kategori.Trim().TrimEnd('.') == normalizedCategory ? 1 : 0)
+                .ThenByDescending(v => v.YuklenmeTarihi)
+                .Take(limit)
+                .Select(v => new
+                {
+                    id = v.Id,
+                    videoAdi = v.VideoAdi,
+                    videoAciklamasi = v.VideoAciklamasi,
+                    videoYolu = v.VideoYolu,
+                    kapakFotografiYolu = v.KapakFotografiYolu,
+                    kategori = v.Kategori,
+                    goruntulenmeSayisi = v.GoruntulenmeSayisi,
+                    begeniSayisi = v.BegeniSayisi,
+                    dislikeSayisi = v.DislikeSayisi,
+                    yuklenmeTarihi = v.YuklenmeTarihi,
+                    isYouTube = v.IsYouTube,
+                    yukleyenKullanici = new
+                    {
+                        firstName = v.YukleyenKullanici != null ? v.YukleyenKullanici.FirstName : "Anonim",
+                        lastName = v.YukleyenKullanici != null ? v.YukleyenKullanici.LastName : "",
+                        profilePicturePath = v.YukleyenKullanici != null ? v.YukleyenKullanici.ProfilePicturePath : null
+                    }
+                })
+                .ToListAsync();
+
+            return Json(new { success = true, videos = suggestedVideos });
+        } 
+        catch (Exception ex) 
+        { 
+            return StatusCode(500, new { success = false, message = $"Hata: {ex.Message}", videos = new List<object>() }); 
+        }
     }
 
     [HttpPost("api/proxy/videos/{id}/vote")]
-    public async Task<IActionResult> VoteVideoProxy(int id, [FromBody] object body)
+    public async Task<IActionResult> VoteVideoProxy(int id, [FromBody] System.Text.Json.JsonElement body)
     {
-        try { using var httpClient = new HttpClient(); var json = body?.ToString() ?? "{}"; var response = await httpClient.PostAsync($"http://94.73.131.202:8090/api/v1/videos/{id}/vote", new StringContent(json, System.Text.Encoding.UTF8, "application/json")); if (response.IsSuccessStatusCode) return Content(await response.Content.ReadAsStringAsync(), "application/json"); return StatusCode((int)response.StatusCode, "External API error"); } catch (Exception ex) { return StatusCode(500, $"Proxy error: {ex.Message}"); }
+        try 
+        { 
+            var video = await _context.VideolarSayfasi.FindAsync(id);
+            if (video == null)
+            {
+                return NotFound(new { success = false, message = "Video bulunamadı" });
+            }
+            
+            var isLike = body.TryGetProperty("isLike", out var isLikeProp) && isLikeProp.GetBoolean();
+            var currentVote = body.TryGetProperty("currentVote", out var currentVoteProp) ? currentVoteProp.GetString() : null;
+            
+            bool? newVoteStatus = null;
+            
+            // Mevcut oy durumuna göre işlem yap
+            if (currentVote == "like")
+            {
+                // Kullanıcı daha önce like atmış
+                if (isLike)
+                {
+                    // Tekrar like'a tıkladı - like'ı geri al
+                    video.BegeniSayisi = Math.Max(0, video.BegeniSayisi - 1);
+                    newVoteStatus = null;
+                }
+                else
+                {
+                    // Dislike'a tıkladı - like'ı kaldır, dislike ekle
+                    video.BegeniSayisi = Math.Max(0, video.BegeniSayisi - 1);
+                    video.DislikeSayisi++;
+                    newVoteStatus = false;
+                }
+            }
+            else if (currentVote == "dislike")
+            {
+                // Kullanıcı daha önce dislike atmış
+                if (isLike)
+                {
+                    // Like'a tıkladı - dislike'ı kaldır, like ekle
+                    video.DislikeSayisi = Math.Max(0, video.DislikeSayisi - 1);
+                    video.BegeniSayisi++;
+                    newVoteStatus = true;
+                }
+                else
+                {
+                    // Tekrar dislike'a tıkladı - dislike'ı geri al
+                    video.DislikeSayisi = Math.Max(0, video.DislikeSayisi - 1);
+                    newVoteStatus = null;
+                }
+            }
+            else
+            {
+                // Daha önce oy vermemiş - yeni oy
+                if (isLike)
+                {
+                    video.BegeniSayisi++;
+                    newVoteStatus = true;
+                }
+                else
+                {
+                    video.DislikeSayisi++;
+                    newVoteStatus = false;
+                }
+            }
+            
+            await _context.SaveChangesAsync();
+            
+            return Json(new { 
+                success = true, 
+                likeCount = video.BegeniSayisi, 
+                dislikeCount = video.DislikeSayisi,
+                voteStatus = newVoteStatus
+            });
+        } 
+        catch (Exception ex) 
+        { 
+            return StatusCode(500, new { success = false, message = $"Hata: {ex.Message}" }); 
+        }
     }
 
     public IActionResult Danismanlar() { return View(); }

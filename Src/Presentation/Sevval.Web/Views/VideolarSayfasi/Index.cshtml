@@ -1,17 +1,90 @@
  @using Sevval.Web.Models
- @using Sevval.Domain.Entities
- @using System.Security.Claims
+@using Sevval.Domain.Entities
+@using System.Security.Claims
 @model IEnumerable<Sevval.Web.Models.VideolarSayfasi>
 
 @{
     ViewData["Title"] = "Videolar";
-    Layout = "~/Views/Shared/_LayoutVideos.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Tailwind CSS Aspect Ratio Plugin Script'i ekleniyor -->
-<script src="https://cdn.tailwindcss.com/nesting/plugin.js"></script>
+@section Styles {
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Videos CSS -->
+    <link rel="stylesheet" href="~/css/videos.css">
+    <link rel="stylesheet" href="~/css/videos-layout.css">
 
-<div class="w-full min-h-screen bg-blue-50/50 flex font-sans">
+    <!-- Tailwind CSS - SADECE video-content-area içinde çalışacak -->
+    <script src="https://cdn.tailwindcss.com?plugins=aspect-ratio,line-clamp"></script>
+    <script>
+        tailwind.config = {
+            important: '.video-content-area',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    aspectRatio: {
+                        '16/9': '16 / 9',
+                    },
+                    screens: {
+                        'lg': '900px',
+                    },
+                },
+            },
+            plugins: [],
+            corePlugins: {
+                preflight: false,
+            }
+        }
+    </script>
+    
+    <!-- NAVBAR STİLLERİ - Tailwind'den ÖNCE yüklenmeli -->
+
+    
+    <!-- Video sayfası için özel stiller -->
+    <style>
+        /* Video içeriği için stiller */
+        .video-content-area a {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+        .video-content-area a:hover {
+            text-decoration: none !important;
+        }
+        .video-content-area h1,
+        .video-content-area h2,
+        .video-content-area h3,
+        .video-content-area h4,
+        .video-content-area p,
+        .video-content-area span {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+        /* Boşlukları düzelt */
+        .video-content-area {
+            margin-top: 30px !important;
+            margin-bottom: 50px !important;
+        }
+        .video-content-area main {
+            padding: 0 !important;
+            margin: 0 !important;
+            padding-bottom: 50px !important;
+        }
+    </style>
+
+    <!-- Plyr.io Video Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <!-- NAVBAR STİLLERİ - Tailwind'den SONRA, en son yüklenmeli -->
+
+}
+
+<div class="video-content-area w-full min-h-screen bg-blue-50/50 flex font-sans">
     <style>
         .video-card { position: relative; background: #ffffff; border-radius: 18px; border: 1px solid rgba(59,130,246,.20); box-shadow: 0 10px 24px rgba(13,110,253,.10), 0 2px 6px rgba(13,110,253,.06); transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; overflow: hidden; background-clip: padding-box; align-items: start;}
         .video-card::after { content: ""; position: absolute; inset: -10px; border-radius: 22px; background: radial-gradient( circle at 15% 10%, rgba(59,130,246,.30), transparent 40% ), radial-gradient( circle at 85% 0%, rgba(33,150,243,.24), transparent 45% ), radial-gradient( circle at 50% 100%, rgba(13,110,253,.18), transparent 50% ); filter: blur(16px); z-index: -1; opacity: .38; transition: opacity .25s ease, filter .25s ease; }
@@ -36,10 +109,10 @@
         .skeleton-channel-name { height: 14px; width: 100px; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; border-radius: 4px; }
         .skeleton-meta { display: flex; gap: 8px; }
         .skeleton-chip { height: 28px; width: 80px; background: linear-gradient(90deg, #e8f0fe 25%, #f3f7ff 50%, #e8f0fe 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s ease-in-out infinite; border-radius: 999px; }
-        .skeleton-container { display: none; }
-        .skeleton-container.loading { display: grid; }
-        .video-grid-container { display: grid; }
-        .video-grid-container.loading { display: none; }
+        .skeleton-container { display: none !important; }
+        .skeleton-container.loading { display: grid !important; }
+        .video-grid-container { display: grid !important; }
+        .video-grid-container.loading { display: none !important; }
     </style>
     <!-- Ana İçerik -->
     <main class="flex-1 p-6 sm:p-8">
@@ -371,8 +444,8 @@
                             window.addEventListener('load', showContent);
                         }
                         
-                        // Fallback: 2 saniye sonra mutlaka göster
-                        setTimeout(showContent, 2000);
+                        // Fallback: 500ms sonra mutlaka göster
+                        setTimeout(showContent, 500);
                     })();
                     
                     // Dim only watched items; "Yeni" etiketi görseli etkilemez
@@ -536,3 +609,6 @@
     </main>
 </div>
 
+@section Scripts {
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+}

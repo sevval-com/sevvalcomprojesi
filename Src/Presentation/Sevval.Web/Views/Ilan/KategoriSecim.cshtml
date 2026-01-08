@@ -474,173 +474,122 @@
             }
         }
         
-        /* MASAÜSTÜ GÖRÜNÜMÜ - Yükseklik 1000px ve üstünde (telefondan masaüstü sitesi göster seçildiğinde) */
-        @@media (min-height: 1000px) {
+        /* MASAÜSTÜ GÖRÜNÜMÜ - Yükseklik 1200px ve üstünde (telefondan masaüstü sitesi göster seçildiğinde) */
+        @@media (max-width: 991px) and (min-height: 1200px) {
             .navbaar {
-                padding: clamp(8px, 1.2vw, 15px) clamp(12px, 2vw, 25px) !important;
-                overflow: hidden !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
+                padding: 4px 3px !important;
             }
-            
+
             .navbaar-container {
                 display: flex !important;
-                flex-direction: row !important;
                 align-items: center !important;
                 justify-content: space-between !important;
                 flex-wrap: nowrap !important;
-                gap: clamp(10px, 2vw, 25px) !important;
-                padding: 0 clamp(10px, 1.5vw, 20px) !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-                overflow: hidden !important;
+                gap: 4px !important;
+                padding: 0 4px !important;
             }
-            
-            /* Logo ve Anlık yazısı solda */
-            .navbaar-container .logo {
-                order: 1 !important;
-                flex-shrink: 1 !important;
-                display: flex !important;
-                align-items: center !important;
-                min-width: 0 !important;
-                max-width: min(200px, 18vw) !important;
+
+            .logo img {
+                height: 20px !important;
             }
-            
-            .navbaar-container .logo img {
-                max-width: 100% !important;
-                height: auto !important;
-            }
-            
+
             .visitor-counts-navbar {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                font-size: clamp(8px, 0.9vw, 11px) !important;
-                padding: clamp(2px, 0.5vw, 5px) clamp(5px, 0.9vw, 9px) !important;
-                margin-left: clamp(5px, 0.9vw, 10px) !important;
-                flex-shrink: 0 !important;
+                display: none !important;
             }
-            
-            /* Navlinks ortada */
+
+            .mobile-menu-btn,
+            #mobile-menu-btn,
+            .hamburger {
+                display: none !important;
+            }
+
             .naav-linkss {
                 display: flex !important;
                 position: static !important;
                 background: transparent !important;
                 flex-direction: row !important;
-                gap: clamp(6px, 1vw, 16px) !important;
-                padding: 0 clamp(4px, 0.8vw, 12px) !important;
-                box-shadow: none !important;
-                margin-left: clamp(10px, 1.5vw, 20px) !important;
+                gap: 6px !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
                 order: 2 !important;
                 flex: 1 1 auto !important;
                 justify-content: center !important;
                 align-items: center !important;
-                min-width: 0 !important;
-                max-width: 100% !important;
-                border-radius: 0 !important;
-                top: auto !important;
-                right: auto !important;
-                overflow: hidden !important;
+                box-shadow: none !important;
             }
-            
-            .naav-linkss li a {
-                display: inline !important;
-                padding: 0 !important;
-                font-size: clamp(10px, 0.95vw, 14px) !important;
-                border-bottom: none !important;
-                background: transparent !important;
-                color: white !important;
-                text-align: left !important;
-            }
-            
+
             .naav-linkss li {
+                width: auto !important;
                 flex-shrink: 0 !important;
-                white-space: nowrap !important;
-                width: auto !important;
-                margin: 0 !important;
+            }
+
+            .naav-linkss a,
+            .naav-linkss li a {
+                display: inline-block !important;
                 padding: 0 !important;
+                margin: 0 !important;
+                font-size: 8px !important;
+                font-weight: 600 !important;
+                white-space: nowrap !important;
+                border-bottom: none !important;
+                color: white !important;
+                line-height: 1.2 !important;
             }
-            
-            .mobile-menu-btn,
-            #mobile-menu-btn,
-            .hamburger {
-                display: none !important;
-                visibility: hidden !important;
-                opacity: 0 !important;
-            }
-            
-            .logo img {
-                height: clamp(30px, 3.5vw, 45px) !important;
-                width: auto !important;
-            }
-            
-            .visitor-counts-navbar {
-                display: inline-flex !important;
-                font-size: clamp(8px, 0.9vw, 11px) !important;
-                padding: clamp(2px, 0.5vw, 5px) clamp(5px, 0.9vw, 9px) !important;
-                margin-left: clamp(5px, 0.9vw, 10px) !important;
-            }
-            
+
             .auth-buttoons,
             .auth-buttons {
-                display: flex !important;
-                flex-direction: row !important;
-                gap: clamp(5px, 0.8vw, 10px) !important;
-                margin-left: auto !important;
+                flex-shrink: 0 !important;
                 order: 3 !important;
-                flex-shrink: 1 !important;
-                min-width: 0 !important;
+                margin: 0 !important;
+                gap: 4px !important;
+                display: flex !important;
                 align-items: center !important;
             }
-            
+
             .auth-buttoons .ilan-ver-btn,
             .auth-buttons .ilan-ver-btn,
             .ilan-ver-btn {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                padding: clamp(5px, 0.8vw, 10px) clamp(8px, 1.2vw, 14px) !important;
-                font-size: clamp(10px, 0.9vw, 13px) !important;
-                gap: clamp(3px, 0.5vw, 6px) !important;
-                border-radius: clamp(12px, 1.5vw, 20px) !important;
+                padding: 3px 6px !important;
+                font-size: 7px !important;
+                gap: 0 !important;
+                border-radius: 4px !important;
+                box-shadow: none !important;
+                line-height: 1 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 16px !important;
+                margin-top: 2px !important;
             }
-            
-            .auth-buttoons .login,
-            .auth-buttons .login {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                padding: clamp(5px, 0.8vw, 10px) clamp(8px, 1.2vw, 14px) !important;
-                font-size: clamp(10px, 0.9vw, 13px) !important;
-                height: auto !important;
-                min-width: auto !important;
-                max-width: none !important;
-                border: 2px solid white !important;
-                border-radius: clamp(4px, 0.5vw, 7px) !important;
-                background: transparent !important;
-                color: white !important;
-            }
-            
-            .auth-buttoons .user-name,
-            .auth-buttons .user-name {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                padding: clamp(4px, 0.7vw, 8px) clamp(6px, 1vw, 12px) !important;
-                font-size: clamp(9px, 0.85vw, 12px) !important;
-                height: auto !important;
-                min-width: auto !important;
-                max-width: 150px !important;
-                border: 2px solid white !important;
-                border-radius: clamp(4px, 0.5vw, 7px) !important;
-                background: transparent !important;
-                color: white !important;
-            }
-            
-            .auth-buttoons .ilan-ver-btn i,
+
             .ilan-ver-btn i {
-                display: inline !important;
+                display: none !important;
+            }
+
+            .auth-buttoons .login,
+            .auth-buttons .login,
+            .auth-buttoons .user-name,
+            .auth-buttons .user-name,
+            .login,
+            .user-name {
+                padding: 3px 6px !important;
+                font-size: 7px !important;
+                border-width: 1px !important;
+                border-radius: 4px !important;
+                line-height: 1 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 16px !important;
+            }
+
+            .naav-linkss .nav-item-with-badge .new-badge {
+                display: none !important;
+            }
+
+            .anlik-text,
+            .anlik-text-short {
+                display: none !important;
             }
         }
         
@@ -1001,7 +950,7 @@
     <script>
         // Kullanıcı cihazını tespit et
         const isMobile8 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const whatsappNumber8 = "905393756389";
+        const whatsappNumber8 = "905558339022";
         const message8 = "Merhaba,%20Şevval%20Emlak%20Sitenizden%20Size%20Ulaşıyorum";
 
         // Doğru linki oluştur

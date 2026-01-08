@@ -66,23 +66,92 @@ namespace Sevval.Web.Controllers
         {
             try
             {
-                // Categories tablosundan kategorileri al
-                var sql = @"
-                    SELECT Id, Name, Icon, Color, CreatedAt, UpdatedAt 
-                    FROM Categories 
-                    ORDER BY Name";
+                var connection = _context.Database.GetDbConnection();
+                if (connection.State != System.Data.ConnectionState.Open)
+                    await connection.OpenAsync();
 
+                // Önce Categories tablosunun var olup olmadığını kontrol et
+                var tableExists = false;
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='Categories'";
+                    var result = await checkCmd.ExecuteScalarAsync();
+                    tableExists = result != null;
+                }
+
+                // Tablo yoksa oluştur ve mevcut kategorileri ekle
+                if (!tableExists)
+                {
+                    using (var createCmd = connection.CreateCommand())
+                    {
+                        createCmd.CommandText = @"
+                            CREATE TABLE IF NOT EXISTS Categories (
+                                Id TEXT PRIMARY KEY,
+                                Name TEXT NOT NULL,
+                                Icon TEXT,
+                                Color TEXT,
+                                CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+                                UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+                            )";
+                        await createCmd.ExecuteNonQueryAsync();
+                    }
+
+                    // VideolarSayfasi'ndaki mevcut kategorileri al ve ekle
+                    var existingCategories = await _context.VideolarSayfasi
+                        .Where(v => !string.IsNullOrEmpty(v.Kategori))
+                        .Select(v => v.Kategori)
+                        .Distinct()
+                        .ToListAsync();
+
+                    foreach (var cat in existingCategories)
+                    {
+                        var catName = cat?.Trim().TrimEnd('.') ?? "";
+                        if (string.IsNullOrEmpty(catName)) continue;
+
+                        using (var insertCmd = connection.CreateCommand())
+                        {
+                            insertCmd.CommandText = @"
+                                INSERT OR IGNORE INTO Categories (Id, Name, Icon, Color, CreatedAt, UpdatedAt)
+                                VALUES (@id, @name, @icon, @color, datetime('now'), datetime('now'))";
+                            
+                            var idParam = insertCmd.CreateParameter();
+                            idParam.ParameterName = "@id";
+                            idParam.Value = Guid.NewGuid().ToString();
+                            insertCmd.Parameters.Add(idParam);
+
+                            var nameParam = insertCmd.CreateParameter();
+                            nameParam.ParameterName = "@name";
+                            nameParam.Value = catName;
+                            insertCmd.Parameters.Add(nameParam);
+
+                            var iconParam = insertCmd.CreateParameter();
+                            iconParam.ParameterName = "@icon";
+                            iconParam.Value = "";
+                            insertCmd.Parameters.Add(iconParam);
+
+                            var colorParam = insertCmd.CreateParameter();
+                            colorParam.ParameterName = "@color";
+                            colorParam.Value = "bg-blue-100 text-blue-800 border-blue-200";
+                            insertCmd.Parameters.Add(colorParam);
+
+                            await insertCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+
+                // Categories tablosundan kategorileri al
                 var categories = new List<object>();
                 var idIsText = IsCategoriesIdText();
 
-                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = sql;
-                    _context.Database.OpenConnection();
+                    command.CommandText = @"
+                        SELECT Id, Name, Icon, Color, CreatedAt, UpdatedAt 
+                        FROM Categories 
+                        ORDER BY Name";
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
-                        // Resolve ordinals once
                         var idOrdinal = reader.GetOrdinal("Id");
                         var nameOrdinal = reader.GetOrdinal("Name");
                         var iconOrdinal = reader.GetOrdinal("Icon");
@@ -94,54 +163,35 @@ namespace Sevval.Web.Controllers
                         {
                             string id;
                             if (reader.IsDBNull(idOrdinal))
-                            {
                                 id = string.Empty;
-                            }
                             else if (idIsText)
-                            {
                                 id = reader.GetString(idOrdinal);
-                            }
                             else
-                            {
                                 id = reader.GetInt32(idOrdinal).ToString();
-                            }
+
                             var name = reader.IsDBNull(nameOrdinal) ? string.Empty : reader.GetString(nameOrdinal);
                             var icon = reader.IsDBNull(iconOrdinal) ? "" : reader.GetString(iconOrdinal);
                             var color = reader.IsDBNull(colorOrdinal) ? "bg-blue-100 text-blue-800 border-blue-200" : reader.GetString(colorOrdinal);
 
-                            // Dates may be stored as TEXT in SQLite; parse safely
-                            DateTime createdAt;
-                            DateTime updatedAt;
+                            DateTime createdAt = DateTime.MinValue;
+                            DateTime updatedAt = DateTime.MinValue;
+
                             if (!reader.IsDBNull(createdAtOrdinal))
                             {
-                                if (reader.GetFieldType(createdAtOrdinal) == typeof(DateTime))
-                                {
-                                    createdAt = reader.GetDateTime(createdAtOrdinal);
-                                }
+                                var createdAtValue = reader.GetValue(createdAtOrdinal);
+                                if (createdAtValue is DateTime dt)
+                                    createdAt = dt;
                                 else
-                                {
-                                    DateTime.TryParse(reader.GetString(createdAtOrdinal), out createdAt);
-                                }
-                            }
-                            else
-                            {
-                                createdAt = DateTime.MinValue;
+                                    DateTime.TryParse(createdAtValue?.ToString(), out createdAt);
                             }
 
                             if (!reader.IsDBNull(updatedAtOrdinal))
                             {
-                                if (reader.GetFieldType(updatedAtOrdinal) == typeof(DateTime))
-                                {
-                                    updatedAt = reader.GetDateTime(updatedAtOrdinal);
-                                }
+                                var updatedAtValue = reader.GetValue(updatedAtOrdinal);
+                                if (updatedAtValue is DateTime dt)
+                                    updatedAt = dt;
                                 else
-                                {
-                                    DateTime.TryParse(reader.GetString(updatedAtOrdinal), out updatedAt);
-                                }
-                            }
-                            else
-                            {
-                                updatedAt = DateTime.MinValue;
+                                    DateTime.TryParse(updatedAtValue?.ToString(), out updatedAt);
                             }
 
                             categories.Add(new
@@ -157,12 +207,73 @@ namespace Sevval.Web.Controllers
                     }
                 }
 
+                if (categories.Count == 0)
+                {
+                    await SeedDefaultCategoryAsync(connection);
+                    categories.Add(new { 
+                        id = Guid.NewGuid().ToString(), 
+                        name = "Genel", 
+                        icon = "", 
+                        color = "bg-blue-100 text-blue-800 border-blue-200", 
+                        createdAt = DateTime.UtcNow, 
+                        updatedAt = DateTime.UtcNow 
+                    });
+                }
+
                 return Json(new { success = true, categories });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Kategoriler yüklenemedi: " + ex.Message });
             }
+        }
+
+        private async Task SeedDefaultCategoryAsync(System.Data.Common.DbConnection connection)
+        {
+             try
+             {
+                var categoryName = "Genel";
+                var categoryColor = "bg-blue-100 text-blue-800 border-blue-200";
+                
+                using (var insertCmd = connection.CreateCommand())
+                {
+                    insertCmd.CommandText = @"
+                        INSERT INTO Categories (Id, Name, Icon, Color, CreatedAt, UpdatedAt)
+                        VALUES (@id, @name, @icon, @color, datetime('now'), datetime('now'))";
+
+                    if (!IsCategoriesIdText())
+                    {
+                         insertCmd.CommandText = @"
+                        INSERT INTO Categories (Name, Icon, Color, CreatedAt, UpdatedAt)
+                        VALUES (@name, @icon, @color, datetime('now'), datetime('now'))";
+                    }
+                    else
+                    {
+                        var idParam = insertCmd.CreateParameter();
+                        idParam.ParameterName = "@id";
+                        idParam.Value = Guid.NewGuid().ToString();
+                        insertCmd.Parameters.Add(idParam);
+                    }
+
+                    var nameParam = insertCmd.CreateParameter();
+                    nameParam.ParameterName = "@name";
+                    nameParam.Value = categoryName;
+                    insertCmd.Parameters.Add(nameParam);
+
+                    var iconParam = insertCmd.CreateParameter();
+                    iconParam.ParameterName = "@icon";
+                    iconParam.Value = "";
+                    insertCmd.Parameters.Add(iconParam);
+
+                    var colorParam = insertCmd.CreateParameter();
+                    colorParam.ParameterName = "@color";
+                    colorParam.Value = categoryColor;
+                    insertCmd.Parameters.Add(colorParam);
+
+                    await insertCmd.ExecuteNonQueryAsync();
+                }
+             }
+             catch { }
         }
 
         [HttpPost]

@@ -15,6 +15,15 @@
     overflow: hidden;
 }
 
+/* Masaüstünde modal scroll'u kapat */
+.daily-offer-modal-custom .modal-dialog {
+    overflow: hidden;
+}
+
+.daily-offer-modal-custom .modal-body {
+    overflow: hidden;
+}
+
 .daily-offer-close-btn {
     position: absolute;
     top: 15px;
