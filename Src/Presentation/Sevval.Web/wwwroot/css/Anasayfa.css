@@ -13,7 +13,6 @@ body {
     width: 100%;
     overflow-x: hidden;
     min-width: -webkit-fill-available;
-    transition: all 0.3s ease;
 }
 
 .background-murat {
@@ -2786,8 +2785,8 @@ body.filter-open .sevvaldrone-popup {
 }
 
 .floating-offer-img {
-    width: 90px;
-    /* Resim genişliği */
+    width: 100px;
+    /* Masaüstü için 100px */
     height: auto;
     /* Oranları koruyarak yüksekliği otomatik ayarlar */
     cursor: pointer;
@@ -4500,7 +4499,7 @@ body {
         padding: 10px 16px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
-        text-align: left !important;
+        text-align: right !important;
         text-decoration: none !important;
         display: block !important;
         transition: background 0.2s !important;
@@ -9824,7 +9823,7 @@ an Ver butonu container ve ücretsiz etiketi */
         padding: 10px 16px !important;
         font-size: 14px !important;
         font-weight: 500 !important;
-        text-align: left !important;
+        text-align: right !important;
         text-decoration: none !important;
         display: block !important;
         transition: background 0.2s !important;
@@ -9878,7 +9877,7 @@ an Ver butonu container ve ücretsiz etiketi */
         color: white !important;
         padding: 10px 16px !important;
         border-bottom: none !important;
-        text-align: left !important;
+        text-align: right !important;
         font-size: 14px !important;
         font-weight: 500 !important;
         white-space: nowrap !important;
@@ -10097,7 +10096,7 @@ enleme - Hamburger menü İlan Ver yanında */
         color: white !important;
         padding: 10px 16px !important;
         border-bottom: none !important;
-        text-align: left !important;
+        text-align: right !important;
         font-size: 14px !important;
         font-weight: 500 !important;
         text-decoration: none !important;

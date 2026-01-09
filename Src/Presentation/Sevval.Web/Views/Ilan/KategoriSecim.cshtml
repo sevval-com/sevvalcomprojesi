@@ -1,4 +1,4 @@
-﻿@model Sevval.Domain.Entities.IlanModel
+@model Sevval.Domain.Entities.IlanModel
 @using Microsoft.AspNetCore.Identity
 @using Sevval.Domain.Entities
 @inject UserManager<ApplicationUser> UserManager
@@ -31,6 +31,43 @@
         html, body {
             overflow-x: hidden !important;
             max-width: 100vw !important;
+        }
+        
+        /* NAVLINKS - Anasayfa ile aynı stil */
+        .naav-linkss,
+        .navbaar .naav-linkss,
+        nav.navbaar .naav-linkss {
+            gap: 1.5rem !important;
+        }
+        
+        .navbaar .naav-linkss a,
+        .naav-linkss a,
+        nav.navbaar .naav-linkss a {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: white !important;
+        }
+        
+        /* YENİ BADGE - 7px - EN YÜKSEK ÖNCELİK */
+        .navbaar .naav-linkss .nav-item-with-badge .new-badge,
+        .navbaar .naav-linkss li.nav-item-with-badge .new-badge,
+        .navbaar .naav-linkss li.nav-item-with-badge span.new-badge,
+        nav.navbaar .naav-linkss .nav-item-with-badge .new-badge,
+        .nav-item-with-badge .new-badge,
+        span.new-badge,
+        .new-badge {
+            position: absolute !important;
+            top: -6px !important;
+            right: 0px !important;
+            left: auto !important;
+            font-size: 7px !important;
+            padding: 2px 5px !important;
+            border-radius: 6px !important;
+            background-color: #28a745 !important;
+            color: white !important;
+            font-weight: bold !important;
+            z-index: 9999 !important;
+            display: inline-block !important;
         }
         
         /* KategoriSecim.css ve hizmetler.css navbar override'ları */

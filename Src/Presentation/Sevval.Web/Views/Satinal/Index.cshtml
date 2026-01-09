@@ -85,7 +85,7 @@
                     <i class="fas fa-bars me-2"></i> Menü
                 </button>
             </div>
-            <div class="collapse d-lg-block" id="controlPanel">
+            <div class="d-none d-lg-block" id="controlPanelDesktop">
                 <div class="sticky-top" style="top: 20px;">
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-primary text-white">
@@ -96,6 +96,18 @@
                             <a class="list-group-item list-group-item-action" href="@Url.Action("Dopingler", "Satinal")"><i class="fas fa-rocket me-2"></i>Dopingler</a>
                             <a class="list-group-item list-group-item-action" href="@Url.Action("Panel", "Ilan")"><i class="fas fa-arrow-left me-2"></i>Panele Dön</a>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="collapse d-lg-none" id="controlPanel">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-gem me-2"></i>Satın Al</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action active" aria-current="page" href="@Url.Action("Index", "Satinal")"><i class="fas fa-box me-2"></i>Paketler</a>
+                        <a class="list-group-item list-group-item-action" href="@Url.Action("Dopingler", "Satinal")"><i class="fas fa-rocket me-2"></i>Dopingler</a>
+                        <a class="list-group-item list-group-item-action" href="@Url.Action("Panel", "Ilan")"><i class="fas fa-arrow-left me-2"></i>Panele Dön</a>
                     </div>
                 </div>
             </div>
