@@ -374,8 +374,8 @@
         }
         /* Günün İlanı Butonu Küçültme */
         .floating-offer-img {
-            width: 60px !important;
-            height: 60px !important;
+            width: 50px !important;
+            height: 50px !important;
         }
     }
 
@@ -948,7 +948,7 @@
         }
         
         .modal-lg-custom {
-            max-width: 90% !important;
+            max-width: 95% !important;
             margin: 10px auto !important;
             max-height: 95vh !important;
         }
@@ -1091,7 +1091,7 @@
     /* ÇOK KÜÇÜK EKRANLAR İÇİN (iPhone SE, vb.) */
     @@media (max-width: 375px) {
         .modal-lg-custom {
-            max-width: 88% !important;
+            max-width: 94% !important;
             margin: 10px auto !important;
             max-height: 95vh !important;
         }
@@ -1658,7 +1658,7 @@
 
     <!-- Bootstrap 5 Modal - Benzersiz Sınıflar -->
     <div class="modal fade daily-offer-modal-custom" id="dailyOfferModal" tabindex="-1" aria-labelledby="dailyOfferLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg-custom">
+        <div class="modal-dialog modal-dialog-centered modal-lg-custom" style="max-width: 90% !important; width: 80% !important;">
             <div class="modal-content">
                 <!-- Close Button -->
                 <button type="button" class="daily-offer-close-btn" data-bs-dismiss="modal" aria-label="Close">
@@ -1812,54 +1812,65 @@
                         <!-- Sağ Taraf: Slider ve Aksiyon Butonları -->
                         <div class="col-md-7 col-12 order-1 order-md-2">
                             <div class="daily-offer-right-col">
-                                <!-- Swiper Container (Benzersiz ID) -->
-                                <div class="daily-offer-slider-wrap">
-                                    <div class="swiper dailyOfferSwiper w-100 h-100">
-                                        <div class="swiper-wrapper">
-                                            @if (ViewBag.Fotograflar != null && ViewBag.Fotograflar.Count > 0)
-                                            {
-                                                bool gununIlaniEklendi = false;
-                                                for (int i = 0; i < ViewBag.Fotograflar.Count; i++)
+                                <!-- Swiper Container with External Navigation -->
+                                <div class="daily-offer-slider-outer" style="position: relative; display: flex; align-items: center; gap: 10px;">
+                                    <!-- Sol Ok - Dışarıda -->
+                                    <button class="daily-offer-nav-btn daily-offer-prev-btn" style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    
+                                    <!-- Slider -->
+                                    <div class="daily-offer-slider-wrap" style="flex: 1; overflow: hidden;">
+                                        <div class="swiper dailyOfferSwiper w-100 h-100">
+                                            <div class="swiper-wrapper">
+                                                @if (ViewBag.Fotograflar != null && ViewBag.Fotograflar.Count > 0)
                                                 {
-                                                    string photoUrl = ViewBag.Fotograflar[i].Url.ToString();
-                                                    if (photoUrl.Contains("wwwroot"))
+                                                    bool gununIlaniEklendi = false;
+                                                    for (int i = 0; i < ViewBag.Fotograflar.Count; i++)
                                                     {
-                                                        int idx = photoUrl.IndexOf("wwwroot");
-                                                        photoUrl = photoUrl.Substring(idx + 8).Replace("\\", "/");
-                                                        if (!photoUrl.StartsWith("/")) photoUrl = "/" + photoUrl;
-                                                    }
-                                                    else if (photoUrl.Contains("images"))
-                                                    {
-                                                        int idx = photoUrl.IndexOf("images");
-                                                        photoUrl = "/" + photoUrl.Substring(idx).Replace("\\", "/");
-                                                    }
+                                                        string photoUrl = ViewBag.Fotograflar[i].Url.ToString();
+                                                        if (photoUrl.Contains("wwwroot"))
+                                                        {
+                                                            int idx = photoUrl.IndexOf("wwwroot");
+                                                            photoUrl = photoUrl.Substring(idx + 8).Replace("\\", "/");
+                                                            if (!photoUrl.StartsWith("/")) photoUrl = "/" + photoUrl;
+                                                        }
+                                                        else if (photoUrl.Contains("images"))
+                                                        {
+                                                            int idx = photoUrl.IndexOf("images");
+                                                            photoUrl = "/" + photoUrl.Substring(idx).Replace("\\", "/");
+                                                        }
 
-                                                    <div class="swiper-slide">
-                                                        <img src="@photoUrl" alt="İlan Resmi" loading="lazy" style="object-fit: contain;" />
-                                                    </div>
-
-                                                    if (!gununIlaniEklendi && i == (ViewBag.Fotograflar.Count / 2))
-                                                    {
                                                         <div class="swiper-slide">
-                                                            <img src="~/ImageFiles/gununilani.png" alt="Günün İlanı" loading="lazy" style="object-fit: contain;" />
+                                                            <img src="@photoUrl" alt="İlan Resmi" loading="lazy" style="object-fit: cover; width: 100%; height: 100%;" />
                                                         </div>
-                                                        gununIlaniEklendi = true;
+
+                                                        if (!gununIlaniEklendi && i == (ViewBag.Fotograflar.Count / 2))
+                                                        {
+                                                            <div class="swiper-slide">
+                                                                <img src="~/ImageFiles/gununilani.png" alt="Günün İlanı" loading="lazy" style="object-fit: cover; width: 100%; height: 100%;" />
+                                                            </div>
+                                                            gununIlaniEklendi = true;
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            else
-                                            {
-                                                <div class="swiper-slide d-flex align-items-center justify-content-center text-white">
-                                                    <div class="text-center">
-                                                        <i class="fas fa-camera fa-3x mb-2"></i>
-                                                        <p>Fotoğraf Yok</p>
+                                                else
+                                                {
+                                                    <div class="swiper-slide d-flex align-items-center justify-content-center text-white">
+                                                        <div class="text-center">
+                                                            <i class="fas fa-camera fa-3x mb-2"></i>
+                                                            <p>Fotoğraf Yok</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
+                                                }
+                                            </div>
                                         </div>
-                                        <div class="swiper-button-next"></div>
-                                        <div class="swiper-button-prev"></div>
                                     </div>
+                                    
+                                    <!-- Sağ Ok - Dışarıda -->
+                                    <button class="daily-offer-nav-btn daily-offer-next-btn" style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
                                 </div>
 
                                 <!-- Alt Aksiyon Butonları -->
@@ -1885,8 +1896,8 @@
 }
 
 <!-- Yüzen buton -->
-<a href="#" id="floating-offer-icon" class="floating-offer-link" style="position: fixed; bottom: 14px; left: 40px; z-index: 9999;">
-    <img src="~/ImageFiles/GÜNÜNİLANİ.webp" alt="Günün İlanı" class="floating-offer-img" loading="lazy" width="100" height="100">
+<a href="#" id="floating-offer-icon" class="floating-offer-link" style="position: fixed !important; bottom: 0.1% !important; left: 30px !important; z-index: 9999 !important;">
+    <img src="~/ImageFiles/GÜNÜNİLANİ.webp" alt="Günün İlanı" class="floating-offer-img" loading="lazy">
 </a>
 
 <div class="tagline-container1" style="display: flex;">
@@ -2312,7 +2323,7 @@
     </div>
 
     <!-- WhatsApp Logo -->
-    <a id="whatsapp-link-8" href="https://wa.me/905558339022?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum" target="_blank" class="whatsapp-float">
+    <a id="whatsapp-link-8" href="https://wa.me/905558339022?text=Merhaba%2C%20%C5%9Eevval%20Emlak%20Sitesinden%20Size%20Ula%C5%9F%C4%B1yorum" target="_blank" class="whatsapp-float" style="position: fixed !important; bottom: 0.1% !important; right: 3% !important; z-index: 9999 !important;">
         <img src="~/sablon/img/724destek.webp" alt="WhatsApp" class="whatsapp-image" loading="lazy" width="90" height="90">
     </a>
 
@@ -2452,8 +2463,8 @@
                 dailyOfferModalElement.addEventListener('shown.bs.modal', function () {
                     var swiper = new Swiper(".dailyOfferSwiper", {
                         navigation: {
-                            nextEl: ".swiper-button-next",
-                            prevEl: ".swiper-button-prev",
+                            nextEl: ".daily-offer-next-btn",
+                            prevEl: ".daily-offer-prev-btn",
                         },
                         loop: true,
                         autoplay: {

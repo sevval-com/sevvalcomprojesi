@@ -26,30 +26,28 @@ body {
 /* CSS */
 .container {
     max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    /* Sağ ve sol boşluk azaltıldı - ilan sola çekildi */
+    margin: 0;
+    margin-left: 5%;
+    padding: 0;
 }
 
 /* İlan sayfası için col-md-4 genişletme */
 .col-md-4 {
-    flex: 0 0 100%;
-    max-width: 720px;
-    /* Daha da küçültüldü */
+    flex: 0 0 68%;
+    max-width: 68%;
+    /* Profil bilgilerine yakın ama çok dibine kadar değil */
     margin: 0;
-    /* Sola hizalandı */
+    margin-left: 0;
 }
 
 .ilan-card {
     margin-bottom: 20px;
     border-radius: 10px;
     width: 100%;
-    max-width: 720px;
-    /* Daha da küçültüldü */
+    max-width: 100%;
     padding: 20px;
     transition: all 0.3s;
     margin: 0 0 20px 0;
-    /* Sola hizalandı */
 }
 
 .ilan-baslik-container {
@@ -88,13 +86,11 @@ body {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: hidden;
-    /* Kaydırma çubuğunu gizler */
     margin-left: 0;
-    margin-top: -1px;
+    margin-top: 30px;
+    /* Aşağı indirildi */
     justify-content: flex-start;
-    /* Sola hizala */
-    padding-left: 40px;
-    /* Soldan biraz boşluk */
+    padding-left: 0;
 }
 
 @media (max-width: 768px) {
@@ -153,9 +149,11 @@ hr {
 .photo-gallery-container {
     position: relative;
     width: 100%;
-    max-width: 720px;
-    /* Daha da küçültüldü */
-    margin: 0 auto;
+    max-width: 100%;
+    /* Yüzdelik - parent'a göre */
+    margin: 0;
+    margin-left: 0%;
+    /* En sola yasla */
     border-radius: 8px;
     overflow: visible;
     background-color: #ffffff;
@@ -170,8 +168,8 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 350px;
-    /* Sabit yükseklik */
+    height: 400px;
+    /* Sabit yükseklik - orantılı görünüm için */
     background-color: #ffffff;
     /* Beyaz arka plan */
     position: relative;
@@ -242,6 +240,7 @@ hr {
         width: 40px;
         height: 40px;
         font-size: 18px;
+        top: 40%;
     }
 
     .nav-button.left {
@@ -334,10 +333,9 @@ hr {
 
 .button-container {
     display: flex;
-    justify-content: flex-start;
-    /* Sola hizala */
-    gap: 15px;
-    /* Küçültüldü */
+    justify-content: center;
+    /* Ortalandı */
+    gap: 3%;
     margin-bottom: 20px;
     padding: 0px;
     border-radius: 15px;
@@ -349,18 +347,21 @@ hr {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 180px;
+    width: 22%;
     /* Küçültüldü */
-    height: 60px;
+    min-width: 120px;
+    max-width: 160px;
+    height: 55px;
+    /* Küçültüldü */
     border: 2px solid #007bff;
-    border-radius: 12px;
+    border-radius: 10px;
     background-color: #f0f8ff;
     color: #007bff;
     font-family: 'Arial', sans-serif;
     font-weight: 600;
     transition: all 0.2s ease;
     cursor: pointer;
-    padding: 8px;
+    padding: 6px;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -438,9 +439,9 @@ hr {
 
 /* Yalnızca YouTube galerisi için */
 #youtube-gallery {
-    max-width: 720px;
-    /* Küçültüldü */
-    max-height: 354px;
+    max-width: 100%;
+    /* Yüzdelik - parent'a göre */
+    max-height: 450px;
     /* margin: 0 auto; */
     /* padding: 20px; */
     background-color: #f1f1f1;
@@ -628,8 +629,8 @@ hr {
     padding: 20px;
     margin-bottom: 20px;
     /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
-    width: 720px;
-    /* Küçültüldü */
+    width: 100%;
+    /* Yüzdelik - parent'a göre */
     margin-left: 0;
     max-width: 100%;
     /* Ensure responsiveness */
@@ -769,37 +770,44 @@ hr {
 /* Tab Başlıkları */
 .tabs {
     display: flex;
-    justify-content: space-evenly;
-    background: linear-gradient(90deg, #0197f6, #0170c1);
-    padding: 8px;
-    border-radius: 6px 6px 0 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    background-color: #007bff;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: none;
     margin-bottom: 15px;
+    overflow: hidden;
+    border: none;
 }
 
 .tab-button {
     background-color: transparent;
-    color: white;
-    border: 2px solid transparent;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: bold;
+    color: #ffffff !important;
+    border: none;
+    padding: 15px 20px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    border-radius: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
     text-align: center;
-    flex-grow: 1;
+    flex: 1;
+    outline: none;
 }
 
 .tab-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-    border-color: #fff;
+    background-color: #ffffff !important;
+    color: #007bff !important;
 }
 
 .tab-button.active {
-    background-color: #015f9d;
-    border-color: #fff;
+    background-color: #007bff !important;
+    color: #ffffff !important;
+}
+
+.tab-button.active:hover {
+    background-color: #ffffff !important;
+    color: #007bff !important;
 }
 
 /* Mobile Responsive Fixes for Tabs */
@@ -841,8 +849,8 @@ hr {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.5s ease-out;
     width: 100%;
-    max-width: 720px;
-    /* Küçültüldü */
+    max-width: 100%;
+    /* Yüzdelik - parent'a göre */
     margin-left: 0;
     margin-right: auto;
 }
@@ -861,7 +869,7 @@ hr {
 /* Konum Haritası */
 .location-window iframe {
     width: 100%;
-    height: 300px;
+    height: 450px;
     border-radius: 6px;
     border: none;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -871,13 +879,13 @@ hr {
 /* Harita Container */
 #map-container {
     width: 100%;
-    min-height: 350px;
+    min-height: 450px;
 }
 
 /* Harita Div - dinamik ID için */
 [id^="map-"] {
     width: 100%;
-    min-height: 350px;
+    min-height: 450px;
     background-color: #e0e0e0;
     border-radius: 6px;
 }
@@ -885,7 +893,7 @@ hr {
 /* Harita içindeki iframe */
 [id^="map-"] iframe {
     width: 100%;
-    height: 350px;
+    height: 450px;
     border: none;
     border-radius: 6px;
 }
@@ -1004,7 +1012,7 @@ hr {
         /* Removed overflow-x: hidden to prevent clipping of borders/shadows */
     }
 
-    /* Map Specific Fixes */
+  /* Map Specific Fixes - Mobilde yatay görünüm */
     [id^="map-"],
     .map-container,
     .gm-style,
@@ -1012,13 +1020,14 @@ hr {
     .location-window iframe {
         width: 100% !important;
         max-width: 100% !important;
+        min-height: 250px !important;
+        height: 250px !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
-        /* Clip map content strictly here */
         border-radius: 6px;
-        /* Ensure map respects radius */
     }
 }
+
 
 /* Animasyon: Fade In */
 @keyframes fadeIn {
@@ -1052,22 +1061,23 @@ hr {
 
 .user-info-container {
     position: absolute;
-    top: 106px;
-    left: 80.6%;
-    transform: translateX(-50%);
+    top: 140px;
+    /* Aşağı indirildi */
+    left: 70.6%;
+    transform: none;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    width: 395px;
+    width: 26%;
+    min-width: 300px;
+    max-width: 395px;
     padding: 20px;
     background-color: #ffffff;
     border-radius: 9px;
     border-left: 7px solid #007BFF;
     overflow: hidden;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
-    /* Gölge efekti */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* Sağdan, yukarıdan ve aşağıdan gölge */
 }
 
 .profile-picture {
@@ -1257,10 +1267,12 @@ h4 {
 /* Ana Container */
 .yorum-alani-container {
     position: absolute;
-    top: 335px;
-    left: 80%;
-    transform: translateX(-50%);
-    width: 395px;
+    top: 370px;
+    /* Aşağı indirildi */
+    left: 70%;
+    transform: none;
+    width: 26%;
+    min-width: 300px;
     max-width: 395px;
     border-radius: 12px;
     padding: 10px;
@@ -1556,7 +1568,9 @@ h4 {
     }
 
     .random-ilan-card img {
-        height: 80px !important;
+        height: 120px !important;
+        width: 100% !important;
+        object-fit: cover !important;
     }
 
     .random-ilan-card h4 {
@@ -1574,7 +1588,7 @@ h4 {
     .random-ilanlar-container {
         margin: 15px 0 !important;
         padding: 8px !important;
-        margin-top: 280px !important;
+        margin-top: 50px !important;
     }
 
     .random-ilanlar-title {
@@ -1593,7 +1607,9 @@ h4 {
     }
 
     .random-ilan-card img {
-        height: 60px !important;
+        height: 120px !important;
+        width: 100% !important;
+        object-fit: cover !important;
     }
 
     .random-ilan-card h4 {
@@ -1895,19 +1911,22 @@ h4 {
 
     .button-container {
         flex-direction: row;
-        gap: 8px;
-        flex-wrap: wrap;
+        gap: 5px;
+        flex-wrap: nowrap;
         justify-content: center;
     }
 
     .option-button {
-        width: 31%;
-        padding: 0px;
-        font-size: 14px;
+        width: 28%;
+        min-width: 80px;
+        max-width: 100px;
+        padding: 8px 5px;
+        font-size: 12px;
+        height: 50px;
     }
 
     .option-button i {
-        font-size: 28px;
+        font-size: 22px;
         top: 1px;
         position: relative;
     }
@@ -1991,7 +2010,7 @@ h4 {
         left: 0 !important;
         top: 0 !important;
         margin-top: 130px !important;
-        margin-bottom: 10px !important;
+        margin-bottom: -26px !important;
         width: calc(100% - 20px) !important;
         max-width: 350px !important;
         margin-left: auto !important;
@@ -2006,7 +2025,7 @@ h4 {
         transform: translateX(-15px) !important;
         left: 0 !important;
         top: 0 !important;
-        margin-top: 10px !important;
+        margin-top: 0px !important;
         margin-bottom: 15px !important;
         width: calc(100% - 20px) !important;
         max-width: 350px !important;
@@ -2051,7 +2070,7 @@ h4 {
         transform: none !important;
         left: 0 !important;
         top: 0 !important;
-        margin-top: 0px !important;
+        margin-top: -20px !important;
         margin-bottom: 10px !important;
         width: calc(100% - 30px) !important;
         max-width: 320px !important;
@@ -3340,9 +3359,11 @@ h2 {
     cursor: pointer;
     border-radius: 5px;
     font-size: 14px;
-    position: absolute;
-    left: 10px;
-    top: 281px;
+    position: relative;
+    left: auto;
+    top: auto;
+    display: block;
+    width: fit-content;
 }
 
 
@@ -4053,5 +4074,103 @@ h2 {
     hr {
         width: 100% !important;
         margin-left: 0 !important;
+    }
+}
+
+
+/* 375x667 Küçük Telefonlar için Özel Stiller */
+@media (max-width: 375px) {
+    /* 1. Fotoğrafı Büyüt butonu - fotoğrafın sol altında, dışında */
+    .btn-enlarge-photo {
+        position: relative !important;
+        left: 0 !important;
+        top: auto !important;
+        margin-top: 10px !important;
+        display: block !important;
+        width: fit-content !important;
+    }
+
+    /* 2. Özellikler kısmı taşmasın */
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding: 0 5px !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    .features-grid div {
+        padding: 10px !important;
+        font-size: 14px !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .tab-content {
+        padding: 8px !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 3. Şevval Emlak ve Profil Bilgileri arasında mesafe */
+    .user-info-container {
+        margin-bottom: 30px !important;
+    }
+
+    /* Şevval Emlak ile Yorum Ekleyin arasındaki mesafeyi azalt */
+    .yorum-alani-container {
+        margin-top: -10px !important;
+    }
+
+    /* 4. Danışmanın Diğer İlanları fotoğrafları */
+    .random-ilan-card img {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 80px !important;
+        object-fit: cover !important;
+    }
+
+    .random-ilanlar-list {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .random-ilan-card {
+        width: 100% !important;
+        overflow: hidden !important;
+    }
+}
+
+/* 480px ve altı için genel mobil düzeltmeleri */
+@media (max-width: 480px) {
+    /* Fotoğrafı Büyüt butonu */
+    .btn-enlarge-photo {
+        position: relative !important;
+        left: 0 !important;
+        top: auto !important;
+        margin-top: 10px !important;
+    }
+
+    /* Özellikler taşmasın */
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        padding: 0 10px !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Profil ve yorum alanı mesafeleri */
+    .user-info-container {
+        margin-bottom: 25px !important;
+    }
+
+    .yorum-alani-container {
+        margin-top: -15px !important;
+    }
+
+    /* Danışman ilanları fotoğrafları */
+    .random-ilan-card img {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 70px !important;
+        object-fit: cover !important;
     }
 }

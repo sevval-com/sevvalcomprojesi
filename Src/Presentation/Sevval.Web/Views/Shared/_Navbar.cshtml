@@ -2,6 +2,21 @@
 @using Sevval.Domain.Entities
 @inject UserManager<ApplicationUser> UserManager
 
+<style>
+@@media (max-width: 1200px) {
+    .naav-linkss li {
+        display: flex !important;
+        justify-content: flex-end !important;
+        width: 100% !important;
+    }
+    .naav-linkss li a {
+        display: inline-block !important;
+        width: auto !important;
+        text-align: right !important;
+    }
+}
+</style>
+
 <nav class="navbaar">
     <div class="navbaar-container" style="position: relative;">
         <!-- LOGO -->
@@ -14,25 +29,25 @@
         
         <!-- MENÜ LİNKLERİ -->
         <ul class="naav-linkss" id="nav-links">
-            <li><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+            <li style="display:flex;justify-content:flex-end;"><a href="@Url.Action("Index", "Home")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Ana Sayfa</a></li>
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                <li>
-                    <a href="@Url.Action("Panel", "Ilan")">Mağazam</a>
+                <li style="display:flex;justify-content:flex-end;">
+                    <a href="@Url.Action("Panel", "Ilan")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Mağazam</a>
                 </li>
             }
-            <li><a href="@Url.Action("Firmalar", "Home")">Firmalar</a></li>
-            <li>
-                <a href="@Url.Action("Index", "VideolarSayfasi")">Videolar</a>
+            <li style="display:flex;justify-content:flex-end;"><a href="@Url.Action("Firmalar", "Home")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Firmalar</a></li>
+            <li style="display:flex;justify-content:flex-end;">
+                <a href="@Url.Action("Index", "VideolarSayfasi")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Videolar</a>
             </li>
-            <li class="nav-item-with-badge">
-                <a href="@Url.Action("Index", "Drone")">Sevval Drone</a>
+            <li class="nav-item-with-badge" style="display:flex;justify-content:flex-end;position:relative;">
+                <a href="@Url.Action("Index", "Drone")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Şevval Drone</a>
                 <span class="new-badge">Yeni</span>
             </li>
-            <li class="dropdoawn">
-                <a href="@Url.Action("About", "Home")">Hakkımızda</a>
+            <li class="dropdoawn" style="display:flex;justify-content:flex-end;">
+                <a href="@Url.Action("About", "Home")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Hakkımızda</a>
             </li>
-            <li><a href="@Url.Action("Index", "Blog")">Blog</a></li>
+            <li style="display:flex;justify-content:flex-end;"><a href="@Url.Action("Index", "Blog")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Blog</a></li>
         </ul>
         
         <!-- AUTH BUTONLARI -->
@@ -60,9 +75,7 @@
                             <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
                             <li><a href="@Url.Action("Index", "Satinal")">Satın Al</a></li>
                             <li>
-                                <a href="@Url.Action("ParselSorgu", "Drone")">
-                                    Sevval Drone <span class="nav-badge">Yeni</span>
-                                </a>
+                                <a href="@Url.Action("ParselSorgu", "Drone")" class="dropdown-drone-link">Sevval Drone <span class="nav-badge">Yeni</span></a>
                             </li>
                             <li><a href="@Url.Action("Settings", "Account")">Ayarlar</a></li>
                             @if (User.Identity.IsAuthenticated &&
@@ -102,22 +115,79 @@
                 var navLinks = document.getElementById("nav-links");
                 var mobileMenuBtn = document.getElementById("mobile-menu-btn");
                 
+                // Hamburger menü yazılarını sağa yasla
+                function alignMenuItemsRight() {
+                    // force-desktop modunda bu fonksiyon çalışmasın
+                    if (document.body.classList.contains('force-desktop')) {
+                        return;
+                    }
+                    
+                    var menuItems = document.querySelectorAll('.naav-linkss li');
+                    var menuLinks = document.querySelectorAll('.naav-linkss li a');
+                    
+                    if (window.innerWidth <= 1200) {
+                        // Mobil - inline style ekle
+                        menuItems.forEach(function(li) {
+                            // nav-item-with-badge için özel kontrol
+                            if (!li.classList.contains('nav-item-with-badge')) {
+                                li.style.cssText = 'display: flex !important; justify-content: flex-end !important; width: 100% !important;';
+                            }
+                        });
+                        menuLinks.forEach(function(a) {
+                            a.style.cssText = 'display: inline-block !important; width: auto !important; text-align: right !important;';
+                        });
+                    } else {
+                        // Masaüstü - inline style'ları temizle
+                        menuItems.forEach(function(li) {
+                            li.style.cssText = '';
+                        });
+                        menuLinks.forEach(function(a) {
+                            a.style.cssText = '';
+                        });
+                    }
+                }
+                
+                // Sayfa yüklendiğinde ve resize olduğunda çalıştır
+                alignMenuItemsRight();
+                window.addEventListener('resize', alignMenuItemsRight);
+                
                 // Mobil mi yoksa masaüstü görünümü mü kontrol et
                 // CSS ile uyumlu: yükseklik 1000px ve üstünde masaüstü görünümü
+                // force-desktop class'ı varsa her zaman masaüstü görünümü
                 function isMobileView() {
+                    if (document.body.classList.contains('force-desktop')) {
+                        return false; // force-desktop varsa mobil değil
+                    }
                     return window.innerWidth <= 899 && window.innerHeight < 1000;
                 }
                 
                 // Mobilde menü butonunu göster
                 function handleMobileMenu() {
+                    // force-desktop class'ı varsa - viewport zaten değiştirildi, CSS kuralları çalışacak
+                    if (document.body.classList.contains('force-desktop')) {
+                        // Hamburger menüyü gizle
+                        if (mobileMenuBtn) {
+                            mobileMenuBtn.style.cssText = 'display: none !important;';
+                        }
+                        // Nav links'i göster
+                        if (navLinks) {
+                            navLinks.classList.remove('active');
+                        }
+                        return;
+                    }
+                    
                     if (isMobileView()) {
                         if (mobileMenuBtn) {
                             mobileMenuBtn.style.display = 'flex';
                             mobileMenuBtn.style.flexDirection = 'column';
+                            mobileMenuBtn.style.visibility = 'visible';
                         }
                     } else {
                         // Masaüstü görünümü - hamburger gizle, navlinks göster
-                        if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+                        if (mobileMenuBtn) {
+                            mobileMenuBtn.style.display = 'none';
+                            mobileMenuBtn.style.visibility = 'hidden';
+                        }
                         if (navLinks) navLinks.classList.remove('active');
                     }
                 }
@@ -126,6 +196,11 @@
                 if (mobileMenuBtn) {
                     mobileMenuBtn.addEventListener('click', function(e) {
                         e.stopPropagation();
+                        // Dropdown menüyü kapat
+                        document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
+                            content.classList.remove('show');
+                        });
+                        // Hamburger menüyü aç/kapat
                         if (navLinks) navLinks.classList.toggle('active');
                     });
                 }
@@ -151,6 +226,9 @@
                         userName.addEventListener('click', function(e) {
                             e.preventDefault();
                             e.stopPropagation();
+                            
+                            // Hamburger menüyü kapat
+                            if (navLinks) navLinks.classList.remove('active');
                             
                             // Diğer tüm dropdown'ları kapat
                             document.querySelectorAll('.user-dropdown-content').forEach(function(content) {
