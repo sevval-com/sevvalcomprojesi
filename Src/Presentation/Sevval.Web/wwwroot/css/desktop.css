@@ -1,4 +1,4 @@
-﻿@media screen and (min-width: 1024px) {
+﻿@media screen and (min-width: 900px) {
     body .daily-offer-container {
         width: 90vw;
         top: 25%;
@@ -9,9 +9,9 @@
         top: 0.5vw;
     }
 
-        .offer-left div {
-            font-size: 24px;
-        }
+    .offer-left div {
+        font-size: 24px;
+    }
 
     .slideshow-container {
         top: -5vw;

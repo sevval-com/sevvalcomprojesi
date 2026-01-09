@@ -2,7 +2,6 @@
 
 /* Temel body ayarları */
 body {
-    font-family: 'Calibri', sans-serif;
     background-color: #f8fafc;
 }
 
@@ -39,7 +38,8 @@ body {
     margin: auto;
 }
 
-.sol-bolum, .sag-bolum {
+.sol-bolum,
+.sag-bolum {
     flex: 1;
     padding: 40px 30px;
     display: flex;
@@ -67,7 +67,8 @@ body {
     color: rgba(255, 255, 255, 0.9);
 }
 
-.sol-bolum h2, .sag-bolum h2 {
+.sol-bolum h2,
+.sag-bolum h2 {
     margin-bottom: 10px;
     font-size: 24px;
     color: #fff;
@@ -127,13 +128,14 @@ body {
         flex-direction: column;
         min-height: auto;
     }
-    
+
     .sag-bolum {
         border-left: none;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
-    .sol-bolum, .sag-bolum {
+
+    .sol-bolum,
+    .sag-bolum {
         padding: 30px 20px;
     }
 }

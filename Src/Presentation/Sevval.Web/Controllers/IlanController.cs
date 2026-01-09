@@ -1388,11 +1388,15 @@ public class IlanController : Controller
 
         // RandomIlanlar için fotoğrafları çek
         var randomIlanIds = randomIlanlar.Select(i => i.Id).ToList();
-        var randomIlanPhotos = await _context.Photos.AsNoTracking()
+        var allRandomPhotos = await _context.Photos.AsNoTracking()
             .Where(p => randomIlanIds.Contains(p.IlanId))
+            .ToListAsync();
+        
+        // Her ilan için sadece ilk fotoğrafı al (memory'de grupla)
+        var randomIlanPhotos = allRandomPhotos
             .GroupBy(p => p.IlanId)
             .Select(g => g.First())
-            .ToListAsync();
+            .ToList();
 
         string companyName = null;
         int companyTotalIlanCount = 0;

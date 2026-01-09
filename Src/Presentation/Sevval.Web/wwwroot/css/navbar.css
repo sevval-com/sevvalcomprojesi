@@ -1,10 +1,9 @@
 /* ============================================
-   NAVBAR - TÜM CİHAZLAR İÇİN
+   NAVBAR - TÜM CİHAZLAR İÇİN SABİT BOYUTLAR
    ============================================ */
 
 /* ============================================
    ANLIK YAZISI - VARSAYILAN STİLLER
-   Büyük ekranlarda "Anlık:" göster, küçük ekranlarda gizle
    ============================================ */
 .anlik-text {
     display: inline !important;
@@ -14,274 +13,10 @@
     display: none !important;
 }
 
-/* ============================================
-   500px - 1200px genişlik için özel düzenleme
-   ============================================ */
-@media (min-width: 500px) and (max-width: 1200px) and (min-height: 1000px) {
-    .navbaar {
-        padding: clamp(6px, 1vw, 12px) clamp(5px, 0.8vw, 10px) !important;
-    }
-    
-    .navbaar-container {
-        padding: 0 clamp(5px, 0.8vw, 10px) !important;
-        gap: clamp(5px, 0.8vw, 12px) !important;
-    }
-    
-    /* Logo ve Anlık yazısı en sola yapıştır ve küçült */
-    .navbaar-container .logo {
-        max-width: min(140px, 15vw) !important;
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-    }
-    
-    .logo img {
-        height: clamp(25px, 3vw, 35px) !important;
-        width: auto !important;
-    }
-    
-    .visitor-counts-navbar {
-        font-size: clamp(7px, 0.8vw, 10px) !important;
-        padding: clamp(2px, 0.4vw, 4px) clamp(4px, 0.7vw, 7px) !important;
-        margin-left: clamp(3px, 0.6vw, 6px) !important;
-    }
-    
-    .naav-linkss {
-        margin-left: clamp(8px, 1.2vw, 15px) !important;
-        gap: clamp(5px, 0.8vw, 12px) !important;
-    }
-    
-    .naav-linkss li a {
-        font-size: clamp(9px, 0.85vw, 12px) !important;
-    }
-}
-
-/* ============================================
-   MASAÜSTÜ GÖRÜNÜMÜ - Yükseklik 1000px ve üstünde
-   Telefondan "masaüstü sitesi göster" seçildiğinde aktif olur
-   ============================================ */
-@media (min-height: 1000px) {
-    .navbaar {
-        padding: clamp(10px, 1.5vw, 20px) clamp(15px, 2.5vw, 30px) !important;
-        overflow: visible !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .navbaar-container {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        flex-wrap: nowrap !important;
-        gap: clamp(10px, 2vw, 25px) !important;
-        padding: 0 clamp(15px, 2vw, 25px) !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        overflow: visible !important;
-    }
-
-    /* Logo ve Anlık yazısı solda */
-    .navbaar-container .logo {
-        order: 1 !important;
-        flex-shrink: 1 !important;
-        display: flex !important;
-        align-items: center !important;
-        min-width: 0 !important;
-        max-width: min(200px, 18vw) !important;
-    }
-    
-    .navbaar-container .logo img {
-        max-width: 100% !important;
-        height: auto !important;
-    }
-    
-    .visitor-counts-navbar {
-        white-space: nowrap !important;
-        width: auto !important;
-        min-width: fit-content !important;
-        font-size: clamp(8px, 0.9vw, 11px) !important;
-        padding: clamp(2px, 0.5vw, 5px) clamp(5px, 0.9vw, 9px) !important;
-        margin-left: clamp(5px, 0.9vw, 10px) !important;
-        flex-shrink: 0 !important;
-    }
-
-    /* Navlinks ortada */
-    .naav-linkss {
-        display: flex !important;
-        position: static !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        flex-direction: row !important;
-        gap: clamp(8px, 1.2vw, 20px) !important;
-        padding: 0 clamp(6px, 1vw, 12px) !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
-        border-radius: 0 !important;
-        margin-left: clamp(10px, 1.5vw, 20px) !important;
-        order: 2 !important;
-        flex: 1 1 auto !important;
-        justify-content: center !important;
-        align-items: center !important;
-        overflow: hidden !important;
-        top: auto !important;
-        right: auto !important;
-    }
-    
-    .naav-linkss li {
-        flex-shrink: 0 !important;
-        white-space: nowrap !important;
-        width: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    .naav-linkss li a {
-        display: inline !important;
-        padding: 0 !important;
-        font-size: clamp(11px, 1.1vw, 15px) !important;
-        border-bottom: none !important;
-        background: transparent !important;
-        color: white !important;
-    }
-
-    .mobile-menu-btn,
-    #mobile-menu-btn {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    .hamburger {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
-    .visitor-counts-navbar {
-        display: inline-flex !important;
-        font-size: 14px !important;
-        padding: 8px 14px !important;
-        margin-left: 15px !important;
-    }
-
-    .auth-buttoons,
-    .auth-buttons {
-        display: flex !important;
-        flex-direction: row !important;
-        gap: clamp(6px, 0.9vw, 12px) !important;
-        margin-left: auto !important;
-        order: 3 !important;
-        flex-shrink: 1 !important;
-        min-width: 0 !important;
-        align-items: center !important;
-    }
-    
-    .auth-buttoons .ilan-ver-btn,
-    .auth-buttons .ilan-ver-btn,
-    .ilan-ver-btn {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        padding: clamp(6px, 0.9vw, 11px) clamp(10px, 1.4vw, 18px) !important;
-        font-size: clamp(11px, 1vw, 14px) !important;
-        gap: clamp(4px, 0.6vw, 7px) !important;
-        border-radius: clamp(15px, 2vw, 25px) !important;
-    }
-    
-    .auth-buttoons .login,
-    .auth-buttons .login {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        padding: clamp(6px, 0.9vw, 11px) clamp(10px, 1.4vw, 18px) !important;
-        font-size: clamp(11px, 1vw, 14px) !important;
-        height: auto !important;
-        min-width: auto !important;
-        max-width: none !important;
-        border: 2px solid white !important;
-        border-radius: clamp(5px, 0.7vw, 8px) !important;
-        background: transparent !important;
-        color: white !important;
-    }
-    
-    .auth-buttoons .user-name,
-    .auth-buttons .user-name {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        padding: clamp(5px, 0.8vw, 9px) clamp(8px, 1.2vw, 14px) !important;
-        font-size: clamp(10px, 0.9vw, 13px) !important;
-        height: auto !important;
-        min-width: auto !important;
-        max-width: 140px !important;
-        border: 2px solid white !important;
-        border-radius: clamp(5px, 0.7vw, 8px) !important;
-        background: transparent !important;
-        color: white !important;
-    }
-
-    .auth-buttoons .post-ad,
-    .auth-buttons .post-ad {
-        height: auto !important;
-        min-width: auto !important;
-        padding: clamp(8px, 1.2vw, 14px) clamp(12px, 1.8vw, 22px) !important;
-        font-size: clamp(12px, 1.2vw, 16px) !important;
-    }
-
-    .auth-buttoons .ilan-ver-btn i,
-    .ilan-ver-btn i {
-        display: inline !important;
-    }
-
-    .logo img {
-        height: clamp(30px, 3.5vw, 45px) !important;
-        width: auto !important;
-    }
-}
-
-/* ============================================ */
-
-/* 500px - 1200px genişlik için normal masaüstü görünümü */
-@media (min-width: 500px) and (max-width: 1200px) {
-    .navbaar {
-        padding: clamp(8px, 1.2vw, 15px) clamp(8px, 1.2vw, 15px) !important;
-    }
-    
-    .navbaar-container {
-        padding: 0 clamp(8px, 1.2vw, 15px) !important;
-        gap: clamp(8px, 1.2vw, 15px) !important;
-    }
-    
-    /* Logo ve Anlık yazısı en sola yapıştır ve küçült */
-    .logo {
-        max-width: min(160px, 16vw) !important;
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-    }
-    
-    .logo img {
-        height: clamp(35px, 4vw, 50px) !important;
-    }
-    
-    .visitor-counts-navbar {
-        font-size: clamp(10px, 1vw, 13px) !important;
-        padding: clamp(4px, 0.6vw, 8px) clamp(6px, 0.9vw, 12px) !important;
-        margin-left: clamp(5px, 0.8vw, 10px) !important;
-    }
-    
-    .naav-linkss {
-        margin-left: clamp(15px, 2vw, 30px) !important;
-        gap: clamp(8px, 1.2vw, 20px) !important;
-    }
-    
-    .naav-linkss a {
-        font-size: clamp(11px, 1.1vw, 15px) !important;
-    }
-}
-
 /* Ana navbar */
 .navbaar {
     background: linear-gradient(90deg, #009cfb, #0056b3);
-    padding: clamp(12px, 1.5vw, 18px) clamp(18px, 2.5vw, 28px);
+    padding: 12px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 9999;
@@ -304,13 +39,12 @@
     gap: 15px;
 }
 
-/* Logo - MASAÜSTÜ */
+/* Logo - SABİT BOYUT - EN SOLDA */
 .logo {
     display: flex;
     align-items: center;
-    flex-shrink: 1;
-    min-width: 0;
-    max-width: min(250px, 22vw);
+    flex-shrink: 0;
+    order: 1;
 }
 
 .logo a {
@@ -319,10 +53,9 @@
 }
 
 .logo img {
-    height: clamp(45px, 5vw, 65px);
+    height: 50px;
     width: auto;
     cursor: pointer;
-    max-width: 100%;
 }
 
 /* Mobil menü butonu - MASAÜSTÜNDE GİZLE */
@@ -331,71 +64,68 @@
     display: none;
 }
 
-/* Ziyaretçi sayısı - MASAÜSTÜ */
+/* Ziyaretçi sayısı - SABİT BOYUT - LOGONUN YANINDA */
 .visitor-counts-navbar {
-    display: inline-flex;
-    align-items: center;
-    gap: clamp(5px, 0.7vw, 10px);
-    font-size: clamp(11px, 1.2vw, 15px);
-    font-weight: 600;
-    color: #fff;
-    margin-left: clamp(10px, 1.4vw, 20px);
-    background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.35);
-    padding: clamp(6px, 0.9vw, 11px) clamp(10px, 1.4vw, 18px);
-    border-radius: 999px;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,.12);
-    flex-shrink: 0;
-    white-space: nowrap;
-    width: auto;
-    min-width: fit-content;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    margin-left: 10px !important;
+    background: rgba(255, 255, 255, .18) !important;
+    border: 1px solid rgba(255, 255, 255, .35) !important;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    backdrop-filter: blur(4px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .1) !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    order: 2 !important;
 }
 
-/* Anlık yazısı - daha büyük ve belirgin */
+/* Anlık yazısı */
 .visitor-counts-navbar .anlik-label {
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
 }
 
 .visitor-counts-navbar span {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    line-height: 1;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    line-height: 1 !important;
+    font-size: 11px !important;
 }
 
 .visitor-counts-navbar .icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    font-size: 22px;
-    line-height: 1;
-    color: #01e11b;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    height: auto !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    color: #01e11b !important;
     background: transparent;
     border-radius: 0;
     box-shadow: none;
-    text-shadow: 0 0 6px rgba(1,225,27,.25);
+    text-shadow: 0 0 6px rgba(1, 225, 27, .25);
     margin-right: 5px;
 }
 
-/* Menü linkleri - MASAÜSTÜ */
+/* Menü linkleri - RESPONSIVE - ORTADA AMA BİRAZ SAĞA */
 .naav-linkss {
     display: flex;
     list-style: none;
-    gap: clamp(10px, 1.4vw, 28px);
-    margin: 0;
-    margin-left: clamp(20px, 3vw, 60px);
-    padding: 0 clamp(6px, 1vw, 12px);
+    gap: 1.5rem;
+    margin: 0 auto;
+    padding: 0 0 0 10%;
     align-items: center;
     flex: 1 1 auto;
     justify-content: center;
-    min-width: 0;
-    overflow: hidden;
+    order: 3;
 }
 
 .naav-linkss li {
@@ -405,55 +135,54 @@
 }
 
 .naav-linkss a {
-    color: white;
-    text-decoration: none;
-    font-size: clamp(12px, 1.3vw, 16px);
-    font-weight: 600;
+    color: white !important;
+    text-decoration: none !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.5 !important;
+    letter-spacing: normal !important;
+    text-shadow: 0 0 0.5px rgba(255, 255, 255, 0.5) !important;
     transition: color 0.3s;
+    white-space: nowrap;
 }
 
 .naav-linkss a:hover {
     color: #5fff00;
 }
 
-/* Auth butonları */
+/* Auth butonları - EN SAĞDA */
 .auth-buttoons {
     display: flex;
     align-items: center;
-    gap: clamp(8px, 1.2vw, 15px);
-    flex-shrink: 1;
-    margin-left: auto;
-    min-width: 0;
-    overflow: visible;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    margin-left: 0;
+    margin-right: 1%;
+    padding-right: 0;
+    order: 4;
 }
 
 .auth-buttoons .ilan-ver-btn {
-    padding: clamp(8px, 1.2vw, 13px) clamp(12px, 1.6vw, 22px);
-    font-size: clamp(12px, 1.2vw, 16px);
-    gap: clamp(5px, 0.7vw, 9px);
-    border-radius: clamp(18px, 2.4vw, 28px);
+    padding: 10px 18px;
+    font-size: 14px;
+    gap: 8px;
+    border-radius: 25px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .auth-buttoons .login {
-    padding: clamp(8px, 1.2vw, 13px) clamp(12px, 1.6vw, 22px);
-    font-size: clamp(12px, 1.2vw, 16px);
-    border-radius: clamp(5px, 0.7vw, 9px);
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .auth-buttoons .user-name {
-    padding: clamp(8px, 1.2vw, 13px) clamp(12px, 1.6vw, 22px);
-    font-size: clamp(12px, 1.2vw, 16px);
-    border-radius: clamp(5px, 0.7vw, 9px);
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
     white-space: nowrap;
-    max-width: none;
-    overflow: visible;
-    text-overflow: clip;
 }
 
 /* İlan Ver butonu */
@@ -579,17 +308,18 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
 
 .user-dropdown-content {
     display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
+    position: fixed !important;
+    top: 60px !important;
+    right: 0 !important;
+    left: auto !important;
     background: white;
     min-width: 200px;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    border-radius: 0 0 0 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     z-index: 99999;
     padding: 8px 0;
     list-style: none;
-    margin: 5px 0 0 0;
+    margin: 0;
 }
 
 .user-dropdown-content.show {
@@ -641,7 +371,7 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
     background: white;
     min-width: 200px;
     border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     z-index: 10001;
     padding: 8px 0;
     pointer-events: auto;
@@ -698,7 +428,7 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
     width: 40px;
     height: 40px;
     cursor: pointer;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 5px;
     flex-shrink: 0;
 }
@@ -717,18 +447,18 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
    Telefonda masaüstü görünümü seçildiğinde (yükseklik >= 1000px) bu stiller uygulanmaz
    TÜM MOBİL CİHAZLARDA AYNI GÖRÜNÜM
    ============================================ */
-@media (max-width: 991px) and (max-height: 999px) {
+@media (max-width: 991px) {
     .navbaar {
         padding: 8px 10px !important;
     }
-    
+
     .navbaar-container {
         flex-wrap: nowrap !important;
         gap: 6px !important;
         padding: 0 6px !important;
         align-items: center !important;
     }
-    
+
     /* Logo - mobil */
     .logo {
         flex-shrink: 0 !important;
@@ -737,104 +467,116 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
         align-items: center !important;
         gap: 6px !important;
     }
-    
+
     .logo img {
         height: 32px !important;
         width: auto !important;
     }
-    
-    /* Ziyaretçi sayısı - kompakt ve okunabilir */
+
+    /* Ziyaretçi sayısı - MOBİLDE KÜÇÜK GÖSTER */
     .visitor-counts-navbar {
-        font-size: 11px !important;
-        padding: 4px 8px !important;
+        font-size: 9px !important;
+        padding: 3px 5px !important;
         margin-left: 0 !important;
         margin-top: 0 !important;
         display: inline-flex !important;
         white-space: nowrap !important;
-        border-radius: 10px !important;
-        gap: 4px !important;
-        background: rgba(255,255,255,.25) !important;
+        border-radius: 8px !important;
+        gap: 2px !important;
+        background: rgba(255, 255, 255, .25) !important;
         width: auto !important;
         min-width: fit-content !important;
+        flex-shrink: 0 !important;
     }
-    
+
     .visitor-counts-navbar .icon {
-        font-size: 12px !important;
-        margin-right: 3px !important;
+        font-size: 10px !important;
+        margin-right: 2px !important;
     }
-    
+
     .visitor-counts-navbar span {
-        font-size: 11px !important;
+        font-size: 9px !important;
     }
-    
+
     /* Mobil menü butonu - MOBİLDE GÖSTER */
     .mobile-menu-btn,
-    #mobile-menu-btn {
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .navbaar #mobile-menu-btn,
+    nav.navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         width: 36px !important;
         height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
         padding: 6px !important;
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
         border-radius: 6px !important;
         cursor: pointer !important;
         flex-shrink: 0 !important;
         margin-left: 6px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
-    
+
     .mobile-menu-btn div,
-    #mobile-menu-btn div {
+    #mobile-menu-btn div,
+    .navbaar .mobile-menu-btn div {
+        display: block !important;
         width: 18px !important;
         height: 2px !important;
         background: white !important;
         margin: 2px 0 !important;
         border-radius: 1px !important;
     }
-    
+
     /* Menü linkleri - GİZLE */
     .naav-linkss {
         display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed !important;
+        top: 55px !important;
+        right: 0 !important;
+        left: auto !important;
         background: linear-gradient(135deg, #2563eb, #1d4ed8);
         flex-direction: column;
         min-width: 200px;
         padding: 10px 0;
-        border-radius: 0 0 10px 10px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        border-radius: 0 0 0 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         z-index: 9999;
         gap: 0;
         margin-left: 0;
     }
-    
+
     .naav-linkss.active {
         display: flex;
     }
-    
+
     .naav-linkss li {
         width: 100%;
     }
-    
+
     .naav-linkss a {
         display: block;
         padding: 14px 20px;
         font-size: 16px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .naav-linkss li:last-child a {
         border-bottom: none;
     }
-    
+
     /* Auth butonları - mobil */
     .auth-buttoons {
         gap: 6px !important;
         margin-left: auto;
     }
-    
+
     /* İlan Ver butonu - mobilde küçük tutulmalı */
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
@@ -844,28 +586,29 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
         border-radius: 15px !important;
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2) !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn i,
     .ilan-ver-btn i {
         display: none !important;
     }
-    
+
     .ilan-ver-btn .btn-text-hover {
         display: none !important;
     }
-    
-    .login, .user-name {
+
+    .login,
+    .user-name {
         padding: 6px 10px !important;
         font-size: 11px !important;
         border-width: 1px !important;
     }
-    
+
     .user-name {
         max-width: 80px !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
     }
-    
+
     /* Hamburger - GÖSTER */
     .hamburger {
         display: flex;
@@ -873,60 +616,37 @@ nav.navbaar .auth-buttoons .ilan-ver-btn:hover {
         width: 32px;
         height: 32px;
     }
-    
+
     .hamburger .line {
         width: 18px;
         height: 2px;
     }
-    
+
     /* Dropdown mobilde */
     .dropdown-content {
-        position: absolute;
-        top: calc(100% + 5px);
-        right: 0;
+        position: fixed !important;
+        top: 55px !important;
+        right: 0 !important;
+        left: auto !important;
         min-width: 180px;
+        border-radius: 0 0 0 8px;
+    }
+
+    /* User dropdown mobilde - sayfanın sağ kenarına yapışık */
+    .user-dropdown-content {
+        position: fixed !important;
+        top: 55px !important;
+        right: 0 !important;
+        left: auto !important;
+        min-width: 180px;
+        border-radius: 0 0 0 8px;
     }
 }
 
 /* ============================================
-   ÇOK KÜÇÜK MOBİL - 375px ve altı VE yükseklik 1000px'den küçük
+   ÇOK KÜÇÜK MOBİL - 375px ve altı
+   Bu bölüm artık kullanılmıyor, aşağıdaki daha güçlü media query kullanılıyor
    ============================================ */
-@media (max-width: 375px) and (max-height: 999px) {
-    .navbaar {
-        padding: 8px 8px;
-    }
-    
-    .logo img {
-        height: 42px;
-    }
-    
-    .visitor-counts-navbar {
-        font-size: 10px;
-        padding: 5px 8px;
-    }
-    
-    .visitor-counts-navbar .anlik-label {
-        font-size: 11px;
-        font-weight: 700;
-    }
-    
-    /* İlan Ver butonu - çok küçük ekranlarda */
-    .auth-buttoons .ilan-ver-btn,
-    .ilan-ver-btn {
-        padding: 5px 8px !important;
-        font-size: 10px !important;
-    }
-    
-    .login, .user-name {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-    
-    .hamburger {
-        width: 38px;
-        height: 38px;
-    }
-}
 
 
 /* ============================================
@@ -958,7 +678,8 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
 }
 
 /* Mobil - 991px ve altı VE yükseklik 1000px'den küçük */
-@media (max-width: 991px) and (max-height: 999px) {
+@media (max-width: 991px) {
+
     .navbaar .auth-buttoons .ilan-ver-btn,
     .navbaar .ilan-ver-btn,
     nav.navbaar .auth-buttoons .ilan-ver-btn {
@@ -970,8 +691,9 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
         min-width: auto !important;
         max-width: none !important;
         height: auto !important;
+        margin-top: 2px !important;
     }
-    
+
     .navbaar .auth-buttoons .ilan-ver-btn i,
     .navbaar .ilan-ver-btn i {
         display: none !important;
@@ -979,7 +701,8 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
 }
 
 /* Mobil - 768px ve altı VE yükseklik 1000px'den küçük */
-@media (max-width: 768px) and (max-height: 999px) {
+@media (max-width: 768px) {
+
     .navbaar .auth-buttoons .ilan-ver-btn,
     .navbaar .ilan-ver-btn,
     nav.navbaar .auth-buttoons .ilan-ver-btn {
@@ -994,7 +717,8 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
 }
 
 /* Küçük mobil - 480px ve altı VE yükseklik 1000px'den küçük */
-@media (max-width: 480px) and (max-height: 999px) {
+@media (max-width: 480px) {
+
     .navbaar .auth-buttoons .ilan-ver-btn,
     .navbaar .ilan-ver-btn,
     nav.navbaar .auth-buttoons .ilan-ver-btn {
@@ -1008,19 +732,7 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
     }
 }
 
-/* Çok küçük mobil - 375px ve altı VE yükseklik 1000px'den küçük */
-@media (max-width: 375px) and (max-height: 999px) {
-    .navbaar .auth-buttoons .ilan-ver-btn,
-    .navbaar .ilan-ver-btn,
-    nav.navbaar .auth-buttoons .ilan-ver-btn {
-        padding: 5px 8px !important;
-        font-size: 10px !important;
-        width: auto !important;
-        min-width: auto !important;
-        max-width: none !important;
-        height: auto !important;
-    }
-}
+/* Çok küçük mobil - 375px - Bu bölüm artık kullanılmıyor */
 
 
 /* ============================================
@@ -1064,14 +776,14 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
 }
 
 /* Mobil - post-ad stilleri */
-@media (max-width: 991px) and (max-height: 999px) {
+@media (max-width: 991px) {
     .post-ad-container {
         display: inline-flex !important;
         align-items: center !important;
         position: relative !important;
         flex-shrink: 1 !important;
     }
-    
+
     .auth-buttoons .post-ad,
     .auth-buttons .post-ad {
         display: inline-flex !important;
@@ -1089,7 +801,7 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
         border-radius: 6px !important;
         text-decoration: none !important;
     }
-    
+
     .free-tag {
         position: absolute !important;
         top: -6px !important;
@@ -1111,16 +823,17 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
    ilandet.css ile çakışan stilleri düzeltir
    ============================================ */
 
-/* Menü linkleri - ilandet.css override */
+/* Menü linkleri - ilandet.css override - RESPONSIVE */
 .navbaar .naav-linkss a {
     top: 0 !important;
     position: relative !important;
-    font-size: clamp(12px, 1.3vw, 16px) !important;
-    padding: 5px 0 !important;
+    font-size: 1rem !important;
+    padding: 0.3rem 0 !important;
     line-height: 1.4 !important;
     display: inline-block !important;
     overflow: visible !important;
     text-overflow: clip !important;
+    white-space: nowrap !important;
 }
 
 /* Navbar container overflow fix */
@@ -1144,205 +857,252 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
    ============================================ */
 
 /* 375px ve altı - iPhone SE, küçük telefonlar */
-@media (max-width: 375px) and (max-height: 999px) {
+@media (max-width: 375px) {
     .navbaar {
-        padding: 6px 6px !important;
+        padding: 3px 2px !important;
+        overflow: hidden !important;
+        max-width: 100vw !important;
     }
-    
+
     .navbaar-container {
-        gap: 4px !important;
-        padding: 0 4px !important;
+        gap: 2px !important;
+        padding: 0 2px !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
+        justify-content: space-between !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
     }
-    
-    /* Logo - sadece resim, yan yana */
+
+    /* Logo - daha küçük */
     .logo {
         flex-shrink: 0 !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 4px !important;
+        gap: 2px !important;
     }
-    
+
     .logo img {
-        height: 28px !important;
+        height: 20px !important;
         width: auto !important;
     }
-    
-    /* Ziyaretçi sayısı - kompakt, sadece sayı ve ikon */
+
+    /* Ziyaretçi sayısı - ÇOK KÜÇÜK AMA GÖRÜNÜR */
     .visitor-counts-navbar {
-        font-size: 10px !important;
-        padding: 3px 6px !important;
+        font-size: 6px !important;
+        padding: 1px 3px !important;
         margin-left: 0 !important;
         margin-top: 0 !important;
         display: inline-flex !important;
         white-space: nowrap !important;
-        border-radius: 8px !important;
-        gap: 3px !important;
-        background: rgba(255,255,255,.25) !important;
+        border-radius: 4px !important;
+        gap: 1px !important;
+        background: rgba(255, 255, 255, .25) !important;
+        flex-shrink: 0 !important;
     }
-    
+
     .visitor-counts-navbar .icon {
-        font-size: 11px !important;
-        margin-right: 2px !important;
+        font-size: 7px !important;
+        margin-right: 1px !important;
     }
-    
-    /* "Anlık:" yazısını gizle, sadece sayıyı göster */
+
     .visitor-counts-navbar span {
-        font-size: 10px !important;
+        font-size: 6px !important;
     }
-    
-    /* Auth butonları - daha kompakt */
+
+    /* Auth butonları - DAHA KOMPAKT */
     .auth-buttoons {
-        gap: 4px !important;
+        gap: 1px !important;
         margin-left: auto !important;
-        flex-shrink: 1 !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
     }
-    
-    /* İlan Ver butonu - çok küçük */
+
+    /* İlan Ver butonu - EN KÜÇÜK */
     .auth-buttoons .ilan-ver-btn,
-    .ilan-ver-btn {
-        padding: 5px 8px !important;
-        font-size: 10px !important;
-        gap: 2px !important;
-        border-radius: 12px !important;
+    .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    nav.navbaar .auth-buttoons .ilan-ver-btn {
+        padding: 1px 3px !important;
+        font-size: 5px !important;
+        gap: 0 !important;
+        border-radius: 3px !important;
+        box-shadow: none !important;
+        line-height: 1.2 !important;
     }
-    
+
     .ilan-ver-btn i {
         display: none !important;
     }
-    
+
     .ilan-ver-btn .btn-text-hover {
         display: none !important;
     }
-    
-    /* Giriş Yap butonu - küçük */
+
+    /* Giriş Yap butonu - EN KÜÇÜK */
     .login {
-        padding: 5px 8px !important;
-        font-size: 10px !important;
+        padding: 1px 3px !important;
+        font-size: 5px !important;
         border-width: 1px !important;
+        line-height: 1.2 !important;
     }
-    
-    /* Kullanıcı adı - küçük */
+
+    /* Kullanıcı adı (S.FATİH TÜMEN) - EN KÜÇÜK */
     .user-name {
-        padding: 5px 8px !important;
-        font-size: 10px !important;
+        padding: 1px 2px !important;
+        font-size: 5px !important;
         border-width: 1px !important;
-        max-width: 70px !important;
+        max-width: 35px !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
     }
-    
-    /* Mobil menü butonu - küçük */
+
+    /* Mobil menü butonu - KESİNLİKLE GÖRÜNÜR */
     .mobile-menu-btn,
-    #mobile-menu-btn {
-        width: 30px !important;
-        height: 30px !important;
-        padding: 5px !important;
-        margin-left: 3px !important;
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .navbaar #mobile-menu-btn,
+    nav.navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        min-height: 18px !important;
+        padding: 2px !important;
+        margin-left: 1px !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-radius: 2px !important;
+        flex-shrink: 0 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
-    
+
     .mobile-menu-btn div,
-    #mobile-menu-btn div {
-        width: 16px !important;
-        height: 2px !important;
+    #mobile-menu-btn div,
+    .navbaar .mobile-menu-btn div {
+        display: block !important;
+        width: 10px !important;
+        height: 1px !important;
+        background: white !important;
+        margin: 1px 0 !important;
+        border-radius: 1px !important;
     }
 }
 
 /* 360px ve altı - Galaxy S8, çok küçük telefonlar */
-@media (max-width: 360px) and (max-height: 999px) {
+@media (max-width: 360px) {
     .navbaar {
-        padding: 5px 4px !important;
+        padding: 4px 3px !important;
     }
-    
+
     .navbaar-container {
-        gap: 3px !important;
-        padding: 0 3px !important;
+        gap: 2px !important;
+        padding: 0 2px !important;
     }
-    
+
     .logo img {
-        height: 26px !important;
+        height: 24px !important;
     }
-    
+
     /* Ziyaretçi sayısı - kompakt */
     .visitor-counts-navbar {
-        font-size: 9px !important;
-        padding: 3px 5px !important;
+        font-size: 7px !important;
+        padding: 2px 3px !important;
         margin-left: 0 !important;
         display: inline-flex !important;
     }
-    
+
     .visitor-counts-navbar .icon {
-        font-size: 10px !important;
+        font-size: 8px !important;
     }
-    
+
     .auth-buttoons {
-        gap: 3px !important;
+        gap: 2px !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
-        padding: 5px 7px !important;
-        font-size: 9px !important;
+        padding: 2px 4px !important;
+        font-size: 7px !important;
     }
-    
+
     .login {
-        padding: 4px 7px !important;
-        font-size: 9px !important;
+        padding: 2px 4px !important;
+        font-size: 7px !important;
     }
-    
+
     .user-name {
-        padding: 4px 7px !important;
-        font-size: 9px !important;
-        max-width: 60px !important;
+        padding: 2px 4px !important;
+        font-size: 7px !important;
+        max-width: 45px !important;
     }
-    
+
     .mobile-menu-btn,
-    #mobile-menu-btn {
-        width: 28px !important;
-        height: 28px !important;
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        min-height: 24px !important;
+        padding: 3px !important;
+        margin-left: 2px !important;
+    }
+
+    .mobile-menu-btn div,
+    #mobile-menu-btn div {
+        width: 12px !important;
+        height: 2px !important;
+        margin: 1px 0 !important;
     }
 }
 
 /* 320px ve altı - iPhone 5/SE eski, çok eski telefonlar */
-@media (max-width: 320px) and (max-height: 999px) {
+@media (max-width: 320px) {
     .navbaar {
         padding: 4px 3px !important;
     }
-    
+
     .logo img {
         height: 24px !important;
     }
-    
+
     /* Ziyaretçi sayısı - en küçük ama okunabilir */
     .visitor-counts-navbar {
         font-size: 8px !important;
         padding: 2px 4px !important;
         display: inline-flex !important;
     }
-    
+
     .visitor-counts-navbar .icon {
         font-size: 9px !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
         padding: 4px 6px !important;
         font-size: 8px !important;
     }
-    
+
     .login {
         padding: 4px 6px !important;
         font-size: 8px !important;
     }
-    
+
     .user-name {
         padding: 4px 6px !important;
         font-size: 8px !important;
         max-width: 50px !important;
     }
-    
+
     .mobile-menu-btn,
     #mobile-menu-btn {
         width: 26px !important;
@@ -1354,40 +1114,40 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
    ORTA BOY TELEFONLAR - 376px - 414px
    iPhone 6/7/8, iPhone X, Pixel
    ============================================ */
-@media (min-width: 376px) and (max-width: 414px) and (max-height: 999px) {
+@media (min-width: 376px) and (max-width: 414px) {
     .navbaar {
         padding: 10px 10px !important;
     }
-    
+
     .navbaar-container {
         gap: 8px !important;
     }
-    
+
     .logo img {
         height: 40px !important;
     }
-    
+
     .visitor-counts-navbar {
         font-size: 10px !important;
         padding: 5px 8px !important;
         margin-left: 5px !important;
     }
-    
+
     .auth-buttoons {
         gap: 6px !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
         padding: 7px 10px !important;
         font-size: 11px !important;
     }
-    
+
     .login {
         padding: 6px 10px !important;
         font-size: 11px !important;
     }
-    
+
     .user-name {
         padding: 6px 10px !important;
         font-size: 11px !important;
@@ -1401,31 +1161,31 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
    BÜYÜK TELEFONLAR - 415px - 480px
    iPhone Plus, iPhone Pro Max, Galaxy Note
    ============================================ */
-@media (min-width: 415px) and (max-width: 480px) and (max-height: 999px) {
+@media (min-width: 415px) and (max-width: 480px) {
     .navbaar {
         padding: 10px 12px !important;
     }
-    
+
     .logo img {
         height: 45px !important;
     }
-    
+
     .visitor-counts-navbar {
         font-size: 11px !important;
         padding: 6px 10px !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
         padding: 8px 12px !important;
         font-size: 12px !important;
     }
-    
+
     .login {
         padding: 7px 12px !important;
         font-size: 12px !important;
     }
-    
+
     .user-name {
         padding: 7px 12px !important;
         font-size: 12px !important;
@@ -1437,31 +1197,31 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
    TABLET - 481px - 768px
    iPad Mini, küçük tabletler
    ============================================ */
-@media (min-width: 481px) and (max-width: 768px) and (max-height: 999px) {
+@media (min-width: 481px) and (max-width: 768px) {
     .navbaar {
         padding: 12px 15px !important;
     }
-    
+
     .logo img {
         height: 50px !important;
     }
-    
+
     .visitor-counts-navbar {
         font-size: 12px !important;
         padding: 7px 12px !important;
     }
-    
+
     .auth-buttoons .ilan-ver-btn,
     .ilan-ver-btn {
         padding: 8px 14px !important;
         font-size: 13px !important;
     }
-    
+
     .login {
         padding: 8px 14px !important;
         font-size: 13px !important;
     }
-    
+
     .user-name {
         padding: 8px 14px !important;
         font-size: 13px !important;
@@ -1482,35 +1242,37 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
     display: none !important;
 }
 
-/* 375px ve altı: "Anlık:" gizle, sadece sayı göster */
-@media (max-width: 375px) and (max-height: 999px) {
+/* 375px ve altı: Anlık yazısı GÖRÜNÜR kalacak, sadece küçültülecek */
+@media (max-width: 375px) {
     .anlik-text {
-        display: none !important;
+        display: inline !important;
+        font-size: 6px !important;
     }
-    
+
     .anlik-text-short {
         display: none !important;
     }
-    
-    /* Göz ikonunu da gizle, sadece sayı kalsın */
+
+    /* Göz ikonu küçük */
     .visitor-counts-navbar .icon {
         display: inline !important;
-        font-size: 12px !important;
+        font-size: 7px !important;
     }
 }
 
-/* 320px ve altı: Sadece sayı */
-@media (max-width: 320px) and (max-height: 999px) {
+/* 320px ve altı: Anlık yazısı hala görünür */
+@media (max-width: 320px) {
     .anlik-text {
-        display: none !important;
+        display: inline !important;
+        font-size: 5px !important;
     }
-    
+
     .anlik-text-short {
         display: none !important;
     }
-    
+
     .visitor-counts-navbar .icon {
-        font-size: 10px !important;
+        font-size: 6px !important;
     }
 }
 
@@ -1545,20 +1307,919 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1);
     }
 }
 
 /* Mobil görünümde badge */
-@media (max-width: 991px) and (max-height: 999px) {
+@media (max-width: 991px) {
     .navbaar .naav-linkss .nav-item-with-badge .new-badge {
         font-size: 8px !important;
         padding: 1px 4px !important;
         top: -6px !important;
         right: -8px !important;
+    }
+}
+
+
+/* ============================================
+   MASAÜSTÜ - RESPONSIVE REM/%
+   Ekran 992px ve üstünde
+   Sol: Logo + Anlık | Sağ: Menü + Butonlar
+   ============================================ */
+@media (min-width: 992px) {
+    .navbaar {
+        padding: 0.8rem 1% !important;
+    }
+
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        gap: 0.5% !important;
+        /* Reduced gap */
+        padding: 0 0.5% !important;
+        flex-wrap: nowrap !important;
+    }
+
+    /* SOL KISIM: Logo + Anlık */
+    .logo {
+        flex-shrink: 0 !important;
+        order: 1 !important;
+        margin-right: 0 !important;
+    }
+
+    .logo img {
+        height: 2.5rem !important;
+        /* Smaller logo */
+        width: auto !important;
+    }
+
+    .visitor-counts-navbar {
+        font-size: 0.75rem !important;
+        /* Smaller text */
+        padding: 0.4rem 0.6rem !important;
+        margin-left: 0.5% !important;
+        flex-shrink: 0 !important;
+        order: 2 !important;
+    }
+
+    /* SAĞ KISIM: Menü linkleri - Compacter */
+    .naav-linkss {
+        display: flex !important;
+        position: static !important;
+        background: transparent !important;
+        flex-direction: row !important;
+        gap: 0.8rem !important;
+        /* Much smaller gap */
+        margin: 0 auto !important;
+        padding: 0 1% !important;
+        /* Reduced padding */
+        order: 3 !important;
+        flex: 1 1 auto !important;
+        justify-content: center !important;
+    }
+
+    .naav-linkss li {
+        flex-shrink: 1 !important;
+        /* Allow shrinking */
+    }
+
+    .naav-linkss a {
+        font-size: 0.9rem !important;
+        /* Smaller font */
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+    }
+
+    /* Auth butonları - EN SAĞDA */
+    .auth-buttoons {
+        flex-shrink: 0 !important;
+        order: 4 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        gap: 0.5rem !important;
+    }
+
+    .auth-buttoons .ilan-ver-btn {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .login,
+    .user-name {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+}
+
+/* Restore spacious layout for larger screens */
+@media (min-width: 1200px) {
+    .navbaar {
+        padding: 1.25rem 1% !important;
+    }
+
+    .navbaar-container {
+        gap: 2% !important;
+        padding: 0 1% !important;
+    }
+
+    .logo img {
+        height: 3.125rem !important;
+    }
+
+    .visitor-counts-navbar {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 0.875rem !important;
+    }
+
+    .naav-linkss {
+        gap: 1.5rem !important;
+        padding: 0 5% !important;
+    }
+
+    .naav-linkss a {
+        font-size: 1.0625rem !important;
+        font-weight: 700 !important;
+    }
+
+    .auth-buttoons {
+        gap: 0.75rem !important;
+    }
+
+    .auth-buttoons .ilan-ver-btn {
+        padding: 10px 18px !important;
+        font-size: 14px !important;
+    }
+
+    .login,
+    .user-name {
+        padding: 10px 18px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* ============================================
+   YÜKSEK ÇÖZÜNÜRLÜKLÜ EKRANLAR (LARGE DESKTOPS)
+   User Request: Navlink yazılarını büyüt
+   ============================================ */
+@media (min-width: 1400px) {
+    .naav-linkss a {
+        font-size: 1.25rem !important;
+        /* ~20px */
+    }
+}
+
+@media (min-width: 1600px) {
+    .naav-linkss a {
+        font-size: 1.35rem !important;
+        /* ~22px */
+    }
+}
+
+@media (max-width: 991px) {
+    .d-mobile-none {
+        display: none;
+    }
+
+    .d-mobile-block {
+        display: block;
+    }
+
+    .d-mobile-flex {
+        display: flex;
+    }
+}
+
+@media (min-width: 992px) {
+    .d-desktop-none {
+        display: none;
+    }
+
+    .d-desktop-block {
+        display: block;
+    }
+
+    .d-desktop-flex {
+        display: flex;
+    }
+}
+
+/* ============================================
+   MOBİL MENÜ DÜZELTMESİ
+   User Request: Mobilde menü yazıları sola çok yaslı
+   ============================================ */
+@media (max-width: 991px) {
+    .navbaar .naav-linkss a {
+        display: block !important;
+        padding-left: 25px !important;
+        padding-right: 25px !important;
+        box-sizing: border-box !important;
+    }
+}
+
+
+/* ============================================
+   TELEFONDA MASAÜSTÜ GÖRÜNÜMÜ - YÜKSEKLİK BAZLI
+   Kullanıcı telefondan "Masaüstü Görünümü" seçtiğinde
+   viewport yüksekliği artar (genellikle 1200px+)
+   Bu durumda dar ekranda bile masaüstü layout gösterilir
+   ============================================ */
+
+/* Yükseklik >= 1200px VE genişlik <= 991px ise MASAÜSTÜ görünümü */
+@media (max-width: 991px) and (min-height: 1200px) {
+
+    /* Navbar - masaüstü layout */
+    .navbaar {
+        padding: 4px 3px !important;
+    }
+
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+        padding: 0 4px !important;
+    }
+
+    /* Logo */
+    .logo {
+        flex-shrink: 0 !important;
+        order: 1 !important;
+    }
+
+    .logo img {
+        height: 20px !important;
+    }
+
+    /* Ziyaretçi sayısı - GİZLE */
+    .visitor-counts-navbar {
+        display: none !important;
+    }
+
+    /* Mobil menü butonu - GİZLE */
+    .mobile-menu-btn,
+    #mobile-menu-btn {
+        display: none !important;
+    }
+
+    /* Hamburger - GİZLE */
+    .hamburger {
+        display: none !important;
+    }
+
+    /* Menü linkleri */
+    .naav-linkss,
+    .navbaar .naav-linkss,
+    nav.navbaar .naav-linkss {
+        display: flex !important;
+        position: static !important;
+        background: transparent !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        order: 2 !important;
+        flex: 1 1 auto !important;
+        justify-content: center !important;
+        align-items: center !important;
+        min-width: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    .naav-linkss li,
+    .navbaar .naav-linkss li {
+        width: auto !important;
+        flex-shrink: 0 !important;
+        list-style: none !important;
+    }
+
+    .naav-linkss a,
+    .naav-linkss li a,
+    .navbaar .naav-linkss a,
+    .navbaar .naav-linkss li a {
+        display: inline-block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 8px !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        border-bottom: none !important;
+        color: white !important;
+        line-height: 1.2 !important;
+        top: 0 !important;
+    }
+
+    /* Auth butonları - hizalı */
+    .auth-buttoons {
+        flex-shrink: 0 !important;
+        order: 3 !important;
+        margin: 0 !important;
+        gap: 4px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .auth-buttoons .ilan-ver-btn,
+    .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    nav.navbaar .auth-buttoons .ilan-ver-btn {
+        padding: 3px 6px !important;
+        font-size: 7px !important;
+        gap: 0 !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 16px !important;
+        vertical-align: middle !important;
+        margin-top: 5px !important;
+    }
+
+    .ilan-ver-btn i {
+        display: none !important;
+    }
+
+    .login,
+    .user-name,
+    .auth-buttoons .login,
+    .auth-buttoons .user-name {
+        padding: 3px 6px !important;
+        font-size: 7px !important;
+        border-width: 1px !important;
+        border-radius: 4px !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 16px !important;
+        vertical-align: middle !important;
+    }
+
+    /* Anlık yazısını göster */
+    .anlik-text,
+    .anlik-text-short {
+        display: inline !important;
+    }
+
+    /* Badge gizle */
+    .naav-linkss .nav-item-with-badge .new-badge,
+    .navbaar .naav-linkss .nav-item-with-badge .new-badge {
+        display: none !important;
+    }
+}
+
+
+
+/* ============================================
+   375px ÖZEL - EN YÜKSEK ÖNCELİK
+   Bu media query dosyanın en sonunda olduğu için
+   diğer tüm stilleri override eder
+   ============================================ */
+@media (max-width: 375px) {
+    .navbaar {
+        padding: 2px 1px !important;
+        overflow: hidden !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+    }
+
+    .navbaar-container {
+        gap: 1px !important;
+        padding: 0 1px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        max-width: 375px !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    .logo {
+        flex-shrink: 0 !important;
+        gap: 1px !important;
+    }
+
+    .logo img {
+        height: 18px !important;
+    }
+
+    .visitor-counts-navbar {
+        font-size: 9px !important;
+        padding: 2px 4px !important;
+        gap: 2px !important;
+        border-radius: 3px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .visitor-counts-navbar .icon {
+        font-size: 9px !important;
+        margin-right: 2px !important;
+    }
+
+    .visitor-counts-navbar span {
+        font-size: 9px !important;
+    }
+
+    .auth-buttoons {
+        gap: 1px !important;
+        margin-left: auto !important;
+        flex-shrink: 0 !important;
+    }
+
+    .auth-buttoons .ilan-ver-btn,
+    .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    nav.navbaar .auth-buttoons .ilan-ver-btn {
+        padding: 1px 2px !important;
+        font-size: 5px !important;
+        border-radius: 2px !important;
+        box-shadow: none !important;
+        line-height: 1 !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    .ilan-ver-btn i {
+        display: none !important;
+    }
+
+    .login {
+        padding: 1px 2px !important;
+        font-size: 5px !important;
+        border-width: 1px !important;
+        line-height: 1 !important;
+    }
+
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 1px 2px !important;
+        font-size: 5px !important;
+        border-width: 1px !important;
+        max-width: 30px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1 !important;
+        height: auto !important;
+    }
+
+    .mobile-menu-btn,
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .navbaar #mobile-menu-btn,
+    nav.navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+        padding: 2px !important;
+        margin-left: 1px !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-radius: 2px !important;
+        flex-shrink: 0 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .mobile-menu-btn div,
+    #mobile-menu-btn div,
+    .navbaar .mobile-menu-btn div {
+        display: block !important;
+        width: 10px !important;
+        height: 1px !important;
+        background: white !important;
+        margin: 1px 0 !important;
+    }
+}
+
+
+/* ============================================
+   400px ALTI - BUTONLAR KÜÇÜK, MENÜ BUTONU SOLA
+   EN SON EKLENEN - EN YÜKSEK ÖNCELİK
+   ============================================ */
+@media (max-width: 400px) {
+
+    /* Navbar container - sağ padding azalt */
+    .navbaar-container {
+        padding-right: 8px !important;
+    }
+
+    /* İlan Ver butonu - KÜÇÜLT */
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn,
+    nav.navbaar .auth-buttoons .ilan-ver-btn {
+        padding: 4px 8px !important;
+        font-size: 9px !important;
+    }
+
+    /* Kullanıcı adı (S.FATİH TÜMEN) - KÜÇÜLT ve HİZALA */
+    .user-name,
+    .auth-buttoons .user-name,
+    .navbaar .auth-buttoons .user-name {
+        padding: 6px 6px !important;
+        font-size: 9px !important;
+        max-width: 50px !important;
+        margin-top: 2px !important;
+    }
+
+    /* Giriş Yap butonu - KÜÇÜLT */
+    .login,
+    .auth-buttoons .login {
+        padding: 4px 8px !important;
+        font-size: 9px !important;
+    }
+
+    /* Auth butonları gap - KÜÇÜLT */
+    .auth-buttoons {
+        gap: 4px !important;
+    }
+
+    /* Menü butonu - SOLA ÇEK */
+    .mobile-menu-btn,
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
+        margin-right: 8px !important;
+        margin-left: 4px !important;
+    }
+
+    /* İlan Ver butonu hizalama */
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn {
+        margin-top: 2px !important;
+    }
+}
+
+
+/* ============================================
+   375px VE ALTI - EN SON, EN YÜKSEK ÖNCELİK
+   ============================================ */
+@media (max-width: 375px) {
+
+    /* İlan Ver ve User-name aynı hizada */
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn,
+    .navbaar .ilan-ver-btn,
+    .navbaar .auth-buttoons .ilan-ver-btn,
+    nav.navbaar .auth-buttoons .ilan-ver-btn {
+        padding: 2px 4px !important;
+        font-size: 6px !important;
+    }
+
+    .user-name,
+    .auth-buttoons .user-name,
+    .navbaar .auth-buttoons .user-name,
+    nav.navbaar .auth-buttoons .user-name,
+    .navbaar-container .auth-buttoons .user-name {
+        padding: 3px 4px !important;
+        font-size: 6px !important;
+        max-width: 35px !important;
+        margin-top: -1px !important;
+    }
+
+    .login,
+    .auth-buttoons .login {
+        padding: 2px 4px !important;
+        font-size: 6px !important;
+    }
+
+    .mobile-menu-btn,
+    #mobile-menu-btn,
+    .navbaar .mobile-menu-btn,
+    .auth-buttoons .mobile-menu-btn {
+        margin-right: 6px !important;
+        margin-left: 2px !important;
+    }
+}
+
+
+/* ============================================
+   MOBİL ANLIK YAZISI - EN YÜKSEK ÖNCELİK
+   ============================================ */
+@media (max-width: 991px) {
+    .visitor-counts-navbar {
+        display: flex !important;
+        align-items: center !important;
+        font-size: 11px !important;
+        padding: 4px 8px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-radius: 5px !important;
+        gap: 3px !important;
+    }
+
+    .visitor-counts-navbar .icon {
+        display: inline !important;
+        font-size: 11px !important;
+        margin-right: 3px !important;
+    }
+
+    .visitor-counts-navbar span,
+    .visitor-counts-navbar .anlik-text,
+    .visitor-counts-navbar .anlik-label {
+        display: inline !important;
+        font-size: 11px !important;
+    }
+
+    .anlik-text,
+    .anlik-text-short {
+        display: inline !important;
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    /* Navbar */
+    .navbaar {
+        padding: 6px 0 !important;
+    }
+
+    /* Navbar container */
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 0 5px !important;
+        gap: 0 !important;
+        width: 100% !important;
+        position: relative !important;
+    }
+
+    /* Logo - daha küçük */
+    .logo {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 3px !important;
+    }
+
+    .logo img {
+        height: 24px !important;
+        width: auto !important;
+    }
+
+    /* Anlık sayacı - çok kompakt */
+    .visitor-counts-navbar {
+        display: flex !important;
+        align-items: center !important;
+        font-size: 8px !important;
+        padding: 2px 4px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-radius: 4px !important;
+        gap: 2px !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        margin-left: 3px !important;
+    }
+
+    .visitor-counts-navbar .icon {
+        display: inline !important;
+        font-size: 8px !important;
+        margin-right: 2px !important;
+    }
+
+    .visitor-counts-navbar span,
+    .visitor-counts-navbar .anlik-text,
+    .visitor-counts-navbar .anlik-label {
+        display: inline !important;
+        font-size: 8px !important;
+    }
+
+    .anlik-text,
+    .anlik-text-short {
+        display: inline !important;
+        font-size: 8px !important;
+    }
+
+    /* Nav links gizle */
+    .naav-linkss {
+        display: none !important;
+    }
+
+    /* Auth butonları - SAĞA YAPIŞTIR */
+    .auth-buttoons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        position: absolute !important;
+        right: 5px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+
+    /* İlan Ver butonu - küçük */
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn {
+        padding: 5px 8px !important;
+        font-size: 9px !important;
+        white-space: nowrap !important;
+    }
+
+    .ilan-ver-btn .btn-text {
+        font-size: 9px !important;
+    }
+
+    .ilan-ver-btn i {
+        font-size: 9px !important;
+        margin-right: 2px !important;
+    }
+
+    /* Kullanıcı adı - küçük */
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 5px 8px !important;
+        font-size: 9px !important;
+        max-width: 90px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* Hamburger menü */
+    .mobile-menu-btn {
+        width: 32px !important;
+        height: 32px !important;
+        margin-left: 4px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .mobile-menu-btn div {
+        width: 18px !important;
+        height: 2px !important;
+    }
+}
+
+
+@media (max-width: 400px) {
+    /* Navbar - tam genişlik, padding yok */
+    .navbaar {
+        padding: 8px 0 !important;
+    }
+
+    /* Navbar container - sağa yasla */
+    .navbaar-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 0 5px !important;
+        gap: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Logo alanı */
+    .logo {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+    }
+
+    .logo img {
+        height: 28px !important;
+        width: auto !important;
+    }
+
+    /* Anlık sayacı */
+    .visitor-counts-navbar {
+        font-size: 9px !important;
+        padding: 3px 6px !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        margin-left: 5px !important;
+        margin-right: 0 !important;
+    }
+
+    .visitor-counts-navbar .icon,
+    .visitor-counts-navbar span,
+    .visitor-counts-navbar .anlik-text,
+    .visitor-counts-navbar .anlik-label,
+    .anlik-text,
+    .anlik-text-short {
+        font-size: 9px !important;
+    }
+
+    /* Nav links gizle */
+    .naav-linkss {
+        display: none !important;
+    }
+
+    /* Auth butonları - SAĞA YAPIŞTIR */
+    .auth-buttoons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+        flex-shrink: 0 !important;
+        position: absolute !important;
+        right: 5px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+
+    /* İlan Ver butonu */
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn {
+        padding: 6px 10px !important;
+        font-size: 10px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Kullanıcı adı */
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 6px 10px !important;
+        font-size: 10px !important;
+        max-width: 100px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+
+    /* Hamburger menü */
+    .mobile-menu-btn {
+        margin-left: 5px !important;
+        flex-shrink: 0 !important;
+    }
+}
+
+
+/* 320px ve altı - çok küçük ekranlar */
+@media (max-width: 320px) {
+    .navbaar {
+        padding: 5px 0 !important;
+    }
+
+    .navbaar-container {
+        padding: 0 3px !important;
+        gap: 0 !important;
+        position: relative !important;
+    }
+
+    .logo img {
+        height: 20px !important;
+    }
+
+    .visitor-counts-navbar {
+        font-size: 7px !important;
+        padding: 2px 3px !important;
+        margin-left: 2px !important;
+    }
+
+    .visitor-counts-navbar .icon,
+    .visitor-counts-navbar span {
+        font-size: 7px !important;
+    }
+
+    /* Auth butonları - SAĞA YAPIŞTIR */
+    .auth-buttoons {
+        gap: 3px !important;
+        position: absolute !important;
+        right: 3px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+
+    .ilan-ver-btn,
+    .auth-buttoons .ilan-ver-btn {
+        padding: 4px 6px !important;
+        font-size: 8px !important;
+    }
+
+    .user-name,
+    .auth-buttoons .user-name {
+        padding: 4px 6px !important;
+        font-size: 8px !important;
+        max-width: 70px !important;
+    }
+
+    .mobile-menu-btn {
+        width: 28px !important;
+        height: 28px !important;
     }
 }

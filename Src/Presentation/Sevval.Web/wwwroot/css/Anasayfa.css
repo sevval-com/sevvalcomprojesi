@@ -71,7 +71,7 @@ img {
     /* Hover durumunda biraz büyüme */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
 
     .logo span {
         display: none;
@@ -114,7 +114,7 @@ img {
 }
 
 /* Mobil görünüm için stil ayarları - % tabanlı responsive */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     body {
         max-width: 100%;
         /* Mobil cihazlar için tam genişlik */
@@ -140,12 +140,16 @@ img {
         /* Alt boşluk % olarak */
         right: 3%;
         /* Sağ boşluk % olarak */
+        width: auto !important;
+        height: auto !important;
     }
 
     .whatsapp-image {
         width: 15vw;
         max-width: 60px;
         /* Mobil görünümde viewport bazlı */
+        height: auto !important;
+        object-fit: contain;
     }
 
     .hero-section {
@@ -442,7 +446,7 @@ img {
 
 
 /* Mobil CSS - % tabanlı responsive */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .nav-links {
         display: none;
         flex-direction: column;
@@ -695,7 +699,7 @@ img {
 }
 
 /* Mobil cihazlar için düzenlemeler */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 991px) {
     .popup-content {
         width: 90%;
         /* Pop-up genişliği mobilde %90'a düştü */
@@ -3936,7 +3940,9 @@ body {
     /* Arama alanı ile arasına boşluk */
     margin-top: -10px;
     /* Yukarı almak için negatif margin */
-}/* Mobil görünüm için */
+}
+
+/* Mobil görünüm için */
 @media (max-width: 768px) {
     .tagline {
         font-size: 150%;
@@ -4502,7 +4508,7 @@ body {
     }
 
     .naav-linkss a:hover {
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
     }
 
     .kategori {
@@ -4808,7 +4814,7 @@ body {
     .background-murat {
         height: 496px;
         background-position: center 30% !important;
-    
+
     }
 
     .sehir-kart {
@@ -7156,6 +7162,10 @@ button:hover {
 
 
 @media screen and (max-width: 768px) {
+    .floating-offer-link {
+        left: 25px;
+    }
+
     .offer-right {
         position: absolute;
         top: -10vw;
@@ -8293,7 +8303,7 @@ button:focus {
     }
 
     .naav-linkss a:hover {
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
     }
 
 
@@ -9821,7 +9831,7 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 
     .naav-linkss a:hover {
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
     }
 
     .auth-buttoons {
@@ -9878,7 +9888,7 @@ an Ver butonu container ve ücretsiz etiketi */
     }
 
     .naav-linkss a:hover {
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
     }
 
     .naav-linkss li:last-child a {
@@ -10097,7 +10107,7 @@ enleme - Hamburger menü İlan Ver yanında */
     }
 
     .naav-linkss a:hover {
-        background: rgba(255,255,255,0.15) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
     }
 
     .naav-linkss li:last-child a {
@@ -10477,7 +10487,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
     width: 44px;
     height: 44px;
     padding: 8px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     cursor: pointer;
     flex-shrink: 0;
@@ -10495,6 +10505,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
 
 /* Mobil - 991px ve altı */
 @media (max-width: 991px) {
+
     /* Mobil menü butonunu göster */
     .mobile-menu-btn {
         display: flex !important;
@@ -10504,13 +10515,13 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         width: 44px !important;
         height: 44px !important;
         padding: 8px !important;
-        background: rgba(255,255,255,0.25) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
         border-radius: 6px !important;
         cursor: pointer !important;
         flex-shrink: 0 !important;
         margin-left: 10px !important;
     }
-    
+
     .mobile-menu-btn div {
         display: block !important;
         width: 24px !important;
@@ -10519,7 +10530,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         margin: 3px 0 !important;
         border-radius: 2px !important;
     }
-    
+
     /* Logo her zaman görünür */
     .navbaar .logo,
     .navbaar-container .logo {
@@ -10529,7 +10540,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         align-items: center !important;
         flex-shrink: 0 !important;
     }
-    
+
     .navbaar .logo img,
     .navbaar-container .logo img {
         display: block !important;
@@ -10538,14 +10549,14 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         width: 55px !important;
         height: auto !important;
     }
-    
+
     /* Ziyaretçi sayacı görünür */
     .visitor-counts-navbar {
         display: inline-flex !important;
         visibility: visible !important;
         opacity: 1 !important;
     }
-    
+
     /* Navbar container düzeni */
     .navbaar-container {
         display: flex !important;
@@ -10555,7 +10566,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         flex-wrap: nowrap !important;
         padding: 10px 15px !important;
     }
-    
+
     /* Nav linkler - mobilde gizli, active olunca göster */
     .naav-linkss {
         display: none !important;
@@ -10567,14 +10578,14 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         min-width: 200px !important;
         padding: 10px 0 !important;
         border-radius: 0 0 10px 10px !important;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3) !important;
         z-index: 9999 !important;
     }
-    
+
     .naav-linkss.active {
         display: flex !important;
     }
-    
+
     /* Auth butonları */
     .auth-buttoons {
         display: flex !important;
@@ -10593,13 +10604,13 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         height: 40px !important;
         padding: 6px !important;
     }
-    
+
     .mobile-menu-btn div {
         width: 22px !important;
         height: 2px !important;
         margin: 2px 0 !important;
     }
-    
+
     .navbaar .logo img,
     .navbaar-container .logo img {
         width: 48px !important;
@@ -10668,7 +10679,7 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         font-size: 13px;
         gap: 6px;
     }
-    
+
     .ilan-ver-btn i {
         font-size: 14px;
     }
@@ -10681,8 +10692,14 @@ DÜZELTME - Mobil tasarım kompakt ve düzgün */
         font-size: 12px;
         gap: 5px;
     }
-    
+
     .ilan-ver-btn i {
         display: none;
+    }
+}
+/* Custom fix for login popup z-index on small mobile devices */
+@media (max-width: 400px) {
+    .pencere, #popup-giris {
+        z-index: 10005 !important;
     }
 }
