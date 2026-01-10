@@ -2350,6 +2350,11 @@ nav.navbaar .auth-buttoons .ilan-ver-btn {
         padding: 2px 6px !important;
         order: 1 !important;
     }
+
+    body:not(.force-desktop) .naav-linkss li.nav-item-message,
+    body:not(.force-desktop) .navbaar .naav-linkss li.nav-item-message {
+        align-self: flex-end !important;
+    }
 }
 
 
