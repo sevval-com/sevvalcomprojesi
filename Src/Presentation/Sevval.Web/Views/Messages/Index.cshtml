@@ -164,16 +164,18 @@
         margin: 0;
     }
     .feed-list {
-        display: grid;
+        display: flex;
+        flex-direction: column;
         gap: 14px;
         overflow-y: auto;
         padding-right: 6px;
         flex: 1;
         min-height: 0;
-        max-width: 980px;
+        max-width: 820px;
         width: 100%;
         margin: 0 auto;
-        align-items: start;
+        align-items: stretch;
+        align-content: flex-start;
     }
     .feed-footer {
         display: flex;
@@ -197,6 +199,16 @@
         display: grid;
         gap: 12px;
         overflow: hidden;
+    }
+
+    @@media (min-width: 1200px) {
+        .feed-list {
+            gap: 6px;
+            max-width: 760px;
+        }
+        .message-card {
+            padding: 10px;
+        }
     }
     .card-header {
         display: flex;
