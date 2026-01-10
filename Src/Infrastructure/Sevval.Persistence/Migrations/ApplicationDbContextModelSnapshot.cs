@@ -2151,6 +2151,112 @@ namespace Sevval.Persistence.Migrations
                     b.ToTable("Yorumlar");
                 });
 
+            modelBuilder.Entity("Sevval.Domain.Messaging.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ListingId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MessageType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId", "SenderId", "CreatedOnUtc");
+
+                    b.HasIndex("SenderId", "RecipientId", "CreatedOnUtc");
+
+                    b.HasIndex("ListingId", "RecipientId", "SenderId", "CreatedOnUtc");
+
+                    b.HasIndex("ListingId", "SenderId", "RecipientId", "CreatedOnUtc");
+
+                    b.ToTable("MessagingMessages", (string)null);
+                });
+
+            modelBuilder.Entity("Sevval.Domain.Messaging.MessageReadState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeliveredOnUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReadOnUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReaderId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId", "ReaderId")
+                        .IsUnique();
+
+                    b.ToTable("MessageReadStates", (string)null);
+                });
+
             modelBuilder.Entity("Sevval.Persistence.Context.sevvalemlak.Models.AboutUsContent", b =>
                 {
                     b.Property<int>("Id")
@@ -2484,6 +2590,15 @@ namespace Sevval.Persistence.Migrations
                     b.Navigation("Ilan");
 
                     b.Navigation("Kullanici");
+                });
+
+            modelBuilder.Entity("Sevval.Domain.Messaging.MessageReadState", b =>
+                {
+                    b.HasOne("Sevval.Domain.Messaging.Message", null)
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sevval.Web.Models.VideoLike", b =>

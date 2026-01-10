@@ -15,4 +15,6 @@ public class MessageDto
     public DateTime CreatedOnUtc { get; set; }
 
     public string Status { get; set; } = string.Empty;
+
+    public string MessageType { get; set; } = string.Empty;
 }

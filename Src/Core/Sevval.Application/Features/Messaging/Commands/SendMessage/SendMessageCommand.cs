@@ -10,4 +10,8 @@ public class SendMessageCommand : IRequest<SendMessageResult>
     public string RecipientId { get; set; } = string.Empty;
 
     public string Body { get; set; } = string.Empty;
+
+    public MessageType MessageType { get; set; } = MessageType.Other;
+
+    public int? ListingId { get; set; }
 }

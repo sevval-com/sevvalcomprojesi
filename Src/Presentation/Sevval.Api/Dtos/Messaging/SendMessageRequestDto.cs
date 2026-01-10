@@ -1,3 +1,5 @@
+using Sevval.Domain.Messaging;
+
 namespace Sevval.Api.Dtos.Messaging;
 
 public class SendMessageRequestDto
@@ -8,4 +10,8 @@ public class SendMessageRequestDto
     public string RecipientId { get; set; } = string.Empty;
 
     public string Body { get; set; } = string.Empty;
+
+    public MessageType? MessageType { get; set; }
+
+    public int? ListingId { get; set; }
 }

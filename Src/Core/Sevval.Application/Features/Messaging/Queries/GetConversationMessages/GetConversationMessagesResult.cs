@@ -15,4 +15,8 @@ public class GetConversationMessagesResult
     public DateTime CreatedOnUtc { get; set; }
 
     public MessageStatus Status { get; set; }
+
+    public MessageType MessageType { get; set; } = MessageType.Other;
+
+    public bool IsRead { get; set; }
 }

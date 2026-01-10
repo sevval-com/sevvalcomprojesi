@@ -7,7 +7,6 @@ using AspNet.Security.OAuth.Apple;
 using Microsoft.EntityFrameworkCore;
 using Sevval.Application.Interfaces.IService;
 using Sevval.Domain.Entities;
-using Sevval.Infrastructure.Services;
 using Sevval.Persistence.Context;
 using sevvalemlak.csproj;
 using System.Globalization;
@@ -15,6 +14,15 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using Sevval.Application.Constants;
+using Sevval.Application;
+using Sevval.Application.Interfaces.Messaging;
+using Sevval.Application.Interfaces.IService.Common;
+using Sevval.Infrastructure;
+using Sevval.Infrastructure.Services;
+using Sevval.Mapper.Mapper;
+using Sevval.Persistence;
+using Sevval.Web.Services;
+using Sevval.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +103,14 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
+builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddApplication();
+builder.Services.AddMapper();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddPersistence();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IRealTimeNotifier, SignalRRealTimeNotifier>();
 
 
 
@@ -285,7 +301,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapHub<MessagingHub>("/hubs/messaging");
 
 // Uygulama çalýþtýrýlýyor
 app.Run();
-
