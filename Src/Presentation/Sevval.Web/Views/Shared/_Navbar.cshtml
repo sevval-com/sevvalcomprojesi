@@ -44,6 +44,17 @@
                 <a href="@Url.Action("Index", "Drone")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Şevval Drone</a>
                 <span class="new-badge">Yeni</span>
             </li>
+            <li class="nav-item-with-badge" style="display:flex;justify-content:flex-end;position:relative;">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a href="@Url.Action("Index", "Messages")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Mesajlar</a>
+                }
+                else
+                {
+                    <a href="#" title="Lütfen giriş yapınız" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Mesajlar</a>
+                }
+                <span class="new-badge">Yeni</span>
+            </li>
             <li class="dropdoawn" style="display:flex;justify-content:flex-end;">
                 <a href="@Url.Action("About", "Home")" style="text-align:right;font-size:16px !important;font-weight:700 !important;">Hakkımızda</a>
             </li>
@@ -64,12 +75,21 @@
                 var currentUser = await UserManager.GetUserAsync(User);
                 if (currentUser != null)
                 {
-                    <div class="user-dropdown">
-                        <a href="#" class="user-name">@currentUser.FirstName @currentUser.LastName</a>
+                    <div class="user-dropdown" data-userid="@currentUser.Id">
+                        <a href="#" class="user-name">
+                            @currentUser.FirstName @currentUser.LastName
+                            <span class="msg-badge d-none" id="navbarMessageBadge"></span>
+                        </a>
                         <ul class="user-dropdown-content">
                             <li><a href="@Url.Action("RedirectToStore", "Ilan", new { email = User.Identity.Name })">Mağazam</a></li>
                             <li><a href="@Url.Action("Panel", "Ilan")">Raporlar</a></li>
                             <li><a href="@Url.Action("Ilanlar", "Ilan")">İlanlar</a></li>
+                            <li>
+                                <a href="@Url.Action("Index", "Messages")">
+                                    Mesajlar
+                                    <span class="msg-badge msg-badge-inline d-none" id="navbarMessageBadgeItem"></span>
+                                </a>
+                            </li>
                             <li><a href="@Url.Action("Videolarim", "VideolarSayfasi")">Videolarım</a></li>
                             <li><a href="@Url.Action("Danismanlar", "Ilan")">Danışmanlar</a></li>
                             <li><a href="@Url.Action("Sozlesmeler", "Ilan")">Sözleşmeler</a></li>
@@ -261,6 +281,61 @@
                         }
                     });
                 });
+
+                // Mesaj badge
+                var dropdownRoot = document.querySelector('.user-dropdown[data-userid]');
+                var badge = document.getElementById('navbarMessageBadge');
+                var badgeItem = document.getElementById('navbarMessageBadgeItem');
+                if (dropdownRoot && badge && badgeItem) {
+                    var userId = dropdownRoot.getAttribute('data-userid');
+                    if (userId) {
+                        badge.classList.add('d-none');
+                        badgeItem.classList.add('d-none');
+                        badge.textContent = '';
+                        badgeItem.textContent = '';
+                        badge.classList.remove('msg-badge--own', 'msg-badge--other', 'msg-badge--comment', 'msg-badge--notif');
+                        badgeItem.classList.remove('msg-badge--own', 'msg-badge--other', 'msg-badge--comment', 'msg-badge--notif');
+
+                        fetch(`/api/v1/messages/unread-counts?CurrentUserId=${encodeURIComponent(userId)}`, { cache: 'no-store' })
+                            .then(function(response) { return response.ok ? response.json() : null; })
+                            .then(function(data) {
+                                if (!data || !data.counts) {
+                                    return;
+                                }
+                                var countsObj = data && data.counts ? data.counts : {};
+                                var counts = Object.values(countsObj || {});
+                                var total = counts.reduce(function(sum, value) {
+                                    var num = parseInt(value, 10);
+                                    return sum + (Number.isFinite(num) ? num : 0);
+                                }, 0);
+                                if (total > 0) {
+                                    var colorClass = 'msg-badge--own';
+                                    if (parseInt(countsObj.Comment || 0, 10) > 0) {
+                                        colorClass = 'msg-badge--comment';
+                                    } else if (parseInt(countsObj.Notification || 0, 10) > 0) {
+                                        colorClass = 'msg-badge--notif';
+                                    } else if (parseInt(countsObj.Other || 0, 10) > 0) {
+                                        colorClass = 'msg-badge--other';
+                                    }
+                                    var text = total > 99 ? '99+' : total.toString();
+                                    badge.textContent = text;
+                                    badgeItem.textContent = text;
+                                    badge.classList.add(colorClass);
+                                    badgeItem.classList.add(colorClass);
+                                    badge.classList.remove('d-none');
+                                    badgeItem.classList.remove('d-none');
+                                } else {
+                                    badge.textContent = '';
+                                    badgeItem.textContent = '';
+                                    badge.classList.remove('msg-badge--own', 'msg-badge--other', 'msg-badge--comment', 'msg-badge--notif');
+                                    badgeItem.classList.remove('msg-badge--own', 'msg-badge--other', 'msg-badge--comment', 'msg-badge--notif');
+                                    badge.classList.add('d-none');
+                                    badgeItem.classList.add('d-none');
+                                }
+                            })
+                            .catch(function() {});
+                    }
+                }
                 
                 // MOBİL NAVBAR DÜZELTMELERİ - JavaScript ile
                 function fixMobileNavbar() {
@@ -281,6 +356,44 @@
                 window.addEventListener('resize', fixMobileNavbar);
             });
         </script>
+        <style>
+            .msg-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 6px;
+                margin-left: 0;
+                border-radius: 999px;
+                background: #dc3545;
+                color: #fff;
+                font-size: 0.65rem;
+                font-weight: 700;
+                line-height: 1;
+                position: absolute;
+                top: -4px;
+                right: -10px;
+                z-index: 2;
+            }
+            .msg-badge.d-none {
+                display: none !important;
+            }
+            .msg-badge:empty {
+                display: none !important;
+            }
+            .msg-badge--own { background: #0d6efd; }
+            .msg-badge--other { background: #6f42c1; }
+            .msg-badge--comment { background: #20c997; }
+            .msg-badge--notif { background: #fd7e14; }
+            .msg-badge-inline {
+                position: static;
+                margin-left: 8px;
+            }
+            .user-dropdown .user-name {
+                position: relative;
+            }
+        </style>
     </div>
 </nav>
 

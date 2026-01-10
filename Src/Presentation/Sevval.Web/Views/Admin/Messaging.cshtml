@@ -1,0 +1,2152 @@
+@{
+    ViewData["Title"] = "Mesajlar";
+    var isIndividualUser = User?.Claims?.Any(c =>
+        !string.IsNullOrWhiteSpace(c.Value) &&
+        c.Value.Contains("Bireysel", System.StringComparison.OrdinalIgnoreCase)) ?? false;
+    var maskedOtherId = ViewData["MaskedOtherId"] as string;
+    var maskedType = ViewData["MaskedType"] as string;
+    var maskedListingId = ViewData["MaskedListingId"] as string;
+    var currentUserId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+}
+
+@section MetaTags {
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+}
+
+@section Styles {
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tyn-primary: #0d6efd;
+            --tyn-primary-hover: #0b5ed7;
+            --tyn-body-bg: #f5f7fb;
+            --tyn-white: #ffffff;
+            --tyn-gray-100: #f1f5f9;
+            --tyn-gray-200: #e2e8f0;
+            --tyn-gray-300: #cbd5e1;
+            --tyn-gray-400: #94a3b8;
+            --tyn-gray-500: #64748b;
+            --tyn-gray-800: #1e293b;
+            --tyn-gray-900: #0f172a;
+            --tyn-border: #e2e8f0;
+            --tyn-thread-bg: #dbeafe;
+            
+            --tab-own: #0d6efd;
+            --tab-other: #6f42c1;
+            --tab-comment: #20c997;
+            --tab-notif: #fd7e14;
+
+            --tyn-radius: 0.75rem;
+            --tyn-radius-lg: 1rem;
+            --tyn-font: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .sevval-chat {
+            font-family: var(--tyn-font);
+            color: var(--tyn-gray-800);
+            background-color: var(--tyn-body-bg);
+            height: calc(var(--vh, 1vh) * 100 - 96px);
+            overflow: hidden;
+        }
+
+        .tyn-root {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            gap: 1.25rem;
+            padding: 24px;
+        }
+        
+        .sevval-chat *::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .sevval-chat *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sevval-chat *::-webkit-scrollbar-thumb {
+            background: var(--tyn-gray-300);
+            border-radius: 99px;
+        }
+        .sevval-chat *::-webkit-scrollbar-thumb:hover {
+            background: var(--tyn-gray-400);
+        }
+
+        .tyn-aside {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(13, 110, 253, 0.35);
+            background-color: var(--tyn-white);
+            flex-shrink: 0;
+            border-radius: 16px;
+            box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.12), 0 10px 24px rgba(13, 110, 253, 0.08);
+            overflow: hidden;
+            margin: 0;
+            height: 100%;
+        }
+
+        .tyn-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--tyn-white);
+            min-width: 0;
+            position: relative;
+            border: 1px solid rgba(13, 110, 253, 0.35);
+            border-radius: 16px;
+            box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.12), 0 10px 24px rgba(13, 110, 253, 0.08);
+            overflow: hidden;
+            margin: 0;
+            height: 100%;
+        }
+
+        @@media (min-width: 1400px) {
+            .tyn-root {
+                max-width: 1600px;
+                margin: 0 auto;
+                padding: 28px 32px;
+                gap: 1.5rem;
+            }
+            .tyn-aside {
+                width: 300px;
+            }
+        }
+
+        @@media (max-width: 1200px) {
+            .tyn-root {
+                padding: 20px;
+                gap: 1rem;
+            }
+            .tyn-aside {
+                width: 250px;
+            }
+            .tyn-header {
+                padding: 0 1rem;
+            }
+        }
+
+        .tyn-header {
+            padding: 0 1.25rem;
+            background: var(--tyn-white);
+            border-bottom: 1px solid #eef1f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            flex-shrink: 0;
+        }
+
+        .search-wrap { position: relative; margin-bottom: 0; }
+        .search-wrap input {
+            width: 100%;
+            border: 1px solid #e1e6ef;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            background: #f4f7fd;
+            outline: none;
+            transition: 0.2s;
+            color: var(--tyn-gray-800);
+        }
+        .search-wrap input:focus { 
+            background: #fff; 
+            border-color: var(--tyn-primary); 
+            box-shadow: 0 8px 20px -12px rgba(13, 110, 253, 0.35); 
+        }
+        .search-icon { display: none; }
+
+        .tyn-tabs { 
+            padding: 0.5rem 0.75rem; 
+            display: flex; 
+            gap: 0.5rem; 
+            overflow: visible; 
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .tyn-tab-btn {
+            white-space: nowrap;
+            font-size: 0.76rem;
+            padding: 0 0.85rem;
+            border-radius: 10px;
+            background: var(--tyn-white);
+            border: 1px solid var(--tyn-gray-200);
+            color: var(--tyn-gray-700);
+            transition: all 0.2s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            cursor: pointer;
+            line-height: 1.1;
+            height: 40px;
+        }
+        .tyn-tab-btn:hover { background: var(--tyn-gray-100); }
+        .tyn-tab-btn.active { background: var(--tyn-gray-100); }
+        
+        .tyn-tab-btn[data-type="Own"].active { 
+            background: rgba(13, 110, 253, 0.12) !important; 
+            border-color: var(--tab-own) !important; 
+            color: var(--tab-own) !important; 
+            box-shadow: 0 6px 14px -10px rgba(13,110,253,0.45);
+        }
+        .tyn-tab-btn[data-type="Other"].active { 
+            background: rgba(111, 66, 193, 0.12) !important; 
+            border-color: var(--tab-other) !important; 
+            color: var(--tab-other) !important; 
+            box-shadow: 0 6px 14px -10px rgba(111,66,193,0.35);
+        }
+        .tyn-tab-btn[data-type="Comment"].active { 
+            background: rgba(32, 201, 151, 0.12) !important; 
+            border-color: var(--tab-comment) !important; 
+            color: var(--tab-comment) !important; 
+            box-shadow: 0 6px 14px -10px rgba(32,201,151,0.35);
+        }
+        .tyn-tab-btn[data-type="Notification"].active { 
+            background: rgba(253, 126, 20, 0.12) !important; 
+            border-color: var(--tab-notif) !important; 
+            color: var(--tab-notif) !important; 
+            box-shadow: 0 6px 14px -10px rgba(253,126,20,0.35);
+        }
+        .tyn-tab-btn.is-disabled {
+            background: #f3f4f6;
+            border-color: #e5e7eb;
+            color: #9ca3af;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+        .listing-btn {
+            border-radius: 999px;
+            font-size: 0.82rem;
+            padding: 0 1rem;
+            border: 1px solid transparent;
+            background: var(--tyn-primary);
+            color: #fff;
+            transition: all 0.2s ease;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 8px 18px -12px rgba(13,110,253,0.6);
+        }
+        .listing-btn.primary {
+            border-color: rgba(13,110,253,0.35);
+            color: var(--tyn-primary);
+            background: rgba(13,110,253,0.06);
+        }
+        .listing-btn:hover {
+            background: var(--tyn-primary-hover);
+            color: #fff;
+        }
+        .tyn-menu-btn.is-busy {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .tyn-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 0.5rem; 
+        }
+        
+        .conversation-item {
+            display: flex; 
+            align-items: flex-start;
+            gap: 12px; 
+            padding: 0.85rem; 
+            border-radius: var(--tyn-radius);
+            cursor: pointer; 
+            transition: all 0.2s; 
+            border: 1px solid transparent; 
+            margin-bottom: 10px;
+            background: #fff;
+            box-shadow: 0 6px 16px rgba(16, 24, 40, 0.08);
+        }
+        .conversation-item:hover { background-color: var(--tyn-gray-100); }
+        .conversation-item.active { 
+            background-color: var(--tyn-primary-hover); 
+            border-color: transparent; 
+        }
+        .conversation-item.active * { color: #fff !important; }
+        
+        .conversation-info { flex: 1; min-width: 0; }
+        .conversation-title { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--tyn-gray-900); 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        .conversation-time { 
+            font-size: 0.7rem; 
+            color: var(--tyn-gray-400); 
+            font-weight: 400; 
+        }
+        .conversation-preview { 
+            font-size: 0.8rem; 
+            color: var(--tyn-gray-500); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            margin-top: 3px; 
+        }
+        
+        .tyn-avatar {
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 600; 
+            color: var(--tyn-primary); 
+            background: rgba(13, 110, 253, 0.1); 
+            font-size: 1rem; 
+            flex-shrink: 0;
+        }
+        .conversation-item.active .tyn-avatar { 
+            background: rgba(255,255,255,0.2); 
+            color: #fff; 
+        }
+
+        .tyn-chat-header {
+            padding: 1rem 1.5rem;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: none; 
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            overflow: visible !important;
+        }
+        .tyn-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .tyn-header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 5;
+        }
+        .tyn-menu-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 10px;
+            border: 1px solid var(--tyn-gray-200);
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--tyn-gray-600);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .tyn-menu-btn:hover { background: var(--tyn-gray-100); }
+        .tyn-header-user {
+            display: flex;
+            align-items: center;
+        }
+        #threadTitle {
+            margin-left: 8px;
+            padding: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+        }
+        #threadSubtitle {
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+        }
+        #threadAvatar.tyn-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 40px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            line-height: 1;
+        }
+
+        .tyn-menu-btn svg { width: 18px; height: 18px; }
+        .tyn-header-right .dropdown { position: relative; z-index: 1021; }
+        .dropdown-menu { z-index: 1060; margin-top: 5px !important; }
+        .tyn-dropdown .dropdown-menu {
+            min-width: 180px;
+            border-radius: 12px;
+            padding: 0.35rem 0;
+            border: 1px solid var(--tyn-gray-200);
+            box-shadow: 0 12px 30px -10px rgba(0,0,0,0.18);
+        }
+        .tyn-dropdown-item {
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            padding: 0.55rem 0.85rem;
+            color: var(--tyn-gray-700);
+            background: none;
+            border: 0;
+            display: block;
+            border-radius: 8px;
+        }
+        .tyn-dropdown-item:hover {
+            background: var(--tyn-gray-100);
+            color: var(--tyn-gray-900);
+        }
+        
+        .tyn-context-bar {
+            background: var(--tyn-thread-bg);
+            border-bottom: 1px solid #e0e7ff;
+            padding: 0.6rem 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tyn-context-details { 
+            font-size: 0.86rem; 
+            color: var(--tyn-gray-800); 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-weight: 600; 
+            flex-wrap: wrap;
+        }
+        .tyn-context-details .price { font-weight: 700; color: var(--tyn-primary); }
+        .tyn-context-details .sep { opacity: 0.3; color: var(--tyn-gray-500); }
+        .is-hidden { display: none !important; }
+        .listing-cta {
+            margin-left: auto;
+        }
+
+        .tyn-listing-mini {
+            background: transparent;
+            border-bottom: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--tyn-gray-800);
+            flex-wrap: nowrap;
+            margin-left: 0;
+        }
+        .listing-mini-title {
+            font-size: 0.75rem;
+            color: var(--tyn-gray-500);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .listing-mini-grid {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .listing-mini-grid::-webkit-scrollbar { display: none; }
+        .listing-mini-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .listing-mini-item span {
+            font-weight: 700;
+            color: var(--tyn-primary);
+        }
+
+        .tyn-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: var(--tyn-body-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .chat-row { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 0.5rem; 
+            max-width: 90%; 
+            margin-bottom: 4px; 
+        }
+        .chat-row.outgoing { 
+            align-self: flex-end; 
+            flex-direction: row-reverse; 
+        }
+        .chat-row.incoming { align-self: flex-start; }
+        
+        .chat-row.outgoing .chat-avatar { display: none; }
+        .chat-avatar.small { 
+            width: 32px; 
+            height: 32px; 
+            font-size: 0.8rem; 
+            border-radius: 50%;
+            overflow: hidden;
+            flex: 0 0 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tyn-avatar img,
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .chat-bubble {
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .chat-row.incoming .chat-bubble {
+            background: var(--tyn-primary);
+            border-bottom-left-radius: 2px;
+            color: #fff;
+        }
+        .chat-row.outgoing .chat-bubble {
+            background: var(--tyn-thread-bg);
+            color: var(--tyn-gray-900);
+            border-bottom-right-radius: 2px;
+        }
+        .chat-meta {
+            font-size: 0.65rem;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chat-row.outgoing .chat-meta { 
+            justify-content: flex-end; 
+        }
+        .chat-row.outgoing .chat-meta .tick-icon.read,
+        .chat-row.outgoing .chat-meta .tick-icon.read span {
+            color: #0d6efd !important;
+        }
+        .chat-row.incoming .chat-meta { color: rgba(255,255,255,0.8); }
+        
+        .tick-icon { font-size: 11px; display: inline-flex; }
+        .tick-icon.double { align-items: center; }
+        .tick-icon.double span { display: inline-block; }
+        .tick-icon.double span + span { margin-left: -3px; }
+        .chat-date-separator {
+            align-self: center;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(13, 110, 253, 0.12);
+            color: var(--tyn-gray-700);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.75rem;
+        }
+        .tick-icon.read { color: #0d6efd; }
+
+        .tyn-footer {
+            padding: 0.75rem 1.5rem;
+            background: #fff;
+            border-top: 1px solid var(--tyn-border);
+        }
+        footer {
+            display: none;
+        }
+        
+        .tyn-composer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .tyn-tools {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .tyn-tool-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            border: 1px solid var(--tyn-gray-200);
+            background: #fff;
+            color: var(--tyn-gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 6px 14px -8px rgba(0,0,0,0.2);
+        }
+        .tyn-tool-btn:hover { 
+            background: var(--tyn-gray-100); 
+            color: var(--tyn-primary);
+            box-shadow: 0 10px 20px -10px rgba(13,110,253,0.35);
+        }
+        .tyn-tool-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .tyn-tool-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.8;
+        }
+
+        .composer-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+        
+        .composer-textarea {
+            width: 100%;
+            border: 1px solid var(--tyn-border);
+            border-radius: 28px;
+            padding: 12px 64px 12px 18px;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            background: #f4f7fd;
+            transition: 0.2s;
+            min-height: 50px;
+            max-height: 140px;
+            line-height: 1.45;
+            font-family: var(--tyn-font);
+            color: var(--tyn-gray-800);
+        }
+        .composer-textarea::placeholder { color: var(--tyn-gray-400); }
+        .composer-textarea:focus {
+            background: #fff;
+            border-color: var(--tyn-primary);
+            box-shadow: 0 10px 22px -14px rgba(13, 110, 253, 0.35);
+        }
+
+        #sendBtn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px !important;
+            height: 40px !important;
+            padding: 0 !important;
+            border-radius: 14px;
+            background: var(--tyn-primary);
+            border: none;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 12px 26px -14px rgba(13,110,253,0.6);
+        }
+        #sendBtn:hover {
+            background: var(--tyn-primary-hover);
+            transform: translateY(-50%) scale(1.03);
+        }
+        #sendBtn svg {
+            width: 20px;
+            height: 20px;
+            margin-left: 0;
+            stroke: #fff !important;
+            fill: none !important;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .emoji-panel {
+            position: absolute;
+            bottom: 52px;
+            left: -12px;
+            background: #fff;
+            border: 1px solid var(--tyn-border);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            display: none;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+            width: 250px;
+            z-index: 100;
+        }
+        .emoji-panel.open { display: grid; }
+        .emoji-panel button {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 8px;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            width: 36px;
+            height: 36px;
+        }
+        .emoji-panel button:hover {
+            background: var(--tyn-gray-100);
+            transform: scale(1.1);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .toast {
+            background: #fff;
+            border-left: 4px solid var(--tyn-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+            font-size: 0.9rem;
+        }
+        
+        .toast.success { border-left-color: #10b981; }
+        .toast.info { border-left-color: #3b82f6; }
+        
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        
+        .toast.success .toast-icon { color: #10b981; }
+        .toast.info .toast-icon { color: #3b82f6; }
+        
+        @@keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@media (max-width: 991px) {
+            .tyn-root { 
+                height: calc(var(--vh, 1vh) * 100 - 96px); 
+                flex-direction: column; 
+            }
+            .tyn-aside { 
+                width: 100%; 
+                height: 100%; 
+                display: flex; 
+            }
+            .tyn-main { 
+                display: none; 
+                margin-left: 0; 
+                height: 100%; 
+            }
+            [data-view="thread"] .tyn-aside { display: none; }
+            [data-view="thread"] .tyn-main { display: flex; }
+            .mobile-back { display: inline-flex !important; }
+            
+            .tyn-chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0.75rem 1rem;
+            }
+            .tyn-tabs {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .tyn-footer {
+                padding: 0.5rem 1rem;
+            }
+            .toast-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .tyn-root {
+                padding: 14px;
+                gap: 0.9rem;
+                height: calc(var(--vh, 1vh) * 100 - 96px);
+            }
+            .tyn-header {
+                height: auto;
+                padding: 0.75rem 0.9rem;
+            }
+            .tyn-aside,
+            .tyn-main {
+                border-radius: 14px;
+            }
+            .tyn-footer {
+                padding: 0.5rem 0.75rem;
+            }
+            .composer-input-wrap {
+                padding: 6px;
+            }
+            .tyn-chat-header {
+                gap: 10px;
+            }
+            .tyn-chat-header .tyn-tabs {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .tyn-chat-header .tyn-tabs .tyn-tab-btn {
+                flex: 0 0 auto;
+            }
+            .tyn-header-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .tyn-context-bar {
+                gap: 6px;
+                padding: 8px 10px;
+            }
+            .tyn-context-details {
+                flex: 1 1 auto;
+                gap: 6px 8px;
+            }
+            .tyn-listing-mini {
+                width: 100%;
+                gap: 6px;
+            }
+            .listing-mini-title {
+                display: none;
+            }
+            .listing-btn {
+                height: 34px;
+                font-size: 0.72rem;
+                padding: 0 0.75rem;
+            }
+            .listing-cta {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .tyn-main {
+                margin-bottom: 10px;
+            }
+            .tyn-context-details {
+                font-size: 0.8rem;
+            }
+            .tyn-context-details .price {
+                font-size: 0.9rem;
+            }
+            .tyn-listing-mini {
+                font-size: 0.76rem;
+            }
+        }
+        
+        @@media (max-width: 576px) {
+            .sevval-chat {
+                height: calc(var(--vh, 1vh) * 100 - 72px);
+            }
+            .tyn-aside { width: 100%; }
+            .search-input { font-size: 0.85rem; }
+            .tyn-tab-btn { font-size: 0.68rem; padding: 0.2rem 0.45rem; }
+            .btn-read-toggle { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+            .composer-textarea { font-size: 0.9rem; }
+            .toast { min-width: 200px; font-size: 0.85rem; }
+            .tyn-chat-header {
+                padding: 0.65rem 0.85rem;
+            }
+            .tyn-header-right {
+                gap: 6px;
+            }
+            .tyn-tabs {
+                width: 100%;
+            }
+            .tyn-tabs .tyn-tab-btn {
+                font-size: 0.7rem;
+                padding: 0.22rem 0.5rem;
+            }
+            .tyn-header-user {
+                gap: 10px;
+            }
+            .tyn-context-details {
+                flex-wrap: wrap;
+                gap: 6px 8px;
+                font-size: 0.74rem;
+            }
+            .tyn-context-details .price {
+                font-size: 0.82rem;
+            }
+            .tyn-context-details .sep {
+                display: none;
+            }
+            .tyn-listing-mini {
+                width: 100%;
+                font-size: 0.7rem;
+            }
+            .listing-mini-title {
+                display: none;
+            }
+            .listing-mini-grid {
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+            .listing-mini-item {
+                white-space: nowrap;
+            }
+            .listing-btn {
+                height: 30px;
+                font-size: 0.68rem;
+                padding: 0 0.65rem;
+            }
+            .chat-bubble {
+                font-size: 0.86rem;
+            }
+            .composer-tools {
+                gap: 6px;
+            }
+            .tyn-composer {
+                gap: 8px;
+            }
+            .composer-textarea {
+                min-height: 56px;
+                padding: 12px 56px 12px 16px;
+            }
+            .tyn-tool-btn {
+                width: 36px;
+                height: 36px;
+            }
+            #sendBtn {
+                width: 44px;
+                height: 44px;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid p-0 sevval-chat">
+    <div class="tyn-root" id="messagingShell" data-view="list"
+         data-me="@currentUserId"
+         data-other="@maskedOtherId"
+         data-type="@maskedType"
+         data-listing-id="@maskedListingId">
+        <aside class="tyn-aside">
+        <div class="tyn-header">
+            <div class="tyn-title-group">
+                <h2 class="title" style="font-size: 1.25rem; margin: 0;">Mesajlar</h2>
+            </div>
+            <button id="refreshBtn" class="d-none">Refresh</button>
+        </div>
+        
+        <div class="p-3 pb-2">
+             <div class="search-wrap">
+                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <circle cx="11" cy="11" r="8"/>
+                     <path d="M21 21l-4.35-4.35"/>
+                 </svg>
+                 <input type="text" class="search-input" id="conversationSearch" placeholder="Sohbet ara">
+             </div>
+        </div>
+        
+        <div class="tyn-list" id="conversationList"></div>
+        <span id="conversationCount" class="d-none"></span>
+        </aside>
+
+        <main class="tyn-main">
+        <div class="tyn-chat-header">
+            <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+                <div class="tyn-header-left tyn-header-user">
+                    <button class="btn btn-sm btn-light mobile-back d-none rounded-circle border" id="backToListBtn" style="width:36px;height:36px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="tyn-avatar" id="threadAvatar">K</div>
+                    <div>
+                         <div class="fw-bold text-dark" id="threadTitle" style="font-size:1rem;">Seçili Sohbet</div>
+                         <div class="text-muted small" id="threadSubtitle" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="tyn-menu-btn" id="markReadBtn" type="button" title="Okundu yap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                    <button class="tyn-menu-btn" id="undoReadBtn" type="button" title="Okunmadı yap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                            <path d="M1 1l22 22"/>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tyn-header-right">
+                <div class="tyn-tabs" id="tabRow" style="padding: 0; border: none;">
+                    @if (!isIndividualUser)
+                    {
+                        <button class="tyn-tab-btn active" data-type="Own" data-color="var(--tab-own)">İlanlarım</button>
+                    }
+                    <button class="tyn-tab-btn @(isIndividualUser ? "active" : "")" data-type="Other" data-color="var(--tab-other)">İlgilendiğim İlanlar</button>
+                    <button class="tyn-tab-btn is-disabled" data-type="Comment" data-color="var(--tab-comment)" title="Yakında" aria-disabled="true">Yorumlar</button>
+                    <button class="tyn-tab-btn is-disabled" data-type="Notification" data-color="var(--tab-notif)" title="Yakında" aria-disabled="true">Sistem Bildirimleri</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tyn-context-bar" id="listingContextBar">
+            <div class="tyn-context-details">
+                 <span class="price" id="listingPrice">—</span>
+                 <span class="sep">•</span>
+                 <span id="listingCode">—</span>
+                 <span class="sep">•</span>
+                 <span id="listingLocation">—</span>
+                 <span class="sep">•</span>
+                 <div class="tyn-listing-mini" id="listingMini">
+                     <div class="listing-mini-title">İlan Özellikleri</div>
+                     <div class="listing-mini-grid">
+                         <div class="listing-mini-item">Metrekare: <span id="listingAreaMini">—</span></div>
+                         <div class="listing-mini-item">Ada No: <span id="listingAdaMini">—</span></div>
+                         <div class="listing-mini-item">Parsel No: <span id="listingParselMini">—</span></div>
+                         <div class="listing-mini-item">Mülk Tipi: <span id="listingTypeMini">—</span></div>
+                     </div>
+                 </div>
+            </div>
+            <div class="listing-cta d-flex align-items-center gap-2">
+                 <a href="#" class="listing-btn" id="listingGoLink">İlana Git</a>
+            </div>
+        </div>
+
+        <div class="tyn-body" id="threadList">
+        </div>
+
+        <div class="tyn-footer">
+            <div class="tyn-composer">
+                 <div class="tyn-tools">
+                     <div class="position-relative">
+                         <button class="tyn-tool-btn" id="emojiToggle" type="button" title="Emoji" style="background:#fff;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                <line x1="15" y1="9" x2="15.01" y2="9"/>
+                            </svg>
+                         </button>
+
+                         <!-- Emoji panel -->
+                         <div class="emoji-panel" id="emojiPanel">
+                             <button type="button">😀</button><button type="button">😁</button><button type="button">😂</button>
+                             <button type="button">😊</button><button type="button">😍</button><button type="button">😎</button>
+                             <button type="button">😇</button><button type="button">🙂</button><button type="button">😉</button>
+                             <button type="button">🤝</button><button type="button">👏</button><button type="button">👍</button>
+                             <button type="button">🙏</button><button type="button">🎉</button><button type="button">💬</button>
+                             <button type="button">❤️</button><button type="button">🏠</button><button type="button">📌</button>
+                         </div>
+                     </div>
+                     <button class="tyn-tool-btn" disabled type="button" title="Fotoğraf" style="background:#fff;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                     </button>
+                     <button class="tyn-tool-btn" disabled type="button" title="Dosya" style="background:#fff;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                     </button>
+                 </div>
+                 
+                 <div class="composer-input-wrap">
+                     <textarea class="composer-textarea" id="messageInput" placeholder="Mesajınızı yazın..." maxlength="500"></textarea>
+                     <button id="sendBtn" type="button" title="Gönder">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                     </button>
+                 </div>
+            </div>
+            <div id="statusText" class="d-none"></div>
+        </div>
+        </main>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="d-none">
+    <input id="currentUserInput"> <input id="otherUserInput">
+    <button id="applyUsersBtn"></button> <button id="openOtherTabBtn"></button>
+</div>
+
+<script>
+    const apiBase = "/api/v1/messages";
+    const urlParams = new URLSearchParams(window.location.search);
+    const shellEl = document.getElementById("messagingShell");
+
+    function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+
+    const allowedTypes = ["Own", "Other", "Comment", "Notification"];
+    const typeParam = urlParams.get("type") || shellEl?.dataset.type;
+    const isIndividualUser = @isIndividualUser.ToString().ToLowerInvariant();
+    const isCorporateUser = !isIndividualUser;
+    let initialType = normalizeTypeParam(typeParam) || "Own";
+    if (isIndividualUser && initialType === "Own") {
+        initialType = "Other";
+    }
+    const initialOtherParam = urlParams.get("other") || shellEl?.dataset.other;
+    const listingParam = urlParams.get("listingId") || shellEl?.dataset.listingId;
+    const initialListingId = listingParam ? parseInt(listingParam, 10) : null;
+    const hasExplicitOther = Boolean(initialOtherParam);
+    const hasExplicitListing = listingParam !== null && listingParam !== undefined && listingParam !== "";
+
+    const state = {
+        me: urlParams.get("me") || shellEl?.dataset.me || "demo-user",
+        other: initialOtherParam || "other-user",
+        listingId: Number.isFinite(initialListingId) ? initialListingId : null,
+        activeType: initialType,
+        page: 1,
+        pageSize: 20,
+        hasMore: true,
+        loadingThread: false,
+        loadingList: false,
+        messages: [],
+        unreadCounts: { Own: 0, Other: 0, Comment: 0, Notification: 0 },
+        conversations: [],
+        userDirectory: {},
+        lastMarkedKey: null,
+        autoReadSuspended: false,
+        skipNextAutoRead: false
+    };
+
+    const messageTypes = [
+        { key: "Own", label: "İlanlarım", value: 0 },
+        { key: "Other", label: "İlgilendiğim İlanlar", value: 1 },
+        { key: "Comment", label: "Yorumlar", value: 2 },
+        { key: "Notification", label: "Sistem Bildirimleri", value: 3 }
+    ];
+
+    const typeLabels = messageTypes.reduce((acc, type) => {
+        acc[type.key] = type.label;
+        return acc;
+    }, {});
+
+    const typeToValue = messageTypes.reduce((acc, type) => {
+        acc[type.key] = type.value;
+        return acc;
+    }, {});
+
+    const shell = document.getElementById("messagingShell");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const statusText = document.getElementById("statusText");
+    const threadList = document.getElementById("threadList");
+    const loadMoreBtn = document.createElement("button");
+    loadMoreBtn.id = "loadMoreBtn";
+    loadMoreBtn.className = "btn btn-sm btn-light rounded-pill border px-3";
+    loadMoreBtn.textContent = "Daha fazla yükle";
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const markReadBtn = document.getElementById("markReadBtn");
+    const undoReadBtn = document.getElementById("undoReadBtn");
+    const tabRow = document.getElementById("tabRow");
+    const threadTitle = document.getElementById("threadTitle");
+    const threadSubtitle = document.getElementById("threadSubtitle");
+    const threadAvatar = document.getElementById("threadAvatar");
+    const conversationList = document.getElementById("conversationList");
+    const conversationSearch = document.getElementById("conversationSearch");
+    const conversationCount = document.getElementById("conversationCount");
+    const listingPrice = document.getElementById("listingPrice");
+    const listingCode = document.getElementById("listingCode");
+    const listingLocation = document.getElementById("listingLocation");
+    const listingGoLink = document.getElementById("listingGoLink");
+    const listingContextBar = document.getElementById("listingContextBar");
+    const listingAreaMini = document.getElementById("listingAreaMini");
+    const listingAdaMini = document.getElementById("listingAdaMini");
+    const listingParselMini = document.getElementById("listingParselMini");
+    const listingTypeMini = document.getElementById("listingTypeMini");
+    const currentUserInput = document.getElementById("currentUserInput");
+    const otherUserInput = document.getElementById("otherUserInput");
+    const applyUsersBtn = document.getElementById("applyUsersBtn");
+    const openOtherTabBtn = document.getElementById("openOtherTabBtn");
+    const emojiToggle = document.getElementById("emojiToggle");
+    const emojiPanel = document.getElementById("emojiPanel");
+    const backToListBtn = document.getElementById("backToListBtn");
+
+    let pollHandle = null;
+
+    function normalizeTypeParam(value) {
+        if (!value) return null;
+        const match = allowedTypes.find(type => type.toLowerCase() === value.toLowerCase());
+        return match || null;
+    }
+
+    function setStatus(message, tone) {
+        // Show toast for important actions
+        if (tone === 'success' || tone === 'info') {
+            showToast(message, tone ||'info');
+        }
+        // Update hidden status text for debugging if needed
+        if(statusText) statusText.textContent = message;
+    }
+    
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('class', 'toast-icon');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '2');
+        
+        if (type === 'success') {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M20 6L9 17l-5-5');
+            icon.appendChild(path);
+        } else {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', '12');
+            circle.setAttribute('cy', '12');
+            circle.setAttribute('r', '10');
+            icon.appendChild(circle);
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M12 16v-4M12 8h.01');
+            icon.appendChild(path);
+        }
+        
+        const text = document.createElement('span');
+        text.textContent = message;
+        
+        toast.appendChild(icon);
+        toast.appendChild(text);
+        container.appendChild(toast);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function getMessageDateValue(message) {
+        if (!message) return "";
+        if (typeof message !== "object") return message;
+        const value = message.createdOnUtc
+            || message.createdOnUTC
+            || message.createdAt
+            || message.createdOn
+            || message.createdAtUtc
+            || message.createdUTC
+            || "";
+        return normalizeDateValue(value);
+    }
+
+    function normalizeDateValue(value) {
+        if (!value) return "";
+        if (value instanceof Date) return value;
+        if (typeof value !== "string") return value;
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value)) {
+            return value.replace(" ", "T") + "Z";
+        }
+        return value;
+    }
+
+    function formatMessageTime(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        const today = new Date();
+        const isToday = date.toDateString() === today.toDateString();
+        return isToday
+            ? date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" })
+            : date.toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", timeZone: "Europe/Istanbul" });
+    }
+
+    function formatListTime(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        const today = new Date();
+        const isToday = date.toDateString() === today.toDateString();
+        return isToday
+            ? date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" })
+            : date.toLocaleDateString("tr-TR", { timeZone: "Europe/Istanbul" });
+    }
+
+    function normalizeMessageType(value) {
+        if (value === null || value === undefined) return null;
+        if (typeof value === "number") {
+            return messageTypes[value] ? messageTypes[value].key : value;
+        }
+        if (typeof value === "string") {
+            if (typeLabels[value]) return value;
+            const asNumber = Number(value);
+            if (!Number.isNaN(asNumber) && messageTypes[asNumber]) {
+                return messageTypes[asNumber].key;
+            }
+            return value;
+        }
+        return value;
+    }
+
+    function normalizeStatus(value) {
+        if (value === null || value === undefined) return null;
+        if (typeof value === "number") {
+            return value === 0 ? "Sent" : value === 1 ? "Delivered" : value === 2 ? "Read" : value.toString();
+        }
+        const text = value.toString();
+        const lower = text.toLowerCase();
+        if (lower === "pending") return "Sent";
+        if (lower === "sent") return "Sent";
+        if (lower === "delivered") return "Delivered";
+        if (lower === "read") return "Read";
+        if (lower === "failed") return "Failed";
+        return text;
+    }
+
+    function normalizeAvatarUrl(url) {
+        if (!url) return "";
+        if (url.startsWith("http")) return url;
+        if (url.startsWith("/")) return url;
+        return `/${url}`;
+    }
+
+    function registerUserInfo(userId, fullName, email, avatarUrl) {
+        if (!userId) return;
+        state.userDirectory[userId] = {
+            fullName: fullName || state.userDirectory[userId]?.fullName || "",
+            email: email || state.userDirectory[userId]?.email || "",
+            avatarUrl: avatarUrl || state.userDirectory[userId]?.avatarUrl || ""
+        };
+    }
+
+    function getDisplayName(userId) {
+        if (userId === "demo-user") return "Siz";
+        if (userId === "other-user") return "Ali Yılmaz";
+        if (userId === "other-user-2") return "Ayşe Demir";
+        const info = state.userDirectory[userId];
+        if (info?.fullName) return info.fullName;
+        if (info?.email) return info.email;
+        if (userId) return userId.slice(0, 8);
+        return "Kullanıcı";
+    }
+
+    function getInitials(userId) {
+        const name = getDisplayName(userId) || "K";
+        const parts = name.split(" ").filter(Boolean);
+        const first = parts[0]?.[0] || "K";
+        const second = parts[1]?.[0] || "";
+        return (first + second).toUpperCase();
+    }
+
+    function getTickState(message) {
+        if (message.senderId !== state.me) return null;
+        const status = normalizeStatus(message.status);
+        if (status === "Sent" || status === "Failed") return "single";
+        if (status === "Read") return "read";
+        return "double";
+    }
+
+    function formatDateSeparator(dateValue) {
+        const date = new Date(dateValue);
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleString("tr-TR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "Europe/Istanbul"
+        });
+    }
+
+    function setView(view) {
+        if (!shell) return;
+        shell.setAttribute("data-view", view);
+    }
+
+    function isNearBottom(element) {
+        if (!element) return true;
+        return element.scrollHeight - element.scrollTop - element.clientHeight < 80;
+    }
+
+    function scrollToBottom(element) {
+        if (!element) return;
+        element.scrollTop = element.scrollHeight;
+    }
+
+    async function fetchJson(url, options) {
+        const baseHeaders = {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            Pragma: "no-cache"
+        };
+        const mergedHeaders = { ...baseHeaders, ...(options && options.headers ? options.headers : {}) };
+        const response = await fetch(url, { cache: "no-store", ...options, headers: mergedHeaders });
+        const contentType = response.headers.get("content-type") || "";
+        const data = contentType.includes("application/json") ? await response.json() : null;
+        if (!response.ok) {
+            const errorMessage = data && (data.error || data.message)
+                ? data.error || data.message
+                : `İstek başarısız (${response.status})`;
+            throw new Error(errorMessage);
+        }
+        return data;
+    }
+
+    function setActiveTab(typeKey, updateUrl = true) {
+        state.activeType = typeKey;
+        tabRow.querySelectorAll(".tyn-tab-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.dataset.type === typeKey);
+            if (btn.dataset.type === typeKey && btn.dataset.color) {
+                const accent = btn.dataset.color.trim();
+                btn.style.borderColor = accent;
+                btn.style.color = accent;
+                btn.style.backgroundColor = toRgba(accent, 0.12);
+            } else {
+                btn.style.borderColor = "";
+                btn.style.color = "";
+                btn.style.backgroundColor = "";
+            }
+        });
+        updateListingVisibility(typeKey);
+        if (updateUrl) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("type", typeKey);
+            if (state.listingId) {
+                url.searchParams.set("listingId", state.listingId.toString());
+            } else {
+                url.searchParams.delete("listingId");
+            }
+            window.history.replaceState({}, "", `${url.pathname}?${url.searchParams.toString()}`);
+        }
+    }
+
+    function updateListingVisibility(typeKey) {
+        const show = typeKey === "Own" || typeKey === "Other";
+        if (listingContextBar) {
+            listingContextBar.classList.toggle("is-hidden", !show);
+        }
+        if (!show) {
+            updateListingPanel(null);
+        }
+    }
+
+    function toRgba(color, alpha) {
+        if (color.startsWith("rgb")) return color.replace("rgb", "rgba").replace(")", `, ${alpha})`);
+        const hex = color.replace("#", "");
+        if (hex.length !== 6) return color;
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+
+    function updateHeader() {
+        threadTitle.textContent = getDisplayName(state.other);
+        if(threadSubtitle) threadSubtitle.textContent = "";
+        const info = state.userDirectory[state.other];
+        if (info?.avatarUrl) {
+            threadAvatar.innerHTML = `<img src="${info.avatarUrl}" alt="">`;
+        } else {
+            threadAvatar.textContent = getInitials(state.other);
+        }
+    }
+
+    function normalizeApiData(data) {
+        if (!data) return null;
+        return data.data || data.Data || data;
+    }
+
+    function slugify(value) {
+        if (!value) return "";
+        const map = { "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u" };
+        return value
+            .toLowerCase()
+            .replace(/[çğıöşü]/g, match => map[match] || match)
+            .replace(/[^a-z0-9\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+    }
+
+    function formatPrice(value) {
+        const num = typeof value === "number" ? value : parseFloat(value);
+        if (!Number.isFinite(num)) return "—";
+        return `${num.toLocaleString("tr-TR")} ₺`;
+    }
+
+    function updateListingPanel(details) {
+        if (!listingPrice || !listingCode || !listingLocation) return;
+
+        if (!details) {
+            listingPrice.textContent = "—";
+            listingCode.textContent = "—";
+            listingLocation.textContent = "—";
+            if (listingAreaMini) listingAreaMini.textContent = "—";
+            if (listingAdaMini) listingAdaMini.textContent = "—";
+            if (listingParselMini) listingParselMini.textContent = "—";
+            if (listingTypeMini) listingTypeMini.textContent = "—";
+            if (listingGoLink) listingGoLink.setAttribute("href", "#");
+            return;
+        }
+
+        listingPrice.textContent = formatPrice(details.price);
+        listingCode.textContent = details.ilanNo || "—";
+        const location = details.sehir
+            ? (details.semt ? `${details.sehir} / ${details.semt}` : details.sehir)
+            : (details.konum || "—");
+        listingLocation.textContent = location;
+        if (listingAreaMini) listingAreaMini.textContent = details.area ?? details.Area ?? details.netMetrekare ?? details.NetMetrekare ?? "—";
+        if (listingAdaMini) listingAdaMini.textContent = details.adaNo ?? details.AdaNo ?? "—";
+        if (listingParselMini) listingParselMini.textContent = details.parselNo ?? details.ParselNo ?? "—";
+        if (listingTypeMini) listingTypeMini.textContent = details.mulkTipi ?? details.MulkTipi ?? details.mulkTipiArsa ?? details.MulkTipiArsa ?? details.arsaDurumu ?? details.ArsaDurumu ?? "—";
+
+        if (listingGoLink && details.id) {
+            listingGoLink.setAttribute("href", `/Ilan/ilansayfasi/${details.id}`);
+        }
+    }
+
+    async function loadListingDetails() {
+        if (!state.listingId) {
+            updateListingPanel(null);
+            return;
+        }
+
+        try {
+            const response = await fetchJson(`/api/v1/announcements/${state.listingId}`);
+            const payload = normalizeApiData(response);
+            const announcement = payload && (payload.announcement || payload.Announcement);
+            if (!announcement) {
+                updateListingPanel(null);
+                return;
+            }
+            updateListingPanel({
+                id: announcement.id ?? announcement.Id,
+                price: announcement.price ?? announcement.Price,
+                ilanNo: announcement.ilanNo ?? announcement.IlanNo,
+                sehir: announcement.sehir ?? announcement.Sehir,
+                semt: announcement.semt ?? announcement.Semt,
+                konum: announcement.konum ?? announcement.Konum,
+                title: announcement.title ?? announcement.Title,
+                area: announcement.area ?? announcement.Area,
+                AdaNo: announcement.AdaNo ?? announcement.adaNo,
+                ParselNo: announcement.ParselNo ?? announcement.parselNo,
+                MulkTipi: announcement.MulkTipi ?? announcement.mulkTipi,
+                MulkTipiArsa: announcement.MulkTipiArsa ?? announcement.mulkTipiArsa,
+                ArsaDurumu: announcement.ArsaDurumu ?? announcement.arsaDurumu,
+                Category: announcement.Category ?? announcement.category,
+                FirstName: announcement.FirstName ?? announcement.firstName,
+                LastName: announcement.LastName ?? announcement.lastName,
+                Email: announcement.Email ?? announcement.email,
+                PhoneNumber: announcement.PhoneNumber ?? announcement.phoneNumber
+            });
+
+            const ownerFirst = announcement.firstName ?? announcement.FirstName;
+            const ownerLast = announcement.lastName ?? announcement.LastName;
+            const ownerEmail = announcement.email ?? announcement.Email;
+            const ownerFullName = [ownerFirst, ownerLast].filter(Boolean).join(" ").trim();
+            if (ownerFullName || ownerEmail) {
+                registerUserInfo(state.other, ownerFullName, ownerEmail, null);
+                updateHeader();
+                renderConversationList();
+            }
+        } catch (error) {
+            updateListingPanel(null);
+        }
+    }
+
+    function resetThread() {
+        state.page = 1;
+        state.messages = [];
+        state.hasMore = true;
+        state.lastMarkedKey = null;
+    }
+
+    function updateUnreadBadges() {
+        messageTypes.forEach(type => {
+            const badge = document.querySelector(`[data-badge="${type.key}"]`);
+            if (badge) {
+                const value = state.unreadCounts[type.key] ?? 0;
+                badge.textContent = value.toString();
+            }
+        });
+
+    }
+
+    function renderConversationList() {
+        conversationList.innerHTML = "";
+        const query = conversationSearch.value.trim().toLowerCase();
+        const items = state.conversations.filter(conv => {
+            if (!query) return true;
+            return conv.label.toLowerCase().includes(query) || conv.preview.toLowerCase().includes(query);
+        });
+
+        if(conversationCount) conversationCount.textContent = items.length ? `${items.length}` : "0";
+
+        if (state.loadingList) {
+            conversationList.innerHTML = '<div class="p-4 text-center text-muted small">Yükleniyor...</div>';
+            return;
+        }
+
+        if (!items.length) {
+            conversationList.appendChild(document.createElement("div"));
+            return;
+        }
+
+        items.forEach(conversation => {
+            const wrapper = document.createElement("div");
+            const isActive = conversation.id === state.other && conversation.listingId === state.listingId;
+            wrapper.className = "conversation-item" + (isActive ? " active" : "");
+            wrapper.addEventListener("click", () => {
+                if (conversation.id === state.other && conversation.listingId === state.listingId && conversation.messageType === state.activeType) {
+                    if (shell?.getAttribute("data-view") === "list" && window.innerWidth < 992) {
+                        setView("thread");
+                    }
+                    return;
+                }
+                const nextType = conversation.messageType || state.activeType;
+                setActiveTab(nextType);
+                state.other = conversation.id;
+                state.listingId = conversation.listingId ?? null;
+                state.autoReadSuspended = false;
+                state.skipNextAutoRead = false;
+                resetThread();
+                loadAll();
+                if (window.innerWidth < 992) {
+                    setView("thread");
+                }
+            });
+
+            const avatar = document.createElement("div");
+            avatar.className = "tyn-avatar small";
+            if (conversation.avatarUrl) {
+                avatar.innerHTML = `<img src="${conversation.avatarUrl}" alt="">`;
+            } else {
+                avatar.textContent = getInitials(conversation.id);
+            }
+
+            const info = document.createElement("div");
+            info.className = "conversation-info";
+
+            const title = document.createElement("div");
+            title.className = "conversation-title";
+            title.innerHTML = `<span>${conversation.label}</span> <span class="conversation-time">${conversation.time}</span>`;
+
+            const preview = document.createElement("div");
+            preview.className = "conversation-preview";
+            preview.textContent = conversation.preview;
+
+            const meta = document.createElement("div");
+            meta.className = "conversation-meta";
+            if (conversation.unread > 0) {
+                 meta.innerHTML = `<span class="badge bg-primary rounded-pill">${conversation.unread} yeni</span>`;
+            } else {
+                 meta.innerHTML = `<span></span>`;
+            }
+
+            info.appendChild(title);
+            info.appendChild(preview);
+            info.appendChild(meta);
+
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(info);
+
+            conversationList.appendChild(wrapper);
+        });
+    }
+
+    function renderMessages(target, items) {
+        target.innerHTML = "";
+        
+        if (target === threadList) {
+             const btnCont = document.createElement("div");
+             btnCont.className = "text-center mb-3";
+             btnCont.appendChild(loadMoreBtn);
+             target.appendChild(btnCont);
+             loadMoreBtn.classList.toggle("d-none", !state.hasMore);
+        }
+
+        if (state.loadingThread && !items.length) {
+            target.innerHTML = '<div class="p-4 text-center text-muted small">Yükleniyor...</div>';
+            return;
+        }
+
+        if (!items.length && !state.loadingThread) {
+            target.appendChild(document.createElement("div"));
+            return;
+        }
+
+        let lastDateKey = null;
+        items.forEach(message => {
+            const dateValue = getMessageDateValue(message);
+            const date = new Date(dateValue);
+            const dateKey = Number.isNaN(date.getTime())
+                ? null
+                : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+            if (dateKey && dateKey !== lastDateKey) {
+                const separator = document.createElement("div");
+                separator.className = "chat-date-separator";
+                separator.textContent = formatDateSeparator(dateValue);
+                target.appendChild(separator);
+                lastDateKey = dateKey;
+            }
+
+            const row = document.createElement("div");
+            const isMine = message.senderId === state.me;
+            row.className = `chat-row ${isMine ? "outgoing" : "incoming"}`;
+
+            const avatar = document.createElement("div");
+            avatar.className = "chat-avatar small";
+            const senderInfo = state.userDirectory[message.senderId];
+            const avatarUrl = senderInfo?.avatarUrl ? normalizeAvatarUrl(senderInfo.avatarUrl) : "";
+            if (avatarUrl) {
+                avatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
+            } else {
+                avatar.textContent = getInitials(message.senderId);
+            }
+
+            const bubble = document.createElement("div");
+            bubble.className = "chat-bubble";
+            bubble.textContent = message.body;
+
+            const meta = document.createElement("div");
+            meta.className = "chat-meta";
+
+            const tickState = getTickState(message);
+            let tickHtml = "";
+            if (tickState) {
+                if (tickState === "single") {
+                    tickHtml = "<span class=\"tick-icon\" title=\"Gönderildi\">✓</span>";
+                } else if (tickState === "read") {
+                    tickHtml = "<span class=\"tick-icon double read\" title=\"Okundu\"><span>✓</span><span>✓</span></span>";
+                } else {
+                    tickHtml = "<span class=\"tick-icon double\" title=\"Teslim edildi\"><span>✓</span><span>✓</span></span>";
+                }
+            }
+
+            meta.innerHTML = `
+                <span>${formatMessageTime(getMessageDateValue(message))}</span>
+                ${tickHtml}
+            `;
+
+            bubble.appendChild(meta);
+
+            if (!isMine) {
+                row.appendChild(avatar);
+                row.appendChild(bubble);
+            } else {
+                row.appendChild(bubble);
+            }
+
+            target.appendChild(row);
+        });
+    }
+
+    async function loadUnreadCounts() {
+        try {
+            const data = await fetchJson(`${apiBase}/unread-counts?CurrentUserId=${encodeURIComponent(state.me)}`);
+            state.unreadCounts = data && data.counts ? data.counts : { Own: 0, Other: 0, Comment: 0, Notification: 0 };
+            updateUnreadBadges();
+        } catch (error) {
+            setStatus(error.message, "error");
+        }
+    }
+
+    async function loadMessages(append) {
+        if (!state.hasMore && append) return;
+
+        const stickToBottom = isNearBottom(threadList) || !threadList.children.length;
+        state.loadingThread = !append && state.messages.length === 0;
+        if (!append) renderMessages(threadList, state.messages);
+
+        try {
+            let items = [];
+            const params = new URLSearchParams({
+                UserId: state.me,
+                OtherUserId: state.other,
+                Page: state.page.toString(),
+                PageSize: state.pageSize.toString(),
+                MessageType: typeToValue[state.activeType].toString()
+            });
+            if (state.listingId) {
+                params.set("ListingId", state.listingId.toString());
+            }
+            const data = await fetchJson(`${apiBase}?${params.toString()}`);
+            items = data && data.items ? data.items : [];
+            const ordered = items.slice().reverse();
+            if (append) {
+                state.messages = ordered.concat(state.messages);
+            } else {
+                state.messages = ordered;
+            }
+            state.hasMore = items.length === state.pageSize;
+            state.loadingThread = false;
+            renderMessages(threadList, state.messages);
+            
+            if (!append && stickToBottom) {
+                scrollToBottom(threadList);
+            }
+            setStatus(`${state.messages.length} mesaj`);
+            if (!append) {
+                if (state.skipNextAutoRead) {
+                    state.skipNextAutoRead = false;
+                } else {
+                    markReadIfNeeded();
+                }
+            }
+        } catch (error) {
+            state.loadingThread = false;
+            renderMessages(threadList, []);
+            setStatus(error.message, "error");
+        }
+    }
+
+    async function markReadIfNeeded() {
+        if (!state.other) return;
+        if (state.activeType === "Comment" || state.activeType === "Notification") return;
+        if (state.autoReadSuspended) return;
+        const key = `${state.me}|${state.other}|${state.activeType}|${state.listingId ?? "none"}`;
+        if (state.lastMarkedKey === key) return;
+        state.lastMarkedKey = key;
+        try {
+            await fetchJson(`${apiBase}/mark-read`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ readerId: state.me, otherUserId: state.other, listingId: state.listingId })
+            });
+            await loadUnreadCounts();
+            await loadConversations();
+        } catch (error) {
+            setStatus(error.message, "error");
+        }
+    }
+
+    async function loadConversations() {
+        state.loadingList = true;
+        renderConversationList();
+
+        try {
+            let items = [];
+            const params = new URLSearchParams({
+                UserId: state.me,
+                MessageType: typeToValue[state.activeType].toString()
+            });
+            const data = await fetchJson(`${apiBase}/conversations?${params.toString()}`);
+            items = data && data.items ? data.items : [];
+            state.conversations = items.map(item => {
+                const typeKey = normalizeMessageType(item.messageType) || state.activeType;
+                registerUserInfo(item.otherUserId, item.otherUserFullName, item.otherUserEmail, item.otherUserAvatarUrl);
+                return {
+                    id: item.otherUserId,
+                    label: getDisplayName(item.otherUserId),
+                    avatarUrl: item.otherUserAvatarUrl || "",
+                    preview: item.lastMessagePreview || "Yeni konuşma.",
+                    time: item.lastMessageAtUtc ? formatListTime(item.lastMessageAtUtc) : "",
+                    lastDate: item.lastMessageAtUtc,
+                    unread: item.unreadCount || 0,
+                    messageType: typeKey,
+                    listingId: item.listingId ?? null
+                };
+            });
+
+            state.conversations.sort((a, b) => new Date(b.lastDate || 0) - new Date(a.lastDate || 0));
+
+            const activeConversation = state.conversations.find(
+                conv => conv.id === state.other && conv.listingId === state.listingId
+            );
+
+            if (!activeConversation && !hasExplicitOther && !hasExplicitListing && state.conversations.length > 0) {
+                state.other = state.conversations[0].id;
+                state.listingId = state.conversations[0].listingId ?? null;
+            } else if (activeConversation) {
+                state.other = activeConversation.id;
+                state.listingId = activeConversation.listingId ?? null;
+            }
+
+            state.loadingList = false;
+            renderConversationList();
+        } catch (error) {
+            state.loadingList = false;
+            renderConversationList();
+            setStatus(error.message, "error");
+        }
+    }
+
+    async function loadAll() {
+        await loadUnreadCounts();
+        await loadConversations();
+        updateHeader();
+        updateListingVisibility(state.activeType);
+        await loadMessages(false);
+        await loadListingDetails();
+    }
+
+    async function sendMessage() {
+        const input = messageInput;
+        const body = input.value.trim();
+        if (!body) return;
+
+        sendBtn.disabled = true;
+
+        try {
+            const payload = {
+                senderId: state.me,
+                recipientId: state.other,
+                body,
+                messageType: typeToValue[state.activeType]
+            };
+            if (state.listingId) {
+                payload.listingId = state.listingId;
+            }
+
+            const result = await fetchJson(apiBase, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (result && result.isSuccess === false) {
+                throw new Error(result.error || "Mesaj gönderilemedi.");
+            }
+
+            input.value = "";
+            resetThread();
+            await loadAll();
+            scrollToBottom(threadList);
+            setStatus("Mesaj gönderildi", "success");
+        } catch (error) {
+            setStatus(error.message, "error");
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    async function markConversationAsRead() {
+        markReadBtn.classList.add("is-busy");
+        markReadBtn.disabled = true;
+        try {
+            await fetchJson(`${apiBase}/mark-read`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ readerId: state.me, otherUserId: state.other, listingId: state.listingId })
+            });
+            state.autoReadSuspended = false;
+            resetThread();
+            await loadAll();
+            setStatus("Okundu olarak işaretlendi", "success");
+        } catch (error) {
+            setStatus(error.message, "error");
+        } finally {
+            markReadBtn.disabled = false;
+            markReadBtn.classList.remove("is-busy");
+        }
+    }
+
+    async function undoConversationRead() {
+        undoReadBtn.classList.add("is-busy");
+        undoReadBtn.disabled = true;
+        try {
+            state.autoReadSuspended = true;
+            state.skipNextAutoRead = true;
+            await fetchJson(`${apiBase}/undo-read`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ readerId: state.me, otherUserId: state.other, listingId: state.listingId, messageIds: null })
+            });
+            resetThread();
+            await loadAll();
+            setStatus("Okunmadı olarak işaretlendi", "info");
+        } catch (error) {
+            setStatus(error.message, "error");
+        } finally {
+            undoReadBtn.disabled = false;
+            undoReadBtn.classList.remove("is-busy");
+        }
+    }
+
+    function startPolling() {
+        if (pollHandle) return;
+        pollHandle = window.setInterval(() => {
+            loadUnreadCounts();
+            loadConversations();
+            if (state.page === 1) {
+                loadMessages(false);
+            }
+        }, 3000);
+    }
+
+    function bindEvents() {
+        tabRow.querySelectorAll(".tyn-tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (btn.classList.contains("is-disabled")) {
+                    showToast("Yakında", "info");
+                    return;
+                }
+                if (btn.dataset.type === "Other" && isCorporateUser && state.activeType === "Own" && state.listingId) {
+                    window.location.href = `/messages?me=${encodeURIComponent(state.me)}&type=Other`;
+                    return;
+                }
+                setActiveTab(btn.dataset.type);
+                resetThread();
+                loadAll();
+            });
+        });
+
+        loadMoreBtn.addEventListener("click", () => {
+            state.page += 1;
+            loadMessages(true);
+        });
+
+        sendBtn.addEventListener("click", () => sendMessage());
+
+        messageInput.addEventListener("keydown", event => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        markReadBtn.addEventListener("click", markConversationAsRead);
+        undoReadBtn.addEventListener("click", undoConversationRead);
+        refreshBtn.addEventListener("click", () => {
+            resetThread();
+            loadAll();
+        });
+
+        conversationSearch.addEventListener("input", renderConversationList);
+
+        currentUserInput.value = state.me;
+        otherUserInput.value = state.other;
+
+        applyUsersBtn.addEventListener("click", () => {
+            const me = currentUserInput.value.trim() || "demo-user";
+            const other = otherUserInput.value.trim() || "other-user";
+            const url = new URL(window.location.href);
+            url.searchParams.set("me", me);
+            url.searchParams.set("other", other);
+            url.searchParams.set("type", state.activeType);
+            if (state.listingId) {
+                url.searchParams.set("listingId", state.listingId.toString());
+            } else {
+                url.searchParams.delete("listingId");
+            }
+            window.location.href = url.toString();
+        });
+
+        openOtherTabBtn.addEventListener("click", () => {
+            const me = currentUserInput.value.trim() || "demo-user";
+            const other = otherUserInput.value.trim() || "other-user";
+            const url = new URL(window.location.href);
+            url.searchParams.set("me", other);
+            url.searchParams.set("other", me);
+            url.searchParams.set("type", state.activeType);
+            if (state.listingId) {
+                url.searchParams.set("listingId", state.listingId.toString());
+            } else {
+                url.searchParams.delete("listingId");
+            }
+            window.open(url.toString(), "_blank");
+        });
+
+        emojiToggle.addEventListener("click", event => {
+            event.stopPropagation();
+            emojiPanel.classList.toggle("open");
+        });
+
+        emojiPanel.addEventListener("click", event => {
+            if (event.target.tagName !== "BUTTON") return;
+            messageInput.value += event.target.textContent;
+            messageInput.focus();
+            emojiPanel.classList.remove("open");
+        });
+
+        document.addEventListener("click", event => {
+            if (!emojiPanel.contains(event.target) && event.target !== emojiToggle) {
+                emojiPanel.classList.remove("open");
+            }
+        });
+
+        backToListBtn.addEventListener("click", () => {
+            if (window.innerWidth < 992) {
+                markReadIfNeeded()
+                    .finally(() => { window.location.href = "/messages"; });
+                return;
+            }
+            setView("list");
+            loadUnreadCounts();
+            loadConversations();
+        });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 992) {
+                setView("list");
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        setActiveTab(state.activeType, false);
+        bindEvents();
+        startPolling();
+        loadAll();
+        if (window.innerWidth < 992 && (hasExplicitOther || hasExplicitListing)) {
+            setView("thread");
+        }
+    });
+</script>

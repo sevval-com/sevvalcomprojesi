@@ -6,9 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Sevval.Api;
+using Sevval.Api.Services;
 using Sevval.Application;
 using Sevval.Application.Exceptions;
 using Sevval.Application.Features.Common;
+using Sevval.Application.Interfaces.Messaging;
 using Sevval.Application.Utilities;
 using Sevval.Domain.Entities;
 using Sevval.Infrastructure;
@@ -109,6 +111,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddMapper();
 builder.Services.AddApplication();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped<IRealTimeNotifier, NullRealTimeNotifier>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

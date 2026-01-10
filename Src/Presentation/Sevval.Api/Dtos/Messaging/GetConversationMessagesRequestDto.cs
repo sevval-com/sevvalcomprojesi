@@ -1,3 +1,5 @@
+using Sevval.Domain.Messaging;
+
 namespace Sevval.Api.Dtos.Messaging;
 
 public class GetConversationMessagesRequestDto
@@ -9,4 +11,8 @@ public class GetConversationMessagesRequestDto
     public int Page { get; set; } = 1;
 
     public int PageSize { get; set; } = 50;
+
+    public MessageType? MessageType { get; set; }
+
+    public int? ListingId { get; set; }
 }

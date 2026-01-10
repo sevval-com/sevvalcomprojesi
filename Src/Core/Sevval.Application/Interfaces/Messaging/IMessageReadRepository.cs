@@ -1,3 +1,4 @@
+using Sevval.Domain.Messaging;
 using MessagingMessage = Sevval.Domain.Messaging.Message;
 
 namespace Sevval.Application.Interfaces.Messaging;
@@ -12,6 +13,8 @@ public interface IMessageReadRepository
         string participantBId,
         int page,
         int pageSize,
+        MessageType? messageType,
+        int? listingId,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -21,5 +24,13 @@ public interface IMessageReadRepository
         string senderId,
         DateTime fromUtcInclusive,
         DateTime toUtcExclusive,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Returns conversation summaries ordered by last activity (newest first).
+    /// </summary>
+    Task<IReadOnlyList<ConversationSummary>> GetConversationsAsync(
+        string userId,
+        MessageType? messageType,
         CancellationToken cancellationToken);
 }

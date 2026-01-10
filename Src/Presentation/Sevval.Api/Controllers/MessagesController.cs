@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,9 @@ namespace Sevval.Api.Controllers
             {
                 SenderId = request.SenderId,
                 RecipientId = request.RecipientId,
-                Body = request.Body
+                Body = request.Body,
+                MessageType = request.MessageType ?? Sevval.Domain.Messaging.MessageType.Other,
+                ListingId = request.ListingId
             };
 
             var result = await _mediator.Send(command, cancellationToken);
@@ -43,13 +46,19 @@ namespace Sevval.Api.Controllers
                     Error = result.Error
                 };
 
-                return StatusCode(StatusCodes.Status429TooManyRequests, failureResponse);
+                return result.Error switch
+                {
+                    "ListingNotFound" => StatusCode(StatusCodes.Status404NotFound, failureResponse),
+                    "ListingOwnerNotFound" => StatusCode(StatusCodes.Status400BadRequest, failureResponse),
+                    "ListingOwnerMismatch" => StatusCode(StatusCodes.Status403Forbidden, failureResponse),
+                    _ => StatusCode(StatusCodes.Status429TooManyRequests, failureResponse)
+                };
             }
 
             var successResponse = new SendMessageResponseDto
             {
-                MessageId = result.MessageId,
-                CreatedOnUtc = result.CreatedOnUtc,
+                MessageId = result.MessageId ?? Guid.Empty,
+                CreatedOnUtc = result.CreatedOnUtc ?? DateTime.UtcNow,
                 Status = result.Status.ToString(),
                 IsSuccess = true
             };
@@ -66,7 +75,9 @@ namespace Sevval.Api.Controllers
                 UserId = request.UserId,
                 OtherUserId = request.OtherUserId,
                 Page = request.Page,
-                PageSize = request.PageSize
+                PageSize = request.PageSize,
+                MessageType = request.MessageType,
+                ListingId = request.ListingId
             };
 
             var result = await _mediator.Send(query, cancellationToken);
@@ -79,12 +90,13 @@ namespace Sevval.Api.Controllers
                         Id = m.Id,
                         SenderId = m.SenderId,
                         RecipientId = m.RecipientId,
-                        Body = m.Body,
-                        CreatedOnUtc = m.CreatedOnUtc,
-                        Status = m.Status.ToString()
-                    })
-                    .ToList()
-            };
+                    Body = m.Body,
+                    CreatedOnUtc = m.CreatedOnUtc,
+                    Status = m.IsRead ? "Read" : m.Status.ToString(),
+                    MessageType = m.MessageType.ToString()
+                })
+                .ToList()
+        };
 
             return Ok(response);
         }

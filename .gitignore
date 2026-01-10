@@ -516,3 +516,6 @@ apply_video_approval_migration.sql
 
 # prevent accidental api push
 emlakdrone-api-main/
+
+# user uploads
+Src/Presentation/Sevval.Web/wwwroot/uploads/

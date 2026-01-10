@@ -19,6 +19,7 @@ namespace Sevval.Persistence
             services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
             services.AddScoped<IMessageReadRepository, MessageRepository>();
             services.AddScoped<IMessageWriteRepository, MessageRepository>();
+            services.AddScoped<IMessageReadStateRepository, MessageReadStateRepository>();
 
             return services;
         }
