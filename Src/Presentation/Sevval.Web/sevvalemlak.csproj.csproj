@@ -59,6 +59,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Sevval.Infrastructure\Sevval.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Core\Sevval.Mapper\Sevval.Mapper.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Sevval.Persistence\Sevval.Persistence.csproj" />
   </ItemGroup>
 
